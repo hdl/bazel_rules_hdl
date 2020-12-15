@@ -144,6 +144,7 @@ genlex(
 cc_binary(
     name = "wc",
     srcs = ["wc.c"],
+    copts = ["-w"],
 )
 
 sh_test(
