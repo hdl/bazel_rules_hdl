@@ -11,15 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Wrapper script for Python scripts in the Skywater PDK.
 
+This is a workaround to allow running scripts that use relative imports even
+though Bazel doesn't run Python binaries with the -m parameter that's required
+to make relative imports work.
+"""
 
-# The structure for adding a third_party dependency is to create a folder in this
-# directory that will contain the build rules and workspace rules required to import
-# it.
-load("//dependency_support/at_clifford_yosys:at_clifford_yosys.bzl", "at_clifford_yosys")
-load("//dependency_support/com_google_skywater_pdk:com_google_skywater_pdk.bzl", "com_google_skywater_pdk")
-
-
-def dependency_support():
-  at_clifford_yosys()
-  com_google_skywater_pdk()
+from skywater_pdk.liberty import main
+main()
