@@ -29,6 +29,6 @@ def org_gnu_m4():
         sha256 = "f2c1e86ca0a404ff281631bdc8377638992744b175afb806e25871a24a934e07",
         build_file = Label("//dependency_support:org_gnu_m4/bundled.BUILD.bazel"),
         patches = [
-            "@com_google_bazel_rules_hdl//dependency_support/org_gnu_m4:no_freadahead.patch",
+            "@rules_hdl//dependency_support/org_gnu_m4:no_freadahead.patch",
         ],
     )

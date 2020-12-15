@@ -18,9 +18,9 @@
 
 package(default_visibility = ["//visibility:private"])
 
-load("@com_google_bazel_rules_hdl//dependency_support:copy.bzl", "copy")
-load("@com_google_bazel_rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex")
-load("@com_google_bazel_rules_hdl//dependency_support:pseudo_configure.bzl", "pseudo_configure")
+load("@rules_hdl//dependency_support:copy.bzl", "copy")
+load("@rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex")
+load("@rules_hdl//dependency_support:pseudo_configure.bzl", "pseudo_configure")
 
 licenses(["notice"])  # BSD
 
@@ -149,7 +149,7 @@ cc_binary(
 
 sh_test(
     name = "wc_test",
-    srcs = ["@com_google_bazel_rules_hdl//dependency_support/com_github_westes_flex:wc_test.sh"],
+    srcs = ["@rules_hdl//dependency_support/com_github_westes_flex:wc_test.sh"],
     args = ["$(location :wc)"],
     data = [
         ":wc",

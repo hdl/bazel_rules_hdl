@@ -16,9 +16,9 @@ package(default_visibility = ["//visibility:private"])
 
 licenses(["restricted"])
 
-load("@com_google_bazel_rules_hdl//dependency_support:copy.bzl", "copy", "touch")
-load("@com_google_bazel_rules_hdl//dependency_support/org_gnu_bison:bison.bzl", "genyacc")
-load("@com_google_bazel_rules_hdl//dependency_support:pseudo_configure.bzl", "pseudo_configure")
+load("@rules_hdl//dependency_support:copy.bzl", "copy", "touch")
+load("@rules_hdl//dependency_support/org_gnu_bison:bison.bzl", "genyacc")
+load("@rules_hdl//dependency_support:pseudo_configure.bzl", "pseudo_configure")
 
 exports_files(["LICENSE"])
 
@@ -268,7 +268,7 @@ cc_binary(
 
 sh_test(
     name = "calc_test",
-    srcs = ["@com_google_bazel_rules_hdl//dependency_support/org_gnu_bison:calc_test.sh"],
+    srcs = ["@rules_hdl//dependency_support/org_gnu_bison:calc_test.sh"],
     args = ["$(location :calc)"],
     data = [
         ":calc",

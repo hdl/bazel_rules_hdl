@@ -15,8 +15,8 @@
 # Description:
 #   A BUILD file for m4 based on FSF stock source.
 
-load("@com_google_bazel_rules_hdl//dependency_support:copy.bzl", "touch")
-load("@com_google_bazel_rules_hdl//dependency_support:pseudo_configure.bzl", "pseudo_configure")
+load("@rules_hdl//dependency_support:copy.bzl", "touch")
+load("@rules_hdl//dependency_support:pseudo_configure.bzl", "pseudo_configure")
 
 package(
     default_visibility = ["//visibility:public"],
