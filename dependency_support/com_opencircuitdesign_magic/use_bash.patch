@@ -1,0 +1,301 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+Makes the makedbh script run with bash instead of csh. Bazel systems AFAIK
+always have bash preinstalled, but this is not the case for csh. For example,
+Ubuntu 18.04 does not ship with csh.
+
+diff --git scripts/makedbh scripts/makedbh
+index 01e4fa5..f587a72 100755
+--- scripts/makedbh
++++ scripts/makedbh
+@@ -1,189 +1,185 @@
+-#!/bin/csh -f
++#!/bin/bash
+ #
+-# makes the "database.h" (1st argument, $1) file from "database.h.in"
+-# (2nd argument, $2), setting various mask operation definitions
++# makes the "database.h" (2nd argument, $2) file from "database.h.in"
++# (1st argument, $1), setting various mask operation definitions
+ # according to the number of words implied by the value of TT_MAXTYPES
+ 
++set -e
++
+ # The following mess grabs the value of TT_MAXTYPES from database.h.in
+ #
+-set maxtypes=`sed -n -e '/^#define[[:space:]]*TT_MAXTYPES/s/#define[[:space:]]*TT_MAXTYPES[[:space:]]*//p' < $1 | sed -e 's/\/\*[[:print:]]*\*\/[[:space:]]*//g' `
++database_h_in=$1
++database_h=$2
++maxtypes=`sed -n -e '/^#define[[:space:]]*TT_MAXTYPES/s/#define[[:space:]]*TT_MAXTYPES[[:space:]]*//p' < $database_h_in | sed -e 's/\/\*[[:print:]]*\*\/[[:space:]]*//g' `
+ #
+ # Alternative method works with outdated versions of sed/ed.
+ #
+-if ($maxtypes == "") then
+-   set maxtypes=`sed -n -e '/^#define[ 	]*TT_MAXTYPES/s/#define[ 	]*TT_MAXTYPES[ 	]*//p' < $1 | sed -e 's/\/\*.*\*\/[ 	]*//g' `
+-endif
++if [ -z $maxtypes ]; then
++   maxtypes=`sed -n -e '/^#define[ 	]*TT_MAXTYPES/s/#define[ 	]*TT_MAXTYPES[ 	]*//p' < $database_h_in | sed -e 's/\/\*.*\*\/[ 	]*//g' `
++fi
+ #
+ # If we can't generate database.h correctly, nothing is going to compile.
+ #
+-if ($maxtypes == "") then
++if [ -z $maxtypes ]; then
+    echo "Bad sed script in scripts/makedbh:  Cannot generate database/database.h!"
+    exit
+-endif
++fi
+ 
+ # Find derived values from bits per word
+ # Note that bits-per-word should be determined from the compiler, but
+ # 32 bits per word has always been hardwired into magic.
+ #
+-set bpw = 32
++bpw=32
+ 
+ # @ wordmask=$bpw - 1
+ # set wordshift=`echo "c=l($bpw); d=l(2); scale=0; c/d" | bc -l`
+ # @ maskwords=$maxtypes + $bpw - 1
+ # @ maskwords/=$bpw
+ 
+-@ maskwords=$maxtypes + $bpw - 1
+-@ maskwords/=$bpw
++let "maskwords=$maxtypes + $bpw - 1"
++let "maskwords/=$bpw"
+ 
+ 
+ # Generate the main part of the database.h file from database.h.in
+-cat $1 > $2
+-
+-# Generate a list of integers from 0 to the value of "maskwords" - 1
+-set count=""
+-@ maskwords--
+-while (${maskwords} >= 0)
+-   set count=`echo ${count} ${maskwords}`
+-   @ maskwords--
+-end
++cat $database_h_in > $database_h
+ 
+ # NOTE: echo -n is not POSIX, not portable to newer Bourne-shells, so use printf
+ # NOTE:  Some OSes are known to buffer printf and echo independently, so do not
+ # intermix "echo" and "printf" or output may have lines out of order.
+ 
+-printf "#define TTMaskZero(m) ( \\\n" >> $2
+-foreach i (${count})
++printf '#define TTMaskZero(m) ( \\\n' >> $2
++for ((i=${maskwords}-1;i>=0;i--)); do
+    printf "	(m)->tt_words[$i] = 0" >> $2
+-   if ($i == 0) then
++   if [ $i == 0 ]; then
+       printf ")\n" >> $2
+       printf "\n" >> $2
+    else
+-      printf ", \\\n" >> $2
+-   endif
+-end
++      printf ', \\\n' >> $2
++   fi
++done
+ 
+-printf "#define TTMaskIsZero(m) ( \\\n" >> $2
+-foreach i (${count})
++printf '#define TTMaskIsZero(m) ( \\\n' >> $2
++for ((i=${maskwords}-1;i>=0;i--)); do
+    printf "	(m)->tt_words[$i] == 0" >> $2
+-   if ($i == 0) then
++   if [ $i == 0 ]; then
+       printf ")\n" >> $2
+       printf "\n" >> $2
+    else
+-      printf " && \\\n" >> $2
+-   endif
+-end
++      printf ' && \\\n' >> $2
++   fi
++done
+ 
+-printf "#define TTMaskEqual(m, n) ( \\\n" >> $2
+-foreach i (${count})
++printf '#define TTMaskEqual(m, n) ( \\\n' >> $2
++for ((i=${maskwords}-1;i>=0;i--)); do
+    printf "	(m)->tt_words[$i] == (n)->tt_words[$i]" >> $2
+-   if ($i == 0) then
++   if [ $i == 0 ]; then
+       printf ")\n" >> $2
+       printf "\n" >> $2
+    else
+-      printf " && \\\n" >> $2
+-   endif
+-end
++      printf ' && \\\n' >> $2
++   fi
++done
+ 
+-printf "#define TTMaskIntersect(m, n) ( \\\n" >> $2
+-foreach i (${count})
++printf '#define TTMaskIntersect(m, n) ( \\\n' >> $2
++for ((i=${maskwords}-1;i>=0;i--)); do
+    printf "	((m)->tt_words[$i] & (n)->tt_words[$i])" >> $2
+-   if ($i == 0) then
++   if [ $i == 0 ]; then
+       printf ")\n" >> $2
+       printf "\n" >> $2
+    else
+-      printf " || \\\n" >> $2
+-   endif
+-end
++      printf ' || \\\n' >> $2
++   fi
++done
+ 
+-printf "#define TTMaskCom(m) ( \\\n" >> $2
+-foreach i (${count})
++printf '#define TTMaskCom(m) ( \\\n' >> $2
++for ((i=${maskwords}-1;i>=0;i--)); do
+    printf "	((m)->tt_words[$i] = ~(m)->tt_words[$i])" >> $2
+-   if ($i == 0) then
++   if [ $i == 0 ]; then
+       printf ")\n" >> $2
+       printf "\n" >> $2
+    else
+-      printf ", \\\n" >> $2
+-   endif
+-end
++      printf ', \\\n' >> $2
++   fi
++done
+ 
+-printf "#define TTMaskCom2(m, n) ( \\\n" >> $2
+-foreach i (${count})
++printf '#define TTMaskCom2(m, n) ( \\\n' >> $2
++for ((i=${maskwords}-1;i>=0;i--)); do
+    printf "	((m)->tt_words[$i] = ~(n)->tt_words[$i])" >> $2
+-   if ($i == 0) then
++   if [ $i == 0 ]; then
+       printf ")\n" >> $2
+       printf "\n" >> $2
+    else
+-      printf ", \\\n" >> $2
+-   endif
+-end
++      printf ', \\\n' >> $2
++   fi
++done
+ 
+-printf "#define TTMaskSetMask(m, n) ( \\\n" >> $2
+-foreach i (${count})
++printf '#define TTMaskSetMask(m, n) ( \\\n' >> $2
++for ((i=${maskwords}-1;i>=0;i--)); do
+    printf "	((m)->tt_words[$i] |= (n)->tt_words[$i])" >> $2
+-   if ($i == 0) then
++   if [ $i == 0 ]; then
+       printf ")\n" >> $2
+       printf "\n" >> $2
+    else
+-      printf ", \\\n" >> $2
+-   endif
+-end
++      printf ', \\\n' >> $2
++   fi
++done
+ 
+-printf "#define TTMaskSetMask3(m, n, o) ( \\\n" >> $2
+-foreach i (${count})
++printf '#define TTMaskSetMask3(m, n, o) ( \\\n' >> $2
++for ((i=${maskwords}-1;i>=0;i--)); do
+    printf "	((m)->tt_words[$i] |= (n)->tt_words[$i] | (o)->tt_words[$i])" \
+ 	>> $2
+-   if ($i == 0) then
++   if [ $i == 0 ]; then
+       printf ")\n" >> $2
+       printf "\n" >> $2
+    else
+-      printf ", \\\n" >> $2
+-   endif
+-end
++      printf ', \\\n' >> $2
++   fi
++done
+ 
+-printf "#define TTMaskAndMask(m, n) ( \\\n" >> $2
+-foreach i (${count})
++printf '#define TTMaskAndMask(m, n) ( \\\n' >> $2
++for ((i=${maskwords}-1;i>=0;i--)); do
+    printf "	((m)->tt_words[$i] &= (n)->tt_words[$i])" >> $2
+-   if ($i == 0) then
++   if [ $i == 0 ]; then
+       printf ")\n" >> $2
+       printf "\n" >> $2
+    else
+-      printf ", \\\n" >> $2
+-   endif
+-end
++      printf ', \\\n' >> $2
++   fi
++done
+ 
+-printf "#define TTMaskAndMask3(m, n, o) ( \\\n" >> $2
+-foreach i (${count})
++printf '#define TTMaskAndMask3(m, n, o) ( \\\n' >> $2
++for ((i=${maskwords}-1;i>=0;i--)); do
+    printf "	((m)->tt_words[$i] = (n)->tt_words[$i] & (o)->tt_words[$i])" \
+ 	>> $2
+-   if ($i == 0) then
++   if [ $i == 0 ]; then
+       printf ")\n" >> $2
+       printf "\n" >> $2
+    else
+-      printf ", \\\n" >> $2
+-   endif
+-end
++      printf ', \\\n' >> $2
++   fi
++done
+ 
+-printf "#define TTMaskClearMask(m, n) ( \\\n" >> $2
+-foreach i (${count})
++printf '#define TTMaskClearMask(m, n) ( \\\n' >> $2
++for ((i=${maskwords}-1;i>=0;i--)); do
+    printf "	((m)->tt_words[$i] &= ~(n)->tt_words[$i])" >> $2
+-   if ($i == 0) then
++   if [ $i == 0 ]; then
+       printf ")\n" >> $2
+       printf "\n" >> $2
+    else
+-      printf ", \\\n" >> $2
+-   endif
+-end
++      printf ', \\\n' >> $2
++   fi
++done
+ 
+-printf "#define TTMaskClearMask3(m, n, o) ( \\\n" >> $2
+-foreach i (${count})
++printf '#define TTMaskClearMask3(m, n, o) ( \\\n' >> $2
++for ((i=${maskwords}-1;i>=0;i--)); do
+    printf "	((m)->tt_words[$i] = (n)->tt_words[$i] & ~(o)->tt_words[$i])" \
+ 	>> $2
+-   if ($i == 0) then
++   if [ $i == 0 ]; then
+       printf ")\n" >> $2
+    else
+-      printf ", \\\n" >> $2
+-   endif
+-end
++      printf ', \\\n' >> $2
++   fi
++done
+ 
+ printf "\n" >> $2
+ printf "#endif /* _DATABASE_H */\n" >> $2

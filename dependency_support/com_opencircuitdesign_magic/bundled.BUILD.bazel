@@ -1,0 +1,245 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("@rules_hdl//dependency_support:copy.bzl", "copy")
+
+licenses(["notice"])
+
+DEFINES = [
+    "CAD_DIR=\"\\\"external/com_opencircuitdesign_magic/cad_root_runfiles\\\"\"",
+    "BIN_DIR=\"\\\"NO_IRSIM_PATH\\\"\"",
+    "MAGIC_DATE=\"\\\"REDACTED\\\"\"",
+    "MAGIC_VERSION=\"\\\"8.3\"\\\"",
+    "MAGIC_REVISION=\"\\\"50\"\\\"",
+    "SIZEOF_VOID_P=8",
+    "SIZEOF_UNSIGNED_INT=4",
+    "SIZEOF_UNSIGNED_LONG=8",
+    "HAVE_SYS_MMAN_H=1",
+    "HAVE_PATHS_H=1",
+    "HAVE_VA_COPY=1",
+    "HAVE___VA_COPY=1",
+    "EXT2SPICE_AUTO=1",
+    "EXT2SIM_AUTO=1",
+    "FILE_LOCKS=1",
+    "CALMA_MODULE=1",
+    "CIF_MODULE=1",
+    "PLOT_MODULE=1",
+    "LEF_MODULE=1",
+    "USE_READLINE=1",
+    "HAVE_READLINE=1",
+    "HAVE_PTHREADS=1",
+    "ROUTE_MODULE=1",
+    "RSIM_MODULE=1",
+    "linux=1",
+    "SYSV=1",
+    "GCORE=\"\\\"/usr/bin/gcore\"\\\"",
+    "True=1",
+    "False=0",
+]
+
+COPTS = [
+    "-std=gnu11",
+    "-w",
+]
+
+genrule(
+    name = "database_h",
+    srcs = [
+        "database/database.h.in",
+        "scripts/makedbh",
+    ],
+    outs = ["database/database.h"],
+    cmd = "$(location :scripts/makedbh) $(location :database/database.h.in) $@",
+)
+
+cc_library(
+    name = "libmagic",
+    srcs = glob([
+        "bplane/*.c",
+        "calma/*.c",
+        "cif/*.c",
+        "cmwind/*.c",
+        "commands/*.c",
+        "database/*.c",
+        "dbwind/*.c",
+        "debug/*.c",
+        "drc/*.c",
+        "ext2spice/*.c",
+        "extcheck/*.c",
+        "extflat/*.c",
+        "extract/*.c",
+        "garouter/*.c",
+        "gcr/*.c",
+        "graphics/grMain.c",
+        "graphics/grLock.c",
+        "graphics/grDStyle.c",
+        "graphics/grText.c",
+        "graphics/grCMap.c",
+        "graphics/grClip.c",
+        "graphics/grGlyphs.c",
+        "graphics/grNull.c",
+        "graphics/W3Dmain.c",
+        "grouter/*.c",
+        "irouter/*.c",
+        "lef/*.c",
+        "lisp/*.c",
+        "magic/*.c",
+        "mzrouter/*.c",
+        "net2ir/*.c",
+        "netmenu/*.c",
+        "oa/*.c",
+        "plot/*.c",
+        "plow/*.c",
+        "resis/*.c",
+        "router/*.c",
+        "scmos/*.c",
+        "select/*.c",
+        "sim/*.c",
+        "textio/*.c",
+        "tiles/*.c",
+        "utils/*.c",
+        "windows/*.c",
+        "wiring/*.c",
+    ], exclude = [
+        "magic/magicTop.c",
+        "ext2spice/ext2spice.c",
+        "extcheck/extcheck.c",
+        "net2ir/net2ir.c",
+
+        "bplane/bpTest.c",
+        "utils/LIB*.c",
+        "utils/parsetest.c",  # Not listed in Magic Makefile.
+
+        "grouter/grouteNet.c",  # Not listed in Magic Makefile.
+        "grouter/grouteTile.c",  # Not listed in Magic Makefile.
+        "grouter/groutePin.c",  # Not listed in Magic Makefile.
+        "resis/ResWrite.c",  # Not listed in Magic Makefile.
+    ]),
+    hdrs = glob([
+        "*/*.h",
+    ]) + [
+        "database/database.h",
+    ],
+    includes = ["utils"],
+    deps = [
+        "@org_gnu_readline//:readline",
+    ],
+    defines = DEFINES,
+    copts = COPTS,
+)
+
+cc_library(
+    name = "magic_version",
+    srcs = ["@rules_hdl//dependency_support/com_opencircuitdesign_magic:magic_version.c"],
+    defines = DEFINES,
+    copts = COPTS,
+)
+
+
+copy(
+    name = "minimum_tech",
+    src = "scmos/minimum.tech.in",
+    out = "scmos/minimum.tech",
+)
+
+RUNFILES = {
+    "minimum.tech": "scmos/minimum.tech",
+    "mos.7bit.dstyle": "scmos/mos.7bit.dstyle",
+    "mos.7bit.std.cmap": "scmos/mos.7bit.std.cmap",
+    "bw.glyphs": "graphics/bw.glyphs",
+    "windows7.glyphs": "windows/windows7.glyphs",
+}
+
+[copy(
+    name = file,
+    src = RUNFILES[file],
+    out = "cad_root_runfiles/magic/sys/" + file,
+) for file in RUNFILES]
+
+filegroup(
+    name = "tech",
+    srcs = [
+        ":minimum_tech",
+    ] + [file for file in RUNFILES],
+)
+
+[cc_binary(
+    name = name,
+    srcs = [
+        "ext2spice/" + name + ".c",
+    ],
+    defines = DEFINES,
+    copts = COPTS,
+    deps = [
+        ":libmagic",
+        ":magic_version",
+    ],
+    visibility = ["//visibility:public"],
+) for name in ["ext2spice", "ext2hier"]]
+
+[cc_binary(
+    name = name,
+    srcs = [
+        "ext2sim/" + name + ".c",
+    ],
+    defines = DEFINES,
+    copts = COPTS,
+    deps = [
+        ":libmagic",
+        ":magic_version",
+    ],
+    visibility = ["//visibility:public"],
+) for name in ["ext2sim", "finds", "sim2simp"]]
+
+cc_binary(
+    name = "extcheck",
+    srcs = [
+        "extcheck/extcheck.c",
+    ],
+    defines = DEFINES,
+    copts = COPTS,
+    deps = [
+        ":libmagic",
+        ":magic_version",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "net2ir",
+    srcs = [
+        "net2ir/net2ir.c",
+    ],
+    defines = DEFINES,
+    copts = COPTS,
+    deps = [
+        ":libmagic",
+        ":magic_version",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "magic",
+    srcs = [
+        "magic/magicTop.c",
+    ],
+    data = [
+        ":tech",
+    ],
+    defines = DEFINES + ["MAGIC_WRAPPER"],
+    copts = COPTS,
+    deps = [":libmagic"],
+    visibility = ["//visibility:public"],
+)
