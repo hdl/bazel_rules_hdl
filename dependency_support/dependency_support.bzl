@@ -18,16 +18,24 @@
 # it.
 load("//dependency_support/at_clifford_yosys:at_clifford_yosys.bzl", "at_clifford_yosys")
 load("//dependency_support/com_github_westes_flex:com_github_westes_flex.bzl", "com_github_westes_flex")
+load("//dependency_support/com_google_absl:com_google_absl.bzl", "com_google_absl")
+load("//dependency_support/com_google_googletest:com_google_googletest.bzl", "com_google_googletest")
 load("//dependency_support/com_google_skywater_pdk:com_google_skywater_pdk.bzl", "com_google_skywater_pdk")
+load("//dependency_support/net_invisible_island_ncurses:net_invisible_island_ncurses.bzl", "net_invisible_island_ncurses")
 load("//dependency_support/org_fftw:org_fftw.bzl", "org_fftw")
 load("//dependency_support/org_gnu_bison:org_gnu_bison.bzl", "org_gnu_bison")
 load("//dependency_support/org_gnu_m4:org_gnu_m4.bzl", "org_gnu_m4")
+load("//dependency_support/org_gnu_readline:org_gnu_readline.bzl", "org_gnu_readline")
 
 
 def dependency_support():
   at_clifford_yosys()
   com_github_westes_flex()
+  com_google_absl()
+  com_google_googletest()
   com_google_skywater_pdk()
+  net_invisible_island_ncurses()
   org_fftw()
   org_gnu_bison()
   org_gnu_m4()
+  org_gnu_readline()
