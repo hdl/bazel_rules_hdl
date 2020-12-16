@@ -1,0 +1,48 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+licenses(["notice"])
+
+load("@com_google_bazel_rules_hdl//dependency_support/com_google_skywater_pdk:cell_libraries.bzl", "CELL_LIBRARIES")
+load("@com_google_bazel_rules_hdl_pip_deps//:requirements.bzl", "requirement")
+
+py_binary(
+    name = "liberty",
+    visibility = ["//visibility:public"],
+    srcs = ["@com_google_bazel_rules_hdl//dependency_support/com_google_skywater_pdk:liberty_wrapper.py"],
+    main = "@com_google_bazel_rules_hdl//dependency_support/com_google_skywater_pdk:liberty_wrapper.py",
+    python_version = "PY3",
+    deps = [
+        ":skywater_pdk_py",
+    ],
+)
+
+py_library(
+    name = "skywater_pdk_py",
+    visibility = ["//visibility:public"],
+    srcs = glob(["scripts/python-skywater-pdk/skywater_pdk/*.py"]),
+    imports = ["scripts/python-skywater-pdk"],
+    deps = [
+        # The code only directly depends on dataclasses-json. I don't understand
+        # why the Bazel Python rules don't automatically depend on its
+        # dependencies.
+        requirement("dataclasses-json"),
+    ],
+)
+
+filegroup(
+    name = "timing_all",
+    visibility = ["//visibility:public"],
+    srcs = ["@com_google_skywater_pdk_%s//:timing_all" % library_name for library_name in CELL_LIBRARIES],
+)
