@@ -16,6 +16,7 @@
 # The structure for adding a third_party dependency is to create a folder in this
 # directory that will contain the build rules and workspace rules required to import
 # it.
+load("//dependency_support/at_clifford_icestorm:at_clifford_icestorm.bzl", "at_clifford_icestorm")
 load("//dependency_support/at_clifford_yosys:at_clifford_yosys.bzl", "at_clifford_yosys")
 load("//dependency_support/com_icarus_iverilog:com_icarus_iverilog.bzl", "com_icarus_iverilog")
 load("//dependency_support/com_github_westes_flex:com_github_westes_flex.bzl", "com_github_westes_flex")
@@ -36,6 +37,7 @@ load("//dependency_support/org_gnu_readline:org_gnu_readline.bzl", "org_gnu_read
 load("//dependency_support/org_sourceware_bzip2:org_sourceware_bzip2.bzl", "org_sourceware_bzip2")
 
 def dependency_support():
+  at_clifford_icestorm()
   at_clifford_yosys()
   com_github_westes_flex()
   com_google_absl()
