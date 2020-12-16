@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC
+# Copyright 2020 The XLS Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,22 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-workspace(name = "rules_hdl")
+"""Loads the ABC system for sequential synthesis and verification, used by yosys."""
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-maybe(
-    http_archive,
-    name = "rules_python",
-    url = "https://github.com/bazelbuild/rules_python/releases/download/0.1.0/rules_python-0.1.0.tar.gz",
-    sha256 = "b6d46438523a3ec0f3cead544190ee13223a52f6a6765a29eae7b7cc24cc83a0",
-)
-load("//:init.bzl", "init")
-init()
-
-# Third Party
-load("//dependency_support:dependency_support.bzl", "dependency_support")
-dependency_support()
-# Third Party
-
+def net_zlib():
+    maybe(
+        http_archive,
+        name = "net_zlib",
+        sha256 = "f5cc4ab910db99b2bdbba39ebbdc225ffc2aa04b4057bc2817f1b94b6978cfc3",
+        strip_prefix = "zlib-1.2.11",
+        urls = [
+            "https://github.com/madler/zlib/archive/v1.2.11.zip",
+        ],
+        build_file = "@//dependency_support/net_zlib:bundled.BUILD.bazel",
+    )

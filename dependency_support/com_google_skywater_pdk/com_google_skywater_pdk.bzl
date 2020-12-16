@@ -22,7 +22,7 @@ load(":cell_libraries.bzl", "CELL_LIBRARIES")
 def _build_file(library_name):
     library = CELL_LIBRARIES[library_name]
     return """
-load("@com_google_bazel_rules_hdl//dependency_support/com_google_skywater_pdk:declare_cell_library.bzl", "declare_cell_library")
+load("@rules_hdl//dependency_support/com_google_skywater_pdk:declare_cell_library.bzl", "declare_cell_library")
 declare_cell_library("%s")
 """ % library_name
 

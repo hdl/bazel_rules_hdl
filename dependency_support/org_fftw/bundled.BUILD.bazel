@@ -1,0 +1,322 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+load("@rules_hdl//dependency_support:pseudo_configure.bzl", "pseudo_configure")
+
+licenses(["restricted"])
+
+exports_files(["LICENSE"])
+
+pseudo_configure(
+    name = "config_h",
+    src = "config.h.in",
+    out = "config.h",
+    defs = [],
+    mappings = {
+        "FFTW_CC": "\"bazel-cc\"",
+        "HAVE_ABORT": "1",
+        "HAVE_ALLOCA": "1",
+        "HAVE_ALLOCA_H": "1",
+        "HAVE_CLOCK_GETTTIME": "1",
+        "HAVE_COSL": "1",
+        "HAVE_DECL_COSL": "1",
+        "HAVE_DECL_COSQ": "0",
+        "HAVE_DECL_DRAND48": "1",
+        "HAVE_DECL_MEMALIGN": "1",
+        "HAVE_DECL_POSIX_MEMALIGN": "1",
+        "HAVE_DECL_SINL": "1",
+        "HAVE_DECL_SINQ": "0",
+        "HAVE_DECL_SRAND48": "1",
+        "HAVE_DLFCN_H": "1",
+        "HAVE_DRAND48": "1",
+        "HAVE_GETTIMEOFDAY": "1",
+        "HAVE_INTTYPES_H": "1",
+        "HAVE_ISNAN": "1",
+        "HAVE_LIBINTL_H": "1",
+        "HAVE_LIBM": "1",
+        "HAVE_LIMITS_H": "1",
+        "HAVE_LONG_DOUBLE": "1",
+        "HAVE_MALLOC_H": "1",
+        "HAVE_MEMALIGN": "1",
+        "HAVE_MEMORY_H": "1",
+        "HAVE_MEMSET": "1",
+        "HAVE_POSIX_MEMALIGN": "1",
+        "HAVE_SINL": "1",
+        "HAVE_SNPRINTF": "1",
+        "HAVE_SQRT": "1",
+        "HAVE_STDDEF_H": "1",
+        "HAVE_STDINT_H": "1",
+        "HAVE_STDLIB_H": "1",
+        "HAVE_STRINGS_H": "1",
+        "HAVE_STRING_H": "1",
+        "HAVE_SYSCTL": "1",
+        "HAVE_SYS_STAT_H": "1",
+        "HAVE_SYS_SYSCTL_H": "1",
+        "HAVE_SYS_TIME_H": "1",
+        "HAVE_SYS_TYPES_H": "1",
+        "HAVE_UINTPTR_T": "1",
+        "HAVE_UNISTD_H": "1",
+        "HAVE_VPRINTF": "1",
+        "PACKAGE": "\"fftw\"",
+        "PACKAGE_BUGREPORT": "\"fftw@fftw.org\"",
+        "PACKAGE_NAME": "\"fftw\"",
+        "PACKAGE_STRING": "\"fftw\"",
+        "PACKAGE_TARNAME": "\"fftw\"",
+        "PACKAGE_URL": "\"\"",
+        "PACKAGE_VERSION": "\"bazel\"",
+        "SIZEOF_DOUBLE": "8",
+        "SIZEOF_FFTW_R2R_KIND": "4",
+        "SIZEOF_FLOAT": "4",
+        "SIZEOF_INT": "4",
+        "SIZEOF_LONG": "8",
+        "SIZEOF_LONG_LONG": "8",
+        "SIZEOF_PTRDIFF_T": "8",
+        "SIZEOF_SIZE_T": "8",
+        "SIZEOF_UNSIGNED_INT": "4",
+        "SIZEOF_UNSIGNED_LONG": "8",
+        "SIZEOF_UNSIGNED_LONG_LONG": "8",
+        "STDC_HEADERS": "1",
+        "TIME_WITH_SYS_TIME": "1",
+        "VERSION": "\"bazel\"",
+    },
+)
+
+# Note that we don't build f77api.c; it's unlikely that anyone is
+# using the fortran api.
+filegroup(
+    name = "fftw_srcs",
+    srcs = glob(
+        [
+            "api/*.c",
+            "api/*.h",
+            "cell/*.c",
+            "cell/*.h",
+            "dft/*.c",
+            "dft/*.h",
+            "dft/scalar/*.c",
+            "dft/scalar/*.h",
+            "dft/scalar/*/*.c",
+            "dft/scalar/*/*.h",
+            "kernel/*.c",
+            "kernel/*.h",
+            "rdft/*.c",
+            "rdft/*.h",
+            "rdft/scalar/*.c",
+            "rdft/scalar/*.h",
+            "rdft/scalar/*/*.c",
+            "rdft/scalar/*/*.h",
+            "reodft/*.c",
+            "reodft/*.h",
+        ],
+        exclude = ["api/f77api.c"],
+    ) + [
+        "config.h",
+    ],
+    visibility = ["//visibility:private"],
+)
+
+fftw_cc_opts = [
+    "-Iexternal/org_fftw",
+    "-Iexternal/org_fftw/dft",
+    "-Iexternal/org_fftw/dft/scalar",
+    "-Iexternal/org_fftw/kernel",
+    "-Iexternal/org_fftw/rdft",
+    "-Iexternal/org_fftw/rdft/scalar",
+    "-Iexternal/org_fftw/reodft",
+    "-Iexternal/org_fftw/dft/simd",
+    "-Iexternal/org_fftw/rdft/simd",
+    "-Iexternal/org_fftw/simd-support",
+    "-w",
+]
+
+config_setting(
+    name = "arm",
+    values = {
+        "cpu": "arm",
+    }
+)
+
+config_setting(
+    name = "ppc",
+    values = {
+        "cpu": "ppc",
+    }
+)
+
+config_setting(
+    name = "x86_64",
+    values = {
+        "cpu": "x86_64",
+    }
+)
+
+config_setting(
+    name = "k8",
+    values = {
+        "cpu": "k8",
+    }
+)
+
+fftw_arch_srcs = select({
+    ":x86_64": [":fftw_extra_simd_srcs_avx2"],
+    ":k8": [":fftw_extra_simd_srcs_avx2"],
+    # The above assumes that the x86 CPU supports AVX2, this is for older CPUs:
+    # ":x86_64": [":fftw_extra_simd_srcs_sse2"],
+    ":ppc": [":fftw_extra_simd_srcs_vsx"],
+    ":arm": [":fftw_extra_simd_srcs_neon"],
+    "//conditions:default": [],
+})
+
+fftw_arch_copts = select({
+    ":k8": [
+        "-DHAVE_SSE2=1",
+        "-DHAVE_FMA=1",
+        "-DHAVE_AVX=1",
+        "-DHAVE_AVX2=1",
+        "-mavx",
+        "-mavx2",
+        "-mfma",
+    ],
+    ":x86_64": [
+        "-DHAVE_SSE2=1",
+        "-DHAVE_FMA=1",
+        "-DHAVE_AVX=1",
+        "-DHAVE_AVX2=1",
+        "-mavx",
+        "-mavx2",
+        "-mfma",
+    ],
+    # The above assumes that the x86 CPU supports AVX2, this is for older CPUs:
+    # ":x86_64": ["-DHAVE_SSE2=1"],
+    ":arm": ["-DHAVE_NEON=1"],
+    ":ppc": ["-DHAVE_VSX=1"],
+    "//conditions:default": [],
+})
+
+filegroup(
+    name = "fftw_extra_simd_srcs",
+    srcs = glob([
+        "dft/simd/*.c",
+        "dft/simd/*.h",
+        "rdft/simd/*.c",
+        "rdft/simd/*.h",
+        "simd-support/*.c",
+        "simd-support/*.h",
+    ]),
+    visibility = ["//visibility:private"],
+)
+
+filegroup(
+    name = "fftw_extra_simd_srcs_sse2",
+    srcs = [":fftw_extra_simd_srcs"] + glob([
+        "dft/simd/generic-simd128/*.c",
+        "dft/simd/generic-simd256/*.c",
+        "dft/simd/sse2/*.c",
+        "rdft/simd/generic-simd128/*.c",
+        "rdft/simd/generic-simd256/*.c",
+        "rdft/simd/sse2/*.c",
+    ], exclude = [
+        "**/genus.c",
+    ]),
+    visibility = ["//visibility:private"],
+)
+
+filegroup(
+    name = "fftw_extra_simd_srcs_avx2",
+    srcs = [":fftw_extra_simd_srcs_sse2"] + glob([
+        "dft/simd/avx/*.c",
+        "dft/simd/avx2/*.c",
+        "dft/simd/avx2-128/*.c",
+        "rdft/simd/avx/*.c",
+        "rdft/simd/avx2/*.c",
+        "rdft/simd/avx2-128/*.c",
+    ], exclude = [
+        "**/genus.c",
+    ]),
+    visibility = ["//visibility:private"],
+)
+
+filegroup(
+    name = "fftw_extra_simd_srcs_vsx",
+    srcs = [":fftw_extra_simd_srcs"] + glob([
+        "dft/simd/vsx/*.c",
+        "rdft/simd/vsx/*.c",
+    ]),
+    visibility = ["//visibility:private"],
+)
+
+filegroup(
+    name = "fftw_extra_simd_srcs_neon",
+    srcs = [":fftw_extra_simd_srcs"] + glob([
+        "dft/simd/neon/*.c",
+        "rdft/simd/neon/*.c",
+    ]),
+    visibility = ["//visibility:private"],
+)
+
+filegroup(
+    name = "fftw_textual_headers",
+    srcs = glob([
+        "dft/simd/common/*.c",
+        "rdft/simd/common/*.c",
+    ]),
+    visibility = ["//visibility:private"],
+)
+
+# :fftw is the double precision (double) version of FFTW. To use this version,
+# include "fftw3.h", use the fftw_ prefix for all function calls, and link with
+# the "@org_fftw//:fftw" library.
+#
+# :fftwf is the single precision (float) version of FFTW. To use this version,
+# include "fftw3.h" and use the fftwf_ prefix instead of fftw_ for all function
+# calls.
+#
+# 1/ is required if a program uses both single and double precision FFTs, and
+# is the approach suggested in the FFTW3 documentation. 2/ makes it convenient
+# to experiment with both double and single precision with minimal code change.
+#
+# To mix single and double precision processing in the same code, include
+# "fftw3.h", use fftw_ or fftwf_ functions depending on the data type, and link
+# with both the "@org_fftw//:fftw" and "@org_fftw//:fftwf" libraries.
+
+cc_library(
+    name = "fftw",
+    srcs = [
+        ":fftw_srcs",
+    ] + fftw_arch_srcs,
+    hdrs = ["api/fftw3.h"],
+    textual_hdrs = [":fftw_textual_headers"],
+    copts = fftw_cc_opts + fftw_arch_copts,
+    includes = ["api"],
+)
+
+cc_library(
+    name = "fftwf",
+    srcs = [
+        ":fftw_srcs",
+    ] + fftw_arch_srcs,
+    hdrs = [
+        "api/fftw3.h",
+    ],
+    textual_hdrs = [":fftw_textual_headers"],
+    copts = fftw_cc_opts + fftw_arch_copts + [
+        "-DFFTW_SINGLE",
+        "-DBENCHFFT_SINGLE",
+    ],
+    includes = ["api"],
+)

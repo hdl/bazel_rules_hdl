@@ -1,0 +1,35 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+Makes ExtBasic.c not depend on TCL things if TCL build is not enabled. This
+patch probably makes sense to upstream.
+
+diff --git extract/ExtBasic.c extract/ExtBasic.c
+index 6d04862..53f1a26 100644
+--- extract/ExtBasic.c
++++ extract/ExtBasic.c
+@@ -875,9 +875,13 @@ extNodeName(node)
+ 		// If subsName is a Tcl variable (begins with "$"), make the
+ 		// variable substitution, if one exists.  Ignore double-$.
+ 
++#ifdef MAGIC_WRAPPER
+ 		char *varsub = (char *)Tcl_GetVar(magicinterp,
+ 			&ExtCurStyle->exts_globSubstrateName[1],
+ 			TCL_GLOBAL_ONLY);
++#else
++		char *varsub = NULL;
++#endif
+ 		return (varsub != NULL) ? varsub : ExtCurStyle->exts_globSubstrateName;
+ 	    }
+ 	    else

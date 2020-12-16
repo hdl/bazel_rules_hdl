@@ -12,22 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-workspace(name = "rules_hdl")
+"""Loads the gperf perfect hash function generator, used by iverilog."""
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-maybe(
-    http_archive,
-    name = "rules_python",
-    url = "https://github.com/bazelbuild/rules_python/releases/download/0.1.0/rules_python-0.1.0.tar.gz",
-    sha256 = "b6d46438523a3ec0f3cead544190ee13223a52f6a6765a29eae7b7cc24cc83a0",
-)
-load("//:init.bzl", "init")
-init()
-
-# Third Party
-load("//dependency_support:dependency_support.bzl", "dependency_support")
-dependency_support()
-# Third Party
-
+def org_gnu_gperf():
+    maybe(
+        http_archive,
+        name = "org_gnu_gperf",
+        urls = [
+            "http://ftp.acc.umu.se/mirror/gnu.org/gnu/gperf/gperf-3.1.tar.gz",
+            "http://ftp.gnu.org/gnu/gperf/gperf-3.1.tar.gz",
+        ],
+        strip_prefix = "gperf-3.1",
+        sha256 = "588546b945bba4b70b6a3a616e80b4ab466e3f33024a352fc2198112cdbb3ae2",
+        build_file = Label("//dependency_support:org_gnu_gperf/bundled.BUILD.bazel"),
+    )

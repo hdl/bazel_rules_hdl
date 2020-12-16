@@ -14,14 +14,14 @@
 
 licenses(["notice"])
 
-load("@com_google_bazel_rules_hdl//dependency_support/com_google_skywater_pdk:cell_libraries.bzl", "CELL_LIBRARIES")
-load("@com_google_bazel_rules_hdl_pip_deps//:requirements.bzl", "requirement")
+load("@rules_hdl//dependency_support/com_google_skywater_pdk:cell_libraries.bzl", "CELL_LIBRARIES")
+load("@rules_hdl_pip_deps//:requirements.bzl", "requirement")
 
 py_binary(
     name = "liberty",
     visibility = ["//visibility:public"],
-    srcs = ["@com_google_bazel_rules_hdl//dependency_support/com_google_skywater_pdk:liberty_wrapper.py"],
-    main = "@com_google_bazel_rules_hdl//dependency_support/com_google_skywater_pdk:liberty_wrapper.py",
+    srcs = ["@rules_hdl//dependency_support/com_google_skywater_pdk:liberty_wrapper.py"],
+    main = "@rules_hdl//dependency_support/com_google_skywater_pdk:liberty_wrapper.py",
     python_version = "PY3",
     deps = [
         ":skywater_pdk_py",

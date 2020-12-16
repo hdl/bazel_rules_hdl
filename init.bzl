@@ -27,8 +27,8 @@ def init(python_interpreter=None, python_interpreter_target=None):
     not use the right Python toolchain when installing pip dependencies.
     '''
     pip_install(
-        name = "com_google_bazel_rules_hdl_pip_deps",
-        requirements = "@com_google_bazel_rules_hdl//dependency_support:pip_requirements.txt",
+        name = "rules_hdl_pip_deps",
+        requirements = "@rules_hdl//dependency_support:pip_requirements.txt",
         python_interpreter = python_interpreter,
         python_interpreter_target = python_interpreter_target
     )

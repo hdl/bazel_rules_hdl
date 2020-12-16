@@ -12,22 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-workspace(name = "rules_hdl")
+"""Registers Bazel workspaces for the GNU readline library."""
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-maybe(
-    http_archive,
-    name = "rules_python",
-    url = "https://github.com/bazelbuild/rules_python/releases/download/0.1.0/rules_python-0.1.0.tar.gz",
-    sha256 = "b6d46438523a3ec0f3cead544190ee13223a52f6a6765a29eae7b7cc24cc83a0",
-)
-load("//:init.bzl", "init")
-init()
-
-# Third Party
-load("//dependency_support:dependency_support.bzl", "dependency_support")
-dependency_support()
-# Third Party
-
+def net_sourceforge_ngspice():
+    maybe(
+        new_git_repository,
+        name = "net_sourceforge_ngspice",
+        commit = "371ad3496c684c620e9ad6fb34f6a4bca10f7bac",  # ngspice-33, 2020-12-03
+        remote = "git://git.code.sf.net/p/ngspice/ngspice",
+        shallow_since = "1603013722 +0200",
+        build_file = Label("//dependency_support/net_sourceforge_ngspice:bundled.BUILD.bazel"),
+    )

@@ -1,0 +1,332 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# The NGSPICE circuit simulator.
+
+load("@rules_hdl//dependency_support:copy.bzl", "copy")
+load("@rules_hdl//dependency_support:pseudo_configure.bzl", "pseudo_configure")
+load("@rules_hdl//dependency_support/org_gnu_bison:bison.bzl", "genyacc")
+load("@rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex")
+
+cc_binary(
+    name = "cmpp",
+    srcs = glob([
+        "src/xspice/cmpp/*.c",
+        "src/xspice/cmpp/*.h",
+    ]) + [
+        "src/xspice/cmpp/ifs_lex.c",
+        "src/xspice/cmpp/ifs_yacc.c",
+        "src/xspice/cmpp/ifs_yacc.h",
+        "src/xspice/cmpp/mod_lex.c",
+        "src/xspice/cmpp/mod_yacc.c",
+        "src/xspice/cmpp/mod_yacc.h",
+    ],
+    includes = ["src/xspice/cmpp"],
+)
+
+genlex(
+    name = "ifs_lex",
+    src = "src/xspice/cmpp/ifs_lex.l",
+    out = "src/xspice/cmpp/ifs_lex.c",
+)
+
+genlex(
+    name = "mod_lex",
+    src = "src/xspice/cmpp/mod_lex.l",
+    out = "src/xspice/cmpp/mod_lex.c",
+)
+
+genyacc(
+    name = "ifs_yacc",
+    src = "src/xspice/cmpp/ifs_yacc.y",
+    header_out = "src/xspice/cmpp/ifs_yacc.h",
+    source_out = "src/xspice/cmpp/ifs_yacc.c",
+)
+
+genyacc(
+    name = "mod_yacc",
+    src = "src/xspice/cmpp/mod_yacc.y",
+    header_out = "src/xspice/cmpp/mod_yacc.h",
+    source_out = "src/xspice/cmpp/mod_yacc.c",
+)
+
+GENERATED_FILE_SUBDIRS = [
+    "digital",
+    "spice2poly",
+    "xtraevt",
+    "analog",
+    "xtradev",
+    "table",
+]
+
+C_DEFINES = [
+    "SIMULATOR",
+    "THREADS",
+]
+
+COPTS = ["-w"]
+
+[genrule(
+    name = "%s_cmextrn_h" % subdir,
+    srcs = glob([
+        "src/xspice/icm/%s/modpath.lst" % subdir,
+        "src/xspice/icm/%s/udnpath.lst" % subdir,
+        "src/xspice/icm/%s/**/*.ifs" % subdir,
+        "src/xspice/icm/%s/**/*.c" % subdir,
+    ]),
+    outs = [
+        "src/xspice/icm/%s/cmextrn.h" % subdir,
+        "src/xspice/icm/%s/cminfo.h" % subdir,
+        "src/xspice/icm/%s/udnextrn.h" % subdir,
+        "src/xspice/icm/%s/udninfo.h" % subdir,
+    ],
+    cmd = "CMPP_IDIR=$$(dirname $$(dirname $(location src/xspice/icm/" + subdir + "/modpath.lst)))/" + subdir + " CMPP_ODIR=\"$$(dirname $(location src/xspice/icm/" + subdir + "/cmextrn.h))\" $(location :cmpp) -lst",
+    message = "Generating cmextrn.h for %s" % subdir,
+    tools = [
+        ":cmpp",
+    ],
+) for subdir in GENERATED_FILE_SUBDIRS]
+
+[copy(
+    name = "dlmain_%s" % subdir,
+    src = "src/xspice/icm/dlmain.c",
+    out = "src/xspice/icm/%s/dlmain.c" % subdir,
+) for subdir in GENERATED_FILE_SUBDIRS]
+
+IDM_FILES = [
+    "src/xspice/icm/%s/cminfo.h" % subdir for subdir in GENERATED_FILE_SUBDIRS
+] + [
+    "src/xspice/icm/%s/cmextrn.h" % subdir for subdir in GENERATED_FILE_SUBDIRS
+] + [
+    "src/xspice/icm/%s/udnextrn.h" % subdir for subdir in GENERATED_FILE_SUBDIRS
+] + [
+    "src/xspice/icm/%s/udninfo.h" % subdir for subdir in GENERATED_FILE_SUBDIRS
+] + [
+    # TODO This is not used because this requires compiling these as shared
+    # libraries, which is not implemented yet by this BUILD file.
+    # "src/xspice/icm/%s/dlmain.c" % subdir for subdir in GENERATED_FILE_SUBDIRS
+]
+
+cc_library(
+    name = "ngspice_headers",
+    hdrs = glob([
+        "src/**/*.h",
+    ]) + [
+        "src/frontend/parse-bison.h",
+        "src/include/ngspice/config.h",
+        "src/spicelib/parser/inpptree-parser.h",
+    ],
+    includes = [
+        "src/include",
+        "src/frontend",
+        "src/maths/poly",
+        "src/spicelib/devices",
+        "src/spicelib/parser",
+    ],
+)
+
+cc_library(
+    name = "libngspice",
+    srcs = glob([
+        "src/**/*.c",
+        "src/spicelib/parser/inpptree-parser.c",
+    ], exclude = [
+        "**/test_*.c",
+        "src/main.c",
+        "src/makeidx.c",
+        "src/ngmultidec.c",
+        "src/ngnutmeg.c",
+        "src/ngproc2mod.c",
+        "src/ngsconvert.c",
+        "src/frontend/testcommands.c",
+        "src/nghelp.c",
+        "src/spicelib/analysis/pssinit.c",
+        "src/spicelib/analysis/psssetp.c",
+        "src/spicelib/analysis/dcpss.c",
+        "src/tclspice.c",
+        "src/unsupported/sen2setp.c",
+        "src/unsupported/spiced.c",
+        "src/xspice/cm/cmexport.c",
+        "src/xspice/icm/dlmain.c",
+        "src/xspice/icm/**/*.c",
+        "src/xspice/cmpp/*.c",
+    ]) + [
+        "src/frontend/parse-bison.c",
+        "src/spicelib/parser/inpptree-parser.c",
+        "src/spicelib/parser/inpptree-parser.h",
+    ],
+    defines = C_DEFINES,
+    deps = [
+        ":ngspice_headers",
+        "@org_fftw//:fftw",
+        "@org_gnu_readline//:readline",
+    ],
+    copts = COPTS,
+)
+
+cc_binary(
+    name = "ngspice",
+    srcs = ["src/main.c"],
+    deps = [
+        ":libngspice",
+    ],
+    defines = C_DEFINES,
+    linkopts = ["-ldl"],
+    visibility = ["//visibility:public"],
+)
+
+genyacc(
+    name = "inpptree_parser",
+    src = "src/spicelib/parser/inpptree-parser.y",
+    header_out = "src/spicelib/parser/inpptree-parser.h",
+    source_out = "src/spicelib/parser/inpptree-parser.c",
+)
+
+genyacc(
+    name = "parse_bison",
+    src = "src/frontend/parse-bison.y",
+    header_out = "src/frontend/parse-bison.h",
+    source_out = "src/frontend/parse-bison.c",
+)
+
+pseudo_configure(
+    name = "config_h",
+    out = "src/include/ngspice/config.h",
+    additional = {
+        "CIDER": "1",
+        "HAVE_ACCESS": "1",
+        "HAVE_ACOSH": "1",
+        "HAVE_ALLOCA": "1",
+        "HAVE_ALLOCA_H": "1",
+        "HAVE_ARPA_INET_H": "1",
+        "HAVE_ASINH": "1",
+        "HAVE_ATANH": "1",
+        "HAVE_CTYPE_H": "1",
+        "HAVE_DECL_ISINF": "1",
+        "HAVE_DECL_ISNAN": "1",
+        "HAVE_DIRENT_H": "1",
+        "HAVE_DIRNAME": "1",
+        "HAVE_DLFCN_H": "1",
+        "HAVE_DUP2": "1",
+        "HAVE_ENDPWENT": "1",
+        "HAVE_ERFC": "1",
+        "HAVE_FCNTL_H": "1",
+        "HAVE_FINITE": "1",
+        "HAVE_FLOAT_H": "1",
+        "HAVE_FORK": "1",
+        "HAVE_FTIME": "1",
+        "HAVE_GETCWD": "1",
+        "HAVE_GETHOSTBYNAME": "1",
+        "HAVE_GETOPT_H": "1",
+        "HAVE_GETOPT_LONG": "1",
+        "HAVE_GETRLIMIT": "1",
+        "HAVE_GETTIMEOFDAY": "1",
+        "HAVE_GNUREADLINE": "1",
+        "HAVE_INTTYPES_H": "1",
+        "HAVE_ISATTY": "1",
+        "HAVE_LIBFFTW3": "1",
+        "HAVE_LIBINTL_H": "1",
+        "HAVE_LIBM": "1",
+        "HAVE_LIBPTHREAD": "1",
+        "HAVE_LIMITS_H": "1",
+        "HAVE_LOCALTIME": "1",
+        "HAVE_LOGB": "1",
+        "HAVE_MALLOC": "1",
+        "HAVE_MALLOC_H": "1",
+        "HAVE_MEMORY_H": "1",
+        "HAVE_MEMSET": "1",
+        "HAVE_MODF": "1",
+        "HAVE_NETDB_H": "1",
+        "HAVE_NETINET_IN_H": "1",
+        "HAVE_POPEN": "1",
+        "HAVE_PWD_H": "1",
+        "HAVE_QSORT": "1",
+        "HAVE_REALLOC": "1",
+        "HAVE_SCALB": "1",
+        "HAVE_SCALBN": "1",
+        "HAVE_SELECT": "1",
+        "HAVE_SIGSETJMP": "/**/",
+        "HAVE_SIG_T": "1",
+        "HAVE_SNPRINTF": "1",
+        "HAVE_SOCKET": "1",
+        "HAVE_STDBOOL_H": "1",
+        "HAVE_STDDEF_H": "1",
+        "HAVE_STDINT_H": "1",
+        "HAVE_STDLIB_H": "1",
+        "HAVE_STRCHR": "1",
+        "HAVE_STRDUP": "1",
+        "HAVE_STRERROR": "1",
+        "HAVE_STRINGS_H": "1",
+        "HAVE_STRING_H": "1",
+        "HAVE_STRNCASECMP": "1",
+        "HAVE_STROPTS_H": "1",
+        "HAVE_STRRCHR": "1",
+        "HAVE_STRSTR": "1",
+        "HAVE_STRTOL": "1",
+        "HAVE_STRUCT_TM_TM_ZONE": "1",
+        "HAVE_SYS_FILE_H": "1",
+        "HAVE_SYS_IOCTL_H": "1",
+        "HAVE_SYS_IO_H": "1",
+        "HAVE_SYS_PARAM_H": "1",
+        "HAVE_SYS_SELECT_H": "1",
+        "HAVE_SYS_SOCKET_H": "1",
+        "HAVE_SYS_STAT_H": "1",
+        "HAVE_SYS_TIMEB_H": "1",
+        "HAVE_SYS_TIME_H": "1",
+        "HAVE_SYS_TYPES_H": "1",
+        "HAVE_SYS_WAIT_H": "1",
+        "HAVE_TCGETATTR": "1",
+        "HAVE_TCSETATTR": "1",
+        "HAVE_TDESTROY": "1",
+        "HAVE_TERMCAP_H": "1",
+        "HAVE_TERMIOS_H": "1",
+        "HAVE_TM_ZONE": "1",
+        "HAVE_TSEARCH": "1",
+        "HAVE_UNISTD_H": "1",
+        "HAVE_UTIMES": "1",
+        "HAVE_VALUES_H": "1",
+        "HAVE_VFORK": "1",
+        "HAVE_VPRINTF": "1",
+        "HAVE_WORKING_FORK": "1",
+        "HAVE_WORKING_VFORK": "1",
+        "HAVE__BOOL": "1",
+        "HAVE__PROC_MEMINFO": "1",
+        "HAVE___SIGHANDLER_T": "1",
+        "IPC_UNIX_SOCKETS": "1",
+        "LT_OBJDIR": "\".libs/\"",
+        "NGSPICEBINDIR": "\"/usr/local/bin\"",
+        "NGSPICEBUILDDATE": "\"Thu Dec  3 20:05:53 UTC 2020\"",
+        "NGSPICEDATADIR": "\"/usr/local/share/ngspice\"",
+        "NOINTHELP": "1",
+        "OS_COMPILED": "6",
+        "PACKAGE": "\"ngspice\"",
+        "PACKAGE_BUGREPORT": "\"http://ngspice.sourceforge.net/bugrep.html\"",
+        "PACKAGE_NAME": "\"ngspice\"",
+        "PACKAGE_STRING": "\"ngspice 33\"",
+        "PACKAGE_TARNAME": "\"ngspice\"",
+        "PACKAGE_URL": "\"\"",
+        "PACKAGE_VERSION": "\"33\"",
+        "RETSIGTYPE": "void",
+        "SELECT_TYPE_ARG1": "int",
+        "SELECT_TYPE_ARG234": "(fd_set *)",
+        "SELECT_TYPE_ARG5": "(struct timeval *)",
+        "STDC_HEADERS": "1",
+        "TIME_WITH_SYS_TIME": "1",
+        # "USE_OMP": "1",  # OpenMP is disabled for now because the compiler toolchain doesn't support it.
+        "VERSION": "\"33\"",
+        "XSPICE": "1",
+        "X_DISPLAY_MISSING": "1",
+        "YYTEXT_POINTER": "1",
+    },
+)

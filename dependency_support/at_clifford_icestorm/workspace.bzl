@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC
+# Copyright 2020 The XLS Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,22 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-workspace(name = "rules_hdl")
+"""Loads the Icestorm project that documents the bitstream format of Lattice iCE40."""
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-maybe(
-    http_archive,
-    name = "rules_python",
-    url = "https://github.com/bazelbuild/rules_python/releases/download/0.1.0/rules_python-0.1.0.tar.gz",
-    sha256 = "b6d46438523a3ec0f3cead544190ee13223a52f6a6765a29eae7b7cc24cc83a0",
-)
-load("//:init.bzl", "init")
-init()
-
-# Third Party
-load("//dependency_support:dependency_support.bzl", "dependency_support")
-dependency_support()
-# Third Party
-
+def repo():
+    maybe(
+        http_archive,
+        name = "at_clifford_icestorm",
+        urls = [
+            "https://github.com/cliffordwolf/icestorm/archive/cd2610e0fa1c6a90e8e4e4cfe06db1b474e752bb.zip",  # 2020-06-02
+        ],
+        strip_prefix = "icestorm-cd2610e0fa1c6a90e8e4e4cfe06db1b474e752bb",
+        sha256 = "e8d12796091f5988097459450de20e4a59c873ca2fa580fef2f560c5543a1738",
+        build_file = Label("//dependency_support:at_clifford_icestorm/bundled.BUILD.bazel"),
+    )
