@@ -35,6 +35,7 @@ load("//dependency_support/org_gnu_gperf:org_gnu_gperf.bzl", "org_gnu_gperf")
 load("//dependency_support/org_gnu_m4:org_gnu_m4.bzl", "org_gnu_m4")
 load("//dependency_support/org_gnu_readline:org_gnu_readline.bzl", "org_gnu_readline")
 load("//dependency_support/org_sourceware_bzip2:org_sourceware_bzip2.bzl", "org_sourceware_bzip2")
+load("//dependency_support/tk_tcl:tk_tcl.bzl", "tk_tcl")
 
 def dependency_support():
   at_clifford_icestorm()
@@ -56,3 +57,4 @@ def dependency_support():
   org_gnu_m4()
   org_gnu_readline()
   org_sourceware_bzip2()
+  tk_tcl()
