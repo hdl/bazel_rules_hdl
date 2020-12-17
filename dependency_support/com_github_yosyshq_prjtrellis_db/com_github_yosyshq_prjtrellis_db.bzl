@@ -12,22 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-workspace(name = "rules_hdl")
+"""Loads the Project Trellis database with bitstream documentation for Lattice ECP5 devices."""
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-maybe(
-    http_archive,
-    name = "rules_python",
-    url = "https://github.com/bazelbuild/rules_python/releases/download/0.1.0/rules_python-0.1.0.tar.gz",
-    sha256 = "b6d46438523a3ec0f3cead544190ee13223a52f6a6765a29eae7b7cc24cc83a0",
-)
-
-# Third Party
-load("//dependency_support:dependency_support.bzl", "dependency_support")
-dependency_support()
-# Third Party
-
-load("//:init.bzl", "init")
-init()
+def com_github_yosyshq_prjtrellis_db():
+    maybe(
+        http_archive,
+        name = "com_github_yosyshq_prjtrellis_db",
+        urls = [
+            "https://github.com/SymbiFlow/prjtrellis-db/archive/c137076fdd8bfca3d2bf9cdacda9983dbbec599a.zip",  # 2020-06-03
+        ],
+        strip_prefix = "prjtrellis-db-c137076fdd8bfca3d2bf9cdacda9983dbbec599a",
+        sha256 = "01d3d3906a7f690bd05f97b87bf196f602c659e0dadc77ebbccdd1acf1e362ca",
+        build_file = Label("//dependency_support/com_github_yosyshq_prjtrellis_db:bundled.BUILD.bazel"),
+    )
