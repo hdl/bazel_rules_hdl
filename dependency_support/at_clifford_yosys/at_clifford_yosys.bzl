@@ -12,11 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Loads the Yosys framework for Verilog synthesis."""
 
-"""
-The bazel yosys package.
-"""
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 def at_clifford_yosys():
-  # Include the http_archive rule here as well as any BUILD files.
-  print("Add yosys rules")
+    maybe(
+        http_archive,
+        name = "at_clifford_yosys",
+        urls = [
+            "https://github.com/YosysHQ/yosys/archive/aafaeb66dfd839b8223059884d2741dadc9e2d92.zip",
+        ],
+        strip_prefix = "yosys-aafaeb66dfd839b8223059884d2741dadc9e2d92",
+        sha256 = "d8156497c882fb6754597b6193a65966b83cd81e362174de5d986b6a5fce05c3",
+        build_file = Label("//dependency_support:at_clifford_yosys/bundled.BUILD.bazel"),
+    )
