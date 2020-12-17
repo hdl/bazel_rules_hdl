@@ -13,6 +13,8 @@
 # limitations under the License.
 
 load("@rules_python//python:pip.bzl", "pip_install")
+load("//dependency_support/boost:init_boost.bzl", "init_boost")
+load("//dependency_support/pybind11:init_pybind11.bzl", "init_pybind11")
 
 def init(python_interpreter=None, python_interpreter_target=None):
     '''Initializes the bazel_rules_hdl workspace.
@@ -32,3 +34,6 @@ def init(python_interpreter=None, python_interpreter_target=None):
         python_interpreter = python_interpreter,
         python_interpreter_target = python_interpreter_target
     )
+
+    init_boost()
+    init_pybind11()
