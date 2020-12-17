@@ -1159,6 +1159,7 @@ cc_library(
         "-Wno-unused-function",
         "-Wno-unused-variable",
         "-Wno-write-strings",
+        "-Wno-maybe-uninitialized",  # This is possibly concerning.
         "-Wno-sometimes-uninitialized",  # This is possibly concerning.
         "-Wno-unknown-warning-option",  # Clang and GCC warn differently.
     ],
