@@ -122,7 +122,7 @@ GENERATED_HEADERS = [
 
 YOSYS_COPTS = [
     "-DYOSYS_SRC='\"./\"'",
-    "-DYOSYS_DATDIR='\"./\"'",
+    "-DYOSYS_DATDIR='std::getenv(\"YOSYS_DATDIR\") ? std::getenv(\"YOSYS_DATDIR\") : \".\"'",
     "-fexceptions",
     "-Wno-error",
     "-Wno-implicit-fallthrough",
