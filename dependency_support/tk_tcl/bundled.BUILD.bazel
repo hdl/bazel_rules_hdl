@@ -92,6 +92,18 @@ cc_library(
     ],
 )
 
+# Contains the runtime libraries used in the tcl build rules.
+#
+# The filegroup is included in the data attribute of rules that require external
+# files to run correctly.
+filegroup(
+    name = "tcl_library_internal",
+    srcs = glob([
+        "library/**/*"
+    ]),
+    visibility = ["//visibility:private"],
+)
+
 # tclUnixInit uses additional define
 cc_library(
     name = "tclUnixInit",
@@ -108,9 +120,12 @@ cc_library(
         "generic/*.h",
         "unix/*.h",
     ]),
+    data = [
+        ":tcl_library_internal",
+    ],
     copts = TCL_COPTS + [
-        "-DTCL_LIBRARY=\\\"dependency_support/tcl_tk/library\\\"",
-        "-DTCL_PACKAGE_PATH=\\\"dependency_support/tcl_tk/tcl8.6.4\\\"",
+        "-DTCL_LIBRARY=\\\"external/tk_tcl/library\\\"",
+        "-DTCL_PACKAGE_PATH=\\\"external/tk_tcl\\\"",
     ],
     includes = ["generic", "unix"],
 )
@@ -131,13 +146,16 @@ cc_library(
         "-DCFG_INSTALL_BINDIR='\"this_BINDIR_does_not_exist\"'",
         "-DCFG_INSTALL_DOCDIR='\"this_DOCDIR_does_not_exist\"'",
         "-DCFG_INSTALL_INCDIR='\"this_INCDIR_does_not_exist\"'",
-        "-DCFG_INSTALL_SCRDIR='\"this_SCRDIR_does_not_exist\"'",
+        "-DCFG_INSTALL_SCRDIR='\"external/tk_tcl/library\"'",
         "-DCFG_RUNTIME_LIBDIR='\"this_LIBDIR_does_not_exist\"'",
         "-DCFG_RUNTIME_BINDIR='\"this_BINDIR_does_not_exist\"'",
         "-DCFG_RUNTIME_DOCDIR='\"this_DOCDIR_does_not_exist\"'",
         "-DCFG_RUNTIME_INCDIR='\"this_INCDIR_does_not_exist\"'",
-        "-DCFG_RUNTIME_SCRDIR='\"this_SCRDIR_does_not_exist\"'",
+        "-DCFG_RUNTIME_SCRDIR='\"external/tk_tcl/library\"'",
         "-DTCL_CFGVAL_ENCODING='\"ascii\"'",
+    ],
+    data = [
+        ":tcl_library_internal",
     ],
     includes = [
         "generic/",
