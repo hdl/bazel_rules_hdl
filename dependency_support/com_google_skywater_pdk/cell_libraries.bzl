@@ -51,6 +51,7 @@ CELL_LIBRARIES = {
             "tt_025C_1v80": ["basic"],
             "tt_100C_1v80": ["basic"],
         },
+        "default_corner": "ff_100C_1v95",
     },
     "sky130_fd_sc_hdll": {
         "commit": "0694bd23893de20f5233ef024acf6cca1e750ac6",  # v0.1.1, 2020-12-04
@@ -68,6 +69,7 @@ CELL_LIBRARIES = {
             "ss_n40C_1v76": ["basic"],
             "tt_025C_1v80": ["basic"],
         },
+        "default_corner": "ff_100C_1v95",
     },
     "sky130_fd_sc_hs": {
         "commit": "1d051f49bfe4e2fe9108d702a8bc2e9c081005a4",  # v0.0.2, 2020-12-04
@@ -95,6 +97,7 @@ CELL_LIBRARIES = {
             "tt_100C_1v80": ["basic"],
             "tt_150C_1v80": ["basic"],
         },
+        "default_corner": "ff_100C_1v95",
     },
     "sky130_fd_sc_hvl": {
         "commit": "4fd4f858d16c558a6a488b200649e909bb4dd800",  # v0.0.3, 2020-12-04
@@ -158,6 +161,7 @@ CELL_LIBRARIES = {
             "tt_100C_3v30_lv1v80": ["basic"],
             "tt_150C_3v30_lv1v80": ["basic"],
         },
+        "default_corner": "ss_100C_1v95",
     },
     "sky130_fd_sc_lp": {
         "commit": "e2c1e0646999163d35ea7b2521c3ec5c28633e63",  # v0.0.2, 2020-12-04
@@ -178,6 +182,7 @@ CELL_LIBRARIES = {
             "ss_n40C_1v60": ["basic"],
             "ss_n40C_1v65": ["basic"],
         },
+        "default_corner": "ff_100C_1v95",
     },
     "sky130_fd_sc_ls": {
         "commit": "4f549e30dd91a1c264f8895e07b2872fe410a8c2",  # v0.1.1, 2020-12-04
@@ -203,6 +208,7 @@ CELL_LIBRARIES = {
             "tt_025C_1v80": ["basic", "ccsnoise"],
             "tt_100C_1v80": ["basic"],
         },
+        "default_corner": "ff_100C_1v95",
     },
     "sky130_fd_sc_ms": {
         "commit": "ae1b7f68821505cf2d93d9d44cce5ece22710fad",  # v0.0.2, 2020-12-04
@@ -224,5 +230,6 @@ CELL_LIBRARIES = {
             "tt_025C_1v80": ["basic", "ccsnoise"],
             "tt_100C_1v80": ["basic"],
         },
+        "default_corner": "ff_100C_1v95",
     },
 }

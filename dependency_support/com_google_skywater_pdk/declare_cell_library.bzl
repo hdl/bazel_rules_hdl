@@ -16,6 +16,7 @@
 cell library workspace to set things up."""
 
 load(":cell_libraries.bzl", "CELL_LIBRARIES")
+load("@rules_hdl//pdk/skywater130:build_defs.bzl", "skywater_cell_library", "skywater_corner")
 
 _FILE_SUFFIX_BY_CORNER_TYPE = {
     "basic": "",
@@ -29,11 +30,10 @@ _GENERATOR_ARGUMENT_BY_CORNER_TYPE = {
     "leakage": "--leakage",
 }
 
-def declare_cell_library(library_name):
+def declare_cell_library(workspace_name, library_name):
     """This should be called from the BUILD file of a cell library
     workspace. It sets up the targets for the generated files of
     the given library."""
-    native.exports_files(native.glob(["**/*"]))
     native.filegroup(
         name = "spice_models",
         srcs = native.glob(["**/*.spice"]),
@@ -42,25 +42,22 @@ def declare_cell_library(library_name):
     library = CELL_LIBRARIES[library_name]
     corners = library.get("corners", {})
     for corner in corners:
-        corner_types = library["corners"][corner]
-        for corner_type in corner_types:
-            out_path = "timing/%s__%s%s.lib" % (library_name, corner, _FILE_SUFFIX_BY_CORNER_TYPE[corner_type])
-            native.genrule(
-                name = "timing_%s_%s" % (corner, corner_type),
-                visibility = ["//visibility:public"],
-                outs = [out_path],
-                srcs = native.glob(["**/*"]),
-                message = "Generating %s timing files, %s corner %s" % (library_name, corner_type, corner),
-                cmd = "$(location @com_google_skywater_pdk//:liberty) %s \"external/com_google_skywater_pdk_%s\" %s > /dev/null && mv \"external/com_google_skywater_pdk_%s/%s\" $@" % (_GENERATOR_ARGUMENT_BY_CORNER_TYPE[corner_type], library_name, corner, library_name, out_path),
-                tools = ["@com_google_skywater_pdk//:liberty"],
-            )
-        native.filegroup(
-            name = "timing_%s_all" % corner,
-            visibility = ["//visibility:public"],
-            srcs = [":timing_%s_%s" % (corner, corner_type) for corner_type in corner_types]
+        ccsnoise = "ccsnoise" in corners[corner]
+        leakage = ccsnoise
+        skywater_corner(
+            name = "{}".format(corner),
+            visibility = ["//visibility:private"],
+            srcs = native.glob([
+                "cells/**/*.lib.json",
+                "timing/*.lib.json",
+            ]),
+            standard_cell_name = library_name,
+            ccsnoise = ccsnoise,
+            leakage = leakage,
+            standard_cell_root = "external/{}".format(workspace_name),
         )
-    native.filegroup(
-        name = "timing_all",
-        visibility = ["//visibility:public"],
-        srcs = [":timing_%s_all" % corner for corner in corners],
+    skywater_cell_library(
+        name = library_name,
+        process_corners = [":{}".format(corner) for corner in corners],
+        default_corner = library.get("default_corner", ""),
     )

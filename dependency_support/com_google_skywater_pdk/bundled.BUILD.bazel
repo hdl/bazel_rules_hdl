@@ -40,9 +40,3 @@ py_library(
         requirement("dataclasses-json"),
     ],
 )
-
-filegroup(
-    name = "timing_all",
-    visibility = ["//visibility:public"],
-    srcs = ["@com_google_skywater_pdk_%s//:timing_all" % library_name for library_name in CELL_LIBRARIES],
-)

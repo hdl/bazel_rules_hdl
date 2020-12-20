@@ -19,12 +19,12 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load(":cell_libraries.bzl", "CELL_LIBRARIES")
 
-def _build_file(library_name):
+def _build_file(workspace_name, library_name):
     library = CELL_LIBRARIES[library_name]
     return """
 load("@rules_hdl//dependency_support/com_google_skywater_pdk:declare_cell_library.bzl", "declare_cell_library")
-declare_cell_library("%s")
-""" % library_name
+declare_cell_library("{}", "{}")
+""".format(workspace_name, library_name)
 
 def com_google_skywater_pdk():
     maybe(
@@ -40,11 +40,12 @@ def com_google_skywater_pdk():
 
     for library_name in CELL_LIBRARIES:
         library = CELL_LIBRARIES[library_name]
+        workspace_name = "com_google_skywater_pdk_" + library_name
         maybe(
             new_git_repository,
-            name = "com_google_skywater_pdk_" + library_name,
+            name = workspace_name,
             commit = library["commit"],
             remote = "https://foss-eda-tools.googlesource.com/skywater-pdk/libs/%s.git" % library_name,
             shallow_since = library["shallow_since"],
-            build_file_content = _build_file(library_name),
+            build_file_content = _build_file(workspace_name, library_name),
         )
