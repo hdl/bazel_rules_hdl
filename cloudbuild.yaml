@@ -1,0 +1,14 @@
+timeout: 3600s
+options:
+  machineType: 'N1_HIGHCPU_8'
+logsBucket: 'gs://bazel_rules_hdl'
+
+steps:
+# Run the build
+- name: l.gcr.io/google/bazel:3.5.0
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    echo The build was successfully invoked.
+  timeout: 3600s
