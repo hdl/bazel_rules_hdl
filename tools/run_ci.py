@@ -12,13 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-build --cxxopt "-std=c++17"
-build --host_cxxopt "-std=c++17"
+import os
+import uuid
 
-build:ciremotebuild --bes_results_url=https://app.buildbuddy.io/invocation/
-build:ciremotebuild --bes_backend=grpcs://cloud.buildbuddy.io
-build:ciremotebuild --remote_cache=grpcs://cloud.buildbuddy.io
-build:ciremotebuild --remote_download_toplevel
-build:ciremotebuild --tls_client_certificate=/root/.ssh/buildbuddy-cert.pem
-build:ciremotebuild --tls_client_key=/root/.ssh/buildbuddy-key.pem
-build:ciremotebuild --build_metadata=VISIBILITY=PUBLIC
+invocation_id = str(uuid.uuid1())
+results_url = "https://app.buildbuddy.io/invocation/%s" % invocation_id
+print('The build logs are available at %s' % results_url)
+os.system('bazel build --invocation_id=%s --config=ciremotebuild //...' % invocation_id)
