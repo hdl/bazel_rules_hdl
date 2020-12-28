@@ -7,3 +7,4 @@ build:ciremotebuild --remote_cache=grpcs://cloud.buildbuddy.io
 build:ciremotebuild --remote_download_toplevel
 build:ciremotebuild --tls_client_certificate=/root/.ssh/buildbuddy-cert.pem
 build:ciremotebuild --tls_client_key=/root/.ssh/buildbuddy-key.pem
+build:ciremotebuild --build_metadata=VISIBILITY=PUBLIC
