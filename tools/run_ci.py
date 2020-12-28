@@ -12,10 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
 import os
+import shlex
 import uuid
 
+def parse_arguments():
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--user', help='Name of the user that initiated the build')
+  return parser.parse_args()
+
+args = parse_arguments()
 invocation_id = str(uuid.uuid1())
 results_url = "https://app.buildbuddy.io/invocation/%s" % invocation_id
-print('The build logs are available at %s' % results_url)
-os.system('bazel build --invocation_id=%s --config=ciremotebuild //...' % invocation_id)
+os.system('bazel build' +
+    ' --invocation_id=' + invocation_id +
+    ' --build_metadata=USER=' + shlex.quote(args.user) +
+    ' --config=ciremotebuild //...')

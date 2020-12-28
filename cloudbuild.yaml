@@ -36,8 +36,11 @@ steps:
   args:
   - '-c'
   - |
-    python3 tools/run_ci.py
+    python3 tools/run_ci.py --user="${_USERNAME}"
   timeout: 3600s
   volumes:
   - name: 'ssh'
     path: /root/.ssh
+
+substitutions:
+  _USERNAME: $(pull_request.pull_request.user.login)
