@@ -27,6 +27,7 @@ steps:
   - |
     gcloud secrets versions access latest --secret=buildbuddy-cert > /root/.ssh/buildbuddy-cert.pem
     gcloud secrets versions access latest --secret=buildbuddy-key > /root/.ssh/buildbuddy-key.pem
+    gcloud secrets versions access latest --secret=github-app-key-cloud-build-status-reporter > /root/.ssh/github-app-key-cloud-build-status-reporter.pem
   volumes:
   - name: 'ssh'
     path: /root/.ssh
@@ -37,7 +38,19 @@ steps:
   args:
   - '-c'
   - |
-    python3 tools/run_ci.py --user="${_USERNAME}"
+    set -e
+    python3 tools/generate_uuid.py > invocation_id.txt
+    echo STATUS: Reporting logs with invocation id $(cat invocation_id.txt) to GitHub.
+    bazel run //tools:report_status_to_github -- \
+        --head_sha=${COMMIT_SHA} \
+        --invocation_id=$(cat invocation_id.txt) \
+        --github_app_key_file=/root/.ssh/github-app-key-cloud-build-status-reporter.pem
+    echo STATUS: Reported logs to GitHub.
+    bazel build \
+        --invocation_id=$(cat invocation_id.txt) \
+        --build_metadata=USER="${_USERNAME}" \
+        --config=ciremotebuild \
+        //...
   timeout: 3600s
   volumes:
   - name: 'ssh'
