@@ -15,6 +15,7 @@
 build --cxxopt "-std=c++17"
 build --host_cxxopt "-std=c++17"
 
+build:ciremotebuild --crosstool_top=@llvm_toolchain//:toolchain
 build:ciremotebuild --bes_results_url=https://app.buildbuddy.io/invocation/
 build:ciremotebuild --bes_backend=grpcs://cloud.buildbuddy.io
 build:ciremotebuild --remote_cache=grpcs://cloud.buildbuddy.io
