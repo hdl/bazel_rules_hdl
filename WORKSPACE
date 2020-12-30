@@ -17,6 +17,10 @@ workspace(name = "rules_hdl")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
+load("//toolchains/cpython:cpython_toolchain.bzl", "register_cpython_repository")
+register_cpython_repository()
+register_toolchains("//toolchains/cpython:cpython_toolchain")
+
 maybe(
     http_archive,
     name = "rules_python",
@@ -30,4 +34,4 @@ dependency_support()
 # Third Party
 
 load("//:init.bzl", "init")
-init()
+init(python_interpreter_target = "@rules_hdl_cpython//:install/bin/python3",)

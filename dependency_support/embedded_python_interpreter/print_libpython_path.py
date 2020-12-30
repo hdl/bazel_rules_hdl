@@ -19,8 +19,18 @@ import os
 
 config_vars = sysconfig.get_config_vars()
 file_paths = [
-    os.path.join(config_vars[pv], config_vars['LDLIBRARY'])
-    for pv in ('LIBDIR', 'LIBPL')
+  os.path.join(config_vars[pv], config_vars['LDLIBRARY'])
+  for pv in ('LIBDIR', 'LIBPL')
 ]
+
+if 'rules_hdl_cpython' in config_vars['prefix']:
+  # Hack: Work around broken library paths in the hermetic Python toolchain that
+  # is used in rules_hdl CI runs (and can optionally be used by its users as
+  # well). It reports that the library path is an absolute path like
+  #
+  #   /install/lib/libpython3.8.so
+  #
+  # but this path doesn't exist. So we'll fix it here.
+  file_paths = [path.replace('/install', config_vars['prefix']) for path in file_paths]
 
 print(list(filter(os.path.exists, file_paths))[0])
