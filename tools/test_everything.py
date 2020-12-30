@@ -20,6 +20,7 @@ This is what the CI builds do, and the script also works locally. Run it with
 
 import os
 import subprocess
+import sys
 
 ALL_TARGETS = [
   '//...',
@@ -50,5 +51,6 @@ ALL_TARGETS = [
 ]
 
 for action in ['build', 'test']:
-  subprocess.call('bazel ' + action + ' ' + os.environ.get('EXTRA_BAZEL_ARGS', '') + ' ' + ' '.join(ALL_TARGETS), shell=True)
-
+  return_code = subprocess.call('bazel ' + action + ' ' + os.environ.get('EXTRA_BAZEL_ARGS', '') + ' ' + ' '.join(ALL_TARGETS), shell=True)
+  if return_code != 0:
+    sys.exit(return_code)
