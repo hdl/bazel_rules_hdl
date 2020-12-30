@@ -50,8 +50,6 @@ llvm_toolchain(
         "linux": "clang+llvm-10.0.1-x86_64-pc-linux-gnu",
     },
 )
-load("@llvm_toolchain//:toolchains.bzl", "llvm_register_toolchains")
-llvm_register_toolchains()
 
 maybe(
     http_archive,
