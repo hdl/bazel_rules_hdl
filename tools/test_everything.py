@@ -13,6 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+'''This script builds and tests everything that rules_hdl has.
+
+This is what the CI builds do, and the script also works locally. Run it with
+`tools/test_everything.py`.'''
+
 import os
 import subprocess
 

@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+'''This script is used by CI builds. It reports the Bazel build log link to
+GitHub. This is done as a workaround for Cloud Build's lack of ability to share
+build logs with the public.'''
+
 import argparse
 import json
 from jwt import JWT, jwk_from_pem

@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+'''This script generates and prints a UUID. It's used by the CI scripts, which
+run on old Ubuntu that doesn't have the genuuid command installed.'''
+
 import uuid
 
 print(str(uuid.uuid1()))
