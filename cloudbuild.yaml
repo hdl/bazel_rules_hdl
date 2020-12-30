@@ -46,11 +46,9 @@ steps:
         --invocation_id=$(cat invocation_id.txt) \
         --github_app_key_file=/root/.ssh/github-app-key-cloud-build-status-reporter.pem
     echo STATUS: Reported logs to GitHub.
-    bazel build \
-        --invocation_id=$(cat invocation_id.txt) \
+    EXTRA_BAZEL_ARGS="--invocation_id=$(cat invocation_id.txt) \
         --build_metadata=USER="${_USERNAME}" \
-        --config=ciremotebuild \
-        //...
+        --config=ciremotebuild" tools/test_everything.py
   timeout: 3600s
   volumes:
   - name: 'ssh'
