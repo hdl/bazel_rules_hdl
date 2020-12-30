@@ -48,7 +48,8 @@ steps:
     echo STATUS: Reported logs to GitHub.
     EXTRA_BAZEL_ARGS="--invocation_id=$(cat invocation_id.txt) \
         --build_metadata=USER="${_USERNAME}" \
-        --config=ciremotebuild" tools/test_everything.py
+        --config=ciremotebuild \
+        --bes_results_url=https://app.buildbuddy.io/invocation/" tools/test_everything.py
   timeout: 3600s
   volumes:
   - name: 'ssh'
