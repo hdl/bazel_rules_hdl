@@ -126,11 +126,12 @@ YOSYS_COPTS = [
     "-fexceptions",
     "-Wno-error",
     "-Wno-implicit-fallthrough",
-    "-Wno-vla",
+    "-Wno-maybe-uninitialized",  # This is possibly concerning.
+    "-Wno-misleading-indentation",
     "-Wno-unused-but-set-variable",
     "-Wno-unused-variable",
-    "-Wno-maybe-uninitialized",  # This is possibly concerning.
     "-Wno-unknown-warning-option",  # Clang and GCC warn differently.
+    "-Wno-vla",
 ]
 
 cc_library(

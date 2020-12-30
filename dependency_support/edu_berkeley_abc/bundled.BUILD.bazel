@@ -1151,7 +1151,10 @@ cc_library(
     copts = [
         "-O2",
         "-Wno-format-overflow",
+        "-Wno-implicit-int-float-conversion",
+        "-Wno-misleading-indentation",
         "-Wno-nonnull",
+        "-Wno-self-assign",
         "-Wno-sign-compare",
         "-Wno-strict-aliasing",
         "-Wno-stringop-overflow",
