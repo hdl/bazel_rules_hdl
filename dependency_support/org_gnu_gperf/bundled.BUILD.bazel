@@ -42,8 +42,7 @@ cc_binary(
     deps = [":gperf_includes"],
     includes = ["lib", "src"],
     copts = [
-        "-Wno-register",
-        "-Wno-strict-aliasing",
+        "-w",
     ],
     output_licenses = ["unencumbered"],
     visibility = ["//visibility:public"],
