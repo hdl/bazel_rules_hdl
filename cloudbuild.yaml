@@ -14,7 +14,7 @@
 
 timeout: 3600s
 options:
-  machineType: 'N1_HIGHCPU_8'
+  machineType: 'N1_HIGHCPU_32'
   diskSizeGb: 100
 logsBucket: 'gs://bazel_rules_hdl'
 
