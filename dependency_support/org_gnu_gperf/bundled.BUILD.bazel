@@ -22,11 +22,17 @@ load("@rules_hdl//dependency_support:pseudo_configure.bzl", "pseudo_configure")
 
 exports_files(["COPYING"])
 
+COPTS = [
+    "-w",
+    "-std=c++11",
+]
+
 cc_library(
     name = "gperf_includes",
     textual_hdrs = glob([
         "src/*.icc",
     ]),
+    copts = COPTS,
 )
 
 cc_binary(
@@ -41,9 +47,7 @@ cc_binary(
     ],
     deps = [":gperf_includes"],
     includes = ["lib", "src"],
-    copts = [
-        "-w",
-    ],
+    copts = COPTS,
     output_licenses = ["unencumbered"],
     visibility = ["//visibility:public"],
 )
