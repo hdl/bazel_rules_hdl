@@ -41,7 +41,7 @@ steps:
     set -e
     python3 tools/generate_uuid.py > invocation_id.txt
     echo STATUS: Reporting logs with invocation id $(cat invocation_id.txt) to GitHub.
-    bazel run //tools:report_status_to_github -- \
+    bazel run --config=ciremotebuild //tools:report_status_to_github -- \
         --head_sha=${COMMIT_SHA} \
         --invocation_id=$(cat invocation_id.txt) \
         --github_app_key_file=/root/.ssh/github-app-key-cloud-build-status-reporter.pem
