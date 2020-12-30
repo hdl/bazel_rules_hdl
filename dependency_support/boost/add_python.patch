@@ -16,7 +16,7 @@ diff --git BUILD.boost BUILD.boost
 index e6b28cf..99470c5 100644
 --- BUILD.boost
 +++ BUILD.boost
-@@ -2268,3 +2268,41 @@ boost_library(
+@@ -2268,3 +2268,40 @@ boost_library(
          ":utility",
      ],
  )
@@ -25,7 +25,6 @@ index e6b28cf..99470c5 100644
 +    name = "python",
 +    srcs = glob([
 +        "libs/python/src/converter/*.cpp",
-+        "libs/python/src/numpy/*.cpp",
 +        "libs/python/src/object/*.cpp",
 +    ]),
 +    deps = [
