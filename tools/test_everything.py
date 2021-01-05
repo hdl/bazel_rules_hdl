@@ -35,7 +35,6 @@ ALL_TARGETS = [
   '@com_opencircuitdesign_magic//...',
   '@com_opencircuitdesign_netgen//...',
   '@edu_berkeley_abc//...',
-  '@net_invisible_island_ncurses//...',
   '@net_sourceforge_ngspice//...',
   '@net_zlib//...',
   '@org_fftw//...',
