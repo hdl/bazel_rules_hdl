@@ -23,9 +23,10 @@ cc_library(
     srcs = glob(
         ["*.c"],
         exclude = ["*_keymap.c"],
-    ),
+    ) + [
+        "readline/config.h",
+    ],
     hdrs = glob(["*.h"]) + [
-        "config.h",
         "emacs_keymap.c",
         "vi_keymap.c",
     ],
@@ -38,7 +39,6 @@ cc_library(
         "READLINE_HAVE_CONFIG_H",
     ],
     includes = [
-        ".",
         "readline",
     ],
     deps = [
@@ -51,7 +51,7 @@ cc_library(
     name = "prefixed_readline_header",
     include_prefix = "readline",
     hdrs = glob(["*.h"]) + [
-        "config.h",
+        "readline/config.h",
         "emacs_keymap.c",
         "vi_keymap.c",
     ],
@@ -60,7 +60,7 @@ cc_library(
 pseudo_configure(
     name = "config_h",
     src = "config.h.in",
-    out = "config.h",
+    out = "readline/config.h",
     defs = [],
     mappings = {
         '__EXTENSIONS__': '1',
