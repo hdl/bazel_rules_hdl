@@ -51,6 +51,8 @@ DEFINES = [
 COPTS = [
     "-std=gnu11",
     "-w",
+    "-Wno-return-type",  # -w is not enough to silence this warning for Clang.
+    "-Wno-unknown-warning-option",  # Clang and GCC warn differently.
 ]
 
 genrule(
