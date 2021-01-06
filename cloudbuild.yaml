@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-timeout: 3600s
+timeout: 10800s
 options:
   machineType: 'N1_HIGHCPU_32'
   diskSizeGb: 100
@@ -50,7 +50,7 @@ steps:
         --build_metadata=USER="${_USERNAME}" \
         --config=ciremotebuild \
         --bes_results_url=https://app.buildbuddy.io/invocation/" tools/test_everything.py
-  timeout: 3600s
+  timeout: 10800s
   volumes:
   - name: 'ssh'
     path: /root/.ssh
