@@ -50,6 +50,10 @@ ALL_TARGETS = [
 ]
 
 for action in ['build', 'test']:
-  return_code = subprocess.call('bazel ' + action + ' ' + os.environ.get('EXTRA_BAZEL_ARGS', '') + ' ' + ' '.join(ALL_TARGETS), shell=True)
+  command = ' '.join([
+    'bazel', action, os.environ.get('EXTRA_BAZEL_ARGS', ''), os.environ.get('EXTRA_%s_BAZEL_ARGS' % action.upper(), '')
+  ] + ALL_TARGETS)
+  print(command)
+  return_code = subprocess.call(command, shell=True)
   if return_code != 0:
     sys.exit(return_code)
