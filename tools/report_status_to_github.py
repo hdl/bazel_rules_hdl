@@ -26,7 +26,8 @@ import time
 def parse_arguments():
   parser = argparse.ArgumentParser()
   parser.add_argument('--head_sha', help='The git hash of the current commit', required=True)
-  parser.add_argument('--invocation_id', help='Bazel invocation id', required=True)
+  parser.add_argument('--build_invocation_id', help='Bazel invocation id for building', required=True)
+  parser.add_argument('--test_invocation_id', help='Bazel invocation id for testing', required=True)
   parser.add_argument('--github_app_key_file', help='Path to the private key for the GitHub App to use for status reporting', required=True)
   return parser.parse_args()
 
@@ -61,28 +62,29 @@ def generate_installation_access_token(jwt_token, installation_id):
   response.raise_for_status()
   return response.json()['token']
 
-def report_build_status(installation_access_token, head_sha, log_url):
+def report_build_status(installation_access_token, head_sha, invocation_id, invocation_name):
+  log_url = "https://app.buildbuddy.io/invocation/%s" % invocation_id
   response = requests.post('https://api.github.com/repos/hdl/bazel_rules_hdl/check-runs', headers={
     'Authorization': 'token %s' % installation_access_token,
     'Accept': 'application/vnd.github.v3+json',
   }, data=json.dumps({
-    'name': 'Bazel Build Log',
+    'name': 'Bazel %s Log' % invocation_name,
     'head_sha': head_sha,
     'details_url': log_url,
     'status': 'completed',
     'conclusion': 'neutral',
     'output': {
-      'title': 'Bazel Build Log',
-      'summary': '[Bazel Build Log](%s)' % log_url,
+      'title': 'Bazel %s Log' % invocation_name,
+      'summary': '[Bazel %s Log](%s)' % (invocation_name, log_url),
     },
   }))
   response.raise_for_status()
 
 args = parse_arguments()
 private_github_app_key = read_key_file(args.github_app_key_file)
-log_url = "https://app.buildbuddy.io/invocation/%s" % args.invocation_id
 
 jwt_token = generate_jwt_token(private_github_app_key)
 installation_id = find_installation_id(jwt_token)
 installation_access_token = generate_installation_access_token(jwt_token, installation_id)
-report_build_status(installation_access_token, args.head_sha, log_url)
+report_build_status(installation_access_token, args.head_sha, args.build_invocation_id, 'Build')
+report_build_status(installation_access_token, args.head_sha, args.test_invocation_id, 'Test')

@@ -39,17 +39,21 @@ steps:
   - '-c'
   - |
     set -e
-    python3 tools/generate_uuid.py > invocation_id.txt
+    python3 tools/generate_uuid.py > build_invocation_id.txt
+    python3 tools/generate_uuid.py > test_invocation_id.txt
     echo STATUS: Reporting logs with invocation id $(cat invocation_id.txt) to GitHub.
     bazel run --config=ciremotebuild //tools:report_status_to_github -- \
         --head_sha=${COMMIT_SHA} \
-        --invocation_id=$(cat invocation_id.txt) \
+        --build_invocation_id=$(cat build_invocation_id.txt) \
+        --test_invocation_id=$(cat test_invocation_id.txt) \
         --github_app_key_file=/root/.ssh/github-app-key-cloud-build-status-reporter.pem
     echo STATUS: Reported logs to GitHub.
-    EXTRA_BAZEL_ARGS="--invocation_id=$(cat invocation_id.txt) \
-        --build_metadata=USER="${_USERNAME}" \
+    EXTRA_BAZEL_ARGS="--build_metadata=USER=${_USERNAME} \
         --config=ciremotebuild \
-        --bes_results_url=https://app.buildbuddy.io/invocation/" tools/test_everything.py
+        --bes_results_url=https://app.buildbuddy.io/invocation/" \
+    EXTRA_BUILD_BAZEL_ARGS="--invocation_id=$(cat build_invocation_id.txt)" \
+    EXTRA_TEST_BAZEL_ARGS="--invocation_id=$(cat test_invocation_id.txt)" \
+        tools/test_everything.py
   timeout: 10800s
   volumes:
   - name: 'ssh'
