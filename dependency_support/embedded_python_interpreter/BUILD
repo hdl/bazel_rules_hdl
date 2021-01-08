@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load(":cc_so_library.bzl", "cc_so_library")
-
 py_binary(
     name = "print_libpython_path",
     srcs = ["print_libpython_path.py"],
@@ -22,17 +20,29 @@ py_binary(
 )
 
 genrule(
-    name = "embdedded_python_interpreter_symlink",
-    outs = ["embedded_python_interpreter.so.link"],
-    cmd = "ln -s \"$$($(location :print_libpython_path))\" $@",
-    exec_tools = [":print_libpython_path"],
+    name = "embdedded_python_interpreter_so",
+    outs = ["embedded_python_interpreter.so"],
+    # The .so file for the Python runtime has a name that is not known at
+    # analysis time. Because Bazel needs to know the name of the .so file
+    # at analysis time we use a genrule to copy the .so file to a known path.
+    # This causes problems with linking though, because the .so file has a
+    # SONAME entry which causes the linker to create an executable that points
+    # to the path named in SONAME rather than embdedded_python_interpreter.so.
+    # To force the linker to make an executable that points to the right shared
+    # library, the .so file is rewritten so that the SONAME field has the right
+    # path in it.
+    cmd = "cp \"$$($(location :print_libpython_path))\" $@ && $(location @org_nixos_patchelf//:patchelf) --set-soname embedded_python_interpreter.so $@",
+    exec_tools = [
+        ":print_libpython_path",
+        "@org_nixos_patchelf//:patchelf",
+    ],
 )
 
 # C binaries that embed a Python interpreter can depend on this library to get
 # access to the Python symbols. This target uses libpython from the Python
 # interpreter that is used by Bazel.
-cc_so_library(
+cc_import(
     name = "embedded_python_interpreter",
-    src = "embedded_python_interpreter.so.link",
+    shared_library = "embedded_python_interpreter.so",
     visibility = ["//visibility:public"],
 )
