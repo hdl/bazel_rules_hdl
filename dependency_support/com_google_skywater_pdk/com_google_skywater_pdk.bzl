@@ -27,6 +27,8 @@ declare_cell_library("{}", "{}")
 """.format(workspace_name, library_name)
 
 def com_google_skywater_pdk():
+    """Workspace rule for defining SKY130 build rules.
+    """
     maybe(
         http_archive,
         name = "com_google_skywater_pdk",
