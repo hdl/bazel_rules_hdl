@@ -1,6 +1,20 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Skywater 130 PDK support rules.
 
-These rules
+These rules generate PDK providers for downstream tools.
 """
 
 load("//pdk:build_defs.bzl", "CornerInfo", "StandardCellInfo")
@@ -12,19 +26,23 @@ def _skywater_corner_impl(ctx):
     # Choose the build target name as the corner first unless overwritten.
     corner = ctx.attr.corner if ctx.attr.corner else ctx.attr.name
 
-    timing_output = ctx.actions.declare_file("timing/{}__{}{}.lib".format(
-        ctx.attr.standard_cell_name,
-        corner,
-        "_ccsnoise" if ctx.attr.ccsnoise else "",
-    ))
+    corner_suffix = ""
 
     args = ctx.actions.args()
 
-    if ctx.attr.ccsnoise:
+    if ctx.attr.with_leakage:
+        corner_suffix = "_pwrlkg"
+        args.add("--leakage")
+
+    if ctx.attr.with_ccsnoise:
+        corner_suffix = "_ccsnoise"
         args.add("--ccsnoise")
 
-    if ctx.attr.leakage:
-        args.add("--leakage")
+    timing_output = ctx.actions.declare_file("timing/{}__{}{}.lib".format(
+        ctx.attr.standard_cell_name,
+        corner,
+        corner_suffix,
+    ))
 
     args.add_all("-o", [timing_output.dirname])
     args.add(standard_cell_root)
@@ -41,8 +59,8 @@ def _skywater_corner_impl(ctx):
         DefaultInfo(files = depset([timing_output])),
         CornerInfo(
             liberty = timing_output,
-            ccsnoise = ctx.attr.ccsnoise,
-            leakage = ctx.attr.leakage,
+            with_ccsnoise = ctx.attr.with_ccsnoise,
+            with_leakage = ctx.attr.with_leakage,
             corner_name = corner,
         ),
     ]
@@ -82,7 +100,7 @@ skywater_corner = rule(
             doc = "The root directory of the standard cell variants.",
             mandatory = True,
         ),
-        "ccsnoise": attr.bool(
+        "with_ccsnoise": attr.bool(
             default = False,
             doc = "Wheter to generate ccsnoise.",
         ),
@@ -90,7 +108,7 @@ skywater_corner = rule(
             mandatory = True,
             doc = "The name of the standar cell variant ex. sky130_fd_sc_hd",
         ),
-        "leakage": attr.bool(
+        "with_leakage": attr.bool(
             default = False,
             doc = "Wheter to generate leakage",
         ),

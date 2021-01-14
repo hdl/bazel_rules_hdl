@@ -16,34 +16,27 @@
 cell library workspace to set things up."""
 
 load(":cell_libraries.bzl", "CELL_LIBRARIES")
-load("@rules_hdl//pdk/skywater130:build_defs.bzl", "skywater_cell_library", "skywater_corner")
+load("@rules_hdl//dependency_support/com_google_skywater_pdk:build_defs.bzl", "skywater_cell_library", "skywater_corner")
 
-_FILE_SUFFIX_BY_CORNER_TYPE = {
-    "basic": "",
-    "ccsnoise": "_ccsnoise",
-    "leakage": "_pwrlkg",
-}
+def declare_cell_library(workspace_name, name):
+    """This should be called from the BUILD file of a cell library workspace. It sets up the targets for the generated files of the given library.
 
-_GENERATOR_ARGUMENT_BY_CORNER_TYPE = {
-    "basic": "",
-    "ccsnoise": "--ccsnoise",
-    "leakage": "--leakage",
-}
-
-def declare_cell_library(workspace_name, library_name):
-    """This should be called from the BUILD file of a cell library
-    workspace. It sets up the targets for the generated files of
-    the given library."""
+    Args:
+      workspace_name: The name of the skywater workspace
+      name: The name of the top level standard cell library
+    """
     native.filegroup(
         name = "spice_models",
         srcs = native.glob(["**/*.spice"]),
         visibility = ["//visibility:public"],
     )
-    library = CELL_LIBRARIES[library_name]
+    library = CELL_LIBRARIES[name]
     corners = library.get("corners", {})
     for corner in corners:
+        # boolean values indicating ccsnoise and leakage information in this
+        # corner.
         ccsnoise = "ccsnoise" in corners[corner]
-        leakage = ccsnoise
+        leakage = "leakage" in corners[corner]
         skywater_corner(
             name = "{}".format(corner),
             visibility = ["//visibility:private"],
@@ -51,13 +44,13 @@ def declare_cell_library(workspace_name, library_name):
                 "cells/**/*.lib.json",
                 "timing/*.lib.json",
             ]),
-            standard_cell_name = library_name,
-            ccsnoise = ccsnoise,
-            leakage = leakage,
+            standard_cell_name = name,
+            with_ccsnoise = ccsnoise,
+            with_leakage = leakage,
             standard_cell_root = "external/{}".format(workspace_name),
         )
     skywater_cell_library(
-        name = library_name,
+        name = name,
         process_corners = [":{}".format(corner) for corner in corners],
         default_corner = library.get("default_corner", ""),
     )
