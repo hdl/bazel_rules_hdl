@@ -25,6 +25,7 @@ import time
 
 def parse_arguments():
   parser = argparse.ArgumentParser()
+  parser.add_argument('--compiler', help='The name of the compiler used in the build', required=True)
   parser.add_argument('--head_sha', help='The git hash of the current commit', required=True)
   parser.add_argument('--build_invocation_id', help='Bazel invocation id for building', required=True)
   parser.add_argument('--test_invocation_id', help='Bazel invocation id for testing', required=True)
@@ -62,13 +63,13 @@ def generate_installation_access_token(jwt_token, installation_id):
   response.raise_for_status()
   return response.json()['token']
 
-def report_build_status(installation_access_token, head_sha, invocation_id, invocation_name):
+def report_build_status(installation_access_token, head_sha, invocation_id, compiler, invocation_name):
   log_url = "https://app.buildbuddy.io/invocation/%s" % invocation_id
   response = requests.post('https://api.github.com/repos/hdl/bazel_rules_hdl/check-runs', headers={
     'Authorization': 'token %s' % installation_access_token,
     'Accept': 'application/vnd.github.v3+json',
   }, data=json.dumps({
-    'name': 'Bazel %s Log' % invocation_name,
+    'name': '%s %s Log' % (compiler, invocation_name),
     'head_sha': head_sha,
     'details_url': log_url,
     'status': 'completed',
@@ -86,5 +87,5 @@ private_github_app_key = read_key_file(args.github_app_key_file)
 jwt_token = generate_jwt_token(private_github_app_key)
 installation_id = find_installation_id(jwt_token)
 installation_access_token = generate_installation_access_token(jwt_token, installation_id)
-report_build_status(installation_access_token, args.head_sha, args.build_invocation_id, 'Build')
-report_build_status(installation_access_token, args.head_sha, args.test_invocation_id, 'Test')
+report_build_status(installation_access_token, args.head_sha, args.build_invocation_id, args.compiler, 'Build')
+report_build_status(installation_access_token, args.head_sha, args.test_invocation_id, args.compiler, 'Test')
