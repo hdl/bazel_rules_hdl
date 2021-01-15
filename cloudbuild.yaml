@@ -60,4 +60,4 @@ steps:
     path: /root/.ssh
 
 substitutions:
-  _USERNAME: $(pull_request.pull_request.user.login)
+  _USERNAME: $(commit.author.login)
