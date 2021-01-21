@@ -17,6 +17,9 @@ build --host_cxxopt "-std=c++17"
 
 build:ciremotebuild --crosstool_top=@llvm_toolchain//:toolchain
 build:ciremotebuild --bes_backend=grpcs://cloud.buildbuddy.io
+build:ciremotebuild --remote_cache=https://storage.googleapis.com/bazel-cache-rules-hdl
+build:ciremotebuild --google_default_credentials
+build:ciremotebuild --remote_download_toplevel
 build:ciremotebuild --tls_client_certificate=/root/.ssh/buildbuddy-cert.pem
 build:ciremotebuild --tls_client_key=/root/.ssh/buildbuddy-key.pem
 build:ciremotebuild --build_metadata=VISIBILITY=PUBLIC
