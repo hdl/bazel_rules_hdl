@@ -14,17 +14,15 @@
 
 """Loads the Eigen C++ template library for linear algebra."""
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 def org_tuxfamily_eigen():
     maybe(
-        http_archive,
+        new_git_repository,
         name = "org_tuxfamily_eigen",
         build_file = Label("//dependency_support/org_tuxfamily_eigen:bundled.BUILD.bazel"),
-        sha256 = "3aebfcf3ca04d34c958bef6de7f80a4639b002989e5281b113b2cf4eb78b3f9b",
-        strip_prefix = "eigen-4fd5d1477b22",
-        urls = [
-            "https://github.com/retone/deps/releases/download/na3/eigen-4fd5d1477b22.tar.bz2",
-        ],
+        commit = "eb71e5db988d4a23e619ed054efd3eb751cdd026",  # 2021-03-17
+        remote = "https://gitlab.com/libeigen/eigen.git",
+        shallow_since = "1615946824 +0100",
     )
