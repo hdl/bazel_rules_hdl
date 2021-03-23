@@ -22,10 +22,19 @@ licenses(["restricted"])
 
 exports_files(["LICENSE"])
 
-pseudo_configure(
+# Remove the #undefs from config.h.in, because otherwise this file undefines the
+# SIMD macros that are set by `fftw_arch_copts` below.
+genrule(
     name = "config_h",
+    srcs = ["config.h.intermediate"],
+    outs = ["config.h"],
+    cmd = "grep -v '#undef' < $(location :config.h.intermediate) > $@",
+)
+
+pseudo_configure(
+    name = "config_h_intermediate",
     src = "config.h.in",
-    out = "config.h",
+    out = "config.h.intermediate",
     defs = [],
     mappings = {
         "FFTW_CC": "\"bazel-cc\"",
@@ -230,8 +239,6 @@ filegroup(
         "rdft/simd/generic-simd128/*.c",
         "rdft/simd/generic-simd256/*.c",
         "rdft/simd/sse2/*.c",
-    ], exclude = [
-        "**/genus.c",
     ]),
     visibility = ["//visibility:private"],
 )
@@ -245,8 +252,6 @@ filegroup(
         "rdft/simd/avx/*.c",
         "rdft/simd/avx2/*.c",
         "rdft/simd/avx2-128/*.c",
-    ], exclude = [
-        "**/genus.c",
     ]),
     visibility = ["//visibility:private"],
 )
@@ -319,4 +324,14 @@ cc_library(
         "-DBENCHFFT_SINGLE",
     ],
     includes = ["api"],
+)
+
+# Simple test to verify compilation.
+cc_test(
+    name = "link_test",
+    size = "small",
+    srcs = ["@rules_hdl//dependency_support/org_fftw:link_test.cc"],
+    deps = [
+        ":fftw",
+    ],
 )
