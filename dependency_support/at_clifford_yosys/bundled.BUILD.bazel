@@ -33,6 +33,7 @@ genrule(
 cc_library(
     name = "version",
     srcs = ["kernel/version.cc"],
+    visibility = ["//visibility:public"],
 )
 
 genrule(
@@ -206,6 +207,7 @@ cc_library(
         "@tk_tcl//:tcl",
     ],
     alwayslink = True,
+    visibility = ["//visibility:public"],
 )
 
 cc_binary(
