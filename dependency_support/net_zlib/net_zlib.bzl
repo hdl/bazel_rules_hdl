@@ -26,5 +26,5 @@ def net_zlib():
         urls = [
             "https://github.com/madler/zlib/archive/v1.2.11.zip",
         ],
-        build_file = "@//dependency_support/net_zlib:bundled.BUILD.bazel",
+        build_file = "@rules_hdl//dependency_support/net_zlib:bundled.BUILD.bazel",
     )
