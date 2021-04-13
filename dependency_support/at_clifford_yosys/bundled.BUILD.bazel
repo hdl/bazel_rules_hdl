@@ -63,16 +63,16 @@ genyacc(
 )
 
 genlex(
-    name = "ilang_lexer",
-    src = "frontends/ilang/ilang_lexer.l",
-    out = "ilang_lexer.cc",
+    name = "rtlil_lexer",
+    src = "frontends/rtlil/rtlil_lexer.l",
+    out = "rtlil_lexer.cc",
 )
 
 genyacc(
-    name = "ilang_parser",
-    src = "frontends/ilang/ilang_parser.y",
-    header_out = "frontends/ilang/ilang_parser.tab.hh",
-    source_out = "frontends/ilang/ilang_parser.tab.cc",
+    name = "rtlil_parser",
+    src = "frontends/rtlil/rtlil_parser.y",
+    header_out = "frontends/rtlil/rtlil_parser.tab.hh",
+    source_out = "frontends/rtlil/rtlil_parser.tab.cc",
 )
 
 py_binary(
@@ -132,6 +132,7 @@ YOSYS_COPTS = [
     "-Wno-unused-variable",
     "-Wno-unknown-warning-option",  # Clang and GCC warn differently.
     "-Wno-vla",
+    "-std=c++11",
 ]
 
 cc_library(
@@ -153,8 +154,8 @@ cc_library(
     ) + [
         ":verilog_lexer",
         ":verilog_parser",
-        ":ilang_lexer",
-        ":ilang_parser",
+        ":rtlil_parser",
+        ":rtlil_lexer",
         "passes/techmap/techmap.inc",
         "techlibs/common/simcells_help.inc",
         "techlibs/common/simlib_help.inc",
@@ -187,8 +188,8 @@ cc_library(
     includes = [
         ".",
         "backends/ilang",
-        "frontends/ilang",
         "frontends/verilog",
+        "frontends/rtlil",
         "passes/techmap",
         "techlibs/common",
     ],
@@ -267,7 +268,6 @@ cc_library(
     features = ["-use_header_modules"],
     licenses = ["notice"],
 )
-
 
 cc_test(
     name = "ezsat_demo_vec",
@@ -409,9 +409,15 @@ py_binary(
 genrule(
     name = "peepopt_pm_h",
     srcs = [
-        "passes/pmgen/peepopt_shiftmul.pmg",
+        "passes/pmgen/ice40_dsp.pmg",
+        "passes/pmgen/ice40_wrapcarry.pmg",
         "passes/pmgen/peepopt_muldiv.pmg",
-        "passes/pmgen/peepopt_dffmux.pmg",
+        "passes/pmgen/peepopt_shiftmul.pmg",
+        "passes/pmgen/xilinx_dsp48a.pmg",
+        "passes/pmgen/xilinx_dsp_cascade.pmg",
+        "passes/pmgen/xilinx_dsp_CREG.pmg",
+        "passes/pmgen/xilinx_dsp.pmg",
+        "passes/pmgen/xilinx_srl.pmg",
     ],
     outs = ["passes/pmgen/peepopt_pm.h"],
     cmd = "$(location :pmgen) -o $(OUTS) -p peepopt $(SRCS)",
