@@ -21,7 +21,7 @@ def com_google_absl():
     maybe(
         http_archive,
         name = "com_google_absl",
-        strip_prefix = "abseil-cpp-68f1ad93251744f096036e65241493774b4e7ac0",
-        urls = ["https://github.com/abseil/abseil-cpp/archive/68f1ad93251744f096036e65241493774b4e7ac0.tar.gz"],  # 2020-12-16
-        sha256 = "8be9cd7c930cfd420dc0eb302b5d98b04846086f26589f63542c4d1d8a81fa4e",
+        strip_prefix = "abseil-cpp-20210324.2",
+        urls = ["https://github.com/abseil/abseil-cpp/archive/refs/tags/20210324.2.zip"],
+        sha256 = "1a7edda1ff56967e33bc938a4f0a68bb9efc6ba73d62bb4a5f5662463698056c",
     )
