@@ -87,6 +87,7 @@ cc_binary(
             "lib/strndup.c",
             "lib/strchrnul.c",
             "lib/strerror-override.c",
+            "lib/strsignal.c",
             "lib/waitpid.c",
         ],
     ),
