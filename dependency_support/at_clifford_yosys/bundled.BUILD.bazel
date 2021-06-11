@@ -12,17 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Yosys is a framework for RTL synthesis tools. It currently has extensive
-# Verilog-2005 support and provides a basic set of synthesis algorithms for
-# various application domains.
+"""
+Yosys is a framework for RTL synthesis tools. It currently has extensive
+Verilog-2005 support and provides a basic set of synthesis algorithms for
+various application domains.
+"""
+
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_hdl//dependency_support/at_clifford_yosys:yosys.bzl", "yosys_syntax_check")
+load("@rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex")
+load("@rules_hdl//dependency_support/org_gnu_bison:bison.bzl", "genyacc")
 
 licenses(["restricted"])
 
 exports_files(["LICENSE"])
-
-load("@rules_hdl//dependency_support/at_clifford_yosys:yosys.bzl", "yosys_syntax_check")
-load("@rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex")
-load("@rules_hdl//dependency_support/org_gnu_bison:bison.bzl", "genyacc")
 
 genrule(
     name = "version_src",

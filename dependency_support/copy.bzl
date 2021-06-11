@@ -25,6 +25,7 @@ def copy(name, src, out):
 
 def touch(name, out, contents = None):
     """Produces a genrule to creates a file, with optional #define contents.
+
     Args:
       name: Name to use for the genrule.
       out: Path for the output file.

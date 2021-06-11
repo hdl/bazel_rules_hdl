@@ -16,6 +16,7 @@
 
 def pseudo_configure(name, out, src = None, defs = [], mappings = {}, additional = None):
     """Creates a genrule that performs a fake 'configure' step on a file.
+
     Args:
       name: Name to use for the created genrule.
       src: ".in" file to transform.

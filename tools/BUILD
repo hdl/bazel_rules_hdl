@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_python//python:defs.bzl", "py_binary")
 load("@rules_hdl_pip_deps//:requirements.bzl", "requirement")
 
 py_binary(

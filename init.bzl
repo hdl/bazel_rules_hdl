@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+""" initializes the bazel_rules_hdl workspace """
+
 load("@rules_python//python:pip.bzl", "pip_install")
 load("//dependency_support/boost:init_boost.bzl", "init_boost")
 load("//dependency_support/pybind11:init_pybind11.bzl", "init_pybind11")
 
-def init(python_interpreter=None, python_interpreter_target=None):
-    '''Initializes the bazel_rules_hdl workspace.
+def init(python_interpreter = None, python_interpreter_target = None):
+    """Initializes the bazel_rules_hdl workspace.
 
     If @bazel_rules_hdl is imported into another Bazel workspace, that workspace
     must call `init` to allow @bazel_rules_hdl to set itself up.
@@ -27,12 +29,12 @@ def init(python_interpreter=None, python_interpreter_target=None):
     the default None value, but if the outside workspace has a custom Python
     toolchain configured, these must be set, otherwise @bazel_rules_hdl will
     not use the right Python toolchain when installing pip dependencies.
-    '''
+    """
     pip_install(
         name = "rules_hdl_pip_deps",
         requirements = "@rules_hdl//dependency_support:pip_requirements.txt",
         python_interpreter = python_interpreter,
-        python_interpreter_target = python_interpreter_target
+        python_interpreter_target = python_interpreter_target,
     )
 
     init_boost()

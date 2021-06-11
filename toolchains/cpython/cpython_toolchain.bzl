@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+""" cpython """
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def register_cpython_repository():
@@ -21,7 +23,7 @@ def register_cpython_repository():
         urls = [
             # This is a re-packaged version of binaries from https://github.com/indygreg/python-build-standalone/releases
             # It's repackaged because Bazel doesn't support .tar.zst files that are uploaded there.
-            "https://github.com/retone/deps/releases/download/na7/cpython-3.8.6-x86_64-unknown-linux-gnu-pgo-20201020T0627.tar.xz"
+            "https://github.com/retone/deps/releases/download/na7/cpython-3.8.6-x86_64-unknown-linux-gnu-pgo-20201020T0627.tar.xz",
         ],
         sha256 = "8571da2a8e3a19fda593bccc6d252fc01f7f567ea4c2a4e5c7d083036ed2c507",
         build_file = "@rules_hdl//toolchains/cpython:cpython.BUILD",
