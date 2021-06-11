@@ -17,6 +17,7 @@
 # iceprog is not included in this BUILD file because it depends on libftdi which
 # is not available at this time.
 
+load("@rules_python//python:defs.bzl", "py_binary")
 load("@rules_hdl//dependency_support:copy.bzl", "copy")
 
 licenses(["notice"])

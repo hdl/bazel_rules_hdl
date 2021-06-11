@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+The structure for adding a third_party dependency is to create a folder in this
+directory that will contain the build rules and workspace rules required to import
+it.
+"""
 
-# The structure for adding a third_party dependency is to create a folder in this
-# directory that will contain the build rules and workspace rules required to import
-# it.
 load("//dependency_support/at_clifford_icestorm:at_clifford_icestorm.bzl", "at_clifford_icestorm")
 load("//dependency_support/at_clifford_yosys:at_clifford_yosys.bzl", "at_clifford_yosys")
 load("//dependency_support/boost:boost.bzl", "boost")
@@ -46,31 +48,32 @@ load("//dependency_support/pybind11:pybind11.bzl", "pybind11")
 load("//dependency_support/tk_tcl:tk_tcl.bzl", "tk_tcl")
 
 def dependency_support():
-  at_clifford_icestorm()
-  at_clifford_yosys()
-  boost()
-  com_github_westes_flex()
-  com_github_yosyshq_nextpnr()
-  com_github_yosyshq_prjtrellis()
-  com_github_yosyshq_prjtrellis_db()
-  com_google_absl()
-  com_google_googletest()
-  com_google_skywater_pdk()
-  com_icarus_iverilog()
-  com_opencircuitdesign_magic()
-  com_opencircuitdesign_netgen()
-  edu_berkeley_abc()
-  net_invisible_island_ncurses()
-  net_sourceforge_ngspice()
-  net_zlib()
-  org_fftw()
-  org_gnu_bison()
-  org_gnu_gperf()
-  org_gnu_m4()
-  org_gnu_readline()
-  org_nixos_patchelf()
-  org_sourceware_bzip2()
-  org_sourceware_libffi()
-  org_tuxfamily_eigen()
-  pybind11()
-  tk_tcl()
+    """ Registers dependencies """
+    at_clifford_icestorm()
+    at_clifford_yosys()
+    boost()
+    com_github_westes_flex()
+    com_github_yosyshq_nextpnr()
+    com_github_yosyshq_prjtrellis()
+    com_github_yosyshq_prjtrellis_db()
+    com_google_absl()
+    com_google_googletest()
+    com_google_skywater_pdk()
+    com_icarus_iverilog()
+    com_opencircuitdesign_magic()
+    com_opencircuitdesign_netgen()
+    edu_berkeley_abc()
+    net_invisible_island_ncurses()
+    net_sourceforge_ngspice()
+    net_zlib()
+    org_fftw()
+    org_gnu_bison()
+    org_gnu_gperf()
+    org_gnu_m4()
+    org_gnu_readline()
+    org_nixos_patchelf()
+    org_sourceware_bzip2()
+    org_sourceware_libffi()
+    org_tuxfamily_eigen()
+    pybind11()
+    tk_tcl()

@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# BUILD file for nextpnr. Does currently not include the GUI.
+""" BUILD file for nextpnr. Does currently not include the GUI. """
+
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_python//python:defs.bzl", "py_binary")
 
 package(
     features = [

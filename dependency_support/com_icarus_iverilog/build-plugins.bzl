@@ -15,8 +15,11 @@
 """BUILD helpers for using iverilog.
 """
 
-def iverilog_compile(srcs, flags = ""):
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+def iverilog_compile(srcs, flags = "", name = ""):
     """Compiles the first .v files given in srcs into a .vvp file.
+
     Passes the flags to iverilog.
     """
     vvp_file = srcs[0] + "vp"  # Changes .v to .vvp
@@ -42,10 +45,11 @@ def iverilog_compile(srcs, flags = ""):
 
 def vpi_binary(name, srcs, **kwargs):
     """Creates a .vpi file with the given name from the given sources.
+
     All the extra arguments are passed directly to cc_binary.
     """
     so_name = name + ".so"
-    native.cc_binary(
+    cc_binary(
         name = so_name,
         srcs = srcs,
         linkshared = 1,

@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-licenses(["notice"])
+""" BUILD file for Skywater PDK """
 
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@rules_hdl//dependency_support/com_google_skywater_pdk:cell_libraries.bzl", "CELL_LIBRARIES")
 load("@rules_hdl_pip_deps//:requirements.bzl", "requirement")
+
+licenses(["notice"])
 
 py_binary(
     name = "liberty",

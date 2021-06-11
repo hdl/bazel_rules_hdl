@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+""" pybind11 """
+
 load("@pybind11_bazel//:python_configure.bzl", "python_configure")
 
 def init_pybind11():

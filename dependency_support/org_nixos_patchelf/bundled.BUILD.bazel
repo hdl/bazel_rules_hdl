@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+""" A BUILD file for patchelf. """
+
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
 licenses(["restricted"])  # GPLv3
 
 cc_binary(

@@ -17,6 +17,7 @@ specified by a provided map."""
 
 def automake_substitution(name, src, out, substitutions = {}):
     """Replaces @VARIABLE_NAME@ occurences with values.
+
     Note: The current implementation does not allow slashes in variable
     values."""
 
