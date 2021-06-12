@@ -1,0 +1,15 @@
+M4 always pass NULL in the directory field, so the codepath is never used.
+Remove it, so we don't need to deal with posix_spawn_file_actions_addchdir.
+
+--- lib/spawn_faction_addchdir.c
++++ lib/spawn_faction_addchdir.c
+@@ -34,7 +34,8 @@ posix_spawn_file_actions_addchdir (posix_spawn_file_actions_t *file_actions,
+ #undef posix_spawn_file_actions_addchdir
+ {
+ #if !REPLACE_POSIX_SPAWN
+-  return posix_spawn_file_actions_addchdir_np (file_actions, path);
++  abort();
++  return 0;
+ #else
+   {
+     /* Copy PATH, because the caller may free it before calling posix_spawn()

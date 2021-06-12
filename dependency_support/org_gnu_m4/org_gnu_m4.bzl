@@ -22,13 +22,14 @@ def org_gnu_m4():
         http_archive,
         name = "org_gnu_m4",
         urls = [
-            "http://ftp.acc.umu.se/mirror/gnu.org/gnu/m4/m4-1.4.18.tar.xz",
-            "http://ftp.gnu.org/gnu/m4/m4-1.4.18.tar.xz",
+            "https://ftp.acc.umu.se/mirror/gnu.org/gnu/m4/m4-1.4.19.tar.xz",
+            "https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz",
         ],
-        strip_prefix = "m4-1.4.18",
-        sha256 = "f2c1e86ca0a404ff281631bdc8377638992744b175afb806e25871a24a934e07",
+        strip_prefix = "m4-1.4.19",
+        sha256 = "63aede5c6d33b6d9b13511cd0be2cac046f2e70fd0a07aa9573a04a82783af96",
         build_file = Label("//dependency_support:org_gnu_m4/bundled.BUILD.bazel"),
         patches = [
             "@rules_hdl//dependency_support/org_gnu_m4:no_freadahead.patch",
+            "@rules_hdl//dependency_support/org_gnu_m4:no_posix_spawn_file_actions_addchdir.patch",
         ],
     )
