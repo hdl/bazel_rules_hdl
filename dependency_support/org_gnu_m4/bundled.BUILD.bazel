@@ -252,7 +252,6 @@ pseudo_configure(
         "HAVE_DECL_STRNDUP",
         "HAVE_DECL_STRNLEN",
         "HAVE_DECL_STRSIGNAL",
-        "HAVE_DECL_SYS_SIGLIST",
         "HAVE_DECL_UNSETENV",
         "HAVE_DECL_WCTOB",
         "HAVE_DECL___FPENDING",
