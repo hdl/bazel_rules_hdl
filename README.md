@@ -15,3 +15,15 @@ So that includes;
 Having rules that can take RTL and be chained to emit GDSII (Sky130/FOSS-PDKs), but that can also be used to target FPGAs and soft CPUs. We want to take advantage of remote builders to accelerate verification with massively parallel clusters. Using the open source community's tools like Yosys, OpenROAD, Verilator, Surelog etc.
 
 The vision of this is that this repository enables `bazel test //mychip/...` and `bazel build //mychip:gds` and in 10 minutes you have verified and emitted a fabricatable design even for the most complex designs.
+
+# Testing
+
+For testing pull requests please run:
+
+```console
+bazel_rules_hdl$ python tools/test_everything.py
+```
+
+Note: `bazel test ...` does not run the tests in Bazel "remote" repositories,
+and `bazel_rules_hdl` bundles together support for several remote repositories
+-- this script serves as a helper for testing them all explicitly.
