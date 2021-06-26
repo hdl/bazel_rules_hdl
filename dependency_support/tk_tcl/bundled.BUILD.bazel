@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Description: Tcl scripting language.
+""" Tcl scripting language. """
+
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 licenses(["notice"])
 
@@ -99,7 +101,7 @@ cc_library(
 filegroup(
     name = "tcl_library_internal",
     srcs = glob([
-        "library/**/*"
+        "library/**/*",
     ]),
     visibility = ["//visibility:private"],
 )
@@ -172,31 +174,78 @@ cc_library(
         "generic/regexec.c",
         "generic/regfree.c",
         "unix/tclLoadDl.c",
+        "libtommath/bn_cutoffs.c",
+        "libtommath/bn_mp_add.c",
+        "libtommath/bn_mp_add_d.c",
+        "libtommath/bn_mp_and.c",
+        "libtommath/bn_mp_clamp.c",
+        "libtommath/bn_mp_clear.c",
+        "libtommath/bn_mp_clear_multi.c",
+        "libtommath/bn_mp_cmp.c",
+        "libtommath/bn_mp_cmp_d.c",
+        "libtommath/bn_mp_cmp_mag.c",
+        "libtommath/bn_mp_cnt_lsb.c",
+        "libtommath/bn_mp_copy.c",
+        "libtommath/bn_mp_count_bits.c",
+        "libtommath/bn_mp_div.c",
+        "libtommath/bn_mp_div_2.c",
+        "libtommath/bn_mp_div_2d.c",
+        "libtommath/bn_mp_div_3.c",
+        "libtommath/bn_mp_div_d.c",
+        "libtommath/bn_mp_exch.c",
+        "libtommath/bn_mp_expt_u32.c",
+        "libtommath/bn_mp_grow.c",
+        "libtommath/bn_mp_init.c",
+        "libtommath/bn_mp_init_copy.c",
+        "libtommath/bn_mp_init_multi.c",
+        "libtommath/bn_mp_init_size.c",
+        "libtommath/bn_mp_init_set.c",
+        "libtommath/bn_mp_lshd.c",
+        "libtommath/bn_mp_mod.c",
+        "libtommath/bn_mp_mod_2d.c",
+        "libtommath/bn_mp_mul.c",
+        "libtommath/bn_mp_mul_2.c",
+        "libtommath/bn_mp_mul_2d.c",
+        "libtommath/bn_mp_mul_d.c",
+        "libtommath/bn_mp_neg.c",
+        "libtommath/bn_mp_or.c",
+        "libtommath/bn_mp_radix_smap.c",
+        "libtommath/bn_mp_radix_size.c",
+        "libtommath/bn_mp_read_radix.c",
+        "libtommath/bn_mp_rshd.c",
+        "libtommath/bn_mp_signed_rsh.c",
+        "libtommath/bn_mp_set.c",
+        "libtommath/bn_mp_shrink.c",
+        "libtommath/bn_mp_sqr.c",
+        "libtommath/bn_mp_sqrt.c",
+        "libtommath/bn_mp_sub.c",
+        "libtommath/bn_mp_sub_d.c",
+        "libtommath/bn_mp_to_radix.c",
+        "libtommath/bn_mp_to_ubin.c",
+        "libtommath/bn_mp_ubin_size.c",
+        "libtommath/bn_mp_xor.c",
+        "libtommath/bn_mp_zero.c",
+        "libtommath/bn_s_mp_add.c",
+        "libtommath/bn_s_mp_balance_mul.c",
+        "libtommath/bn_s_mp_karatsuba_mul.c",
+        "libtommath/bn_s_mp_karatsuba_sqr.c",
+        "libtommath/bn_s_mp_mul_digs.c",
+        "libtommath/bn_s_mp_mul_digs_fast.c",
+        "libtommath/bn_s_mp_reverse.c",
+        "libtommath/bn_s_mp_sqr.c",
+        "libtommath/bn_s_mp_sqr_fast.c",
+        "libtommath/bn_s_mp_sub.c",
+        "libtommath/bn_s_mp_toom_mul.c",
+        "libtommath/bn_s_mp_toom_sqr.c",
     ] + glob(
         [
             "generic/tcl*.c",
             "unix/tcl*.c",
-            "libtommath/*.c",
         ],
         exclude = [
             "generic/tclLoadNone.c",
             "generic/tclPkgConfig.c",
             "generic/tclUniData.c",
-            "libtommath/bn_deprecated.c",
-            "libtommath/bn_mp_init_i32.c",
-            "libtommath/bn_mp_init_i64.c",
-            "libtommath/bn_mp_init_u32.c",
-            "libtommath/bn_mp_init_u64.c",
-            "libtommath/bn_mp_init_ul.c",
-            "libtommath/bn_mp_init_l.c",
-            "libtommath/bn_mp_init_ll.c",
-            "libtommath/bn_mp_init_ull.c",
-            "libtommath/bn_mp_iseven.c",
-            "libtommath/bn_mp_set_u64.c",
-            "libtommath/bn_mp_set_ul.c",
-            "libtommath/bn_mp_set_ull.c",
-            "libtommath/bn_s_mp_exptmod.c",
-            "libtommath/bn_s_mp_exptmod_fast.c",
             "unix/tclAppInit.c",
             "unix/tclLoad*.c",
             "unix/tclUnixInit.c",
@@ -209,7 +258,7 @@ cc_library(
         "generic/reg*.c",
         "libtommath/*.h",
     ]),
-    copts = TCL_COPTS  + [
+    copts = TCL_COPTS + [
         "-w",
         "$(STACK_FRAME_UNLIMITED)",  # regexec.c
     ],
