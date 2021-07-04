@@ -12,15 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# !!! DO NOT DEPEND ON THIS PACKAGE DIRECTLY !!!
-# This package exists only to support the genlex rule, and all users should use
-# that if possible rather than using the binary directly through a genrule.
+""" flex
 
-package(default_visibility = ["//visibility:private"])
+!!! DO NOT DEPEND ON THIS PACKAGE DIRECTLY !!!
+This package exists only to support the genlex rule, and all users should use
+that if possible rather than using the binary directly through a genrule.
+"""
 
-load("@rules_hdl//dependency_support:copy.bzl", "copy")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("@rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex")
 load("@rules_hdl//dependency_support:pseudo_configure.bzl", "pseudo_configure")
+
+package(default_visibility = ["//visibility:private"])
 
 licenses(["notice"])  # BSD
 
@@ -131,8 +134,56 @@ pseudo_configure(
     name = "config_h",
     src = "src/config.h.in",
     out = "src/config.h",
-    defs = ['ENABLE_NLS', 'HAVE_ALLOCA', 'HAVE_ALLOCA_H', 'HAVE_DCGETTEXT', 'HAVE_DLFCN_H', 'HAVE_DUP2', 'HAVE_FORK', 'HAVE_GETTEXT', 'HAVE_INTTYPES_H', 'HAVE_LIBINTL_H', 'HAVE_LIBM', 'HAVE_LIMITS_H', 'HAVE_LOCALE_H', 'HAVE_MALLOC', 'HAVE_MALLOC_H', 'HAVE_MEMORY_H', 'HAVE_MEMSET', 'HAVE_NETINET_IN_H', 'HAVE_POW', 'HAVE_PTHREAD_H', 'HAVE_REALLOC', 'HAVE_REGCOMP', 'HAVE_REGEX_H', 'HAVE_SETLOCALE', 'HAVE_STDBOOL_H', 'HAVE_STDINT_H', 'HAVE_STDLIB_H', 'HAVE_STRCASECMP', 'HAVE_STRCHR', 'HAVE_STRDUP', 'HAVE_STRINGS_H', 'HAVE_STRING_H', 'HAVE_STRTOL', 'HAVE_SYS_STAT_H', 'HAVE_SYS_TYPES_H', 'HAVE_SYS_WAIT_H', 'HAVE_UNISTD_H', 'HAVE_VFORK', 'HAVE_WORKING_FORK', 'HAVE_WORKING_VFORK', 'HAVE__BOOL', 'STDC_HEADERS'],
-    mappings = {'LT_OBJDIR': '".libs"', 'M4': '"M4_environment_variable_must_be_set"', 'PACKAGE': '"flex"', 'PACKAGE_BUGREPORT': '"NA"', 'PACKAGE_NAME': '"the fast lexical analyser generator"', 'PACKAGE_STRING': '"the fast lexical analyser generator 2.6.4"', 'PACKAGE_TARNAME': '"flex"', 'PACKAGE_URL': '""', 'PACKAGE_VERSION': '"2.6.4"', 'VERSION': '"2.6.4"'},
+    defs = [
+        "HAVE_ALLOCA",
+        "HAVE_ALLOCA_H",
+        "HAVE_DLFCN_H",
+        "HAVE_DUP2",
+        "HAVE_FORK",
+        "HAVE_INTTYPES_H",
+        "HAVE_LIBM",
+        "HAVE_LIMITS_H",
+        "HAVE_MALLOC",
+        "HAVE_MALLOC_H",
+        "HAVE_MEMORY_H",
+        "HAVE_MEMSET",
+        "HAVE_NETINET_IN_H",
+        "HAVE_POW",
+        "HAVE_PTHREAD_H",
+        "HAVE_REALLOC",
+        "HAVE_REGCOMP",
+        "HAVE_REGEX_H",
+        "HAVE_STDBOOL_H",
+        "HAVE_STDINT_H",
+        "HAVE_STDLIB_H",
+        "HAVE_STRCASECMP",
+        "HAVE_STRCHR",
+        "HAVE_STRDUP",
+        "HAVE_STRINGS_H",
+        "HAVE_STRING_H",
+        "HAVE_STRTOL",
+        "HAVE_SYS_STAT_H",
+        "HAVE_SYS_TYPES_H",
+        "HAVE_SYS_WAIT_H",
+        "HAVE_UNISTD_H",
+        "HAVE_VFORK",
+        "HAVE_WORKING_FORK",
+        "HAVE_WORKING_VFORK",
+        "HAVE__BOOL",
+        "STDC_HEADERS",
+    ],
+    mappings = {
+        "LT_OBJDIR": '".libs"',
+        "M4": '"M4_environment_variable_must_be_set"',
+        "PACKAGE": '"flex"',
+        "PACKAGE_BUGREPORT": '"NA"',
+        "PACKAGE_NAME": '"the fast lexical analyser generator"',
+        "PACKAGE_STRING": '"the fast lexical analyser generator 2.6.4"',
+        "PACKAGE_TARNAME": '"flex"',
+        "PACKAGE_URL": '""',
+        "PACKAGE_VERSION": '"2.6.4"',
+        "VERSION": '"2.6.4"',
+    },
 )
 
 genlex(
