@@ -233,4 +233,13 @@ extern char **environ;
 #define regfree rpl_regfree
 #define restrict __restrict
 
+#include <stdint.h>
+#include <wchar.h>
+
+struct obstack;
+int obstack_printf(struct obstack *obs, const char *format, ...);
+int obstack_vprintf(struct obstack *obs, const char *format, va_list args);
+int strverscmp(const char *s1, const char *s2);
+int wcwidth(wchar_t wc);
+
 {GNULIB_CONFIG_FOOTER}
