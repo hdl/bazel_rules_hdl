@@ -36,3 +36,21 @@ def yosys_syntax_check(name, srcs):
         tools = [yosys_binary],
         cmd = "$(location " + yosys_binary + ") -Q -T -p 'read_verilog -sv $(SRCS)' 2>&1 | tee $(OUTS)",
     )
+def _move_files_impl(ctx):
+  outputs = []
+
+  for file in ctx.files.srcs:
+    output = ctx.actions.declare_file(ctx.attr.destination + "/" + file.basename)
+    outputs.append(output)
+    ctx.actions.symlink(output = output, target_file = file)
+
+  return [DefaultInfo(files = depset(outputs))]
+
+
+move_files = rule(
+  implementation = _move_files_impl,
+  attrs = {
+    "srcs": attr.label_list(allow_files = True),
+    "destination": attr.string(default = "", doc = "directory prefix to place files under."),
+  }
+)

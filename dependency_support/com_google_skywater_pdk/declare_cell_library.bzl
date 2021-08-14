@@ -53,4 +53,5 @@ def declare_cell_library(workspace_name, name):
         name = name,
         process_corners = [":{}".format(corner) for corner in corners],
         default_corner = library.get("default_corner", ""),
+        visibility = ["//visibility:public"],
     )
