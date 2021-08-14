@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 """Rules for synthesizing (System)Verilog code."""
 
 load("//pdk:build_defs.bzl", "StandardCellInfo")
@@ -124,6 +123,6 @@ synthesize_rtl = rule(
             default = Label("@edu_berkeley_abc//:abc"),
             executable = True,
             cfg = "exec",
-        )
+        ),
     },
 )

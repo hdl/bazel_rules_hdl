@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Describe Verilog providers and some helpful functions for manipulating them."""
 
 # WARNING: prefer using 'merge_verilog_info' rather than constructing these directly
 # to ensure the depset ordering is correct.
@@ -37,8 +38,8 @@ def make_dag_entry(srcs, deps, label):
 
     Args:
       srcs: A list of File that are 'srcs'.
-      deps = tuple(deps)
-      experimental_exclusion_list_files: A list of File that declare file names to exclude
+      deps: A list of Label that are deps of this entry.
+      label: A Label to use as the name for this entry.
     Returns:
       struct with all these fields properly stored.
     """
@@ -97,7 +98,6 @@ def _produce_dag_impl(ctx):
     return [
         verilog_info,
     ]
-
 
 verilog_library = rule(
     attrs = {
