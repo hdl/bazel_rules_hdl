@@ -20,7 +20,7 @@ various application domains.
 
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("@rules_hdl//dependency_support/at_clifford_yosys:yosys.bzl", "yosys_syntax_check")
+load("@rules_hdl//dependency_support/at_clifford_yosys:yosys.bzl", "yosys_syntax_check", "move_files")
 load("@rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex")
 load("@rules_hdl//dependency_support/org_gnu_bison:bison.bzl", "genyacc")
 
@@ -221,6 +221,9 @@ cc_binary(
     ],
     copts = YOSYS_COPTS,
     features = ["-use_header_modules"],
+    data = [
+        ":share_files",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":kernel",
@@ -228,6 +231,68 @@ cc_binary(
         "@org_gnu_readline//:readline",
     ],
 )
+
+move_files(
+  name = "common_techlibs",
+  srcs = glob([
+    "techlibs/common/*.v",
+  ]),
+  destination = "techlibs",
+)
+
+filegroup(
+  name = "share_files",
+  srcs = glob(
+    include = [
+      "techlibs/common/*.v",
+      "techlibs/**/*.v",
+      "techlibs/**/*.vh",
+      "techlibs/**/*.lib",
+      "techlibs/**/*.txt",
+    ],
+    exclude = [
+      "techlibs/common/*.v",
+    ]
+  ) + [
+    ":common_techlibs"
+  ],
+)
+
+# Fileset(
+#     name = "share_files",
+#     out = "share",
+#     entries = [
+#         # The common files are mapped to the toplevel
+#         FilesetEntry(
+#             files = glob(["techlibs/common/*.v"]),
+#             strip_prefix = "techlibs/common",
+#         ),
+#         # These are vendor specific files in subdirectories.
+#         FilesetEntry(
+#             files = glob(
+#                 include = [
+#                     "techlibs/**/*.v",
+#                     "techlibs/**/*.vh",
+#                     "techlibs/**/*.lib",
+#                     "techlibs/**/*.txt",
+#                 ],
+#                 exclude = ["techlibs/common/**"],
+#             ),
+#             strip_prefix = "techlibs/",
+#         ),
+#         # Generated files.
+#         FilesetEntry(
+#             files = [":xilinx_brams"],
+#             destdir = "xilinx",
+#         ),
+#         # Generated files.
+#         FilesetEntry(
+#             files = [":ice40_brams"],
+#             destdir = "ice40",
+#         ),
+#     ],
+# )
+
 
 yosys_syntax_check(
     name = "testing_yosys_syntax_check_build_rule",
