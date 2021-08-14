@@ -12,21 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 load("//synthesis:build_defs.bzl", "synthesize_rtl")
 load("//verilog:providers.bzl", "verilog_library")
 
 synthesize_rtl(
-  name = "verilog_adder_synthesized",
-  deps = [
-    ":verilog_adder",
-  ],
-  top_module = "adder",
+    name = "verilog_adder_synthesized",
+    top_module = "adder",
+    deps = [
+        ":verilog_adder",
+    ],
 )
 
 verilog_library(
-  name = "verilog_adder",
-  srcs = [
-    "verilog_adder.v",
-  ]
+    name = "verilog_adder",
+    srcs = [
+        "verilog_adder.v",
+    ],
 )
