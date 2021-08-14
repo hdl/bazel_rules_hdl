@@ -258,42 +258,6 @@ filegroup(
   ],
 )
 
-# Fileset(
-#     name = "share_files",
-#     out = "share",
-#     entries = [
-#         # The common files are mapped to the toplevel
-#         FilesetEntry(
-#             files = glob(["techlibs/common/*.v"]),
-#             strip_prefix = "techlibs/common",
-#         ),
-#         # These are vendor specific files in subdirectories.
-#         FilesetEntry(
-#             files = glob(
-#                 include = [
-#                     "techlibs/**/*.v",
-#                     "techlibs/**/*.vh",
-#                     "techlibs/**/*.lib",
-#                     "techlibs/**/*.txt",
-#                 ],
-#                 exclude = ["techlibs/common/**"],
-#             ),
-#             strip_prefix = "techlibs/",
-#         ),
-#         # Generated files.
-#         FilesetEntry(
-#             files = [":xilinx_brams"],
-#             destdir = "xilinx",
-#         ),
-#         # Generated files.
-#         FilesetEntry(
-#             files = [":ice40_brams"],
-#             destdir = "ice40",
-#         ),
-#     ],
-# )
-
-
 yosys_syntax_check(
     name = "testing_yosys_syntax_check_build_rule",
     srcs = [
