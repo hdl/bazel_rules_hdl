@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC
+# Copyright 2020-2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ load("//dependency_support/org_gnu_gperf:org_gnu_gperf.bzl", "org_gnu_gperf")
 load("//dependency_support/org_gnu_m4:org_gnu_m4.bzl", "org_gnu_m4")
 load("//dependency_support/org_gnu_readline:org_gnu_readline.bzl", "org_gnu_readline")
 load("//dependency_support/org_nixos_patchelf:org_nixos_patchelf.bzl", "org_nixos_patchelf")
+load("//dependency_support/org_pcre_ftp:org_pcre_ftp.bzl", "org_pcre_ftp")
 load("//dependency_support/org_sourceware_bzip2:org_sourceware_bzip2.bzl", "org_sourceware_bzip2")
 load("//dependency_support/org_sourceware_libffi:org_sourceware_libffi.bzl", "org_sourceware_libffi")
 load("//dependency_support/org_tuxfamily_eigen:org_tuxfamily_eigen.bzl", "org_tuxfamily_eigen")
@@ -74,6 +75,7 @@ def dependency_support():
     org_gnu_m4()
     org_gnu_readline()
     org_nixos_patchelf()
+    org_pcre_ftp()
     org_sourceware_bzip2()
     org_sourceware_libffi()
     org_tuxfamily_eigen()
