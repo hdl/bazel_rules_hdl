@@ -105,6 +105,9 @@ cc_library(
     copts = PCRE8_DEFS,
     includes = ["include"],
     deps = [":internal_hdrs"],
+    visibility = [
+      "@org_swig//:__subpackages__",
+    ]
 )
 
 cc_library(

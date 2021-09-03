@@ -59,6 +59,7 @@ ALL_TARGETS = [
   '@org_nixos_patchelf//...',
   '@org_sourceware_bzip2//...',
   '@org_sourceware_libffi//...',
+  '@org_swig//...',
   '@org_tuxfamily_eigen//...',
   '@pybind11//...',
   '@tk_tcl//...',
