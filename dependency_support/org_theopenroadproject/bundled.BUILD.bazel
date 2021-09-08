@@ -1,0 +1,1687 @@
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("@rules_hdl//dependency_support/org_theopenroadproject:tcl_wrap_cc.bzl", "tcl_wrap_cc")
+load("@rules_hdl//dependency_support/org_theopenroadproject:tcl_encode.bzl", "tcl_encode")
+load("@rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex")
+load("@rules_hdl//dependency_support/org_gnu_bison:bison.bzl", "genyacc")
+
+package(features = ["-parse_headers"])
+
+# OpenRoad Physical Synthesis
+licenses(["restricted"])
+
+exports_files([
+    "LICENSE",
+    "src/sta/etc/TclEncode.tcl",
+])
+
+cc_binary(
+    name = "openroad",
+    srcs = [
+        #Root OpenRoad
+        "src/Main.cc",
+        ":openroad_swig",
+        ":openroad_tcl",
+        #Utility
+        ":logger_swig",
+        #InitFp
+        ":init_floorplan_swig",
+        ":init_floorplan_tcl",
+        #OpenDB
+        ":opendb_tcl",
+        ":opendb_tcl_common",
+        #DbSTA
+        ":db_sta_tcl",
+        ":dbsta_swig",
+        #ioPlacer
+        ":ioplacer_tcl",
+        ":ioplacer_swig",
+        #Resizer
+        ":resizer_swig",
+        ":resizer_tcl",
+        #OpenDP
+        ":opendp_swig",
+        ":opendp_tcl",
+        #finale
+        ":finale_swig",
+        ":finale_tcl",
+        #TritionMP
+        ":tritonmp_swig",
+        ":tritonmp_tcl",
+        #antenna_checker
+        ":ant_swig",
+        ":ant_tcl",
+        #FastRoute
+        ":fastroute_swig",
+        ":fastroute_tcl",
+        #Replace
+        ":replace_swig",
+        ":replace_tcl",
+        #TritonCTS
+        ":triton_cts_tcl",
+        ":triton_cts_swig",
+        #Tapcell
+        ":tapcell_swig",
+        ":tapcell_tcl",
+        #OpenRCX
+        ":rcx_swig",
+        ":rcx_tcl",
+        #TritonRoute
+        ":triton_route_swig",
+        ":triton_route_tcl",
+        #PDNSim
+        ":pdn_sim_swig",
+        ":pdn_sim_tcl",
+        #PartitionManager
+        ":partition_manager_swig",
+        ":partition_manager_tcl",
+        #PDNGen
+        ":pdngen_tcl",
+        ":pdngen_swig",
+        #MPL2
+        ":mpl2_swig",
+        ":mpl2_tcl",
+        #RMP
+        ":rmp_swig",
+        ":rmp_tcl",
+        #STT
+        ":stt_swig",
+        ":stt_tcl",
+    ],
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+        "-Wall",
+        "-Wextra",
+        "-pedantic",
+        "-Wcast-qual",
+        "-Wredundant-decls",
+        "-Wformat-security",
+        "-fopenmp"
+    ],
+    features = ["-use_header_modules"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":logger",
+        ":opendb_lib",
+        ":openroad_lib",
+        ":openroad_version",
+        ":opensta_lib",
+        "@tk_tcl//:tcl",
+    ],
+)
+
+cc_library(
+    name = "openroad_lib",
+    srcs = glob(
+        include = [
+            #Root OpenRoad
+            "src/*.cc",
+            "src/*.cpp",
+            #Utility
+            "src/utl/src/*.cpp",
+            #InitFp
+            "src/ifp/src/*.cc",
+            #GUI Disabled
+            "src/gui/src/stub.cpp",
+            #DbSTA
+            "src/dbSta/src/*.cc",
+            "src/dbSta/src/*.hh",
+            #ioPlacer
+            "src/ppl/src/*.cpp",
+            "src/ppl/src/*.h",
+            #Resizer
+            "src/rsz/src/*.cc",
+            #OpenDP
+            "src/dpl/src/*.cpp",
+            #finale
+            "src/fin/src/*.cpp",
+            "src/fin/src/*.h",
+            #TritionMP
+            "src/mpl/src/*.cpp",
+            "src/mpl/src/*.h",
+            #antenna_checker
+            "src/ant/src/*.cc",
+            #FastRoute
+            "src/grt/src/fastroute/src/*.cpp",
+            "src/grt/src/fastroute/src/*.h",
+            "src/grt/src/*.h",
+            "src/grt/src/*.cpp",
+            #Replace
+            "src/replace/src/*.cpp",
+            "src/replace/src/*.h",
+            #TritonCTS
+            "src/cts/src/*.h",
+            "src/cts/src/*.cpp",
+            #Tapcell
+            "src/tap/src/*.cpp",
+            #OpenRCX
+            "src/rcx/src/*.cpp",
+            #TritonRoute
+            "src/TritonRoute/src/*.cpp",
+            "src/TritonRoute/src/*.h",
+            "src/TritonRoute/src/**/*.h",
+            "src/TritonRoute/src/**/*.cpp",
+            "src/TritonRoute/src/**/*.cc",
+            #PDNSim
+            "src/psm/src/*.cpp",
+            "src/psm/src/*.h",
+            #PartitionManager
+            "src/par/src/*.cpp",
+            #PDNGen
+            "src/pdn/src/*.cc",
+            #STT
+            "src/stt/src/*.cpp",
+            "src/stt/src/pdr/src/*.h",
+            "src/stt/src/pdr/src/*.cpp",
+            #MPL2
+            "src/mpl2/src/*.cpp",
+            "src/mpl2/src/*.h",
+            #RMP
+            "src/rmp/src/*.cpp",
+        ],
+        exclude = [
+            "src/Main.cc",
+            "src/rsz/src/Unused.cc",
+            "src/TritonRoute/src/main.cpp",
+            "src/utl/src/Logger.cpp",
+        ],
+    ),
+    hdrs = glob(
+        include = [
+            #Root OpenRoad
+            "include/ord/*.h",
+            "include/ord/*.hh",
+            #Utility
+            "src/utl/include/utl/*.h",
+            #InitFp
+            "src/ifp/include/ifp/*.hh",
+            #GUI
+            "src/gui/include/gui/*.h",
+            #DbSTA
+            "src/dbSta/include/db_sta/*.hh",
+            #ioPlacer
+            "src/ppl/include/ppl/*.h",
+            #Resizer
+            "src/rsz/include/rsz/*.hh",
+            "src/rsz/include/rsz/*.hh",
+            #OpenDP
+            "src/dpl/include/dpl/*.h",
+            #finale
+            "src/fin/include/fin/*.h",
+            #TritonMP
+            "src/mpl/include/mpl/*.h",
+            #antenna_checker
+            "src/ant/include/ant/*.hh",
+            #FastRoute
+            "src/grt/src/fastroute/include/*.h",
+            "src/grt/include/grt/*.h",
+            #Replace
+            "src/replace/include/replace/*.h",
+            #TritonCTS
+            "src/cts/include/cts/*.h",
+            #Tapcell
+            "src/tap/include/tap/*.h",
+            #OpenRCX
+            "src/rcx/include/rcx/*.h",
+            #TritonRoute
+            "src/TritonRoute/include/triton_route/*.h",
+            #PDNSim
+            "src/psm/include/psm/*.h",
+            "src/psm/include/psm/*.hh",
+            #PartitionManager
+            "src/par/src/*.h",
+            "src/par/include/par/*.h",
+            #PDNGen
+            "src/pdn/include/pdn/*.hh",
+            #STT
+            "src/stt/include/stt/*.h",
+            #MPL2
+            "src/mpl2/include/mpl2/*.h",
+            #RMP
+            "src/rmp/include/rmp/*.h",
+        ],
+        exclude = [
+            "src/utl/include/utl/Logger.h",
+        ],
+    ),
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+        "-Wall",
+        "-Wextra",
+        "-pedantic",
+        "-Wcast-qual",
+        "-Wredundant-decls",
+        "-Wformat-security",
+        "-Iexternal/com_github_quantamhd_lemon",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        #Root OpenRoad
+        "include",
+        #OpenDBTCL
+        "src/OpenDB/src/swig/common",
+        #DbSTA
+        "src/dbSta/include",
+        "src/dbSta/include/db_sta",
+        #GUI
+        "src/gui/include",
+        #InitFp
+        "src/ifp/include",
+        #ioPlacer
+        "src/ppl/include",
+        "src/ppl/include/ppl",
+        "src/ppl/src",
+        #Resizer
+        "src/rsz/include",
+        "src/rsz/include/rsz",
+        #OpenDP
+        "src/dpl/include",
+        "src/dpl/include/dpl",
+        #finale
+        "src/fin/include",
+        "src/fin/include/fin",
+        #TritonMP
+        "src/mpl/include",
+        "src/mpl/include/mpl",
+        #antenna_checker
+        "src/ant/include",
+        "src/ant/include/ant",
+        #FastRoute
+        "src/grt/src/fastroute/include",
+        "src/grt/include/grt",
+        "src/grt/include",
+        #Replace
+        "src/replace/include/replace",
+        "src/replace/include",
+        #TritonCTS
+        "src/cts/src",
+        "src/cts/include",
+        #Tapcell
+        "src/tap/include/tap",
+        "src/tap/include",
+        #OpenRCX
+        "src/rcx/include/rcx",
+        "src/rcx/include",
+        #TritonRoute
+        "src/TritonRoute/include/triton_route",
+        "src/TritonRoute/src",
+        "src/TritonRoute/include",
+        #PDNSim
+        "src/psm/include/psm",
+        "src/psm/include",
+        #PartitionManager
+        "src/par/include",
+        "src/par/include/par",
+        #PDNGen
+        "src/pdn/include",
+        "src/pdn/include/pdn",
+        #MPL2
+        "src/mpl2/include",
+        #RMP
+        "src/rmp/include",
+        #STT
+        "src/stt/include",
+        "src/stt/include/stt",
+    ],
+    linkstatic = True,
+    deps = [
+        ":ParquetFP",
+        ":flute3",
+        ":logger",
+        ":munkres",
+        ":opendb_lib",
+        ":openroad_version",
+        ":opensta_lib",
+        "@boost//:geometry",
+        "@boost//:multi_array",
+        "@boost//:property_tree",
+        "@boost//:icl",
+        "@boost//:polygon",
+        "@boost//:graph",
+        "@org_tuxfamily_eigen//:eigen3",
+        "@com_github_quantamhd_lemon//:lemon",
+        "@com_github_gabime_spdlog//:spdlog",
+        "@tk_tcl//:tcl",
+        "@org_llvm_openmp//:openmp",
+    ],
+    alwayslink = True,
+)
+
+genrule(
+    name = "post9",
+    srcs = [
+        "src/stt/src/flt/etc/MakeDatVar.tcl",
+        "src/stt/src/flt/etc/POST9.dat",
+    ],
+    outs = ["POST9.cpp"],
+    cmd = "$(location @tk_tcl//:tclsh) $(location src/stt/src/flt/etc/MakeDatVar.tcl) post9 \"$@\" $(location src/stt/src/flt/etc/POST9.dat)",
+    exec_tools = ["@tk_tcl//:tclsh"],
+)
+
+genrule(
+    name = "powv9",
+    srcs = [
+        "src/stt/src/flt/etc/MakeDatVar.tcl",
+        "src/stt/src/flt/etc/POWV9.dat",
+    ],
+    outs = ["POWV9.cpp"],
+    cmd = "$(location @tk_tcl//:tclsh) $(location src/stt/src/flt/etc/MakeDatVar.tcl) powv9 \"$@\" $(location src/stt/src/flt/etc/POWV9.dat)",
+    exec_tools = ["@tk_tcl//:tclsh"],
+)
+
+cc_library(
+    name = "flute3",
+    srcs = [
+        "src/stt/src/flt/flute.cpp",
+        ":POST9.cpp",
+        ":POWV9.cpp",
+    ],
+    hdrs = [
+        "src/stt/include/stt/flute.h",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        "src/stt/include",
+        "src/stt/include/stt",
+    ],
+    deps = [
+        ":logger",
+    ],
+)
+
+cc_library(
+    name = "logger",
+    srcs = [
+        "src/utl/src/Logger.cpp",
+    ],
+    hdrs = [
+        "src/utl/include/utl/Logger.h",
+    ],
+    copts = [
+        "-Wno-error",
+        "-Wall",
+        "-Wextra",
+        "-pedantic",
+        "-Wcast-qual",
+        "-Wredundant-decls",
+        "-Wformat-security",
+    ],
+    includes = [
+        "src/utl/include",
+        "src/utl/include/utl",
+    ],
+    visibility = ["@org_theopenroadproject//:__subpackages__"],
+    deps = [
+        "@com_github_gabime_spdlog//:spdlog",
+    ],
+)
+
+cc_library(
+    name = "ParquetFP",
+    srcs = glob([
+        "src/mpl/src/ParquetFP/src/*.cxx",
+    ]),
+    hdrs = glob([
+        "src/mpl/src/ParquetFP/src/*.h",
+        "src/mpl/src/ParquetFP/src/Ctainers/*.h",
+    ]),
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+        "-Wall",
+        "-Wextra",
+        "-pedantic",
+        "-Wcast-qual",
+        "-Wredundant-decls",
+        "-Wformat-security",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        "src/mpl/src/ParquetFP/src",
+    ],
+    visibility = ["@org_theopenroadproject//:__subpackages__"],
+)
+
+cc_library(
+    name = "munkres",
+    srcs = glob([
+        "src/ppl/src/munkres/src/*.cpp",
+    ]),
+    hdrs = glob([
+        "src/ppl/src/munkres/src/*.h",
+    ]),
+    includes = [
+        "src/ppl/src/munkres/src",
+    ],
+    visibility = ["@org_theopenroadproject//:__subpackages__"],
+)
+
+cc_library(
+    name = "openroad_version",
+    hdrs = [
+        ":OpenRoadVersion",
+    ],
+    includes = [
+        "include/ord",
+    ],
+)
+
+genrule(
+    name = "OpenRoadVersion",
+    srcs = [],
+    outs = ["include/ord/Version.hh"],
+    cmd = """echo -e '
+#define OPENROAD_VERSION "HDL-HEAD"
+#define OPENROAD_GIT_SHA1 "HEAD"
+' > \"$@\"
+    """,
+)
+
+tcl_encode(
+    name = "init_floorplan_tcl",
+    srcs = [
+        "src/ifp/src/InitFloorplan.tcl",
+    ],
+    out = "InitFloorplanTclInitVar.cc",
+    char_array_name = "ifp_tcl_inits",
+)
+
+tcl_encode(
+    name = "db_sta_tcl",
+    srcs = [
+        "src/dbSta/src/dbReadVerilog.tcl",
+        "src/dbSta/src/dbSta.tcl",
+        ":tcl_scripts",
+    ],
+    char_array_name = "dbSta_tcl_inits",
+)
+
+tcl_encode(
+    name = "ioplacer_tcl",
+    srcs = [
+        "src/ppl/src/IOPlacer.tcl",
+    ],
+    char_array_name = "ppl_tcl_inits",
+)
+
+tcl_encode(
+    name = "resizer_tcl",
+    srcs = [
+        "src/rsz/src/Resizer.tcl",
+    ],
+    char_array_name = "rsz_tcl_inits",
+)
+
+tcl_encode(
+    name = "opendp_tcl",
+    srcs = [
+        "src/dpl/src/Opendp.tcl",
+    ],
+    char_array_name = "dpl_tcl_inits",
+)
+
+tcl_encode(
+    name = "finale_tcl",
+    srcs = [
+        "src/fin/src/finale.tcl",
+    ],
+    char_array_name = "fin_tcl_inits",
+)
+
+tcl_encode(
+    name = "tritonmp_tcl",
+    srcs = [
+        "src/mpl/src/MacroPlacer.tcl",
+    ],
+    char_array_name = "mpl_tcl_inits",
+)
+
+tcl_encode(
+    name = "ant_tcl",
+    srcs = [
+        "src/ant/src/AntennaChecker.tcl",
+    ],
+    char_array_name = "ant_tcl_inits",
+)
+
+tcl_encode(
+    name = "fastroute_tcl",
+    srcs = [
+        "src/grt/src/GlobalRouter.tcl",
+    ],
+    char_array_name = "grt_tcl_inits",
+)
+
+tcl_encode(
+    name = "tapcell_tcl",
+    srcs = [
+        "src/tap/src/tapcell.tcl",
+    ],
+    char_array_name = "tap_tcl_inits",
+)
+
+tcl_encode(
+    name = "replace_tcl",
+    srcs = [
+        "src/replace/src/replace.tcl",
+    ],
+    char_array_name = "replace_tcl_inits",
+)
+
+tcl_encode(
+    name = "triton_cts_tcl",
+    srcs = [
+        "src/cts/src/tritoncts.tcl",
+    ],
+    char_array_name = "cts_tcl_inits",
+)
+
+tcl_encode(
+    name = "rcx_tcl",
+    srcs = [
+        "src/rcx/src/OpenRCX.tcl",
+    ],
+    char_array_name = "rcx_tcl_inits",
+)
+
+tcl_encode(
+    name = "triton_route_tcl",
+    srcs = [
+        "src/TritonRoute/src/TritonRoute.tcl",
+    ],
+    char_array_name = "TritonRoute_tcl_inits",
+)
+
+tcl_encode(
+    name = "pdn_sim_tcl",
+    srcs = [
+        "src/psm/src/pdnsim.tcl",
+    ],
+    char_array_name = "psm_tcl_inits",
+)
+
+tcl_encode(
+    name = "partition_manager_tcl",
+    srcs = [
+        "src/par/src/partitionmgr.tcl",
+    ],
+    char_array_name = "par_tcl_inits",
+)
+
+tcl_encode(
+    name = "pdngen_tcl",
+    srcs = [
+        "src/pdn/src/PdnGen.tcl",
+    ],
+    char_array_name = "pdn_tcl_inits",
+)
+
+tcl_encode(
+    name = "openroad_tcl",
+    srcs = [":tcl_util"] + [
+        "src/OpenRoad.tcl",
+        "src/ICeWall/src/ICeWall.tcl",
+    ],
+    char_array_name = "openroad_swig_tcl_inits",
+)
+
+tcl_encode(
+    name = "mpl2_tcl",
+    srcs = [
+        "src/mpl2/src/mpl.tcl",
+    ],
+    char_array_name = "mpl2_tcl_inits",
+)
+
+tcl_encode(
+    name = "rmp_tcl",
+    srcs = [
+        "src/rmp/src/rmp.tcl",
+    ],
+    char_array_name = "rmp_tcl_inits",
+)
+
+tcl_encode(
+    name = "stt_tcl",
+    srcs = [
+        "src/stt/src/SteinerTreeBuilder.tcl",
+    ],
+    char_array_name = "stt_tcl_inits",
+)
+
+tcl_wrap_cc(
+    name = "init_floorplan_swig",
+    srcs = [
+        "src/ifp/src/InitFloorplan.i",
+        ":error_swig",
+    ],
+    module = "ifp",
+    namespace_prefix = "ifp",
+    root_swig_src = "src/ifp/src/InitFloorplan.i",
+    swig_includes = [
+        "src/ifp/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "dbsta_swig",
+    srcs = [
+        "src/dbSta/src/dbSta.i",
+        ":error_swig",
+        ":sta_swig_files",
+    ],
+    module = "dbSta",
+    namespace_prefix = "sta",
+    root_swig_src = "src/dbSta/src/dbSta.i",
+    swig_includes = [
+        "src/OpenDB/src/swig/common",
+        "src/dbSta/src",
+        "src/sta",
+    ],
+    deps = [
+        ":opendb_tcl",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "ioplacer_swig",
+    srcs = [
+        "src/ppl/src/IOPlacer.i",
+        ":error_swig",
+    ],
+    module = "ppl",
+    namespace_prefix = "ppl",
+    root_swig_src = "src/ppl/src/IOPlacer.i",
+    swig_includes = [
+        "src/ppl/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "resizer_swig",
+    srcs = [
+        "src/rsz/src/Resizer.i",
+        ":error_swig",
+    ],
+    module = "rsz",
+    namespace_prefix = "rsz",
+    root_swig_src = "src/rsz/src/Resizer.i",
+    swig_includes = [
+        "src/rsz/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "opendp_swig",
+    srcs = [
+        "src/dpl/src/Opendp.i",
+        ":error_swig",
+    ],
+    module = "dpl",
+    namespace_prefix = "dpl",
+    root_swig_src = "src/dpl/src/Opendp.i",
+    swig_includes = [
+        "src/dpl/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "logger_swig",
+    srcs = [
+        "src/utl/src/Logger.i",
+        ":error_swig",
+    ],
+    module = "utl",
+    namespace_prefix = "utl",
+    root_swig_src = "src/utl/src/Logger.i",
+    swig_includes = [
+        "src/utl/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "finale_swig",
+    srcs = [
+        "src/fin/src/finale.i",
+        ":error_swig",
+    ],
+    module = "fin",
+    namespace_prefix = "fin",
+    root_swig_src = "src/fin/src/finale.i",
+    swig_includes = [
+        "src/fin/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "tritonmp_swig",
+    srcs = [
+        "src/mpl/src/MacroPlacer.i",
+        ":error_swig",
+    ],
+    module = "mpl",
+    namespace_prefix = "mpl",
+    root_swig_src = "src/mpl/src/MacroPlacer.i",
+    swig_includes = [
+        "src/mpl/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "ant_swig",
+    srcs = [
+        "src/ant/src/AntennaChecker.i",
+        ":error_swig",
+    ],
+    module = "ant",
+    namespace_prefix = "ant",
+    root_swig_src = "src/ant/src/AntennaChecker.i",
+    swig_includes = [
+        "src/ant/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "fastroute_swig",
+    srcs = [
+        "src/grt/src/GlobalRouter.i",
+        ":error_swig",
+    ],
+    module = "grt",
+    namespace_prefix = "grt",
+    root_swig_src = "src/grt/src/GlobalRouter.i",
+    swig_includes = [
+        "src/grt/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "replace_swig",
+    srcs = [
+        "src/replace/src/replace.i",
+        ":error_swig",
+    ],
+    module = "replace",
+    namespace_prefix = "gpl",
+    root_swig_src = "src/replace/src/replace.i",
+    swig_includes = [
+        "src/replace/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "triton_cts_swig",
+    srcs = [
+        "src/cts/src/tritoncts.i",
+        ":error_swig",
+    ],
+    module = "cts",
+    namespace_prefix = "cts",
+    root_swig_src = "src/cts/src/tritoncts.i",
+    swig_includes = [
+        "src/cts/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "tapcell_swig",
+    srcs = [
+        "src/tap/src/tapcell.i",
+        ":error_swig",
+    ],
+    module = "tap",
+    namespace_prefix = "tap",
+    root_swig_src = "src/tap/src/tapcell.i",
+    swig_includes = [
+        "src/tap/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "rcx_swig",
+    srcs = [
+        "src/rcx/src/ext.i",
+        ":error_swig",
+    ],
+    module = "rcx",
+    namespace_prefix = "rcx",
+    root_swig_src = "src/rcx/src/ext.i",
+    swig_includes = [
+        "src/rcx/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "triton_route_swig",
+    srcs = [
+        "src/TritonRoute/src/TritonRoute.i",
+        ":error_swig",
+    ],
+    module = "TritonRoute",
+    namespace_prefix = "drt",
+    root_swig_src = "src/TritonRoute/src/TritonRoute.i",
+    swig_includes = [
+        "src/TritonRoute/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "pdn_sim_swig",
+    srcs = [
+        "src/psm/src/pdnsim.i",
+        ":error_swig",
+    ],
+    module = "psm",
+    namespace_prefix = "psm",
+    root_swig_src = "src/psm/src/pdnsim.i",
+    swig_includes = [
+        "src/psm/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "partition_manager_swig",
+    srcs = [
+        "src/par/src/partitionmgr.i",
+        ":error_swig",
+    ],
+    module = "Par",
+    namespace_prefix = "par",
+    root_swig_src = "src/par/src/partitionmgr.i",
+    swig_includes = [
+        "src/par/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "pdngen_swig",
+    srcs = [
+        "src/pdn/src/PdnGen.i",
+        ":error_swig",
+    ],
+    module = "pdn",
+    namespace_prefix = "pdn",
+    root_swig_src = "src/pdn/src/PdnGen.i",
+    swig_includes = [
+        "src/pdn/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "openroad_swig",
+    srcs = [
+        "src/OpenRoad.i",
+        ":error_swig",
+    ],
+    module = "Openroad_swig",
+    namespace_prefix = "ord",
+    root_swig_src = "src/OpenRoad.i",
+    swig_includes = [
+        "src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "mpl2_swig",
+    srcs = [
+        "src/mpl2/src/mpl.i",
+        ":error_swig",
+    ],
+    module = "mpl2",
+    namespace_prefix = "mpl2",
+    root_swig_src = "src/mpl2/src/mpl.i",
+    swig_includes = [
+        "src/mpl2/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "rmp_swig",
+    srcs = [
+        "src/rmp/src/rmp.i",
+        ":error_swig",
+    ],
+    module = "rmp",
+    namespace_prefix = "rmp",
+    root_swig_src = "src/rmp/src/rmp.i",
+    swig_includes = [
+        "src/rmp/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "stt_swig",
+    srcs = [
+        "src/stt/src/SteinerTreeBuilder.i",
+        ":error_swig",
+    ],
+    module = "stt",
+    namespace_prefix = "stt",
+    root_swig_src = "src/stt/src/SteinerTreeBuilder.i",
+    swig_includes = [
+        "src/stt/src",
+    ],
+)
+
+filegroup(
+    name = "error_swig",
+    srcs = [
+        "src/Exception.i",
+    ],
+)
+
+## OPENDB
+filegroup(
+    name = "dbdiff",
+    srcs = [
+        "src/OpenDB/src/swig/common/dbdiff.i",
+    ],
+    visibility = ["@org_theopenroadproject//:__subpackages__"],
+)
+
+filegroup(
+    name = "opendb_tcl_common",
+    srcs = [
+        "src/OpenDB/src/swig/common/swig_common.cpp",
+        "src/OpenDB/src/swig/common/swig_common.h",
+    ],
+    visibility = ["@org_theopenroadproject//:__subpackages__"],
+)
+
+tcl_wrap_cc(
+    name = "opendb_tcl",
+    srcs = glob([
+        "src/OpenDB/src/swig/tcl/*.i",
+        "src/OpenDB/src/swig/common/*.i",
+        "src/OpenDB/include/opendb/*.h",
+    ]),
+    module = "opendbtcl",
+    namespace_prefix = "odb",
+    root_swig_src = "src/OpenDB/src/swig/common/opendb.i",
+    swig_includes = [
+        "src/OpenDB/include/opendb",
+        "src/OpenDB/src/swig/tcl",
+    ],
+    swig_options = [
+        # These values are derived from the CMakeList.txt and represent the "rules" this swig file
+        # breaks. Swig refuses to compile our swig files unless we acknowledge we are ignoring the
+        # following warnings. They can be derived by attemtpting to compile without them and fixing
+        # the warnings one by one.
+        "-w509,503,501,472,467,402,401,317,325,378,383,389,365,362,314,258,240,203,201",
+    ],
+)
+
+cc_library(
+    name = "opendb_lib",
+    srcs = glob([
+        "src/OpenDB/src/cdl/*.cpp",
+    ]),
+    hdrs = glob([
+        "src/OpenDB/include/opendb/*.h",
+        "src/OpenDB/include/opendb/*.hpp",
+    ]) + [
+        "src/OpenDB/src/def/def/defiAlias.hpp",
+        "src/OpenDB/src/def/def/defwWriter.hpp",
+        "src/OpenDB/src/def/def/defrReader.hpp",
+        "src/OpenDB/src/lef/lef/lefiDebug.hpp",
+        "src/OpenDB/src/lef/lef/lefiUtil.hpp",
+        "src/OpenDB/src/lef/lef/lefrReader.hpp",
+    ],
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        "src/OpenDB/include",
+        "src/OpenDB/include/opendb",
+    ],
+    visibility = ["@org_theopenroadproject//:__subpackages__"],
+    deps = [
+        ":opendb_db",
+        ":opendb_def",
+        ":opendb_defin",
+        ":opendb_defout",
+        ":opendb_lef",
+        ":opendb_lefin",
+        ":opendb_lefout",
+        ":opendb_tm",
+        ":opendb_zlib",
+        ":opendb_zutil",
+    ],
+)
+
+cc_library(
+    name = "opendb_db",
+    srcs = glob([
+        "src/OpenDB/src/db/*.cpp",
+        "src/OpenDB/src/db/*.h",
+        "src/OpenDB/src/db/*.hpp",
+    ]),
+    hdrs = glob([
+        "src/OpenDB/include/opendb/*.h",
+        "src/OpenDB/include/opendb/*.hpp",
+    ]),
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        "src/OpenDB/include/opendb",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":logger",
+        "@com_github_gabime_spdlog//:spdlog_with_exceptions",
+        "@tk_tcl//:tcl",
+    ],
+)
+
+genyacc(
+    name = "def_bison",
+    src = "src/OpenDB/src/def/def/def.y",
+    header_out = "src/OpenDB/src/def/def/def_parser.hpp",
+    prefix = "defyy",
+    source_out = "src/OpenDB/src/def/def/def_parser.cpp",
+)
+
+cc_library(
+    name = "opendb_def",
+    srcs = glob(
+        include = [
+            "src/OpenDB/src/def/def/*.cpp",
+            "src/OpenDB/src/def/def/*.h",
+            "src/OpenDB/src/def/def/*.hpp",
+            "src/OpenDB/src/def/defzlib/*.hpp",
+            "src/OpenDB/src/def/defzlib/*.cpp",
+        ],
+        exclude = [
+            "src/OpenDB/src/def/def/defiComponent.hpp",
+            "src/OpenDB/src/def/def/defiUtil.hpp",
+        ],
+    ) + [
+        "src/OpenDB/src/def/def/def_parser.hpp",
+        "src/OpenDB/src/def/def/def_parser.cpp",
+    ],
+    hdrs = glob([
+        "src/OpenDB/include/opendb/*.h",
+        "src/OpenDB/include/opendb/*.hpp",
+    ]) + [
+        "src/OpenDB/src/def/def/defiComponent.hpp",
+        "src/OpenDB/src/def/def/defiUtil.hpp",
+        "src/OpenDB/src/def/def/defiAlias.hpp",
+        "src/OpenDB/src/def/def/defwWriter.hpp",
+        "src/OpenDB/src/def/def/defrReader.hpp",
+        "src/OpenDB/src/def/defzlib/defzlib.hpp",
+    ],
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        "src/OpenDB/include/opendb",
+        "src/OpenDB/src/def/def",
+        "src/OpenDB/src/def/defzlib",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        "@net_zlib//:zlib",
+    ],
+)
+
+cc_library(
+    name = "opendb_zutil",
+    srcs = glob(["src/OpenDB/src/zutil/*.cpp"]),
+    hdrs = glob([
+        "src/OpenDB/include/opendb/*.h",
+        "src/OpenDB/include/opendb/*.hpp",
+    ]),
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        "src/OpenDB/include/opendb",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        "@tk_tcl//:tcl",
+    ],
+)
+
+cc_library(
+    name = "opendb_defout",
+    srcs = glob([
+        "src/OpenDB/src/defout/*.cpp",
+        "src/OpenDB/src/defout/*.h",
+    ]),
+    hdrs = glob([
+        "src/OpenDB/include/opendb/*.h",
+        "src/OpenDB/include/opendb/*.hpp",
+    ]),
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        "src/OpenDB/include/opendb",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":logger",
+        "@tk_tcl//:tcl",
+    ],
+)
+
+cc_library(
+    name = "opendb_defin",
+    srcs = glob([
+        "src/OpenDB/src/defin/*.cpp",
+        "src/OpenDB/src/defin/*.h",
+    ]),
+    hdrs = glob([
+        "src/OpenDB/include/opendb/*.h",
+        "src/OpenDB/include/opendb/*.hpp",
+    ]),
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        "src/OpenDB/include/opendb",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":logger",
+        ":opendb_def",
+        ":opendb_zutil",
+        "@tk_tcl//:tcl",
+    ],
+)
+
+genyacc(
+    name = "lef_bison",
+    src = "src/OpenDB/src/lef/lef/lef.y",
+    header_out = "src/OpenDB/src/lef/lef/lef_parser.hpp",
+    prefix = "lefyy",
+    source_out = "src/OpenDB/src/lef/lef/lef_parser.cpp",
+)
+
+cc_library(
+    name = "opendb_lef",
+    srcs = glob(
+        include = [
+            "src/OpenDB/src/lef/lef/*.cpp",
+            "src/OpenDB/src/lef/lef/*.h",
+            "src/OpenDB/src/lef/lef/*.hpp",
+            "src/OpenDB/src/lef/lefzlib/*.cpp",
+        ],
+        exclude = [
+            "src/OpenDB/src/lef/lef/lefiDebug.hpp",
+            "src/OpenDB/src/lef/lef/lefiUtil.hpp",
+            "src/OpenDB/src/lef/lef/lefrReader.hpp",
+        ],
+    ) + [
+        "src/OpenDB/src/lef/lef/lef_parser.hpp",
+        "src/OpenDB/src/lef/lef/lef_parser.cpp",
+    ],
+    hdrs = glob([
+        "src/OpenDB/include/opendb/*.h",
+        "src/OpenDB/include/opendb/*.hpp",
+    ]) + [
+        "src/OpenDB/src/lef/lef/lefiDebug.hpp",
+        "src/OpenDB/src/lef/lef/lefiUtil.hpp",
+        "src/OpenDB/src/lef/lef/lefrReader.hpp",
+        "src/OpenDB/src/lef/lefzlib/lefzlib.hpp",
+    ],
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        "src/OpenDB/include/opendb",
+        "src/OpenDB/src/lef/lef",
+        "src/OpenDB/src/lef/lefzlib",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        "@net_zlib//:zlib",
+    ],
+)
+
+cc_library(
+    name = "opendb_lefin",
+    srcs = glob([
+        "src/OpenDB/src/lefin/*.cpp",
+        "src/OpenDB/src/lefin/*.h",
+    ]),
+    hdrs = glob([
+        "src/OpenDB/include/opendb/*.h",
+        "src/OpenDB/include/opendb/*.hpp",
+    ]),
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        "src/OpenDB/include/opendb",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":logger",
+        ":opendb_lef",
+        ":opendb_zutil",
+        "@boost//:iostreams",
+        "@boost//:foreach",
+        "@boost//:variant",
+        "@boost//:spirit",
+        "@boost//:lambda",
+        "@boost//:fusion",
+        "@boost//:bind",
+        "@boost//:algorithm",
+        "@tk_tcl//:tcl",
+    ],
+)
+
+cc_library(
+    name = "opendb_lefout",
+    srcs = glob([
+        "src/OpenDB/src/lefout/*.cpp",
+        "src/OpenDB/src/lefout/*.h",
+    ]),
+    hdrs = glob([
+        "src/OpenDB/include/opendb/*.h",
+        "src/OpenDB/include/opendb/*.hpp",
+    ]),
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        "src/OpenDB/include/opendb",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":logger",
+        "@tk_tcl//:tcl",
+    ],
+)
+
+cc_library(
+    name = "opendb_tm",
+    srcs = glob([
+        "src/OpenDB/src/tm/*.cpp",
+    ]),
+    hdrs = glob([
+        "src/OpenDB/include/opendb/*.h",
+        "src/OpenDB/include/opendb/*.hpp",
+    ]),
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        "src/OpenDB/include/opendb",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        "@tk_tcl//:tcl",
+    ],
+)
+
+cc_library(
+    name = "opendb_zlib",
+    srcs = glob([
+        "src/OpenDB/src/zlib/*.cpp",
+    ]),
+    hdrs = glob([
+        "src/OpenDB/include/opendb/*.h",
+        "src/OpenDB/include/opendb/*.hpp",
+    ]),
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        "src/OpenDB/include/opendb",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        "@net_zlib//:zlib",
+    ],
+)
+
+## OPENDB
+
+## OpenSTA
+genlex(
+    name = "LibertyExprLex",
+    src = "src/sta/liberty/LibertyExprLex.ll",
+    out = "src/sta/liberty/LibertyExprLex.cc",
+    prefix = "LibertyExprLex_",
+)
+
+genyacc(
+    name = "LibertyExprParser",
+    src = "src/sta/liberty/LibertyExprParse.yy",
+    header_out = "src/sta/liberty/LibertyExprParse.hh",
+    prefix = "LibertyExprParse_",
+    source_out = "src/sta/liberty/LibertyExprParse.cc",
+)
+
+# Liberty Parser
+genlex(
+    name = "LibertyLex",
+    src = "src/sta/liberty/LibertyLex.ll",
+    out = "src/sta/liberty/LibertyLex.cc",
+    prefix = "LibertyLex_",
+)
+
+genyacc(
+    name = "LibertyParser",
+    src = "src/sta/liberty/LibertyParse.yy",
+    header_out = "src/sta/liberty/LibertyParse.hh",
+    prefix = "LibertyParse_",
+    source_out = "src/sta/liberty/LibertyParse.cc",
+)
+
+# Spef scan/parse.
+genlex(
+    name = "SpefLex",
+    src = "src/sta/parasitics/SpefLex.ll",
+    out = "src/sta/parasitics/SpefLex.cc",
+    prefix = "SpefLex_",
+)
+
+genyacc(
+    name = "SpefParser",
+    src = "src/sta/parasitics/SpefParse.yy",
+    header_out = "src/sta/parasitics/SpefParse.hh",
+    prefix = "SpefParse_",
+    source_out = "src/sta/parasitics/SpefParse.cc",
+)
+
+# Verilog scan/parse.
+genlex(
+    name = "VerilogLex",
+    src = "src/sta/verilog/VerilogLex.ll",
+    out = "src/sta/verilog/VerilogLex.cc",
+    prefix = "VerilogLex_",
+)
+
+genyacc(
+    name = "VerilogParser",
+    src = "src/sta/verilog/VerilogParse.yy",
+    header_out = "src/sta/verilog/VerilogParse.hh",
+    prefix = "VerilogParse_",
+    source_out = "src/sta/verilog/VerilogParse.cc",
+)
+
+# sdf scan/parse.
+genlex(
+    name = "SdfLex",
+    src = "src/sta/sdf/SdfLex.ll",
+    out = "src/sta/sdf/SdfLex.cc",
+    prefix = "SdfLex_",
+)
+
+genyacc(
+    name = "SdfParser",
+    src = "src/sta/sdf/SdfParse.yy",
+    header_out = "src/sta/sdf/SdfParse.hh",
+    prefix = "SdfParse_",
+    source_out = "src/sta/sdf/SdfParse.cc",
+)
+
+# The order here is very important as the script to encode these relies on it
+tcl_srcs = [
+    "src/sta/tcl/Util.tcl",
+    "src/sta/tcl/Graph.tcl",
+    "src/sta/tcl/Liberty.tcl",
+    "src/sta/tcl/Link.tcl",
+    "src/sta/tcl/Network.tcl",
+    "src/sta/tcl/NetworkEdit.tcl",
+    "src/sta/tcl/Sdc.tcl",
+    "src/sta/tcl/Search.tcl",
+    "src/sta/tcl/Cmds.tcl",
+    "src/sta/tcl/Variables.tcl",
+    "src/sta/tcl/Sta.tcl",
+    "src/sta/tcl/Power.tcl",
+    "src/sta/tcl/Splash.tcl",
+    "src/sta/dcalc/DelayCalc.tcl",
+    "src/sta/parasitics/Parasitics.tcl",
+    "src/sta/sdf/Sdf.tcl",
+    "src/sta/verilog/Verilog.tcl",
+]
+
+exported_tcl = [
+    "src/sta/tcl/Graph.tcl",
+    "src/sta/tcl/Liberty.tcl",
+    "src/sta/tcl/Network.tcl",
+    "src/sta/tcl/NetworkEdit.tcl",
+    "src/sta/tcl/Sdc.tcl",
+    "src/sta/tcl/Search.tcl",
+    "src/sta/tcl/Cmds.tcl",
+    "src/sta/tcl/Variables.tcl",
+    "src/sta/tcl/Sta.tcl",
+    "src/sta/tcl/Power.tcl",
+    "src/sta/tcl/Splash.tcl",
+    "src/sta/dcalc/DelayCalc.tcl",
+    "src/sta/parasitics/Parasitics.tcl",
+    "src/sta/sdf/Sdf.tcl",
+]
+
+filegroup(
+    name = "tcl_scripts",
+    srcs = exported_tcl,
+    visibility = ["@org_theopenroadproject//:__subpackages__"],
+)
+
+tcl_encode(
+    name = "StaTclInitVar",
+    srcs = tcl_srcs,
+    char_array_name = "tcl_inits",
+)
+
+genrule(
+    name = "StaConfig",
+    srcs = [],
+    outs = ["src/sta/util/StaConfig.hh"],
+    cmd = """echo -e '
+    #define STA_VERSION "2.2.1"
+    #define STA_GIT_SHA1 "53d4d57cb8550d2ceed18adad75b73bba7858f4f"
+    #define CUDD 0
+    #define SSTA 0' > \"$@\"
+    """,
+)
+
+filegroup(
+    name = "sta_swig_files",
+    srcs = [
+        "src/sta/app/StaApp.i",
+        "src/sta/dcalc/DelayCalc.i",
+        "src/sta/parasitics/Parasitics.i",
+        "src/sta/sdf/Sdf.i",
+        "src/sta/tcl/Exception.i",
+        "src/sta/tcl/NetworkEdit.i",
+        "src/sta/tcl/StaTcl.i",
+        "src/sta/verilog/Verilog.i",
+    ],
+    visibility = ["@org_theopenroadproject//:__subpackages__"],
+)
+
+tcl_wrap_cc(
+    name = "StaApp",
+    srcs = [
+        ":sta_swig_files",
+    ],
+    root_swig_src = "src/sta/app/StaApp.i",
+    swig_includes = [
+        "src/sta/dcalc",
+        "src/sta/parasitics",
+        "src/sta/sdf",
+        "src/sta/tcl",
+        "src/sta/verilog",
+    ],
+)
+
+parser_cc = [
+    # Liberty Expression Parser
+    ":src/sta/liberty/LibertyExprParse.cc",
+    ":src/sta/liberty/LibertyExprLex.cc",
+    # Liberty Parser
+    ":src/sta/liberty/LibertyLex.cc",
+    ":src/sta/liberty/LibertyParse.cc",
+    # Spef scan/parse.
+    ":src/sta/parasitics/SpefLex.cc",
+    ":src/sta/parasitics/SpefParse.cc",
+    # Verilog scan/parse.
+    ":src/sta/verilog/VerilogLex.cc",
+    ":src/sta/verilog/VerilogParse.cc",
+    # sdf scan/parse.
+    ":src/sta/sdf/SdfLex.cc",
+    ":src/sta/sdf/SdfParse.cc",
+]
+
+parser_headers = [
+    # Liberty Expression Parser
+    ":src/sta/liberty/LibertyExprParse.hh",
+    # Liberty Parser
+    ":src/sta/liberty/LibertyParse.hh",
+    # Spef scan/parse.
+    ":src/sta/parasitics/SpefParse.hh",
+    # Verilog scan/parse.
+    ":src/sta/verilog/VerilogParse.hh",
+    # sdf scan/parse.
+    ":src/sta/sdf/SdfParse.hh",
+]
+
+cc_binary(
+    name = "opensta",
+    srcs = [
+        "src/sta/app/Main.cc",
+        ":StaApp",
+        ":StaTclInitVar",
+    ],
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+        "-Wall",
+        "-Wextra",
+        "-pedantic",
+        "-Wcast-qual",
+        "-Wredundant-decls",
+        "-Wformat-security",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        "src/sta/",
+        "src/sta/dcalc",
+        "src/sta/include/sta",
+        "src/sta/util",
+    ],
+    deps = [
+        ":opensta_lib",
+        "@tk_tcl//:tcl",
+    ],
+)
+
+cc_library(
+    name = "opensta_lib",
+    srcs = parser_cc + parser_headers + glob([
+        "src/sta/dcalc/*.hh",
+        "src/sta/util/*.hh",
+        "src/sta/parasitics/*.hh",
+        "src/sta/liberty/*.hh",
+        "src/sta/sdc/*.hh",
+        "src/sta/sdf/*.hh",
+        "src/sta/search/*.hh",
+        "src/sta/verilog/*.hh",
+    ]) + glob(
+        include = [
+            "src/sta/app/StaMain.cc",
+            "src/sta/dcalc/*.cc",
+            "src/sta/graph/*.cc",
+            "src/sta/network/*.cc",
+            "src/sta/util/*.cc",
+            "src/sta/parasitics/*.cc",
+            "src/sta/liberty/*.cc",
+            "src/sta/sdc/*.cc",
+            "src/sta/sdf/*.cc",
+            "src/sta/search/*.cc",
+            "src/sta/verilog/*.cc",
+        ],
+        exclude = [
+            "src/sta/search/WriteSpice.cc",
+            "src/sta/graph/Delay.cc",
+            "src/sta/liberty/LibertyExt.cc",
+            "src/sta/util/Machine*.cc",
+        ],
+    ) + [
+        ":StaConfig",
+        "src/sta/util/Machine.cc",
+    ],
+    hdrs = glob(
+        include = ["src/sta/include/sta/*.hh"],
+    ) + [
+        "src/sta/util/MachineLinux.cc",
+    ],
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+        "-Wall",
+        "-Wextra",
+        "-pedantic",
+        "-Wcast-qual",
+        "-Wredundant-decls",
+        "-Wformat-security",
+    ],
+    features = [
+        "-use_header_modules",
+    ],
+    includes = [
+        "src/sta/",
+        "src/sta/dcalc",
+        "src/sta/include",
+        "src/sta/include/sta",
+        "src/sta/util",
+    ],
+    visibility = ["@org_theopenroadproject//:__subpackages__"],
+    deps = [
+        "@tk_tcl//:tcl",
+    ],
+)
+
+filegroup(
+    name = "tcl_util",
+    srcs = [
+        "src/sta/tcl/Util.tcl",
+    ],
+    visibility = ["@org_theopenroadproject//:__subpackages__"],
+)
+
+## OpenSTA

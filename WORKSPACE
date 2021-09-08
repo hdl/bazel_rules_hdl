@@ -29,6 +29,24 @@ http_archive(
     urls = ["https://github.com/grailbio/bazel-toolchain/archive/7e7c7cf1f965f348861085183d79b6a241764390.tar.gz"],
 )
 
+# This sysroot is used by github.com/vsco/bazel-toolchains.
+# Disabled for now waiting on https://github.com/pybind/pybind11_bazel/pull/29
+# py_bind11 relies on installed linux headers which a custom sysroot disables.
+# Once hermetic python is supported this should no longer be an issue.
+# http_archive(
+#     name = "org_chromium_sysroot_linux_x64",
+#     build_file_content = """
+# filegroup(
+#   name = "sysroot",
+#   srcs = glob(["*/**"]),
+#   visibility = ["//visibility:public"],
+# )
+# """,
+#     sha256 = "73d828bf653f8f8548be704ce1ded4d195bf2bf937fc5426dd5636a9940d1969",
+#     urls = ["https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/3c248ba4290a5ad07085b7af07e6785bf1ae5b66/debian_stretch_amd64_sysroot.tar.xz"],
+# )
+
+
 load("@com_grail_bazel_toolchain//toolchain:deps.bzl", "bazel_toolchain_dependencies")
 
 bazel_toolchain_dependencies()
@@ -54,6 +72,10 @@ llvm_toolchain(
             "https://github.com/retone/deps/releases/download/na5/clang+llvm-10.0.1-x86_64-pc-linux-gnu.tar.xz",
         ],
     },
+    # Disabled for now waiting on https://github.com/pybind/pybind11_bazel/pull/29
+    # sysroot = {
+    #     "linux": "@org_chromium_sysroot_linux_x64//:sysroot",
+    # },
 )
 
 maybe(
