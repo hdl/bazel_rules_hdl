@@ -17,14 +17,14 @@
 cc_library(
     name = "spdlog",
     hdrs = glob([
-        "src/include/spdlog/**/*.h",
+        "include/spdlog/**/*.h",
     ]),
     defines = [
         "SPDLOG_FMT_EXTERNAL",
         "SPDLOG_NO_EXCEPTIONS",
     ],
     includes = [
-        "src/include",
+        "include",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -36,18 +36,33 @@ cc_library(
 cc_library(
     name = "spdlog_with_exceptions",
     hdrs = glob([
-        "src/include/spdlog/*.h",
-        "src/include/spdlog/*/*.h",
+        "include/spdlog/*.h",
+        "include/spdlog/*/*.h",
     ]),
     defines = [
         "SPDLOG_FMT_EXTERNAL",
     ],
     includes = [
-        "src/include",
+        "include",
     ],
     visibility = ["//visibility:public"],
     deps = [
         "@com_google_absl//absl/container:node_hash_map",
         "@com_github_fmtlib_fmt//:fmtlib_with_exceptions",
     ],
+)
+
+cc_test(
+    name = "test_fmt_helper",
+    srcs = [
+        "tests/test_fmt_helper.cpp",
+        "tests/includes.h",
+        "tests/catch.hpp",
+        "tests/utils.h",
+        "tests/utils.cpp",
+        "tests/main.cpp",
+    ],
+    deps = [
+        ":spdlog",
+    ]
 )
