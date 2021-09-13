@@ -50,4 +50,8 @@ def com_google_skywater_pdk():
             remote = "https://foss-eda-tools.googlesource.com/skywater-pdk/libs/%s.git" % library_name,
             shallow_since = library["shallow_since"],
             build_file_content = _build_file(workspace_name, library_name),
+            patches = library.get("patches", []),
+            patch_args = [
+                "-p1",
+            ],
         )

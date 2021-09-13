@@ -28,9 +28,9 @@ def com_github_quantamhd_lemon():
         sha256 = "a7f28821431b76505966e9a34c94c180130f6162ed2fc59ade8a685b5d5dcfeb",
         build_file = Label("//dependency_support/com_github_quantamhd_lemon:bundled.BUILD.bazel"),
         patches = [
-          "//dependency_support/com_github_quantamhd_lemon:lemon.patch",
+            "//dependency_support/com_github_quantamhd_lemon:lemon.patch",
         ],
         patch_args = [
-          "-p1",
-        ]
+            "-p1",
+        ],
     )

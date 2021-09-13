@@ -26,10 +26,10 @@ def org_theopenroadproject():
         remote = "https://github.com/The-OpenROAD-Project/OpenROAD.git",
         build_file = Label("//dependency_support/org_theopenroadproject:bundled.BUILD.bazel"),
         patches = [
-          "//dependency_support/org_theopenroadproject:0001-utility-Adds-ability-to-quiet-and-silece-stdout-logg.patch",
+            "//dependency_support/org_theopenroadproject:0001-utility-Adds-ability-to-quiet-and-silece-stdout-logg.patch",
         ],
         patch_args = [
-          "-p1"
+            "-p1",
         ],
-        shallow_since = "1628440377 +0200"
+        shallow_since = "1628440377 +0200",
     )

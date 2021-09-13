@@ -51,7 +51,17 @@ def declare_cell_library(workspace_name, name):
         )
     skywater_cell_library(
         name = name,
+        srcs = native.glob(
+            include = [
+                "cells/**/*.lef",
+            ],
+            exclude = [
+                "cells/**/*.magic.lef",
+            ],
+        ),
         process_corners = [":{}".format(corner) for corner in corners],
         default_corner = library.get("default_corner", ""),
         visibility = ["//visibility:public"],
+        openroad_configuration = library.get("open_road_configuration", None),
+        tech_lef = "tech/{}.tlef".format(name) if library.get("library_type", None) != "ip_library" else None,
     )
