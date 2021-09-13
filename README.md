@@ -1,20 +1,24 @@
 # bazel_rules_hdl
 Hardware Description Language (Verilog, VHDL, Chisel, nMigen, etc) with open tools (Yosys, Verilator, OpenROAD, etc) rules for Bazel (https://bazel.build)
 
+**THIS REPO REQUIRES BAZEL 3.5.0 or greater**
+
 ## Installation
 
 In your `WORKSPACE` file. Which is a file at the top directory of every bazel
 repo:
 
 ```starlark
-git_hash = "{LATEST_HASH}"
-git_sha256 = "{LATEST_SHA}"
+# You don't need these variables, but are useful for configurability.
+# Feel free to hardcode these values in the maybe http_archive below.
+rules_hdl_git_hash = "{LATEST_HASH}"
+rules_hdl_git_sha256 = "{LATEST_SHA}"
 
-maybe(s
+maybe(
     http_archive,
     name = "rules_hdl",
-    sha256 = git_sha256,
-    strip_prefix = "bazel_rules_hdl-%s" % git_hash,
+    sha256 = rules_hdl_git_sha256,
+    strip_prefix = "bazel_rules_hdl-%s" % rules_hdl_git_hash,
     urls = [
         "https://github.com/hdl/bazel_rules_hdl/archive/%s.tar.gz" % git_hash,
     ],
