@@ -55,6 +55,16 @@ def declare_cell_library(workspace_name, name):
             include = [
                 "cells/**/*.lef",
             ],
+            # There are two types of lefs in the PDK. One for magic a layout
+            # tool that requires some different properties set in the LEF that
+            # are not always suitable for the downstream tools like OpenROAD
+            # and yosys. We're basically just choosing that we want the normal
+            # lefs instead of the magic ones.
+            #
+            # Currently this repo doesn't integrate magic into the flow. At
+            # some point it will, and we'll need to somehow have both lefs, or
+            # fix the lefs upstream. Just know that you may at some point in the
+            # future need to modify this.
             exclude = [
                 "cells/**/*.magic.lef",
             ],
