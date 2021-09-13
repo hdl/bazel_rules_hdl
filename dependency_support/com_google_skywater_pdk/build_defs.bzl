@@ -18,6 +18,7 @@ These rules generate PDK providers for downstream tools.
 """
 
 load("//pdk:build_defs.bzl", "CornerInfo", "StandardCellInfo")
+load("//pdk:open_road_configuration.bzl", "OpenRoadPdkInfo")
 
 def _skywater_corner_impl(ctx):
     # Choose user supplied root, or default to build directory.
@@ -68,9 +69,25 @@ def _skywater_corner_impl(ctx):
 def _skywater_cell_library_impl(ctx):
     corners = dict([(dep[CornerInfo].corner_name, dep[CornerInfo]) for dep in ctx.attr.process_corners])
 
+    open_road_configuration = None
+    if ctx.attr.openroad_configuration:
+        open_road_configuration = ctx.attr.openroad_configuration[OpenRoadPdkInfo]
+
+    cell_lef_files = [lef_file for lef_file in ctx.files.srcs if lef_file.extension == "lef"]
+
+    tech_lef = None
+    if ctx.attr.tech_lef:
+        tech_lef = ctx.file.tech_lef
+
     return [
         DefaultInfo(files = depset([])),
-        StandardCellInfo(corners = corners, default_corner = corners.get(ctx.attr.default_corner, None)),
+        StandardCellInfo(
+            corners = corners,
+            default_corner = corners.get(ctx.attr.default_corner, None),
+            open_road_configuration = open_road_configuration,
+            tech_lef = tech_lef,
+            cell_lef_definitions = cell_lef_files,
+        ),
     ]
 
 skywater_cell_library = rule(
@@ -80,7 +97,9 @@ skywater_cell_library = rule(
         "process_corners": attr.label_list(
             providers = [CornerInfo],
         ),
+        "tech_lef": attr.label(allow_single_file = True, doc = "The tech lef file for these standard cells"),
         "default_corner": attr.string(mandatory = True),
+        "openroad_configuration": attr.label(providers = [OpenRoadPdkInfo]),
     },
 )
 

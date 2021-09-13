@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC
+# Copyright 2020-2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,8 +23,10 @@ StandardCellInfo = provider(
         "tech_lef": "Tech LEF file for the PDK",
         "cell_lef_definitions": "list of Abstract LEFs files for each standard cell.",
         "parasitic_extraction_benchmark": "Optional calibration file for OpenRCX.",
+        "open_road_configuration": "OpenROAD PDK configuration.",
     },
 )
+
 CornerInfo = provider(
     "Contains information about standard cells at different corners",
     fields = {

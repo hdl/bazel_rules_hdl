@@ -25,10 +25,12 @@ CELL_LIBRARIES = {
     "sky130_fd_io": {
         "commit": "7ec511f1a4689e174c63b3964d1ba8da9a3565e5",  # v0.2.1, 2020-12-09
         "shallow_since": "1606239275 -0800",
+        "library_type": "ip_library",
     },
     "sky130_fd_pr": {
         "commit": "f62031a1be9aefe902d6d54cddd6f59b57627436",  # v0.20.1, 2020-12-09
         "shallow_since": "1605038979 -0800",
+        "library_type": "ip_library",
     },
     "sky130_fd_sc_hd": {
         "commit": "ac7fb61f06e6470b94e8afdf7c25268f62fbd7b1",  # v0.0.2, 2020-12-04
@@ -52,6 +54,10 @@ CELL_LIBRARIES = {
             "tt_100C_1v80": ["basic"],
         },
         "default_corner": "ff_100C_1v95",
+        "open_road_configuration": Label("//dependency_support/com_google_skywater_pdk/sky130_fd_sc_hd:open_road_sky130_fd_sc_hd"),
+        "patches": [
+            Label("//dependency_support/com_google_skywater_pdk/sky130_fd_sc_hd:pdk.patch"),
+        ],
     },
     "sky130_fd_sc_hdll": {
         "commit": "0694bd23893de20f5233ef024acf6cca1e750ac6",  # v0.1.1, 2020-12-04

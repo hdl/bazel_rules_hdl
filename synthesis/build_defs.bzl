@@ -33,7 +33,7 @@ def _systhesize_design_impl(ctx):
     transitive_srcs = _transitive_srcs(ctx.attr.deps)
     verilog_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs.to_list()]
 
-    yosys_script = ctx.actions.declare_file("___yosys.script")
+    yosys_script = ctx.actions.declare_file("{}___yosys.script".format(ctx.attr.name))
     verilog_files = [src for sub_tuple in verilog_srcs for src in sub_tuple]
     read_verilog_lines = "\n".join(["read_verilog -sv -defer {}".format(src.path) for src in verilog_files])
 

@@ -12,8 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-exports_files([
-    "kmp_i18n_default.inc",
-    "kmp_i18n_id.inc",
-    "kmp_config.h",
-])
+# Place and Route package.
