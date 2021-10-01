@@ -22,7 +22,9 @@ def net_invisible_island_ncurses():
         http_archive,
         name = "net_invisible_island_ncurses",
         urls = [
-            "https://invisible-mirror.net/archives/ncurses/ncurses-6.2.tar.gz",
+            "https://ftp.gnu.org/gnu/ncurses/ncurses-6.2.tar.gz",
+            "https://fossies.org/linux/misc/ncurses-6.2.tar.gz",
+            "http://ftp.vim.org/ftp/gnu/ncurses/ncurses-6.2.tar.gz",
         ],
         strip_prefix = "ncurses-6.2",
         sha256 = "30306e0c76e0f9f1f0de987cf1c82a5c21e1ce6568b9227f7da5b71cbea86c9d",
