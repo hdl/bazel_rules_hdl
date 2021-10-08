@@ -223,6 +223,7 @@ cc_binary(
     features = ["-use_header_modules"],
     data = [
         ":share_files",
+        "@edu_berkeley_abc//:abc",
     ],
     visibility = ["//visibility:public"],
     deps = [
