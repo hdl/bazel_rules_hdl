@@ -66,7 +66,7 @@ write_verilog {output}
     inputs.extend(verilog_files)
     inputs.append(yosys_script)
 
-    (tool_inputs, _) = ctx.resolve_tools(tools = [ctx.attr.yosys_tool])
+    (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr.yosys_tool])
 
     yosys_runfiles_dir = ctx.executable.yosys_tool.path + ".runfiles"
 
@@ -85,12 +85,11 @@ write_verilog {output}
         inputs = inputs + tool_inputs.to_list() + [default_liberty_file],
         arguments = [args],
         executable = ctx.executable.yosys_tool,
-        tools = [
-            ctx.executable._abc,
-        ],
+        tools = tool_inputs,
+        input_manifests = input_manifests,
         env = {
             "YOSYS_DATDIR": yosys_runfiles_dir + "/at_clifford_yosys/techlibs/",
-            "ABC": ctx.executable._abc.path,
+            "ABC": yosys_runfiles_dir + "/edu_berkeley_abc/abc",
         },
         mnemonic = "SythesizingRTL",
     )
@@ -116,11 +115,6 @@ synthesize_rtl = rule(
         "top_module": attr.string(default = "top"),
         "yosys_tool": attr.label(
             default = Label("@at_clifford_yosys//:yosys"),
-            executable = True,
-            cfg = "exec",
-        ),
-        "_abc": attr.label(
-            default = Label("@edu_berkeley_abc//:abc"),
             executable = True,
             cfg = "exec",
         ),
