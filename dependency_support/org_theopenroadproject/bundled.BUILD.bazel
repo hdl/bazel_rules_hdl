@@ -146,6 +146,7 @@ cc_library(
             "src/rsz/src/*.cc",
             #OpenDP
             "src/dpl/src/*.cpp",
+            "src/dpl/src/*.h",
             #finale
             "src/fin/src/*.cpp",
             "src/fin/src/*.h",
@@ -160,8 +161,8 @@ cc_library(
             "src/grt/src/*.h",
             "src/grt/src/*.cpp",
             #Replace
-            "src/replace/src/*.cpp",
-            "src/replace/src/*.h",
+            "src/gpl/src/*.cpp",
+            "src/gpl/src/*.h",
             #TritonCTS
             "src/cts/src/*.h",
             "src/cts/src/*.cpp",
@@ -170,11 +171,11 @@ cc_library(
             #OpenRCX
             "src/rcx/src/*.cpp",
             #TritonRoute
-            "src/TritonRoute/src/*.cpp",
-            "src/TritonRoute/src/*.h",
-            "src/TritonRoute/src/**/*.h",
-            "src/TritonRoute/src/**/*.cpp",
-            "src/TritonRoute/src/**/*.cc",
+            "src/drt/src/*.cpp",
+            "src/drt/src/*.h",
+            "src/drt/src/**/*.h",
+            "src/drt/src/**/*.cpp",
+            "src/drt/src/**/*.cc",
             #PDNSim
             "src/psm/src/*.cpp",
             "src/psm/src/*.h",
@@ -186,6 +187,7 @@ cc_library(
             "src/stt/src/*.cpp",
             "src/stt/src/pdr/src/*.h",
             "src/stt/src/pdr/src/*.cpp",
+            "src/stt/src/flt/*.cpp",
             #MPL2
             "src/mpl2/src/*.cpp",
             "src/mpl2/src/*.h",
@@ -195,10 +197,13 @@ cc_library(
         exclude = [
             "src/Main.cc",
             "src/rsz/src/Unused.cc",
-            "src/TritonRoute/src/main.cpp",
+            "src/drt/src/main.cpp",
             "src/utl/src/Logger.cpp",
         ],
-    ),
+    ) + [
+        "src/stt/src/flt/etc/POST9.cpp",
+        "src/stt/src/flt/etc/POWV9.cpp",
+    ],
     hdrs = glob(
         include = [
             #Root OpenRoad
@@ -229,7 +234,7 @@ cc_library(
             "src/grt/src/fastroute/include/*.h",
             "src/grt/include/grt/*.h",
             #Replace
-            "src/replace/include/replace/*.h",
+            "src/gpl/include/gpl/*.h",
             #TritonCTS
             "src/cts/include/cts/*.h",
             #Tapcell
@@ -237,7 +242,7 @@ cc_library(
             #OpenRCX
             "src/rcx/include/rcx/*.h",
             #TritonRoute
-            "src/TritonRoute/include/triton_route/*.h",
+            "src/drt/include/triton_route/*.h",
             #PDNSim
             "src/psm/include/psm/*.h",
             "src/psm/include/psm/*.hh",
@@ -273,7 +278,7 @@ cc_library(
         #Root OpenRoad
         "include",
         #OpenDBTCL
-        "src/OpenDB/src/swig/common",
+        "src/odb/src/swig/common",
         #DbSTA
         "src/dbSta/include",
         "src/dbSta/include/db_sta",
@@ -305,8 +310,8 @@ cc_library(
         "src/grt/include/grt",
         "src/grt/include",
         #Replace
-        "src/replace/include/replace",
-        "src/replace/include",
+        "src/gpl/include/gpl",
+        "src/gpl/include",
         #TritonCTS
         "src/cts/src",
         "src/cts/include",
@@ -317,9 +322,9 @@ cc_library(
         "src/rcx/include/rcx",
         "src/rcx/include",
         #TritonRoute
-        "src/TritonRoute/include/triton_route",
-        "src/TritonRoute/src",
-        "src/TritonRoute/include",
+        "src/drt/include/triton_route",
+        "src/drt/src",
+        "src/drt/include",
         #PDNSim
         "src/psm/include/psm",
         "src/psm/include",
@@ -337,10 +342,12 @@ cc_library(
         "src/stt/include",
         "src/stt/include/stt",
     ],
+    defines = [
+      "OPENROAD_GIT_DESCRIBE=\\\"bazel_rules_hdl\\\""
+    ],
     linkstatic = True,
     deps = [
         ":ParquetFP",
-        ":flute3",
         ":logger",
         ":munkres",
         ":opendb_lib",
@@ -367,7 +374,7 @@ genrule(
         "src/stt/src/flt/etc/MakeDatVar.tcl",
         "src/stt/src/flt/etc/POST9.dat",
     ],
-    outs = ["POST9.cpp"],
+    outs = ["src/stt/src/flt/etc/POST9.cpp"],
     cmd = "$(location @tk_tcl//:tclsh) $(location src/stt/src/flt/etc/MakeDatVar.tcl) post9 \"$@\" $(location src/stt/src/flt/etc/POST9.dat)",
     exec_tools = ["@tk_tcl//:tclsh"],
 )
@@ -378,29 +385,9 @@ genrule(
         "src/stt/src/flt/etc/MakeDatVar.tcl",
         "src/stt/src/flt/etc/POWV9.dat",
     ],
-    outs = ["POWV9.cpp"],
+    outs = ["src/stt/src/flt/etc/POWV9.cpp"],
     cmd = "$(location @tk_tcl//:tclsh) $(location src/stt/src/flt/etc/MakeDatVar.tcl) powv9 \"$@\" $(location src/stt/src/flt/etc/POWV9.dat)",
     exec_tools = ["@tk_tcl//:tclsh"],
-)
-
-cc_library(
-    name = "flute3",
-    srcs = [
-        "src/stt/src/flt/flute.cpp",
-        ":POST9.cpp",
-        ":POWV9.cpp",
-    ],
-    hdrs = [
-        "src/stt/include/stt/flute.h",
-    ],
-    features = ["-use_header_modules"],
-    includes = [
-        "src/stt/include",
-        "src/stt/include/stt",
-    ],
-    deps = [
-        ":logger",
-    ],
 )
 
 cc_library(
@@ -577,9 +564,9 @@ tcl_encode(
 tcl_encode(
     name = "replace_tcl",
     srcs = [
-        "src/replace/src/replace.tcl",
+        "src/gpl/src/replace.tcl",
     ],
-    char_array_name = "replace_tcl_inits",
+    char_array_name = "gpl_tcl_inits",
 )
 
 tcl_encode(
@@ -601,9 +588,9 @@ tcl_encode(
 tcl_encode(
     name = "triton_route_tcl",
     srcs = [
-        "src/TritonRoute/src/TritonRoute.tcl",
+        "src/drt/src/TritonRoute.tcl",
     ],
-    char_array_name = "TritonRoute_tcl_inits",
+    char_array_name = "drt_tcl_inits",
 )
 
 tcl_encode(
@@ -688,7 +675,7 @@ tcl_wrap_cc(
     namespace_prefix = "sta",
     root_swig_src = "src/dbSta/src/dbSta.i",
     swig_includes = [
-        "src/OpenDB/src/swig/common",
+        "src/odb/src/swig/common",
         "src/dbSta/src",
         "src/sta",
     ],
@@ -812,14 +799,14 @@ tcl_wrap_cc(
 tcl_wrap_cc(
     name = "replace_swig",
     srcs = [
-        "src/replace/src/replace.i",
+        "src/gpl/src/replace.i",
         ":error_swig",
     ],
-    module = "replace",
+    module = "gpl",
     namespace_prefix = "gpl",
-    root_swig_src = "src/replace/src/replace.i",
+    root_swig_src = "src/gpl/src/replace.i",
     swig_includes = [
-        "src/replace/src",
+        "src/gpl/src",
     ],
 )
 
@@ -868,14 +855,14 @@ tcl_wrap_cc(
 tcl_wrap_cc(
     name = "triton_route_swig",
     srcs = [
-        "src/TritonRoute/src/TritonRoute.i",
+        "src/drt/src/TritonRoute.i",
         ":error_swig",
     ],
-    module = "TritonRoute",
+    module = "drt",
     namespace_prefix = "drt",
-    root_swig_src = "src/TritonRoute/src/TritonRoute.i",
+    root_swig_src = "src/drt/src/TritonRoute.i",
     swig_includes = [
-        "src/TritonRoute/src",
+        "src/drt/src",
     ],
 )
 
@@ -988,7 +975,7 @@ filegroup(
 filegroup(
     name = "dbdiff",
     srcs = [
-        "src/OpenDB/src/swig/common/dbdiff.i",
+        "src/odb/src/swig/common/dbdiff.i",
     ],
     visibility = ["@org_theopenroadproject//:__subpackages__"],
 )
@@ -996,8 +983,8 @@ filegroup(
 filegroup(
     name = "opendb_tcl_common",
     srcs = [
-        "src/OpenDB/src/swig/common/swig_common.cpp",
-        "src/OpenDB/src/swig/common/swig_common.h",
+        "src/odb/src/swig/common/swig_common.cpp",
+        "src/odb/src/swig/common/swig_common.h",
     ],
     visibility = ["@org_theopenroadproject//:__subpackages__"],
 )
@@ -1005,16 +992,17 @@ filegroup(
 tcl_wrap_cc(
     name = "opendb_tcl",
     srcs = glob([
-        "src/OpenDB/src/swig/tcl/*.i",
-        "src/OpenDB/src/swig/common/*.i",
-        "src/OpenDB/include/opendb/*.h",
+        "src/odb/src/swig/tcl/*.i",
+        "src/odb/src/swig/common/*.i",
+        "src/odb/include/odb/*.h",
     ]),
-    module = "opendbtcl",
+    module = "odbtcl",
     namespace_prefix = "odb",
-    root_swig_src = "src/OpenDB/src/swig/common/opendb.i",
+    root_swig_src = "src/odb/src/swig/common/odb.i",
     swig_includes = [
-        "src/OpenDB/include/opendb",
-        "src/OpenDB/src/swig/tcl",
+      "src/odb/include",
+        "src/odb/include/odb",
+        "src/odb/src/swig/tcl",
     ],
     swig_options = [
         # These values are derived from the CMakeList.txt and represent the "rules" this swig file
@@ -1028,270 +1016,58 @@ tcl_wrap_cc(
 cc_library(
     name = "opendb_lib",
     srcs = glob([
-        "src/OpenDB/src/cdl/*.cpp",
+        "src/odb/src/cdl/*.cpp",
+        "src/odb/src/db/*.cpp",
+        "src/odb/src/db/*.h",
+        "src/odb/src/db/*.hpp",
+        "src/odb/src/zutil/*.cpp",
+        "src/odb/src/zlib/*.cpp",
+        "src/odb/src/defout/*.cpp",
+        "src/odb/src/defout/*.h",
+        "src/odb/src/defin/*.cpp",
+        "src/odb/src/defin/*.h",
+        "src/odb/src/lefin/*.cpp",
+        "src/odb/src/lefin/*.h",
+        "src/odb/src/lefout/*.cpp",
+        "src/odb/src/lefout/*.h",
+        "src/odb/src/tm/*.cpp",
     ]),
     hdrs = glob([
-        "src/OpenDB/include/opendb/*.h",
-        "src/OpenDB/include/opendb/*.hpp",
+        "src/odb/include/odb/*.h",
+        "src/odb/include/odb/*.hpp",
     ]) + [
-        "src/OpenDB/src/def/def/defiAlias.hpp",
-        "src/OpenDB/src/def/def/defwWriter.hpp",
-        "src/OpenDB/src/def/def/defrReader.hpp",
-        "src/OpenDB/src/lef/lef/lefiDebug.hpp",
-        "src/OpenDB/src/lef/lef/lefiUtil.hpp",
-        "src/OpenDB/src/lef/lef/lefrReader.hpp",
+        "src/odb/src/def/def/defiAlias.hpp",
+        "src/odb/src/def/def/defwWriter.hpp",
+        "src/odb/src/def/def/defrReader.hpp",
+        "src/odb/src/lef/lef/lefiDebug.hpp",
+        "src/odb/src/lef/lef/lefiUtil.hpp",
+        "src/odb/src/lef/lef/lefrReader.hpp",
     ],
     copts = [
         "-fexceptions",
         "-Wno-error",
     ],
-    features = ["-use_header_modules"],
+    features = [
+      "-use_header_modules",
+    ],
     includes = [
-        "src/OpenDB/include",
-        "src/OpenDB/include/opendb",
+        "src/odb/include",
+        "src/odb/include/odb",
+        "src/odb/src/def/def",
+        "src/odb/src/def/defzlib",
+        "src/odb/src/def/lefzlib",
+        "src/odb/src/lef/lef",
+        "src/odb/src/lef/lefin",
+        "src/odb/src/lef/lefzlib",
     ],
     visibility = ["@org_theopenroadproject//:__subpackages__"],
     deps = [
-        ":opendb_db",
-        ":opendb_def",
-        ":opendb_defin",
-        ":opendb_defout",
-        ":opendb_lef",
-        ":opendb_lefin",
-        ":opendb_lefout",
-        ":opendb_tm",
-        ":opendb_zlib",
-        ":opendb_zutil",
-    ],
-)
-
-cc_library(
-    name = "opendb_db",
-    srcs = glob([
-        "src/OpenDB/src/db/*.cpp",
-        "src/OpenDB/src/db/*.h",
-        "src/OpenDB/src/db/*.hpp",
-    ]),
-    hdrs = glob([
-        "src/OpenDB/include/opendb/*.h",
-        "src/OpenDB/include/opendb/*.hpp",
-    ]),
-    copts = [
-        "-fexceptions",
-        "-Wno-error",
-    ],
-    features = ["-use_header_modules"],
-    includes = [
-        "src/OpenDB/include/opendb",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
         ":logger",
+        ":opendb_def",
+        ":opendb_lef",
         "@com_github_gabime_spdlog//:spdlog_with_exceptions",
         "@tk_tcl//:tcl",
-    ],
-)
-
-genyacc(
-    name = "def_bison",
-    src = "src/OpenDB/src/def/def/def.y",
-    header_out = "src/OpenDB/src/def/def/def_parser.hpp",
-    prefix = "defyy",
-    source_out = "src/OpenDB/src/def/def/def_parser.cpp",
-)
-
-cc_library(
-    name = "opendb_def",
-    srcs = glob(
-        include = [
-            "src/OpenDB/src/def/def/*.cpp",
-            "src/OpenDB/src/def/def/*.h",
-            "src/OpenDB/src/def/def/*.hpp",
-            "src/OpenDB/src/def/defzlib/*.hpp",
-            "src/OpenDB/src/def/defzlib/*.cpp",
-        ],
-        exclude = [
-            "src/OpenDB/src/def/def/defiComponent.hpp",
-            "src/OpenDB/src/def/def/defiUtil.hpp",
-        ],
-    ) + [
-        "src/OpenDB/src/def/def/def_parser.hpp",
-        "src/OpenDB/src/def/def/def_parser.cpp",
-    ],
-    hdrs = glob([
-        "src/OpenDB/include/opendb/*.h",
-        "src/OpenDB/include/opendb/*.hpp",
-    ]) + [
-        "src/OpenDB/src/def/def/defiComponent.hpp",
-        "src/OpenDB/src/def/def/defiUtil.hpp",
-        "src/OpenDB/src/def/def/defiAlias.hpp",
-        "src/OpenDB/src/def/def/defwWriter.hpp",
-        "src/OpenDB/src/def/def/defrReader.hpp",
-        "src/OpenDB/src/def/defzlib/defzlib.hpp",
-    ],
-    copts = [
-        "-fexceptions",
-        "-Wno-error",
-    ],
-    features = ["-use_header_modules"],
-    includes = [
-        "src/OpenDB/include/opendb",
-        "src/OpenDB/src/def/def",
-        "src/OpenDB/src/def/defzlib",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
         "@net_zlib//:zlib",
-    ],
-)
-
-cc_library(
-    name = "opendb_zutil",
-    srcs = glob(["src/OpenDB/src/zutil/*.cpp"]),
-    hdrs = glob([
-        "src/OpenDB/include/opendb/*.h",
-        "src/OpenDB/include/opendb/*.hpp",
-    ]),
-    copts = [
-        "-fexceptions",
-        "-Wno-error",
-    ],
-    features = ["-use_header_modules"],
-    includes = [
-        "src/OpenDB/include/opendb",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
-        "@tk_tcl//:tcl",
-    ],
-)
-
-cc_library(
-    name = "opendb_defout",
-    srcs = glob([
-        "src/OpenDB/src/defout/*.cpp",
-        "src/OpenDB/src/defout/*.h",
-    ]),
-    hdrs = glob([
-        "src/OpenDB/include/opendb/*.h",
-        "src/OpenDB/include/opendb/*.hpp",
-    ]),
-    copts = [
-        "-fexceptions",
-        "-Wno-error",
-    ],
-    features = ["-use_header_modules"],
-    includes = [
-        "src/OpenDB/include/opendb",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
-        ":logger",
-        "@tk_tcl//:tcl",
-    ],
-)
-
-cc_library(
-    name = "opendb_defin",
-    srcs = glob([
-        "src/OpenDB/src/defin/*.cpp",
-        "src/OpenDB/src/defin/*.h",
-    ]),
-    hdrs = glob([
-        "src/OpenDB/include/opendb/*.h",
-        "src/OpenDB/include/opendb/*.hpp",
-    ]),
-    copts = [
-        "-fexceptions",
-        "-Wno-error",
-    ],
-    features = ["-use_header_modules"],
-    includes = [
-        "src/OpenDB/include/opendb",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
-        ":logger",
-        ":opendb_def",
-        ":opendb_zutil",
-        "@tk_tcl//:tcl",
-    ],
-)
-
-genyacc(
-    name = "lef_bison",
-    src = "src/OpenDB/src/lef/lef/lef.y",
-    header_out = "src/OpenDB/src/lef/lef/lef_parser.hpp",
-    prefix = "lefyy",
-    source_out = "src/OpenDB/src/lef/lef/lef_parser.cpp",
-)
-
-cc_library(
-    name = "opendb_lef",
-    srcs = glob(
-        include = [
-            "src/OpenDB/src/lef/lef/*.cpp",
-            "src/OpenDB/src/lef/lef/*.h",
-            "src/OpenDB/src/lef/lef/*.hpp",
-            "src/OpenDB/src/lef/lefzlib/*.cpp",
-        ],
-        exclude = [
-            "src/OpenDB/src/lef/lef/lefiDebug.hpp",
-            "src/OpenDB/src/lef/lef/lefiUtil.hpp",
-            "src/OpenDB/src/lef/lef/lefrReader.hpp",
-        ],
-    ) + [
-        "src/OpenDB/src/lef/lef/lef_parser.hpp",
-        "src/OpenDB/src/lef/lef/lef_parser.cpp",
-    ],
-    hdrs = glob([
-        "src/OpenDB/include/opendb/*.h",
-        "src/OpenDB/include/opendb/*.hpp",
-    ]) + [
-        "src/OpenDB/src/lef/lef/lefiDebug.hpp",
-        "src/OpenDB/src/lef/lef/lefiUtil.hpp",
-        "src/OpenDB/src/lef/lef/lefrReader.hpp",
-        "src/OpenDB/src/lef/lefzlib/lefzlib.hpp",
-    ],
-    copts = [
-        "-fexceptions",
-        "-Wno-error",
-    ],
-    features = ["-use_header_modules"],
-    includes = [
-        "src/OpenDB/include/opendb",
-        "src/OpenDB/src/lef/lef",
-        "src/OpenDB/src/lef/lefzlib",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
-        "@net_zlib//:zlib",
-    ],
-)
-
-cc_library(
-    name = "opendb_lefin",
-    srcs = glob([
-        "src/OpenDB/src/lefin/*.cpp",
-        "src/OpenDB/src/lefin/*.h",
-    ]),
-    hdrs = glob([
-        "src/OpenDB/include/opendb/*.h",
-        "src/OpenDB/include/opendb/*.hpp",
-    ]),
-    copts = [
-        "-fexceptions",
-        "-Wno-error",
-    ],
-    features = ["-use_header_modules"],
-    includes = [
-        "src/OpenDB/include/opendb",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
-        ":logger",
-        ":opendb_lef",
-        ":opendb_zutil",
         "@boost//:iostreams",
         "@boost//:foreach",
         "@boost//:variant",
@@ -1300,79 +1076,111 @@ cc_library(
         "@boost//:fusion",
         "@boost//:bind",
         "@boost//:algorithm",
-        "@tk_tcl//:tcl",
     ],
 )
 
 cc_library(
-    name = "opendb_lefout",
-    srcs = glob([
-        "src/OpenDB/src/lefout/*.cpp",
-        "src/OpenDB/src/lefout/*.h",
-    ]),
+    name = "opendb_lef",
+    srcs = glob(
+        include = [
+            "src/odb/src/lef/lef/*.cpp",
+            "src/odb/src/lef/lef/*.h",
+            "src/odb/src/lef/lef/*.hpp",
+            "src/odb/src/lef/lefzlib/*.cpp",
+        ],
+        exclude = [
+            "src/odb/src/lef/lef/lefiDebug.hpp",
+            "src/odb/src/lef/lef/lefiUtil.hpp",
+            "src/odb/src/lef/lef/lefrReader.hpp",
+        ],
+    ) + [
+        "src/odb/src/lef/lef/lef_parser.hpp",
+        "src/odb/src/lef/lef/lef_parser.cpp",
+    ],
     hdrs = glob([
-        "src/OpenDB/include/opendb/*.h",
-        "src/OpenDB/include/opendb/*.hpp",
-    ]),
+        "src/odb/include/opendb/*.h",
+        "src/odb/include/opendb/*.hpp",
+    ]) + [
+        "src/odb/src/lef/lef/lefiDebug.hpp",
+        "src/odb/src/lef/lef/lefiUtil.hpp",
+        "src/odb/src/lef/lef/lefrReader.hpp",
+        "src/odb/src/lef/lefzlib/lefzlib.hpp",
+    ],
     copts = [
         "-fexceptions",
         "-Wno-error",
     ],
     features = ["-use_header_modules"],
     includes = [
-        "src/OpenDB/include/opendb",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
-        ":logger",
-        "@tk_tcl//:tcl",
-    ],
-)
-
-cc_library(
-    name = "opendb_tm",
-    srcs = glob([
-        "src/OpenDB/src/tm/*.cpp",
-    ]),
-    hdrs = glob([
-        "src/OpenDB/include/opendb/*.h",
-        "src/OpenDB/include/opendb/*.hpp",
-    ]),
-    copts = [
-        "-fexceptions",
-        "-Wno-error",
-    ],
-    features = ["-use_header_modules"],
-    includes = [
-        "src/OpenDB/include/opendb",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
-        "@tk_tcl//:tcl",
-    ],
-)
-
-cc_library(
-    name = "opendb_zlib",
-    srcs = glob([
-        "src/OpenDB/src/zlib/*.cpp",
-    ]),
-    hdrs = glob([
-        "src/OpenDB/include/opendb/*.h",
-        "src/OpenDB/include/opendb/*.hpp",
-    ]),
-    copts = [
-        "-fexceptions",
-        "-Wno-error",
-    ],
-    features = ["-use_header_modules"],
-    includes = [
-        "src/OpenDB/include/opendb",
+        "src/odb/include/opendb",
+        "src/odb/src/lef/lef",
+        "src/odb/src/lef/lefzlib",
     ],
     visibility = ["//visibility:private"],
     deps = [
         "@net_zlib//:zlib",
     ],
+)
+
+cc_library(
+    name = "opendb_def",
+    srcs = glob(
+        include = [
+            "src/odb/src/def/def/*.cpp",
+            "src/odb/src/def/def/*.h",
+            "src/odb/src/def/def/*.hpp",
+            "src/odb/src/def/defzlib/*.hpp",
+            "src/odb/src/def/defzlib/*.cpp",
+        ],
+        exclude = [
+            "src/odb/src/def/def/defiComponent.hpp",
+            "src/odb/src/def/def/defiUtil.hpp",
+        ],
+    ) + [
+        "src/odb/src/def/def/def_parser.hpp",
+        "src/odb/src/def/def/def_parser.cpp",
+    ],
+    hdrs = glob([
+        "src/odb/include/opendb/*.h",
+        "src/odb/include/opendb/*.hpp",
+    ]) + [
+        "src/odb/src/def/def/defiComponent.hpp",
+        "src/odb/src/def/def/defiUtil.hpp",
+        "src/odb/src/def/def/defiAlias.hpp",
+        "src/odb/src/def/def/defwWriter.hpp",
+        "src/odb/src/def/def/defrReader.hpp",
+        "src/odb/src/def/defzlib/defzlib.hpp",
+    ],
+    copts = [
+        "-fexceptions",
+        "-Wno-error",
+    ],
+    features = ["-use_header_modules"],
+    includes = [
+        "src/odb/include/opendb",
+        "src/odb/src/def/def",
+        "src/odb/src/def/defzlib",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        "@net_zlib//:zlib",
+    ],
+)
+
+genyacc(
+    name = "def_bison",
+    src = "src/odb/src/def/def/def.y",
+    header_out = "src/odb/src/def/def/def_parser.hpp",
+    prefix = "defyy",
+    source_out = "src/odb/src/def/def/def_parser.cpp",
+)
+
+genyacc(
+    name = "lef_bison",
+    src = "src/odb/src/lef/lef/lef.y",
+    header_out = "src/odb/src/lef/lef/lef_parser.hpp",
+    prefix = "lefyy",
+    source_out = "src/odb/src/lef/lef/lef_parser.cpp",
 )
 
 ## OPENDB

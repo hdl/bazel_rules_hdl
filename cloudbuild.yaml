@@ -39,6 +39,9 @@ steps:
   - '-c'
   - |
     set -e
+    apt-get update
+    apt-get install apt-transport-https ca-certificates -y
+    update-ca-certificates
     python3 tools/generate_uuid.py > build_invocation_id.txt
     python3 tools/generate_uuid.py > test_invocation_id.txt
     echo STATUS: Reporting logs with invocation id $(cat invocation_id.txt) to GitHub.

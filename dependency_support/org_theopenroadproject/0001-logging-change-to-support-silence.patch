@@ -1,18 +1,9 @@
 diff --git a/src/Main.cc b/src/Main.cc
-index 5a242dc8b..3370646b9 100755
+index b85e39a93..5c5a47fe1 100755
 --- a/src/Main.cc
 +++ b/src/Main.cc
-@@ -65,7 +65,7 @@
- #include "ord/Version.hh"
- #include "ord/InitOpenRoad.hh"
- #include "ord/OpenRoad.hh"
--#include "utl/Logger.h" 
-+#include "utl/Logger.h"
- #include "gui/gui.h"
- 
- using std::string;
-@@ -88,6 +88,8 @@ static char **cmd_argv;
- bool gui_mode = false;
+@@ -87,6 +87,8 @@ static int cmd_argc;
+ static char **cmd_argv;
  const char* log_filename = nullptr;
  const char* metrics_filename = nullptr;
 +bool quiet_logs = false;
@@ -20,9 +11,9 @@ index 5a242dc8b..3370646b9 100755
  
  static const char *init_filename = ".openroad";
  
-@@ -185,6 +187,14 @@ main(int argc,
-   initPython();
- #endif
+@@ -175,6 +177,14 @@ main(int argc,
+     remove(metrics_filename);
+   }
  
 +  if (findCmdLineFlag(argc, argv, "-quiet")) {
 +    quiet_logs = true;
@@ -34,26 +25,25 @@ index 5a242dc8b..3370646b9 100755
 +
    cmd_argc = argc;
    cmd_argv = argv;
-   if (findCmdLineFlag(cmd_argc, cmd_argv, "-gui")) {
-@@ -217,7 +227,7 @@ main(int argc,
-     // on ctrl-C. We don't want that if python is not the main interpreter.
-     // We restore the handler from before initPython.
-     sigaction(SIGINT, &orig_sigint_handler, NULL);
--  }  
-+  }
+ #ifdef ENABLE_PYTHON3
+@@ -212,6 +222,7 @@ main(int argc,
+   }
  #endif
+ 
++
    // Set argc to 1 so Tcl_Main doesn't source any files.
    // Tcl_Main never returns.
-@@ -340,7 +350,7 @@ static void
- showUsage(const char *prog,
- 	  const char *init_filename)
+   Tcl_Main(1, argv, ord::tclAppInit);
+@@ -362,7 +373,7 @@ ord::tclAppInit(Tcl_Interp *interp)
+ static void
+ showUsage(const char *prog, const char *init_filename)
  {
 -  printf("Usage: %s [-help] [-version] [-no_init] [-exit] [-gui] [-threads count|max] [-log file_name] cmd_file\n", prog);
 +  printf("Usage: %s [-help] [-version] [-no_init] [-exit] [-gui] [-threads count|max] [-log file_name] [-silent] [-quiet] cmd_file\n", prog);
    printf("  -help              show help and exit\n");
    printf("  -version           show version and exit\n");
    printf("  -no_init           do not read %s init file\n", init_filename);
-@@ -352,6 +362,8 @@ showUsage(const char *prog,
+@@ -374,6 +385,8 @@ showUsage(const char *prog, const char *init_filename)
    printf("  -python            start with python interpreter [limited to db operations]\n");
  #endif
    printf("  -log <file_name>   write a log in <file_name>\n");
@@ -63,10 +53,10 @@ index 5a242dc8b..3370646b9 100755
  }
  
 diff --git a/src/OpenRoad.cc b/src/OpenRoad.cc
-index 5c9522c53..4c23eb687 100755
+index 4beec8391..96bced0d2 100755
 --- a/src/OpenRoad.cc
 +++ b/src/OpenRoad.cc
-@@ -96,6 +96,8 @@ extern int Opendbtcl_Init(Tcl_Interp *interp);
+@@ -96,6 +96,8 @@ extern int Odbtcl_Init(Tcl_Interp *interp);
  // Main.cc set by main()
  extern const char* log_filename;
  extern const char* metrics_filename;
@@ -85,7 +75,7 @@ index 5c9522c53..4c23eb687 100755
    sta_ = makeDbSta();
    verilog_network_ = makeDbVerilogNetwork();
 diff --git a/src/utl/include/utl/Logger.h b/src/utl/include/utl/Logger.h
-index 4ebcb3aac..e54ec8d5f 100644
+index 25129d48f..9597f4f25 100644
 --- a/src/utl/include/utl/Logger.h
 +++ b/src/utl/include/utl/Logger.h
 @@ -86,12 +86,22 @@ enum ToolId
@@ -128,7 +118,7 @@ index 4ebcb3aac..e54ec8d5f 100644
      }
  
    // Do NOT call this directly, use the debugPrint macro  instead (defined below)
-@@ -256,6 +272,7 @@ class Logger
+@@ -257,6 +273,7 @@ class Logger
    std::vector<spdlog::sink_ptr> sinks_;
    std::shared_ptr<spdlog::logger> logger_;
    std::shared_ptr<spdlog::logger> metrics_logger_;
@@ -153,7 +143,7 @@ index 543d48054..d4953d2b7 100644
  initLogger(utl::Logger *logger,
             Tcl_Interp *tcl_interp);
 diff --git a/src/utl/src/Logger.cpp b/src/utl/src/Logger.cpp
-index 989b0c505..5f4471114 100644
+index 2b7323db2..95bae3f02 100644
 --- a/src/utl/src/Logger.cpp
 +++ b/src/utl/src/Logger.cpp
 @@ -35,18 +35,22 @@
