@@ -21,15 +21,15 @@ def org_theopenroadproject():
     maybe(
         new_git_repository,
         name = "org_theopenroadproject",
-        commit = "cb60cd1859458b0089c7d9bdb483bc95cf1c9ce3",
+        commit = "c0801e316f3e846fa82c7d06ad8b87564a946132",
         init_submodules = True,
         remote = "https://github.com/The-OpenROAD-Project/OpenROAD.git",
         build_file = Label("//dependency_support/org_theopenroadproject:bundled.BUILD.bazel"),
         patches = [
-            "//dependency_support/org_theopenroadproject:0001-utility-Adds-ability-to-quiet-and-silece-stdout-logg.patch",
+            "//dependency_support/org_theopenroadproject:0001-logging-change-to-support-silence.patch",
         ],
         patch_args = [
             "-p1",
         ],
-        shallow_since = "1628440377 +0200",
+        shallow_since = "1635087179 -0400",
     )
