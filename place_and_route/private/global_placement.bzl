@@ -39,7 +39,7 @@ def global_placement(ctx, open_road_info):
         "set_wire_rc -signal -layer \"{}\"".format(open_road_configuration.wire_rc_signal_metal_layer),
         "set_wire_rc -clock  -layer \"{}\"".format(open_road_configuration.wire_rc_clock_metal_layer),
         "global_placement -timing_driven -density {density} -init_density_penalty 8e-5 -pad_left {pad_left} -pad_right {pad_right}".format(
-            density = ctx.attr.placement_density, #TODO(bazel): When bazel 4.0.0 is avaliable use float command
+            density = ctx.attr.placement_density,  #TODO(bazel): When bazel 4.0.0 is avaliable use float command
             pad_left = open_road_configuration.global_placement_cell_pad,
             pad_right = open_road_configuration.global_placement_cell_pad,
         ),

@@ -61,11 +61,11 @@ place_and_route = rule(
             doc = "Whether to run detailed routing on a remote executor. If the detailed routing exceeds 15 minutes flip this setting.",
         ),
         "clock_period": attr.string(
-          mandatory = True,
-          doc = """
+            mandatory = True,
+            doc = """
           The amount of time a single clock period lasts. Bazel doesn't support floats so enter the clock period as a decimal in string form.
           The units currently depend on the PDK you're targeting. The default PDK is sky130 and it uses nano seconds for ASAP7 it is pico seconds.
-          """
+          """,
         ),
         "die_width_microns": attr.int(),
         "die_height_microns": attr.int(),
