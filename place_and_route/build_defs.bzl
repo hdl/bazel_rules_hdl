@@ -25,8 +25,6 @@ load("//place_and_route:private/clock_tree_synthesis.bzl", "clock_tree_synthesis
 load("//place_and_route:private/global_routing.bzl", "global_routing")
 load("//place_and_route:private/detailed_routing.bzl", "detailed_routing")
 
-PlaceAndRouteInfo = provider("PlaceAndRoute provider", fields = ["database", "def"])
-
 def _place_and_route_impl(ctx):
     # Throws an error if there is no OpenROAD configuration
     assert_has_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
