@@ -22,11 +22,11 @@ def org_gnu_readline():
         http_archive,
         name = "org_gnu_readline",
         urls = [
-          "https://ftp.gnu.org/gnu/readline/readline-8.0.tar.gz",
-          "http://ftp.vim.org/ftp/gnu/readline/readline-8.0.tar.gz",
-          "http://ftp.swin.edu.au/gnu/readline/readline-8.0.tar.gz",
+            "https://ftp.gnu.org/gnu/readline/readline-8.0.tar.gz",
+            "http://ftp.vim.org/ftp/gnu/readline/readline-8.0.tar.gz",
+            "http://ftp.swin.edu.au/gnu/readline/readline-8.0.tar.gz",
         ],
-        sha256 =  "e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461",
+        sha256 = "e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461",
         strip_prefix = "readline-8.0",
         build_file = Label("//dependency_support/org_gnu_readline:bundled.BUILD.bazel"),
         patches = [

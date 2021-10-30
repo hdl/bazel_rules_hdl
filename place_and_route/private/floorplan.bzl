@@ -37,7 +37,7 @@ def _initialize_floorplan_command(ctx):
         )
 
     if ctx.attr.target_die_utilization_percentage:
-        utilization = ctx.attr.target_die_utilization_percentage #TODO(bazel): When bazel 4.0.0 is avaliable use float command
+        utilization = ctx.attr.target_die_utilization_percentage  #TODO(bazel): When bazel 4.0.0 is avaliable use float command
         return "initialize_floorplan -site \"{site}\" -utilization {utilization} -core_space {core_space}".format(
             utilization = utilization,
             core_space = ctx.attr.core_padding_microns,
