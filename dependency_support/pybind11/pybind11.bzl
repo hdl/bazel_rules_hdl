@@ -21,9 +21,9 @@ def pybind11():
     maybe(
         http_archive,
         name = "pybind11_bazel",
-        strip_prefix = "pybind11_bazel-26973c0ff320cb4b39e45bc3e4297b82bc3a6c09",
-        urls = ["https://github.com/pybind/pybind11_bazel/archive/26973c0ff320cb4b39e45bc3e4297b82bc3a6c09.tar.gz"],  # 2020-12-17
-        sha256 = "8f546c03bdd55d0e88cb491ddfbabe5aeb087f87de2fbf441391d70483affe39",
+        strip_prefix = "pybind11_bazel-992381ced716ae12122360b0fbadbc3dda436dbf",
+        urls = ["https://github.com/pybind/pybind11_bazel/archive/992381ced716ae12122360b0fbadbc3dda436dbf.tar.gz"],  # 2021-09-17
+        sha256 = "0f7a79c25bbe1156724f64c84f6fc4cdae4713fe18bba13aa256984589e99919",
     )
 
     maybe(
