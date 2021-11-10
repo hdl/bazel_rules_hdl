@@ -64,6 +64,7 @@ ALL_TARGETS = [
   '@org_theopenroadproject//...',
   '@org_tuxfamily_eigen//...',
   '@pybind11//...',
+  '@rules_pkg//...',
   '@tk_tcl//...',
 ]
 
