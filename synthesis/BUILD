@@ -12,4 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Empty BUILD file, just to make this directory a Bazel package.
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
+
+pkg_tar(
+    name = "yosys",
+    srcs = ["@at_clifford_yosys//:yosys"],
+    include_runfiles = True,
+    strip_prefix = "/external",
+)

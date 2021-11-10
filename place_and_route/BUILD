@@ -13,3 +13,13 @@
 # limitations under the License.
 
 # Place and Route package.
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
+
+pkg_tar(
+    name = "openroad",
+    srcs = ["@org_theopenroadproject//:openroad"],
+    include_runfiles = True,
+    strip_prefix = "/external",
+)
+
+2
