@@ -13,3 +13,14 @@
 # limitations under the License.
 
 # Place and Route package.
+
+# rules_pkg won't work before Bazel 4 because it depends on the json API.
+# load("@rules_pkg//:pkg.bzl", "pkg_tar")
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+
+pkg_tar(
+    name = "openroad",
+    srcs = ["@org_theopenroadproject//:openroad"],
+    include_runfiles = True,
+    strip_prefix = "/../",
+)

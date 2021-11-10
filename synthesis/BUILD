@@ -12,4 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Empty BUILD file, just to make this directory a Bazel package.
+# rules_pkg won't work before Bazel 4 because it depends on the json API.
+# load("@rules_pkg//:pkg.bzl", "pkg_tar")
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+
+pkg_tar(
+    name = "yosys",
+    srcs = ["@at_clifford_yosys//:yosys"],
+    include_runfiles = True,
+    strip_prefix = "/../",
+)
