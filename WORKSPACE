@@ -84,6 +84,22 @@ maybe(
     url = "https://github.com/bazelbuild/rules_python/releases/download/0.1.0/rules_python-0.1.0.tar.gz",
 )
 
+maybe(
+    http_archive,
+    name = "rules_pkg",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.5.1/rules_pkg-0.5.1.tar.gz",
+        "https://github.com/bazelbuild/rules_pkg/releases/download/0.5.1/rules_pkg-0.5.1.tar.gz",
+    ],
+    sha256 = "a89e203d3cf264e564fcb96b6e06dd70bc0557356eb48400ce4b5d97c2c3720d",
+)
+
+load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
+rules_pkg_dependencies()
+
+load("@rules_pkg//toolchains:rpmbuild.bzl", "rpmbuild_register_toolchains")
+rpmbuild_register_toolchains()
+
 # Third Party
 load("//dependency_support:dependency_support.bzl", "dependency_support")
 
