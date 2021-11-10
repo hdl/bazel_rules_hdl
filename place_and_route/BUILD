@@ -21,5 +21,3 @@ pkg_tar(
     include_runfiles = True,
     strip_prefix = "/external",
 )
-
-2
