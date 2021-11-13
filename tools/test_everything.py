@@ -69,7 +69,7 @@ ALL_TARGETS = [
 
 for action in ['build', 'test']:
   command = ' '.join([
-    'bazel', action, os.environ.get('EXTRA_BAZEL_ARGS', ''), os.environ.get('EXTRA_%s_BAZEL_ARGS' % action.upper(), '')
+    os.environ.get('BAZEL', 'bazel'), action, os.environ.get('EXTRA_BAZEL_ARGS', ''), os.environ.get('EXTRA_%s_BAZEL_ARGS' % action.upper(), '')
   ] + ALL_TARGETS)
   print(command)
   return_code = subprocess.call(command, shell=True)
