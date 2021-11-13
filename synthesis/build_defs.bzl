@@ -29,7 +29,7 @@ def _transitive_srcs(deps):
         transitive = [dep[VerilogInfo].dag for dep in deps],
     )
 
-def _systhesize_design_impl(ctx):
+def _synthesize_design_impl(ctx):
     transitive_srcs = _transitive_srcs(ctx.attr.deps)
     verilog_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs.to_list()]
 
@@ -104,7 +104,7 @@ write_verilog {output}
     ]
 
 synthesize_rtl = rule(
-    implementation = _systhesize_design_impl,
+    implementation = _synthesize_design_impl,
     attrs = {
         "srcs": attr.label_list(allow_files = True),
         "standard_cells": attr.label(
