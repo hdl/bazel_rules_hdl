@@ -16,6 +16,8 @@
 # load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 
+exports_files(["synth.tcl"])
+
 pkg_tar(
     name = "yosys",
     srcs = ["@at_clifford_yosys//:yosys"],
