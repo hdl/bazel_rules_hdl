@@ -33,38 +33,19 @@ def _synthesize_design_impl(ctx):
     transitive_srcs = _transitive_srcs(ctx.attr.deps)
     verilog_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs.to_list()]
 
-    yosys_script = ctx.actions.declare_file("{}___yosys.script".format(ctx.attr.name))
     verilog_files = [src for sub_tuple in verilog_srcs for src in sub_tuple]
-    read_verilog_lines = "\n".join(["read_verilog -sv -defer {}".format(src.path) for src in verilog_files])
+    verilog_flist = ctx.actions.declare_file("{}.flist".format(ctx.attr.name))
+    ctx.actions.write(verilog_flist, "\n".join([f.path for f in verilog_files]) + "\n")
 
     output_file = ctx.actions.declare_file("{}_synth_output.v".format(ctx.attr.name))
     default_liberty_file = ctx.attr.standard_cells[StandardCellInfo].default_corner.liberty
-    yosys_script_content = """
-# read design
-{verilog_statements}
 
-# generic synthesis
-synth -top {top_module}
-
-# mapping to liberty
-dfflibmap -liberty {liberty}
-abc -liberty {liberty}
-
-# write synthesized design
-write_verilog {output}
-    """.format(
-        output_file.path,
-        verilog_statements = read_verilog_lines,
-        top_module = ctx.attr.top_module,
-        liberty = default_liberty_file.path,
-        output = output_file.path,
-    )
-
-    ctx.actions.write(yosys_script, yosys_script_content)
+    synth_tcl = ctx.file.synth_tcl
 
     inputs = []
     inputs.extend(verilog_files)
-    inputs.append(yosys_script)
+    inputs.append(verilog_flist)
+    inputs.append(synth_tcl)
 
     (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr.yosys_tool])
 
@@ -78,7 +59,7 @@ write_verilog {output}
     args.add("-Q")  # Don't print header
     args.add("-T")  # Don't print footer
     args.add_all("-l", [log_file])  # put output in log file
-    args.add_all("-s", [yosys_script])  # command execution
+    args.add_all("-c", [synth_tcl])  # run synthesis tcl script
 
     ctx.actions.run(
         outputs = [output_file, log_file],
@@ -88,6 +69,10 @@ write_verilog {output}
         tools = tool_inputs,
         input_manifests = input_manifests,
         env = {
+            "FLIST": verilog_flist.path,
+            "TOP": ctx.attr.top_module,
+            "OUTPUT": output_file.path,
+            "LIBERTY": default_liberty_file.path,
             "YOSYS_DATDIR": yosys_runfiles_dir + "/at_clifford_yosys/techlibs/",
             "ABC": yosys_runfiles_dir + "/edu_berkeley_abc/abc",
         },
@@ -117,6 +102,10 @@ synthesize_rtl = rule(
             default = Label("@at_clifford_yosys//:yosys"),
             executable = True,
             cfg = "exec",
+        ),
+        "synth_tcl": attr.label(
+            default = Label("//synthesis:synth.tcl"),
+            allow_single_file = True,
         ),
     },
 )
