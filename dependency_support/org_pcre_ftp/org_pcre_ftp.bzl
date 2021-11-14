@@ -22,7 +22,7 @@ def org_pcre_ftp():
         http_archive,
         name = "org_pcre_ftp",
         urls = [
-            "https://ftp.pcre.org/pub/pcre/pcre-8.44.tar.gz",
+            "https://ftp.exim.org/pub/pcre/pcre-8.44.tar.gz",
         ],
         strip_prefix = "pcre-8.44",
         sha256 = "aecafd4af3bd0f3935721af77b889d9024b2e01d96b58471bd91a3063fb47728",
