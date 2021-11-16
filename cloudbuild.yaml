@@ -42,6 +42,12 @@ steps:
     apt-get update
     apt-get install apt-transport-https ca-certificates -y
     update-ca-certificates
+    # This is kind of a hack to upgrade bazel to 4.2.1. When a new Bazel Docker container is released https://github.com/bazelbuild/continuous-integration/issues/1060
+    # Remove this, and just bump the docker container.
+    wget https://github.com/bazelbuild/bazel/releases/download/4.2.1/bazel_nojdk-4.2.1-linux-x86_64
+    chmod +x bazel_nojdk-4.2.1-linux-x86_64
+    mv bazel_nojdk-4.2.1-linux-x86_64 /usr/local/lib/bazel/bin/bazel 
+    # End Bazel upgrade hack.
     python3 tools/generate_uuid.py > build_invocation_id.txt
     python3 tools/generate_uuid.py > test_invocation_id.txt
     echo STATUS: Reporting logs with invocation id $(cat invocation_id.txt) to GitHub.
