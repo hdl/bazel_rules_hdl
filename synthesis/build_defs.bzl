@@ -106,6 +106,7 @@ synthesize_rtl = rule(
         "synth_tcl": attr.label(
             default = Label("//synthesis:synth.tcl"),
             allow_single_file = True,
+            doc = "Tcl synthesis script compatible with the environment-variable API of synth.tcl",
         ),
     },
 )
