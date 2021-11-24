@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Synthesis tool package.
+
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 
 exports_files(["synth.tcl"])

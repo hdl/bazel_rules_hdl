@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Place and Route package.
+# Place and Route tool package.
 
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 
