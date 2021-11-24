@@ -20,5 +20,5 @@ pkg_tar(
     name = "openroad",
     srcs = ["@org_theopenroadproject//:openroad"],
     include_runfiles = True,
-    strip_prefix = "/../",
+    strip_prefix = "./",
 )

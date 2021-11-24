@@ -22,5 +22,5 @@ pkg_tar(
     name = "yosys",
     srcs = ["@at_clifford_yosys//:yosys"],
     include_runfiles = True,
-    strip_prefix = "/../",
+    strip_prefix = "./",
 )
