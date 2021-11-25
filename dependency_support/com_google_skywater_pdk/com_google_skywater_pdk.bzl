@@ -37,7 +37,7 @@ def com_google_skywater_pdk():
         ],
         strip_prefix = "skywater-pdk-3d7617a1acb92ea883539bcf22a632d6361a5de4",
         sha256 = "49e5b03c26131a03eb038697d396a6ebf14058d78196f5d95c2bbdb0bdc8f32e",
-        build_file = Label("//dependency_support/com_google_skywater_pdk:bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support/com_google_skywater_pdk:bundled.BUILD.bazel"),
     )
 
     for library_name in CELL_LIBRARIES:

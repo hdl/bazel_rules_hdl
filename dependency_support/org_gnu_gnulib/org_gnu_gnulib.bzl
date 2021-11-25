@@ -78,14 +78,14 @@ def __org_gnu_gnulib(ctx):
     )
 
     ctx.file("WORKSPACE", "workspace(name = {name})\n".format(name = repr(ctx.name)))
-    ctx.template("BUILD.bazel", Label("//dependency_support:org_gnu_gnulib/bundled.BUILD.bazel"), executable = False)
+    ctx.template("BUILD.bazel", Label("@rules_hdl//dependency_support:org_gnu_gnulib/bundled.BUILD.bazel"), executable = False)
 
-    ctx.template("lib/config.in.h", Label("//dependency_support:org_gnu_gnulib/config.in.h"), executable = False)
-    ctx.template("config-darwin/config.h", Label("//dependency_support:org_gnu_gnulib/config-darwin.h"), substitutions = {
+    ctx.template("lib/config.in.h", Label("@rules_hdl//dependency_support:org_gnu_gnulib/config.in.h"), executable = False)
+    ctx.template("config-darwin/config.h", Label("@rules_hdl//dependency_support:org_gnu_gnulib/config-darwin.h"), substitutions = {
         "{GNULIB_CONFIG_HEADER}": _CONFIG_HEADER,
         "{GNULIB_CONFIG_FOOTER}": _CONFIG_FOOTER,
     }, executable = False)
-    ctx.template("config-linux/config.h", Label("//dependency_support:org_gnu_gnulib/config-linux.h"), substitutions = {
+    ctx.template("config-linux/config.h", Label("@rules_hdl//dependency_support:org_gnu_gnulib/config-linux.h"), substitutions = {
         "{GNULIB_CONFIG_HEADER}": _CONFIG_HEADER,
         "{GNULIB_CONFIG_FOOTER}": _CONFIG_FOOTER,
     }, executable = False)

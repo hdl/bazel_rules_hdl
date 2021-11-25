@@ -26,5 +26,5 @@ def com_github_gabime_spdlog():
         ],
         strip_prefix = "spdlog-1.9.2",
         sha256 = "6fff9215f5cb81760be4cc16d033526d1080427d236e86d70bb02994f85e3d38",
-        build_file = Label("//dependency_support/com_github_gabime_spdlog:bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support/com_github_gabime_spdlog:bundled.BUILD.bazel"),
     )

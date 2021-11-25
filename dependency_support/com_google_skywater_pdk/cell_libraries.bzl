@@ -54,9 +54,9 @@ CELL_LIBRARIES = {
             "tt_100C_1v80": ["basic"],
         },
         "default_corner": "ff_100C_1v95",
-        "open_road_configuration": Label("//dependency_support/com_google_skywater_pdk/sky130_fd_sc_hd:open_road_sky130_fd_sc_hd"),
+        "open_road_configuration": Label("@rules_hdl//dependency_support/com_google_skywater_pdk/sky130_fd_sc_hd:open_road_sky130_fd_sc_hd"),
         "patches": [
-            Label("//dependency_support/com_google_skywater_pdk/sky130_fd_sc_hd:pdk.patch"),
+            Label("@rules_hdl//dependency_support/com_google_skywater_pdk/sky130_fd_sc_hd:pdk.patch"),
         ],
     },
     "sky130_fd_sc_hdll": {

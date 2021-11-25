@@ -26,5 +26,5 @@ def repo():
         ],
         strip_prefix = "icestorm-cd2610e0fa1c6a90e8e4e4cfe06db1b474e752bb",
         sha256 = "e8d12796091f5988097459450de20e4a59c873ca2fa580fef2f560c5543a1738",
-        build_file = Label("//dependency_support:at_clifford_icestorm/bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support:at_clifford_icestorm/bundled.BUILD.bazel"),
     )

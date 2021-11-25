@@ -27,5 +27,5 @@ def org_gnu_gperf():
         ],
         strip_prefix = "gperf-3.1",
         sha256 = "588546b945bba4b70b6a3a616e80b4ab466e3f33024a352fc2198112cdbb3ae2",
-        build_file = Label("//dependency_support:org_gnu_gperf/bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support:org_gnu_gperf/bundled.BUILD.bazel"),
     )

@@ -26,5 +26,5 @@ def com_icarus_iverilog():
         ],
         strip_prefix = "iverilog-10_3",
         sha256 = "4b884261645a73b37467242d6ae69264fdde2e7c4c15b245d902531efaaeb234",
-        build_file = Label("//dependency_support:com_icarus_iverilog/bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support:com_icarus_iverilog/bundled.BUILD.bazel"),
     )

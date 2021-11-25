@@ -26,5 +26,5 @@ def com_github_yosyshq_prjtrellis():
         ],
         strip_prefix = "prjtrellis-315969591a12af11b02b4aa9c1dca9066e1be8e2",
         sha256 = "7f6eaf88ab386e8976e3bf085d0189a9153c19ad9866dea3920c995a7f717bbd",
-        build_file = Label("//dependency_support/com_github_yosyshq_prjtrellis:bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support/com_github_yosyshq_prjtrellis:bundled.BUILD.bazel"),
     )

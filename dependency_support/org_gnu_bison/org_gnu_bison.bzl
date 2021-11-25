@@ -27,5 +27,5 @@ def org_gnu_bison():
         ],
         strip_prefix = "bison-3.5",
         sha256 = "55e4a023b1b4ad19095a5f8279f0dc048fa29f970759cea83224a6d5e7a3a641",
-        build_file = Label("//dependency_support:org_gnu_bison/bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support:org_gnu_bison/bundled.BUILD.bazel"),
     )

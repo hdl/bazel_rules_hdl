@@ -28,8 +28,8 @@ def org_gnu_readline():
         ],
         sha256 = "e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461",
         strip_prefix = "readline-8.0",
-        build_file = Label("//dependency_support/org_gnu_readline:bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support/org_gnu_readline:bundled.BUILD.bazel"),
         patches = [
-            "@rules_hdl//dependency_support/org_gnu_readline:missing_include.patch",
+            Label("@rules_hdl//dependency_support/org_gnu_readline:missing_include.patch"),
         ],
     )

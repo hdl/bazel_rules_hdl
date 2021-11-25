@@ -24,5 +24,5 @@ def net_sourceforge_ngspice():
         commit = "371ad3496c684c620e9ad6fb34f6a4bca10f7bac",  # ngspice-33, 2020-12-03
         remote = "git://git.code.sf.net/p/ngspice/ngspice",
         shallow_since = "1603013722 +0200",
-        build_file = Label("//dependency_support/net_sourceforge_ngspice:bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support/net_sourceforge_ngspice:bundled.BUILD.bazel"),
     )

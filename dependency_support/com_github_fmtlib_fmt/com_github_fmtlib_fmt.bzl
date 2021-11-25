@@ -26,5 +26,5 @@ def com_github_fmtlib_fmt():
         ],
         strip_prefix = "fmt-8.0.1",
         sha256 = "b06ca3130158c625848f3fb7418f235155a4d389b2abc3a6245fb01cb0eb1e01",
-        build_file = Label("//dependency_support/com_github_fmtlib_fmt:bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support/com_github_fmtlib_fmt:bundled.BUILD.bazel"),
     )

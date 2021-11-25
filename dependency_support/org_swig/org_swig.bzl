@@ -26,5 +26,5 @@ def org_swig():
         ],
         strip_prefix = "swig-4.0.0",
         sha256 = "e8a39cd6437e342cdcbd5af27a9bf11b62dc9efec9248065debcb8276fcbb925",
-        build_file = Label("//dependency_support/org_swig:bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support/org_swig:bundled.BUILD.bazel"),
     )
