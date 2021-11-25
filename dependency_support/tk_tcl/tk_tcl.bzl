@@ -26,5 +26,5 @@ def tk_tcl():
         ],
         strip_prefix = "tcl8.6.10",
         sha256 = "5196dbf6638e3df8d5c87b5815c8c2b758496eb6f0e41446596c9a4e638d87ed",
-        build_file = Label("//dependency_support:tk_tcl/bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support:tk_tcl/bundled.BUILD.bazel"),
     )

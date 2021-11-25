@@ -26,5 +26,5 @@ def org_nixos_patchelf():
         ],
         strip_prefix = "patchelf-f34751b88bd07d7f44f5cd3200fb4122bf916c7e",
         sha256 = "5ed94d15c44c13c1fa6a78b2f5ca499e465fd9171e4a1daf194e8523c04a9339",
-        build_file = Label("//dependency_support/org_nixos_patchelf:bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support/org_nixos_patchelf:bundled.BUILD.bazel"),
     )

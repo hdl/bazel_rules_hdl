@@ -26,5 +26,5 @@ def org_pcre_ftp():
         ],
         strip_prefix = "pcre-8.44",
         sha256 = "aecafd4af3bd0f3935721af77b889d9024b2e01d96b58471bd91a3063fb47728",
-        build_file = Label("//dependency_support:org_pcre_ftp/bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support:org_pcre_ftp/bundled.BUILD.bazel"),
     )

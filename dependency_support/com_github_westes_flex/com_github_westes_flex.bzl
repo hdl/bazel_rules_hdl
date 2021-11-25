@@ -26,5 +26,5 @@ def com_github_westes_flex():
         ],
         strip_prefix = "flex-2.6.4",
         sha256 = "e87aae032bf07c26f85ac0ed3250998c37621d95f8bd748b31f15b33c45ee995",
-        build_file = Label("//dependency_support:com_github_westes_flex/bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support:com_github_westes_flex/bundled.BUILD.bazel"),
     )

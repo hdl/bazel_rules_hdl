@@ -26,5 +26,5 @@ def org_fftw():
         ],
         strip_prefix = "fftw-3.3.8",
         sha256 = "6113262f6e92c5bd474f2875fa1b01054c4ad5040f6b0da7c03c98821d9ae303",
-        build_file = Label("//dependency_support/org_fftw:bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support/org_fftw:bundled.BUILD.bazel"),
     )

@@ -26,9 +26,9 @@ def com_opencircuitdesign_magic():
         ],
         strip_prefix = "magic-0df5f6d0731024da457eeb42cb88725d93572920",
         sha256 = "1bc9966e5118c3d312e2dfebadb6f01ca343fbf1f0847e1434300972a4ca91f9",
-        build_file = Label("//dependency_support/com_opencircuitdesign_magic:bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support/com_opencircuitdesign_magic:bundled.BUILD.bazel"),
         patches = [
-            "@rules_hdl//dependency_support/com_opencircuitdesign_magic:magic_wrapper.patch",
-            "@rules_hdl//dependency_support/com_opencircuitdesign_magic:use_bash.patch",
+            Label("@rules_hdl//dependency_support/com_opencircuitdesign_magic:magic_wrapper.patch"),
+            Label("@rules_hdl//dependency_support/com_opencircuitdesign_magic:use_bash.patch"),
         ],
     )

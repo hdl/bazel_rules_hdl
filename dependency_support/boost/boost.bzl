@@ -31,6 +31,6 @@ def boost():
             # Bazel to depend on the Python headers of the current Python
             # toolchain. The patch below selects the same Python headers
             # that the rest of XLS uses.
-            "@rules_hdl//dependency_support/boost:add_python.patch",
+            Label("@rules_hdl//dependency_support/boost:add_python.patch"),
         ],
     )

@@ -26,5 +26,5 @@ def org_sourceware_bzip2():
         ],
         strip_prefix = "bzip2-1.0.8",
         sha256 = "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269",
-        build_file = Label("//dependency_support:org_sourceware_bzip2/bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support:org_sourceware_bzip2/bundled.BUILD.bazel"),
     )

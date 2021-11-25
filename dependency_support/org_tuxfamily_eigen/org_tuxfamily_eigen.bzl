@@ -21,7 +21,7 @@ def org_tuxfamily_eigen():
     maybe(
         new_git_repository,
         name = "org_tuxfamily_eigen",
-        build_file = Label("//dependency_support/org_tuxfamily_eigen:bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support/org_tuxfamily_eigen:bundled.BUILD.bazel"),
         commit = "eb71e5db988d4a23e619ed054efd3eb751cdd026",  # 2021-03-17
         remote = "https://gitlab.com/libeigen/eigen.git",
         shallow_since = "1615946824 +0100",

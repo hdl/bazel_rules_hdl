@@ -26,8 +26,8 @@ def com_github_yosyshq_nextpnr():
         ],
         strip_prefix = "nextpnr-f44498a5301f9f516488fb748c684926be514346",
         sha256 = "ee2a3a9f8a3632b28b33f0c7bd64d70e166c7f641184f2b84b606b7d8a67b878",
-        build_file = Label("//dependency_support/com_github_yosyshq_nextpnr:bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support/com_github_yosyshq_nextpnr:bundled.BUILD.bazel"),
         patches = [
-            "@rules_hdl//dependency_support/com_github_yosyshq_nextpnr:dont_use_random_shuffle.patch",
+            Label("@rules_hdl//dependency_support/com_github_yosyshq_nextpnr:dont_use_random_shuffle.patch"),
         ],
     )

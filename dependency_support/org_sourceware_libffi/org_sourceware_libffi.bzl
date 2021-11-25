@@ -26,5 +26,5 @@ def org_sourceware_libffi():
         ],
         strip_prefix = "libffi-3.3",
         sha256 = "72fba7922703ddfa7a028d513ac15a85c8d54c8d67f55fa5a4802885dc652056",
-        build_file = Label("//dependency_support:org_sourceware_libffi/bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support:org_sourceware_libffi/bundled.BUILD.bazel"),
     )

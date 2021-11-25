@@ -26,5 +26,5 @@ def com_opencircuitdesign_netgen():
         ],
         strip_prefix = "netgen-50b0e9cb6572cfa2f96d49556d13e4c445986e0f",
         sha256 = "2472de7d55f6266be3389e150571e48952a7613f6cb284a59eb46adfde770061",
-        build_file = Label("//dependency_support/com_opencircuitdesign_netgen:bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support/com_opencircuitdesign_netgen:bundled.BUILD.bazel"),
     )

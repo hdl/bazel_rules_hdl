@@ -28,5 +28,5 @@ def net_invisible_island_ncurses():
         ],
         strip_prefix = "ncurses-6.2",
         sha256 = "30306e0c76e0f9f1f0de987cf1c82a5c21e1ce6568b9227f7da5b71cbea86c9d",
-        build_file = Label("//dependency_support:net_invisible_island_ncurses/bundled.BUILD.bazel"),
+        build_file = Label("@rules_hdl//dependency_support:net_invisible_island_ncurses/bundled.BUILD.bazel"),
     )
