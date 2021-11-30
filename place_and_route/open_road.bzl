@@ -118,7 +118,7 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
         write_db = "write_db {}".format(output_db.path),
     )
 
-    file_name = "{}{}.tcl".format(input_hash, command_hash)
+    file_name = "{}_script.tcl".format(output_db.basename[:-(len(output_db.extension) + 1)])
     command_file = ctx.actions.declare_file(file_name)
     ctx.actions.write(command_file, content = command)
 
