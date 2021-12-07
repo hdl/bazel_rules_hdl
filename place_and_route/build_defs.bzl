@@ -29,6 +29,8 @@ def _place_and_route_impl(ctx):
     # Throws an error if there is no OpenROAD configuration
     assert_has_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
 
+    output_files = []
+
     open_road_provider = init_floor_plan(ctx)
     open_road_provider = place_pins(ctx, open_road_provider)
     open_road_provider = pdn_gen(ctx, open_road_provider)
@@ -36,14 +38,17 @@ def _place_and_route_impl(ctx):
     open_road_provider = resize(ctx, open_road_provider)
     open_road_provider = clock_tree_synthesis(ctx, open_road_provider)
     open_road_provider = global_routing(ctx, open_road_provider)
-    open_road_provider = detailed_routing(ctx, open_road_provider)
+    if not ctx.attr.skip_detailed_routing:
+        open_road_provider = detailed_routing(ctx, open_road_provider)
+        output_files.append(open_road_provider.routed_def)
+
+    output_files.append(open_road_provider.output_db)
+    output_files.append(open_road_provider.power_results)
+    output_files.append(open_road_provider.area_results)
+    output_files.extend(open_road_provider.logs.to_list())
+
     return [
-        DefaultInfo(
-            files = depset(
-                [open_road_provider.output_db, open_road_provider.routed_def, open_road_provider.power_results, open_road_provider.area_results] +
-                open_road_provider.logs.to_list(),
-            ),
-        ),
+        DefaultInfo(files = depset(output_files)),
         open_road_provider,
     ]
 
@@ -55,6 +60,10 @@ place_and_route = rule(
             default = Label("@org_theopenroadproject//:openroad"),
             executable = True,
             cfg = "exec",
+        ),
+        "skip_detailed_routing": attr.bool(
+            default = False,
+            doc = "Whether to skip detailed routing. This step is slow and is only required if requiring a fully manufacturable routed_def.",
         ),
         "local_detailed_routing_execution": attr.bool(
             default = False,
