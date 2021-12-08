@@ -20,6 +20,7 @@ it.
 
 load("@rules_hdl//dependency_support/at_clifford_icestorm:at_clifford_icestorm.bzl", "at_clifford_icestorm")
 load("@rules_hdl//dependency_support/at_clifford_yosys:at_clifford_yosys.bzl", "at_clifford_yosys")
+load("@rules_hdl//dependency_support/bazel_skylib:bazel_skylib.bzl", "bazel_skylib")
 load("@rules_hdl//dependency_support/boost:boost.bzl", "boost")
 load("@rules_hdl//dependency_support/com_icarus_iverilog:com_icarus_iverilog.bzl", "com_icarus_iverilog")
 load("@rules_hdl//dependency_support/com_github_fmtlib_fmt:com_github_fmtlib_fmt.bzl", "com_github_fmtlib_fmt")
@@ -60,6 +61,7 @@ def dependency_support():
     """ Registers dependencies """
     at_clifford_icestorm()
     at_clifford_yosys()
+    bazel_skylib()
     boost()
     com_github_fmtlib_fmt()
     com_github_gabime_spdlog()

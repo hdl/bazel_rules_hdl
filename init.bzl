@@ -14,6 +14,7 @@
 
 """ initializes the bazel_rules_hdl workspace """
 
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 load("@rules_python//python:pip.bzl", "pip_install")
 load("//dependency_support/boost:init_boost.bzl", "init_boost")
 load("//dependency_support/pybind11:init_pybind11.bzl", "init_pybind11")
@@ -39,3 +40,5 @@ def init(python_interpreter = None, python_interpreter_target = None):
 
     init_boost()
     init_pybind11()
+
+    bazel_skylib_workspace()
