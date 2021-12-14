@@ -181,6 +181,11 @@ cc_library(
             "src/psm/src/*.h",
             #PartitionManager
             "src/par/src/*.cpp",
+            "src/par/src/MLPart/mlpart/**/*.cxx",
+            "src/par/src/MLPart/mlpart/**/*.h",
+            "src/par/src/MLPart/mlpart/**/*.inl",
+            "src/par/src/MLPart/src/*.h",
+            "src/par/src/MLPart/src/*.cpp",
             #PDNGen
             "src/pdn/src/*.cc",
             #STT
@@ -199,10 +204,17 @@ cc_library(
             "src/rsz/src/Unused.cc",
             "src/drt/src/main.cpp",
             "src/utl/src/Logger.cpp",
+            "src/par/src/MLPart/mlpart/ABKCommon/abkrand_templ.cxx",
+            "src/par/src/MLPart/mlpart/Partitioners/aGreedMoveMan.cxx",
+            "src/par/src/MLPart/mlpart/Combi/grayPermut.cxx",
         ],
     ) + [
         "src/stt/src/flt/etc/POST9.cpp",
         "src/stt/src/flt/etc/POWV9.cpp",
+    ],
+    textual_hdrs = [
+      "src/par/src/MLPart/mlpart/ABKCommon/abkrand_templ.cxx",
+      "src/par/src/MLPart/mlpart/Partitioners/aGreedMoveMan.cxx",
     ],
     hdrs = glob(
         include = [
@@ -331,6 +343,9 @@ cc_library(
         #PartitionManager
         "src/par/include",
         "src/par/include/par",
+        "src/par/src/MLPart/src",
+        "src/par/src/MLPart/mlpart",
+        "src/par/src/MLPart/mlpart/ABKCommon",
         #PDNGen
         "src/pdn/include",
         "src/pdn/include/pdn",
@@ -621,7 +636,7 @@ tcl_encode(
     name = "openroad_tcl",
     srcs = [":tcl_util"] + [
         "src/OpenRoad.tcl",
-        "src/ICeWall/src/ICeWall.tcl",
+        "src/pad/src/pad.tcl",
     ],
     char_array_name = "openroad_swig_tcl_inits",
 )
