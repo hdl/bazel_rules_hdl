@@ -1,9 +1,23 @@
+From f88fef676c6d99e49d6998aba0024fbfe228a119 Mon Sep 17 00:00:00 2001
+From: QuantamHD <emahintorabi@gmail.com>
+Date: Thu, 21 Oct 2021 08:40:13 -0700
+Subject: [PATCH] logging change to support silence
+
+---
+ src/Main.cc                      | 15 ++++++++++++++-
+ src/OpenRoad.cc                  |  4 +++-
+ src/utl/include/utl/Logger.h     | 23 ++++++++++++++++++++---
+ src/utl/include/utl/MakeLogger.h |  5 ++---
+ src/utl/src/Logger.cpp           | 26 ++++++++++++++++++++++----
+ src/utl/src/MakeLogger.cpp       |  7 +++----
+ 6 files changed, 64 insertions(+), 16 deletions(-)
+
 diff --git a/src/Main.cc b/src/Main.cc
-index b85e39a93..5c5a47fe1 100755
+index c4d00af52..d89a5b872 100755
 --- a/src/Main.cc
 +++ b/src/Main.cc
-@@ -87,6 +87,8 @@ static int cmd_argc;
- static char **cmd_argv;
+@@ -87,6 +87,8 @@ int cmd_argc;
+ char **cmd_argv;
  const char* log_filename = nullptr;
  const char* metrics_filename = nullptr;
 +bool quiet_logs = false;
@@ -11,7 +25,7 @@ index b85e39a93..5c5a47fe1 100755
  
  static const char *init_filename = ".openroad";
  
-@@ -175,6 +177,14 @@ main(int argc,
+@@ -180,6 +182,14 @@ main(int argc,
      remove(metrics_filename);
    }
  
@@ -26,7 +40,7 @@ index b85e39a93..5c5a47fe1 100755
    cmd_argc = argc;
    cmd_argv = argv;
  #ifdef ENABLE_PYTHON3
-@@ -212,6 +222,7 @@ main(int argc,
+@@ -217,6 +227,7 @@ main(int argc,
    }
  #endif
  
@@ -34,7 +48,7 @@ index b85e39a93..5c5a47fe1 100755
    // Set argc to 1 so Tcl_Main doesn't source any files.
    // Tcl_Main never returns.
    Tcl_Main(1, argv, ord::tclAppInit);
-@@ -362,7 +373,7 @@ ord::tclAppInit(Tcl_Interp *interp)
+@@ -367,7 +378,7 @@ ord::tclAppInit(Tcl_Interp *interp)
  static void
  showUsage(const char *prog, const char *init_filename)
  {
@@ -43,7 +57,7 @@ index b85e39a93..5c5a47fe1 100755
    printf("  -help              show help and exit\n");
    printf("  -version           show version and exit\n");
    printf("  -no_init           do not read %s init file\n", init_filename);
-@@ -374,6 +385,8 @@ showUsage(const char *prog, const char *init_filename)
+@@ -379,6 +390,8 @@ showUsage(const char *prog, const char *init_filename)
    printf("  -python            start with python interpreter [limited to db operations]\n");
  #endif
    printf("  -log <file_name>   write a log in <file_name>\n");
@@ -53,7 +67,7 @@ index b85e39a93..5c5a47fe1 100755
  }
  
 diff --git a/src/OpenRoad.cc b/src/OpenRoad.cc
-index 4beec8391..96bced0d2 100755
+index 56876d932..a37f98275 100755
 --- a/src/OpenRoad.cc
 +++ b/src/OpenRoad.cc
 @@ -96,6 +96,8 @@ extern int Odbtcl_Init(Tcl_Interp *interp);
@@ -143,7 +157,7 @@ index 543d48054..d4953d2b7 100644
  initLogger(utl::Logger *logger,
             Tcl_Interp *tcl_interp);
 diff --git a/src/utl/src/Logger.cpp b/src/utl/src/Logger.cpp
-index 2b7323db2..95bae3f02 100644
+index fa743559d..1a17bf6f4 100644
 --- a/src/utl/src/Logger.cpp
 +++ b/src/utl/src/Logger.cpp
 @@ -35,18 +35,22 @@
@@ -216,3 +230,6 @@ index 05ee22281..9ff5785ee 100644
  }
  
  void
+-- 
+2.34.0.384.gca35af8252-goog
+
