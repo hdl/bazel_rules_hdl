@@ -17,6 +17,8 @@
 load("//place_and_route:open_road.bzl", "OpenRoadInfo", "openroad_command")
 load("//pdk:open_road_configuration.bzl", "get_open_road_configuration")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
+load("//place_and_route:private/report_area.bzl", "generate_area_results")
+load("//place_and_route:private/report_power.bzl", "generate_power_results")
 
 def _initialize_floorplan_command(ctx):
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
@@ -63,6 +65,8 @@ def init_floor_plan(ctx):
     liberty = netlist_target[SynthesisInfo].standard_cell_info.default_corner.liberty
     tech_lef = netlist_target[SynthesisInfo].standard_cell_info.tech_lef
     std_cell_lef = netlist_target[SynthesisInfo].standard_cell_info.cell_lef_definitions
+    verilog_based_power_results = ctx.actions.declare_file("{}_verilog_based_power_results.textproto".format(ctx.attr.name))
+    verilog_based_area_results = ctx.actions.declare_file("{}_verilog_based_area_results.textproto".format(ctx.attr.name))
 
     open_road_commands = [
         "read_lef {tech_lef}".format(
@@ -84,8 +88,10 @@ def init_floor_plan(ctx):
         _initialize_floorplan_command(ctx),
         "source {tracks_file}".format(
             tracks_file = open_road_configuration.tracks_file.path,
-        ),
+        )
     ])
+    open_road_commands.extend(generate_power_results(ctx, verilog_based_power_results))
+    open_road_commands.extend(generate_area_results(verilog_based_area_results))
 
     input_open_road_files = [
         netlist,
@@ -99,6 +105,10 @@ def init_floor_plan(ctx):
         commands = open_road_commands,
         inputs = input_open_road_files,
         step_name = "floorplan",
+        outputs = [
+            verilog_based_power_results,
+            verilog_based_area_results,
+        ],
     )
 
     return OpenRoadInfo(
@@ -106,4 +116,6 @@ def init_floor_plan(ctx):
         output_db = command_output.db,
         logs = depset([command_output.log_file]),
         input_files = depset(direct = input_open_road_files),
+        verilog_based_power_results = verilog_based_power_results,
+        verilog_based_area_results = verilog_based_area_results,
     )

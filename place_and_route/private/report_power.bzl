@@ -12,22 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Report Area Commands"""
+"""Report Power Commands"""
 
-def generate_area_results(output_file):
-    """Returns a list of openroad commands that will calculate the design area and write it to a text proto.
+load("//synthesis:build_defs.bzl", "SynthesisInfo")
 
-    Design area is defined as the sum of the area of all the instances/standard-cells in a design.
+def generate_power_results(ctx, output_file):
+    netlist_target = ctx.attr.synthesized_rtl
+    liberty = netlist_target[SynthesisInfo].standard_cell_info.default_corner.liberty
 
-    Args:
-        output_file: The output textproto.
-    """
     return [
-        "report_design_area",
-        "set design_area [sta::format_area [rsz::design_area] 0]",
+        "report_power",
+        "set power_result [sta::design_power [sta::parse_corner {}]]",
         "set fp [open \"{output_file}\" w+]".format(
             output_file = output_file.path,
         ),
-        "puts $fp \"area_micro_meters_squared: ${design_area}\"",
+        "puts $fp \"total_package_power_watts: [lindex $power_result 3]\"",
+        "puts $fp \"corner: \\\"{corner}\\\"\"".format(
+            corner = liberty.basename[:-(len(liberty.extension) + 1)],
+        ),
+        "puts $fp \"power_maginitude: \\\"[sta::unit_scale_abreviation \"power\"]\\\"\"",
         "close $fp",
     ]

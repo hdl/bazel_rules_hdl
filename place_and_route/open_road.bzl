@@ -22,9 +22,14 @@ OpenRoadInfo = provider(
         "output_db",
         "routing_guide",
         "routed_def",
+        "verilog_based_power_results",
+        "verilog_based_area_results",
+        "general_routing_power_results",
+        "general_routing_area_results",
+        "logs",
+        # TODO: These are only kept to not break OpenROAD power/area testing. Remove them asap.
         "power_results",
         "area_results",
-        "logs",
     ],
 )
 
@@ -62,6 +67,11 @@ def merge_open_road_info(left, right):
     """
     routed_def = _merge_right(left, right, "routed_def")
     routing_guide = _merge_right(left, right, "routing_guide")
+    verilog_based_power_results = _merge_right(left, right, "verilog_based_power_results")
+    verilog_based_area_results = _merge_right(left, right, "verilog_based_area_results")
+    general_routing_power_results = _merge_right(left, right, "general_routing_power_results")
+    general_routing_area_results = _merge_right(left, right, "general_routing_area_results")
+
     power_results = _merge_right(left, right, "power_results")
     area_results = _merge_right(left, right, "area_results")
 
@@ -72,6 +82,10 @@ def merge_open_road_info(left, right):
         output_db = right.output_db,
         routing_guide = routing_guide,
         routed_def = routed_def,
+        verilog_based_power_results = verilog_based_power_results,
+        verilog_based_area_results = verilog_based_area_results,
+        general_routing_power_results = general_routing_power_results,
+        general_routing_area_results = general_routing_area_results,
         power_results = power_results,
         area_results = area_results,
     )

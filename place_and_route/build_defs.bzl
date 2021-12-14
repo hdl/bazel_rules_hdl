@@ -43,9 +43,16 @@ def _place_and_route_impl(ctx):
         output_files.append(open_road_provider.routed_def)
 
     output_files.append(open_road_provider.output_db)
-    output_files.append(open_road_provider.power_results)
-    output_files.append(open_road_provider.area_results)
     output_files.extend(open_road_provider.logs.to_list())
+
+    if open_road_provider.verilog_based_power_results != None:
+        output_files.append(open_road_provider.verilog_based_power_results)
+    if open_road_provider.verilog_based_area_results != None:
+        output_files.append(open_road_provider.verilog_based_area_results)
+    if open_road_provider.general_routing_power_results != None:
+        output_files.append(open_road_provider.general_routing_power_results)
+    if open_road_provider.general_routing_area_results != None:
+        output_files.append(open_road_provider.general_routing_area_results)
 
     command_file = ctx.actions.declare_file("{}_commands.tcl".format(ctx.attr.name))
     ctx.actions.write(command_file, content = "\n".join(open_road_provider.commands))
