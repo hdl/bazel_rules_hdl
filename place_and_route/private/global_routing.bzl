@@ -14,10 +14,11 @@
 
 """Global Routing openROAD commands"""
 
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command")
-load("//synthesis:build_defs.bzl", "SynthesisInfo")
-load("//place_and_route:private/report_area.bzl", "generate_area_results")
 load("//pdk:open_road_configuration.bzl", "get_open_road_configuration")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command")
+load("//place_and_route:private/report_area.bzl", "generate_area_results")
+load("//place_and_route:private/report_power.bzl", "generate_power_results")
+load("//synthesis:build_defs.bzl", "SynthesisInfo")
 
 def _generate_power_results(output_file, liberty):
     return [
@@ -59,8 +60,8 @@ def global_routing(ctx, open_road_info):
     liberty = netlist_target[SynthesisInfo].standard_cell_info.default_corner.liberty
 
     route_guide = ctx.actions.declare_file("{}.route_guide".format(ctx.attr.name))
-    power_results = ctx.actions.declare_file("{}_power_results.textproto".format(ctx.attr.name))
-    area_results = ctx.actions.declare_file("{}_area_results.textproto".format(ctx.attr.name))
+    general_routing_power_results = ctx.actions.declare_file("{}_general_routing_power_results.textproto".format(ctx.attr.name))
+    general_routing_area_results = ctx.actions.declare_file("{}_general_routing_area_results.textproto".format(ctx.attr.name))
 
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
 
@@ -91,14 +92,12 @@ foreach layer_adjustment {global_routing_layer_adjustments} {{
         "report_wns",
         "report_tns",
         "report_check_types -max_slew -max_capacitance -max_fanout -violators",
-        "report_power",
         "report_floating_nets -verbose",
-        "report_design_area",
         "report_units",
         "set_power_activity -input -activity 1 -duty 0.5",
     ]
-    open_road_commands.extend(_generate_power_results(power_results, liberty))
-    open_road_commands.extend(generate_area_results(area_results))
+    open_road_commands.extend(generate_power_results(ctx, general_routing_power_results))
+    open_road_commands.extend(generate_area_results(general_routing_area_results))
 
     inputs = [
         liberty,
@@ -111,8 +110,8 @@ foreach layer_adjustment {global_routing_layer_adjustments} {{
         inputs = inputs,
         outputs = [
             route_guide,
-            power_results,
-            area_results,
+            general_routing_power_results,
+            general_routing_area_results,
         ],
         step_name = "global_routing",
     )
@@ -123,8 +122,10 @@ foreach layer_adjustment {global_routing_layer_adjustments} {{
         output_db = command_output.db,
         logs = depset([command_output.log_file]),
         routing_guide = route_guide,
-        power_results = power_results,
-        area_results = area_results,
+        general_routing_power_results = general_routing_power_results,
+        general_routing_area_results = general_routing_area_results,
+        power_results = general_routing_power_results,
+        area_results = general_routing_area_results,
     )
 
     return merge_open_road_info(open_road_info, current_action_open_road_info)
