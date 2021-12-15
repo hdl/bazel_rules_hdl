@@ -15,7 +15,7 @@
 """Detailed Routing openROAD commands"""
 
 load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command")
-load("//third_party/bazel_rules_hdl:synthesis/build_defs.bzl", "SynthesisInfo")
+load("//synthesis/build_defs.bzl", "SynthesisInfo")
 
 def _triton_route_parameter_file(ctx, open_road_info):
     triton_route_parameter_file = ctx.actions.declare_file("{}_triton_route_params.params".format(ctx.attr.name))
