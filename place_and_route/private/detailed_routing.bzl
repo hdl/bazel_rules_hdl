@@ -58,10 +58,14 @@ def detailed_routing(ctx, open_road_info):
 
     """
 
+    liberty = ctx.attr.synthesized_rtl[SynthesisInfo].standard_cell_info.default_corner.liberty
     trition_route_params = _triton_route_parameter_file(ctx, open_road_info)
     routed_def = ctx.actions.declare_file("{}_detail_routed.def".format(ctx.attr.name))
 
     open_road_commands = [
+        "read_liberty {liberty_file}".format(
+            liberty_file = liberty.path,
+        ),
         "set_thread_count [exec getconf _NPROCESSORS_ONLN]",
         "detailed_route -param {tr_parameter_file}".format(
             tr_parameter_file = trition_route_params["triton_route_parameter_file"].path,
@@ -72,6 +76,7 @@ def detailed_routing(ctx, open_road_info):
     ]
 
     inputs = [
+        liberty,
         trition_route_params["triton_route_parameter_file"],
         open_road_info.routing_guide,
     ]
