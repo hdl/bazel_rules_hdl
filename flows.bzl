@@ -105,3 +105,57 @@ bind_step_inputs = rule(
         ),
     }
 )
+
+def _flow_to_step_impl(ctx):
+    flow_script = ctx.actions.declare_file(ctx.attr.name + ".sh")
+    runfiles = ctx.runfiles(files = [flow_script])
+
+    step_runfiles = []
+    free_inputs = []
+    flow_outputs = []
+    commands = [script_prefix]
+
+    for step in ctx.attr.steps:
+        for i in step[FlowStepInfo].inputs:
+            if i not in free_inputs and i not in flow_outputs:
+                # INPUT_name is free if no previous step has written OUTPUT_name
+                free_inputs.append(i)
+
+        step_exec = "${{RUNFILES}}/{}".format(step[DefaultInfo].executable.short_path)
+        step_runfiles.append(step[DefaultInfo].runfiles)
+        step_command = " ".join([step_exec] + step[FlowStepInfo].arguments)
+        commands.append(step_command)
+
+        for o in step[FlowStepInfo].outputs:
+            if o not in flow_outputs:
+                flow_outputs.append(o)
+                # Now that OUTPUT_name has been written, INPUT_name is no longer free.
+                # Read INPUT_name from OUTPUT_name from this point forward.
+                commands.append("INPUT_{name}=${{OUTPUT_{name}}}".format(name = o.upper()))
+
+        ctx.actions.write(output = flow_script, content = "\n".join(commands) + "\n", executable = True)
+
+        return [
+            FlowStepInfo(
+                inputs = free_inputs,
+                outputs = flow_outputs,
+                executable_type = "flow",
+                arguments = [],
+            ),
+            DefaultInfo(
+                executable = flow_script,
+                runfiles = runfiles.merge_all(step_runfiles)
+            ),
+        ]
+
+# Collapse a sequence of flow steps into a single-step executable.
+flow_to_step = rule(
+    implementation = _flow_to_step_impl,
+    attrs = {
+        "flow": attr.label_list(
+            doc = "List of steps in the flow",
+            providers = [DefaultInfo, FlowStepInfo],
+            mandatory = True,
+            ),
+        }
+)
