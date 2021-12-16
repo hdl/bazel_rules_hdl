@@ -33,6 +33,7 @@ FlowStepInfo = provider(
         "inputs" : "Uppercase strings naming logical file inputs of a flow step.",
         "outputs" : "Uppercase strings naming logical file outputs of a flow step.",
         "executable_type" : "Type of executable implementing this flow step (e.g. openroad, yosys, etc.).",
+        "arguments" : "Extra arguments to pass when running this step as part of a larger flow",
     }
 )
 
@@ -74,7 +75,8 @@ def _bind_step_inputs_impl(ctx):
         FlowStepInfo(
             inputs = new_inputs,
             outputs = step[FlowStepInfo].outputs,
-            executable_type = step[FlowStepInfo].executable_type
+            executable_type = step[FlowStepInfo].executable_type,
+            arguments = step[FlowStepInfo].arguments,
         ),
         DefaultInfo(
             executable = bind_script,
