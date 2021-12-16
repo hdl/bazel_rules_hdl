@@ -39,7 +39,7 @@ FlowStepInfo = provider(
 
 script_prefix = """
 #!/bin/bash
-export RUNFILES="${RUNFILES:-$0.runfiles}"
+export RUNFILES="${RUNFILES:-$0.runfiles/rules_hdl}"
 """
 
 def _bind_step_inputs_impl(ctx):
