@@ -64,7 +64,7 @@ def _bind_step_inputs_impl(ctx):
     step_executable = step[DefaultInfo].executable
     exec_step = """${{RUNFILES}}/{} "$@"\n""".format(step_executable.short_path)
 
-    bind_script = ctx.actions.declare_file("{}.sh".format(ctx.attr.name))
+    bind_script = ctx.actions.declare_file(ctx.attr.name)
     ctx.actions.write(output=bind_script,
                       content = "\n".join([script_prefix] + env_bindings + [exec_step]),
                       is_executable = True)
@@ -107,7 +107,7 @@ bind_step_inputs = rule(
 )
 
 def _flow_to_step_impl(ctx):
-    flow_script = ctx.actions.declare_file(ctx.attr.name + ".sh")
+    flow_script = ctx.actions.declare_file(ctx.attr.name)
     runfiles = ctx.runfiles(files = [flow_script])
 
     step_runfiles = []
