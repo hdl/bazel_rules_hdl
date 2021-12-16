@@ -159,3 +159,71 @@ flow_to_step = rule(
             ),
         }
 )
+
+def _run_step_with_inputs(ctx, step, inputs_dict):
+    # inputs and output manifests are for the runfiles of the step executable.
+    (tool_inputs, input_manifests) = ctx.resolve_tools(step[DefaultInfo].executable)
+
+    #The inputs_env and inputs handle the named inputs of the step.
+    inputs = []
+    inputs_env = {}
+
+    for i in step[FlowStepInfo].inputs:
+        f = inputs_dict.get(i)
+        if f == None:
+            fail("Required input", i, "not found in input dictionary", inputs_dict)
+        inputs.append(f)
+        inputs_env["INPUT_" + i.upper()] = f.path
+
+    outputs = []
+    outputs_dict = {}
+    outputs_env = {}
+    for o in step[FlowStepInfo].outputs:
+        # TODO(amfv): Figure out if implicitly treating the logical name as an extension
+        # is actually a good idea. I think it works for the output DB, but...
+        f = ctx.actions.declare_file(step.name + "." + o)
+        outputs.append(f)
+        outputs_dict[o] = f
+        outputs_env["OUTPUT_" + o.upper()] = f.path
+
+    ctx.actions.run(
+        outputs = outputs,
+        inputs = inputs,
+        executable = step[DefaultInfo].executable,
+        tools = tool_inputs,
+        arguments = step[FlowStepInfo].arguments,
+        mnemonic = "{}({})".format(step[FlowStepInfo].executable_type, step.label.name),
+        env = dicts.add(inputs_env, outputs_env),
+        input_manifests = input_manifests,
+    )
+
+    return dicts.add(inputs_dict, outputs_dict)
+
+def _run_flow_impl(ctx):
+    if len(ctx.attr.input_names) != len(ctx.attr.input_files):
+        fail("input_names ", ctx.attr.input_names, "and input_files ", ctx.attr.input_files, "lists should have the same length")
+
+    inputs_dict = dict(pairs=zip(ctx.attr.input_names, ctx.attr.input_files))
+
+    for step in ctx.attr.flow:
+        inputs_dict = _run_step_with_inputs(inputs_dict)
+
+    return [ DefaultInfo(files = depset(inputs_dict.values())), ]
+
+run_flow = rule(
+    implementation = _run_flow_impl,
+    attrs = {
+        "flow": attr.label_list(
+            doc = "List of steps in the flow",
+            providers = [DefaultInfo, FlowStepInfo],
+            mandatory = True,
+        ),
+        "input_names": attr.string_list(
+            doc = "Names of initial flow inputs",
+        ),
+        "input_files": attr.label_list(
+            allow_files = True,
+            doc = "Files to use with the named inputs. Must have the same length as input_names",
+        ),
+    },
+)
