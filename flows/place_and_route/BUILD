@@ -14,9 +14,25 @@
 
 # Place and Route tool package.
 
+load("//flows:flows.bzl", "run_flow")
 load("//flows/place_and_route:build_defs.bzl", "openroad_step")
 
 openroad_step(
     name = "hello_openroad",
     script = "hello.tcl",
+    outputs = ["hello"],
+)
+
+openroad_step(
+    name = "goodbye_openroad",
+    script = "goodbye.tcl",
+    inputs = ["hello"],
+    outputs = ["goodbye"],
+)
+
+run_flow(
+    name = "hello_goodbye",
+    flow = ["hello_openroad", "goodbye_openroad"],
+    output_names = ["goodbye"],
+    output_files = ["goodbye.txt"],
 )
