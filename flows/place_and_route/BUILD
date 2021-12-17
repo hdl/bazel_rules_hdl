@@ -14,7 +14,7 @@
 
 # Place and Route tool package.
 
-load("//flows:flows.bzl", "run_flow")
+load("//flows:flows.bzl", "flow_to_step", "run_flow")
 load("//flows/place_and_route:build_defs.bzl", "openroad_step")
 
 openroad_step(
@@ -35,4 +35,9 @@ run_flow(
     flow = ["hello_openroad", "goodbye_openroad"],
     output_names = ["goodbye"],
     output_files = ["goodbye.txt"],
+)
+
+flow_to_step(
+    name = "hello_goodbye_bin",
+    flow = ["hello_openroad", "goodbye_openroad"],
 )

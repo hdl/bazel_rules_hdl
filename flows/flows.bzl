@@ -108,21 +108,20 @@ bind_step_inputs = rule(
 
 def _flow_to_step_impl(ctx):
     flow_script = ctx.actions.declare_file(ctx.attr.name)
-    runfiles = ctx.runfiles(files = [flow_script])
+    flow_runfiles = ctx.runfiles(files = [flow_script])
 
-    step_runfiles = []
     free_inputs = []
     flow_outputs = []
     commands = [script_prefix]
 
-    for step in ctx.attr.steps:
+    for step in ctx.attr.flow:
         for i in step[FlowStepInfo].inputs:
             if i not in free_inputs and i not in flow_outputs:
                 # INPUT_name is free if no previous step has written OUTPUT_name
                 free_inputs.append(i)
 
-        step_exec = "${{RUNFILES}}/{}".format(step[DefaultInfo].executable.short_path)
-        step_runfiles.append(step[DefaultInfo].runfiles)
+        step_exec = "${{RUNFILES}}/{}".format(step[DefaultInfo].files_to_run.executable.short_path)
+        flow_runfiles = flow_runfiles.merge(step[DefaultInfo].default_runfiles)
         step_command = " ".join([step_exec] + step[FlowStepInfo].arguments)
         commands.append(step_command)
 
@@ -131,22 +130,22 @@ def _flow_to_step_impl(ctx):
                 flow_outputs.append(o)
                 # Now that OUTPUT_name has been written, INPUT_name is no longer free.
                 # Read INPUT_name from OUTPUT_name from this point forward.
-                commands.append("INPUT_{name}=${{OUTPUT_{name}}}".format(name = o.upper()))
+                commands.append("export INPUT_{name}=${{OUTPUT_{name}}}".format(name = o.upper()))
 
-        ctx.actions.write(output = flow_script, content = "\n".join(commands) + "\n", executable = True)
+    ctx.actions.write(output = flow_script, content = "\n".join(commands) + "\n", is_executable = True)
 
-        return [
-            FlowStepInfo(
-                inputs = free_inputs,
-                outputs = flow_outputs,
-                executable_type = "flow",
-                arguments = [],
-            ),
-            DefaultInfo(
-                executable = flow_script,
-                runfiles = runfiles.merge_all(step_runfiles)
-            ),
-        ]
+    return [
+        FlowStepInfo(
+            inputs = free_inputs,
+            outputs = flow_outputs,
+            executable_type = "flow",
+            arguments = [],
+        ),
+        DefaultInfo(
+            executable = flow_script,
+            runfiles = flow_runfiles,
+        ),
+    ]
 
 # Collapse a sequence of flow steps into a single-step executable.
 flow_to_step = rule(
@@ -157,7 +156,8 @@ flow_to_step = rule(
             providers = [DefaultInfo, FlowStepInfo],
             mandatory = True,
             ),
-        }
+        },
+    executable = True,
 )
 
 def _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict):
