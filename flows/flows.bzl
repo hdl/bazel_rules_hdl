@@ -48,7 +48,7 @@ def _bind_step_inputs_impl(ctx):
     if len(bind_names) != len(bind_files):
         fail("input_names ", bind_names, "and input_files ", bind_files, "lists should have the same length")
 
-    bindings = dict(pairs=zip(bind_names, bind_files))
+    bindings = dict(zip(bind_names, bind_files))
 
     step = ctx.attr.step
 
@@ -160,9 +160,9 @@ flow_to_step = rule(
         }
 )
 
-def _run_step_with_inputs(ctx, step, inputs_dict):
+def _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict):
     # inputs and output manifests are for the runfiles of the step executable.
-    (tool_inputs, input_manifests) = ctx.resolve_tools(step[DefaultInfo].executable)
+    (tool_inputs, input_manifests) = ctx.resolve_tools(tools=[step])
 
     #The inputs_env and inputs handle the named inputs of the step.
     inputs = []
@@ -179,9 +179,12 @@ def _run_step_with_inputs(ctx, step, inputs_dict):
     outputs_dict = {}
     outputs_env = {}
     for o in step[FlowStepInfo].outputs:
-        # TODO(amfv): Figure out if implicitly treating the logical name as an extension
-        # is actually a good idea. I think it works for the output DB, but...
-        f = ctx.actions.declare_file(step.name + "." + o)
+        f = outputs_step_dict.get((step.label.name,o))
+        if f == None:
+            # TODO(amfv): Figure out if implicitly treating the logical name as an extension
+            # is actually a good idea. I think it works for the output DB, but...
+            f = ctx.actions.declare_file(step.label.name + "." + o)
+
         outputs.append(f)
         outputs_dict[o] = f
         outputs_env["OUTPUT_" + o.upper()] = f.path
@@ -189,10 +192,10 @@ def _run_step_with_inputs(ctx, step, inputs_dict):
     ctx.actions.run(
         outputs = outputs,
         inputs = inputs,
-        executable = step[DefaultInfo].executable,
+        executable = step[DefaultInfo].files_to_run.executable,
         tools = tool_inputs,
         arguments = step[FlowStepInfo].arguments,
-        mnemonic = "{}({})".format(step[FlowStepInfo].executable_type, step.label.name),
+        mnemonic = step[FlowStepInfo].executable_type,
         env = dicts.add(inputs_env, outputs_env),
         input_manifests = input_manifests,
     )
@@ -200,15 +203,35 @@ def _run_step_with_inputs(ctx, step, inputs_dict):
     return dicts.add(inputs_dict, outputs_dict)
 
 def _run_flow_impl(ctx):
-    if len(ctx.attr.input_names) != len(ctx.attr.input_files):
-        fail("input_names ", ctx.attr.input_names, "and input_files ", ctx.attr.input_files, "lists should have the same length")
+    if len(ctx.attr.output_names) != len(ctx.outputs.output_files):
+        fail("output_names ", ctx.attr.output_names, "and output_files ",
+        ctx.attr.output_files, "lists should have the same length")
 
-    inputs_dict = dict(pairs=zip(ctx.attr.input_names, ctx.attr.input_files))
+    outputs_dict = dict(zip(ctx.attr.output_names, ctx.outputs.output_files))
+
+    unhandled_outputs = []
+    unhandled_outputs.extend(ctx.attr.output_names)
+
+    outputs_step_dict = {}
+    for rstep in reversed(ctx.attr.flow):
+        for o in rstep[FlowStepInfo].outputs:
+            if o in unhandled_outputs:
+                outputs_step_dict[(rstep.label.name,o)] = outputs_dict[o]
+                unhandled_outputs.remove(o)
+
+    if unhandled_outputs:
+        fail("no step of the flow produces these outputs:", unhandled_outputs)
+
+    if len(ctx.attr.input_names) != len(ctx.attr.input_files):
+        fail("input_names ", ctx.attr.input_names, "and input_files ",
+        ctx.attr.input_files, "lists should have the same length")
+
+    inputs_dict = dict(zip(ctx.attr.input_names, ctx.attr.input_files))
 
     for step in ctx.attr.flow:
-        inputs_dict = _run_step_with_inputs(inputs_dict)
+        inputs_dict = _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict)
 
-    return [ DefaultInfo(files = depset(inputs_dict.values())), ]
+    return [ DefaultInfo(), ]
 
 run_flow = rule(
     implementation = _run_flow_impl,
@@ -224,6 +247,12 @@ run_flow = rule(
         "input_files": attr.label_list(
             allow_files = True,
             doc = "Files to use with the named inputs. Must have the same length as input_names",
+        ),
+        "output_names": attr.string_list(
+            doc = "Names of final flow outputs",
+        ),
+        "output_files": attr.output_list(
+            doc = "Files to store final output values",
         ),
     },
 )

@@ -29,7 +29,8 @@ def _openroad_step_impl(ctx):
     ]
 
     commands = [script_prefix]
-    commands.append("TCL_LIBRARY=${RUNFILES}/tk_tcl/library")
+    # TODO(amfv): Compute TCL_LIBRARY properly instead of hardcoding it.
+    commands.append("export TCL_LIBRARY=${RUNFILES}/../tk_tcl/library")
 
     exec_openroad = """{openroad} {args} "$@"\n""".format(
         openroad = "${RUNFILES}/" + openroad_executable.short_path,
@@ -46,7 +47,7 @@ def _openroad_step_impl(ctx):
             inputs = ctx.attr.inputs,
             outputs = ctx.attr.outputs,
             executable_type = "openroad",
-            arguments = ["-quiet"], # Run quietly when part of a larger flow.
+            arguments = [], # ["-quiet"], # Run quietly when part of a larger flow.
         ),
         DefaultInfo(
             executable = openroad_wrapper,
