@@ -14,8 +14,6 @@
 
 """File encapsulating the open road command"""
 
-load("//:flows.bzl", "FlowStepInfo", "script_prefix")
-
 OpenRoadInfo = provider(
     "Provider to support running openroad outside of bazel",
     fields = [
@@ -159,65 +157,3 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
     )
 
     return struct(db = output_db, log_file = log_file)
-
-def _openroad_step_impl(ctx):
-    openroad_executable = ctx.attr._openroad.files_to_run.executable
-    openroad_wrapper = ctx.actions.declare_file(ctx.attr.name)
-    runfiles = ctx.runfiles(files = [ctx.file.script, openroad_executable, openroad_wrapper])
-
-    openroad_args = [
-        "-no_init",
-        "-no_splash",
-        "-exit",
-        "${RUNFILES}/" + ctx.file.script.short_path,
-    ]
-
-    commands = [script_prefix]
-    commands.append("TCL_LIBRARY=${RUNFILES}/tk_tcl/library")
-
-    exec_openroad = """{openroad} {args} "$@"\n""".format(
-        openroad = "${RUNFILES}/" + openroad_executable.short_path,
-        args = " ".join(openroad_args)
-    )
-    commands.append(exec_openroad)
-
-    ctx.actions.write(output = openroad_wrapper,
-                      content = "\n".join(commands) + "\n",
-                      is_executable = True)
-
-    return [
-        FlowStepInfo(
-            inputs = ctx.attr.inputs,
-            outputs = ctx.attr.outputs,
-            executable_type = "openroad",
-            arguments = ["-quiet"], # Run quietly when part of a larger flow.
-        ),
-        DefaultInfo(
-            executable = openroad_wrapper,
-            runfiles = runfiles.merge(ctx.attr._openroad[DefaultInfo].default_runfiles),
-        ),
-    ]
-
-openroad_step = rule(
-    implementation = _openroad_step_impl,
-    attrs = {
-        "_openroad": attr.label(
-            default = Label("@org_theopenroadproject//:openroad"),
-            executable = True,
-            cfg = "exec",
-        ),
-        "script": attr.label(
-            doc = "OpenROAD Tcl script implementing this step.",
-            allow_single_file = [".tcl"],
-            mandatory = True,
-
-        ),
-        "inputs": attr.string_list(
-            doc = "Name of logical inputs to the Tcl script",
-        ),
-        "outputs": attr.string_list(
-            doc = "Name of logical outputs of the Tcl script",
-        ),
-    },
-    executable = True,
-)
