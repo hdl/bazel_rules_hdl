@@ -99,6 +99,9 @@ cc_binary(
         #STT
         ":stt_swig",
         ":stt_tcl",
+        #Distributed
+        ":dst_swig",
+        ":dst_tcl",
     ],
     copts = [
         "-fexceptions",
@@ -198,6 +201,9 @@ cc_library(
             "src/mpl2/src/*.h",
             #RMP
             "src/rmp/src/*.cpp",
+            #Distributed
+            "src/dst/src/*.cc",
+            "src/dst/src/*.h",
         ],
         exclude = [
             "src/Main.cc",
@@ -269,6 +275,8 @@ cc_library(
             "src/mpl2/include/mpl2/*.h",
             #RMP
             "src/rmp/include/rmp/*.h",
+            #Distributed
+            "src/dst/include/dst/*.h",
         ],
         exclude = [
             "src/utl/include/utl/Logger.h",
@@ -356,6 +364,9 @@ cc_library(
         #STT
         "src/stt/include",
         "src/stt/include/stt",
+        #Distributed
+        "src/dst/include",
+        "src/dst/include/dst",
     ],
     defines = [
       "OPENROAD_GIT_DESCRIBE=\\\"bazel_rules_hdl\\\""
@@ -374,6 +385,7 @@ cc_library(
         "@boost//:icl",
         "@boost//:polygon",
         "@boost//:graph",
+        "@boost//:asio",
         "@org_tuxfamily_eigen//:eigen3",
         "@com_github_quantamhd_lemon//:lemon",
         "@com_github_gabime_spdlog//:spdlog",
@@ -587,7 +599,7 @@ tcl_encode(
 tcl_encode(
     name = "triton_cts_tcl",
     srcs = [
-        "src/cts/src/tritoncts.tcl",
+        "src/cts/src/TritonCTS.tcl",
     ],
     char_array_name = "cts_tcl_inits",
 )
@@ -658,11 +670,33 @@ tcl_encode(
 )
 
 tcl_encode(
+    name = "dst_tcl",
+    srcs = [
+        "src/dst/src/Distributed.tcl",
+    ],
+    char_array_name = "dst_tcl_inits",
+)
+
+tcl_encode(
     name = "stt_tcl",
     srcs = [
         "src/stt/src/SteinerTreeBuilder.tcl",
     ],
     char_array_name = "stt_tcl_inits",
+)
+
+tcl_wrap_cc(
+    name = "dst_swig",
+    srcs = [
+        "src/dst/src/Distributed.i",
+        ":error_swig",
+    ],
+    module = "dst",
+    namespace_prefix = "dst",
+    root_swig_src = "src/dst/src/Distributed.i",
+    swig_includes = [
+        "src/dst/src",
+    ],
 )
 
 tcl_wrap_cc(
@@ -828,12 +862,12 @@ tcl_wrap_cc(
 tcl_wrap_cc(
     name = "triton_cts_swig",
     srcs = [
-        "src/cts/src/tritoncts.i",
+        "src/cts/src/TritonCTS.i",
         ":error_swig",
     ],
     module = "cts",
     namespace_prefix = "cts",
-    root_swig_src = "src/cts/src/tritoncts.i",
+    root_swig_src = "src/cts/src/TritonCTS.i",
     swig_includes = [
         "src/cts/src",
     ],
