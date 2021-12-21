@@ -21,9 +21,10 @@ def boost():
     maybe(
         git_repository,
         name = "com_github_nelhage_rules_boost",
-        commit = "1e3a69bf2d5cd10c34b74f066054cd335d033d71",
+        # This equivalent to boost 1.78
+        commit = "c8b9b4a75c4301778d2e256b8d72ce47a6c9a1a4",
         remote = "https://github.com/nelhage/rules_boost",
-        shallow_since = "1591047380 -0700",
+        shallow_since = "1640124117 -0800",
         patches = [
             # rules_boost does not include Boost Python, see
             # https://github.com/nelhage/rules_boost/issues/67
