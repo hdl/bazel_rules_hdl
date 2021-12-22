@@ -16,14 +16,14 @@
 
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
 load("//pdk:open_road_configuration.bzl", "assert_has_open_road_configuration")
-load("//place_and_route:private/floorplan.bzl", "init_floor_plan")
-load("//place_and_route:private/place_pins.bzl", "place_pins")
-load("//place_and_route:private/pdn_gen.bzl", "pdn_gen")
-load("//place_and_route:private/global_placement.bzl", "global_placement")
-load("//place_and_route:private/resize.bzl", "resize")
-load("//place_and_route:private/clock_tree_synthesis.bzl", "clock_tree_synthesis")
-load("//place_and_route:private/global_routing.bzl", "global_routing")
-load("//place_and_route:private/detailed_routing.bzl", "detailed_routing")
+load("//place_and_route/private:floorplan.bzl", "init_floor_plan")
+load("//place_and_route/private:place_pins.bzl", "place_pins")
+load("//place_and_route/private:pdn_gen.bzl", "pdn_gen")
+load("//place_and_route/private:global_placement.bzl", "global_placement")
+load("//place_and_route/private:resize.bzl", "resize")
+load("//place_and_route/private:clock_tree_synthesis.bzl", "clock_tree_synthesis")
+load("//place_and_route/private:global_routing.bzl", "global_routing")
+load("//place_and_route/private:detailed_routing.bzl", "detailed_routing")
 
 def _place_and_route_impl(ctx):
     # Throws an error if there is no OpenROAD configuration
@@ -46,6 +46,10 @@ def _place_and_route_impl(ctx):
     output_files.append(open_road_provider.power_results)
     output_files.append(open_road_provider.area_results)
     output_files.extend(open_road_provider.logs.to_list())
+
+    command_file = ctx.actions.declare_file("{}_commands.tcl".format(ctx.attr.name))
+    ctx.actions.write(command_file, content = "\n".join(open_road_provider.commands))
+    output_files.append(command_file)
 
     return [
         DefaultInfo(files = depset(output_files)),
