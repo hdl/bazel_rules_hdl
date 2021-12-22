@@ -47,6 +47,10 @@ def _place_and_route_impl(ctx):
     output_files.append(open_road_provider.area_results)
     output_files.extend(open_road_provider.logs.to_list())
 
+    command_file = ctx.actions.declare_file("{}_commands.tcl".format(ctx.attr.name))
+    ctx.actions.write(command_file, content = "\n".join(open_road_provider.commands))
+    output_files.append(command_file)
+
     return [
         DefaultInfo(files = depset(output_files)),
         open_road_provider,

@@ -68,9 +68,10 @@ def init_floor_plan(ctx):
         "read_lef {tech_lef}".format(
             tech_lef = tech_lef.path,
         ),
-        "{std_cell_lef}".format(
-            std_cell_lef = "\n".join(["read_lef {}".format(file.path) for file in std_cell_lef]),
-        ),
+    ]
+    for file in std_cell_lef:
+        open_road_commands.append("read_lef {}".format(file.path))
+    open_road_commands.extend([
         "read_liberty {liberty}".format(
             liberty = liberty.path,
         ),
@@ -84,7 +85,7 @@ def init_floor_plan(ctx):
         "source {tracks_file}".format(
             tracks_file = open_road_configuration.tracks_file.path,
         ),
-    ]
+    ])
 
     input_open_road_files = [
         netlist,
