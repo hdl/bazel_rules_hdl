@@ -31,11 +31,20 @@ def global_placement(ctx, open_road_info):
     """
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
     liberty = ctx.attr.synthesized_rtl[SynthesisInfo].standard_cell_info.default_corner.liberty
+    rc_script = open_road_configuration.rc_script_configuration
+
+    input_open_road_files = [
+        liberty,
+    ]
+
+    if rc_script:
+        input_open_road_files.append(rc_script)
 
     open_road_commands = [
         "read_liberty {liberty}".format(
             liberty = liberty.path,
         ),
+        "source {}".format(rc_script.path) if rc_script else "",
         "set_wire_rc -signal -layer \"{}\"".format(open_road_configuration.wire_rc_signal_metal_layer),
         "set_wire_rc -clock  -layer \"{}\"".format(open_road_configuration.wire_rc_clock_metal_layer),
         "global_placement -timing_driven -density {density} -init_density_penalty 8e-5 -pad_left {pad_left} -pad_right {pad_right}".format(
@@ -43,10 +52,6 @@ def global_placement(ctx, open_road_info):
             pad_left = open_road_configuration.global_placement_cell_pad,
             pad_right = open_road_configuration.global_placement_cell_pad,
         ),
-    ]
-
-    input_open_road_files = [
-        liberty,
     ]
 
     command_output = openroad_command(

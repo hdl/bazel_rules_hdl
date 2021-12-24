@@ -61,6 +61,18 @@ def _synthesize_design_impl(ctx):
     args.add_all("-l", [log_file])  # put output in log file
     args.add_all("-c", [synth_tcl])  # run synthesis tcl script
 
+    env = {
+        "FLIST": verilog_flist.path,
+        "TOP": ctx.attr.top_module,
+        "OUTPUT": output_file.path,
+        "LIBERTY": default_liberty_file.path,
+        "YOSYS_DATDIR": yosys_runfiles_dir + "/at_clifford_yosys/techlibs/",
+        "ABC": yosys_runfiles_dir + "/edu_berkeley_abc/abc",
+    }
+
+    if ctx.attr.target_clock_period_pico_seconds:
+        env["CLOCK_PERIOD"] = str(ctx.attr.target_clock_period_pico_seconds)
+
     ctx.actions.run(
         outputs = [output_file, log_file],
         inputs = inputs + tool_inputs.to_list() + [default_liberty_file],
@@ -68,14 +80,7 @@ def _synthesize_design_impl(ctx):
         executable = ctx.executable.yosys_tool,
         tools = tool_inputs,
         input_manifests = input_manifests,
-        env = {
-            "FLIST": verilog_flist.path,
-            "TOP": ctx.attr.top_module,
-            "OUTPUT": output_file.path,
-            "LIBERTY": default_liberty_file.path,
-            "YOSYS_DATDIR": yosys_runfiles_dir + "/at_clifford_yosys/techlibs/",
-            "ABC": yosys_runfiles_dir + "/edu_berkeley_abc/abc",
-        },
+        env = env,
         mnemonic = "SythesizingRTL",
     )
 
@@ -108,5 +113,6 @@ synthesize_rtl = rule(
             allow_single_file = True,
             doc = "Tcl synthesis script compatible with the environment-variable API of synth.tcl",
         ),
+        "target_clock_period_pico_seconds": attr.int(doc = "target clock period in picoseconds"),
     },
 )
