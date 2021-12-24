@@ -37,6 +37,7 @@ OpenRoadPdkInfo = provider(
         "tie_low_port": "Tie low port",
         "tie_high_port": "Tie high port",
         "tie_separation": "Tie sepearation value",
+        "rc_script_configuration": "RC script for the various metal layers",
     },
 )
 
@@ -63,6 +64,7 @@ def _open_road_pdk_configuration_impl(ctx):
             tie_low_port = ctx.attr.tie_low_port,
             tie_high_port = ctx.attr.tie_high_port,
             tie_separation = ctx.attr.tie_separation,
+            rc_script_configuration = ctx.file.rc_script_configuration,
         ),
     ]
 
@@ -89,6 +91,7 @@ open_road_pdk_configuration = rule(
         "tie_low_port": attr.string(mandatory = True),
         "tie_high_port": attr.string(mandatory = True),
         "tie_separation": attr.int(mandatory = True),
+        "rc_script_configuration": attr.label(allow_single_file = True),
     },
 )
 

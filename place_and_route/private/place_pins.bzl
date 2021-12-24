@@ -34,7 +34,7 @@ def place_pins(ctx, open_road_info):
 
     open_road_commands = [
         "remove_buffers",
-        "place_pins -random -random_seed 900913 -hor_layers {hor_layers} -ver_layers {ver_layers}".format(
+        "place_pins -hor_layers {hor_layers} -ver_layers {ver_layers}".format(
             hor_layers = open_road_configuration.pin_horizontal_metal_layer,
             ver_layers = open_road_configuration.pin_vertical_metal_layer,
         ),

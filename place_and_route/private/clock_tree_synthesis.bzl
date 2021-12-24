@@ -32,14 +32,24 @@ def clock_tree_synthesis(ctx, open_road_info):
     netlist_target = ctx.attr.synthesized_rtl
     liberty = netlist_target[SynthesisInfo].standard_cell_info.default_corner.liberty
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
+    rc_script = open_road_configuration.rc_script_configuration
+
+    inputs = [
+        liberty,
+    ]
+
+    if rc_script:
+        inputs.append(rc_script)
 
     open_road_commands = [
         "read_liberty {liberty_file}".format(
             liberty_file = liberty.path,
         ),
+        "source {}".format(rc_script.path) if rc_script else "",
         "create_clock [get_ports clk] -period {period}".format(
             period = ctx.attr.clock_period,
         ),
+        "remove_buffers",
         "set_wire_rc -signal -layer \"{}\"".format(open_road_configuration.wire_rc_signal_metal_layer),
         "set_wire_rc -clock  -layer \"{}\"".format(open_road_configuration.wire_rc_clock_metal_layer),
         format_openroad_do_not_use_list(open_road_configuration.do_not_use_cell_list),
@@ -60,10 +70,6 @@ def clock_tree_synthesis(ctx, open_road_info):
             filler_cells = " ".join(open_road_configuration.fill_cells),
         ),
         "check_placement",
-    ]
-
-    inputs = [
-        liberty,
     ]
 
     command_output = openroad_command(
