@@ -16,11 +16,12 @@
 
 load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
-load("//place_and_route/private:report_area.bzl", "generate_area_results")
+load("//place_and_route:private/report_area.bzl", "generate_area_results")
 load("//pdk:open_road_configuration.bzl", "get_open_road_configuration")
 
 def _generate_power_results(output_file, liberty):
-    return [
+    nl = "\\n"
+    return "\n".join([
         "set power_result [sta::design_power [sta::parse_corner {}]]",
         "set fp [open \"{output_file}\" w+]".format(
             output_file = output_file.path,
@@ -31,7 +32,7 @@ def _generate_power_results(output_file, liberty):
         ),
         "puts $fp \"power_maginitude: \\\"[sta::unit_scale_abreviation \"power\"]\\\"\"",
         "close $fp",
-    ]
+    ])
 
 def _global_routing_layer_adjustments(adjustments):
     adjustment_command = "{"
@@ -96,9 +97,9 @@ foreach layer_adjustment {global_routing_layer_adjustments} {{
         "report_design_area",
         "report_units",
         "set_power_activity -input -activity 1 -duty 0.5",
+        _generate_power_results(power_results, liberty),
+        generate_area_results(area_results),
     ]
-    open_road_commands.extend(_generate_power_results(power_results, liberty))
-    open_road_commands.extend(generate_area_results(area_results))
 
     inputs = [
         liberty,

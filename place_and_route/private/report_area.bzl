@@ -22,11 +22,12 @@ def generate_area_results(output_file):
     Args:
         output_file: The output textproto.
     """
-    return [
+    nl = "\\n"
+    return "\n".join([
         "set design_area [sta::format_area [rsz::design_area] 0]",
         "set fp [open \"{output_file}\" w+]".format(
             output_file = output_file.path,
         ),
         "puts $fp \"area_micro_meters_squared: ${design_area}\"",
         "close $fp",
-    ]
+    ])

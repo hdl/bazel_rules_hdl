@@ -96,29 +96,31 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
         outputs: openroad command outpus
         execution_requirements: the remote executor tags.
     """
+    command_input = "\n".join(commands) if type(commands) == "list" else commands
 
     input_hash = hash(" ".join([file.path for file in inputs]))
-    command_hash = hash("\n".join(commands))
-
+    command_hash = hash(command_input)
     output_db = None
+
     if step_name:
         output_db = ctx.actions.declare_file("{}__{}.db".format(ctx.attr.name, step_name))
     else:
         output_db = ctx.actions.declare_file("{}{}.db".format(input_hash, command_hash))
 
-    real_commands = []
-    if input_db:
-        real_commands.append("read_db {}".format(input_db.path))
-    real_commands.extend(commands)
-    real_commands.append("write_db {}".format(output_db.path))
-
     # This is here to make it easy to append to the input arguments of the run command.
     # Otherwise it would fail when no input_db is provided.
     input_db_dependency = [input_db] if input_db else []
 
+    command = "{read_input}\n{command_input}\n{write_db}\n".format(
+        # Optional read_db command added if input file was provided
+        read_input = "read_db {}".format(input_db.path) if input_db else "",
+        command_input = command_input,
+        write_db = "write_db {}".format(output_db.path),
+    )
+
     file_name = "{}_script.tcl".format(output_db.basename[:-(len(output_db.extension) + 1)])
     command_file = ctx.actions.declare_file(file_name)
-    ctx.actions.write(command_file, content = "\n".join(real_commands))
+    ctx.actions.write(command_file, content = command)
 
     (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr._openroad])
     openroad_runfiles_dir = ctx.executable._openroad.path + ".runfiles"
