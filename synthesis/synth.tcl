@@ -41,3 +41,6 @@ if { [info exists ::env(CLOCK_PERIOD) ] } {
 # write synthesized design
 set output $::env(OUTPUT)
 write_verilog $output
+
+# print stats
+stat
