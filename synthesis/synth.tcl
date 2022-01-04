@@ -11,7 +11,7 @@
 
 yosys -import
 
-# read design
+# Read design
 set srcs_flist_path $::env(FLIST)
 set srcs_flist_file [open $srcs_flist_path "r"]
 set srcs_flist_data [read $srcs_flist_file]
@@ -24,11 +24,11 @@ foreach src $srcs {
     yosys read_verilog -sv -defer $src
 }
 
-# generic synthesis
+# Generic synthesis
 set top $::env(TOP)
 yosys synth -top $top
 
-# mapping to liberty
+# Mapping to liberty
 set liberty $::env(LIBERTY)
 dfflibmap -liberty $liberty
 
@@ -38,9 +38,9 @@ if { [info exists ::env(CLOCK_PERIOD) ] } {
   abc -liberty $liberty -dff -g aig
 }
 
-# write synthesized design
+# Write synthesized design
 set output $::env(OUTPUT)
 write_verilog $output
 
-# print stats
+# Print stat
 stat
