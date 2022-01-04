@@ -27,9 +27,6 @@ OpenRoadInfo = provider(
         "general_routing_power_results",
         "general_routing_area_results",
         "logs",
-        # TODO: These are only kept to not break OpenROAD power/area testing. Remove them asap.
-        "power_results",
-        "area_results",
     ],
 )
 
@@ -72,9 +69,6 @@ def merge_open_road_info(left, right):
     general_routing_power_results = _merge_right(left, right, "general_routing_power_results")
     general_routing_area_results = _merge_right(left, right, "general_routing_area_results")
 
-    power_results = _merge_right(left, right, "power_results")
-    area_results = _merge_right(left, right, "area_results")
-
     return OpenRoadInfo(
         commands = left.commands + right.commands,
         input_files = depset([], transitive = [left.input_files, right.input_files]),
@@ -86,8 +80,6 @@ def merge_open_road_info(left, right):
         verilog_based_area_results = verilog_based_area_results,
         general_routing_power_results = general_routing_power_results,
         general_routing_area_results = general_routing_area_results,
-        power_results = power_results,
-        area_results = area_results,
     )
 
 def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = [], outputs = [], execution_requirements = {}):

@@ -88,7 +88,7 @@ def init_floor_plan(ctx):
         _initialize_floorplan_command(ctx),
         "source {tracks_file}".format(
             tracks_file = open_road_configuration.tracks_file.path,
-        )
+        ),
     ])
     open_road_commands.extend(generate_power_results(ctx, verilog_based_power_results))
     open_road_commands.extend(generate_area_results(verilog_based_area_results))

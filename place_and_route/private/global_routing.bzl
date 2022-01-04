@@ -124,8 +124,6 @@ foreach layer_adjustment {global_routing_layer_adjustments} {{
         routing_guide = route_guide,
         general_routing_power_results = general_routing_power_results,
         general_routing_area_results = general_routing_area_results,
-        power_results = general_routing_power_results,
-        area_results = general_routing_area_results,
     )
 
     return merge_open_road_info(open_road_info, current_action_open_road_info)
