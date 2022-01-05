@@ -46,9 +46,6 @@ def clock_tree_synthesis(ctx, open_road_info):
             liberty_file = liberty.path,
         ),
         "source {}".format(rc_script.path) if rc_script else "",
-        "create_clock [get_ports clk] -period {period}".format(
-            period = ctx.attr.clock_period,
-        ),
         "remove_buffers",
         "set_wire_rc -signal -layer \"{}\"".format(open_road_configuration.wire_rc_signal_metal_layer),
         "set_wire_rc -clock  -layer \"{}\"".format(open_road_configuration.wire_rc_clock_metal_layer),
