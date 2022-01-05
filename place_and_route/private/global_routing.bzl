@@ -69,9 +69,6 @@ def global_routing(ctx, open_road_info):
         "read_liberty {liberty_file}".format(
             liberty_file = liberty.path,
         ),
-        "create_clock [get_ports clk] -period {period}".format(
-            period = ctx.attr.clock_period,
-        ),
         """
 foreach layer_adjustment {global_routing_layer_adjustments} {{
     lassign $layer_adjustment layer adjustment
