@@ -16,16 +16,16 @@
 
 load("//flows:flows.bzl", "FlowStepInfo", "script_prefix")
 
-def _openroad_step_impl(ctx):
+def assemble_openroad_step(ctx, wrapper_name, script_file, step_runfiles):
     openroad_executable = ctx.attr._openroad.files_to_run.executable
-    openroad_wrapper = ctx.actions.declare_file(ctx.attr.name)
-    runfiles = ctx.runfiles(files = [ctx.file.script, openroad_executable, openroad_wrapper])
+    openroad_wrapper = ctx.actions.declare_file(wrapper_name)
+    runfiles = ctx.runfiles(files = [script_file, openroad_executable, openroad_wrapper])
 
     openroad_args = [
         "-no_init",
         "-no_splash",
         "-exit",
-        "${RUNFILES}/" + ctx.file.script.short_path,
+        "${RUNFILES}/" + script_file.short_path,
     ]
 
     commands = [script_prefix]
@@ -45,6 +45,8 @@ def _openroad_step_impl(ctx):
         is_executable = True,
     )
 
+    openroad_runfiles = ctx.attr._openroad[DefaultInfo].default_runfiles
+
     return [
         FlowStepInfo(
             inputs = ctx.attr.inputs,
@@ -54,9 +56,13 @@ def _openroad_step_impl(ctx):
         ),
         DefaultInfo(
             executable = openroad_wrapper,
-            runfiles = runfiles.merge(ctx.attr._openroad[DefaultInfo].default_runfiles),
+            # TODO(amfv): Switch to runfiles.merge_all once our minimum Bazel version provides it.
+            runfiles = runfiles.merge(step_runfiles).merge(openroad_runfiles),
         ),
     ]
+
+def _openroad_step_impl(ctx):
+    return assemble_openroad_step(ctx, ctx.attr.name, ctx.file.script, ctx.runfiles())
 
 # Rule for creating a generic openroad step that consumes inputs and produces outputs
 # as files (without using any Bazel providers).
