@@ -55,6 +55,8 @@ def _openroad_step_impl(ctx):
         ),
     ]
 
+# Rule for creating a generic openroad step that consumes inputs and produces outputs
+# as files (without using any Bazel providers).
 openroad_step = rule(
     implementation = _openroad_step_impl,
     attrs = {
