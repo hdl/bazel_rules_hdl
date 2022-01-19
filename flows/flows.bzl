@@ -22,7 +22,8 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 # If you set the following environment variables:
 # RUNFILES=root of a directory tree with the runfiles of the step executable.
 # INPUT_<input_i.upper()>=path to each input file read by this step
-# OUTPUT_<output_i.upper()>=patch to each output file written by this step
+# OUTPUT_<output_i.upper()>=path to each output file written by this step
+# CONSTANT_<constant_i.upper()>=string constants used by this step
 # bazel run :step -- <extra arguments>
 # will run the flow step, generating the outputs from the inputs.
 # Any extra arguments after -- in the bazel run command will be passed to the
@@ -32,6 +33,7 @@ FlowStepInfo = provider(
     fields = {
         "inputs": "Lowercase strings naming logical file inputs of a flow step.",
         "outputs": "Lowercase strings naming logical file outputs of a flow step.",
+        "constants": "Lowercase strings naming string constants used by a flow step.",
         "executable_type": "Type of executable implementing this flow step (e.g. openroad, yosys, etc.).",
         "arguments": "Extra arguments to pass when running this step as part of a larger flow",
     },
@@ -77,6 +79,7 @@ def _bind_step_inputs_impl(ctx):
         FlowStepInfo(
             inputs = new_inputs,
             outputs = step[FlowStepInfo].outputs,
+            constants = step[FlowStepInfo].constants,
             executable_type = step[FlowStepInfo].executable_type,
             arguments = step[FlowStepInfo].arguments,
         ),
@@ -167,7 +170,7 @@ def _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict):
     # inputs and output manifests are for the runfiles of the step executable.
     (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [step])
 
-    #The inputs_env and inputs handle the named inputs of the step.
+    # The inputs_env and inputs handle the named inputs of the step.
     inputs = []
     inputs_env = {}
 
@@ -192,6 +195,13 @@ def _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict):
         outputs_dict[o] = f
         outputs_env["OUTPUT_" + o.upper()] = f.path
 
+    constants_env = {}
+    for c in step[FlowStepInfo].constants:
+        s = ctx.attr.constants.get(c)
+        if s == None:
+            fail("Required constant", c, "not found in constants dictionary", ctx.attr.constants)
+        constants_env["CONSTANT_" + c.upper()] = s
+
     ctx.actions.run(
         outputs = outputs,
         inputs = inputs,
@@ -199,7 +209,7 @@ def _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict):
         tools = tool_inputs,
         arguments = step[FlowStepInfo].arguments,
         mnemonic = step[FlowStepInfo].executable_type,
-        env = dicts.add(inputs_env, outputs_env),
+        env = dicts.add(constants_env, inputs_env, outputs_env),
         input_manifests = input_manifests,
     )
 
@@ -266,6 +276,9 @@ run_flow = rule(
         ),
         "output_files": attr.output_list(
             doc = "Files to store final output values",
+        ),
+        "constants": attr.string_dict(
+            doc = "String constants to use when running the flow",
         ),
     },
 )
