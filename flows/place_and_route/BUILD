@@ -14,6 +14,8 @@
 
 # Place and Route tool package.
 
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("//flows:flows.bzl", "flow_binary", "run_flow")
 load("//flows/place_and_route:build_defs.bzl", "openroad_step")
 
@@ -34,7 +36,7 @@ openroad_step(
 run_flow(
     name = "hello_goodbye",
     constants = {
-        "name": "TestConstant",
+        "name": "TestName",
     },
     flow = [
         "hello_openroad",
@@ -42,6 +44,12 @@ run_flow(
     ],
     output_files = ["goodbye.txt"],
     output_names = ["goodbye"],
+)
+
+diff_test(
+    name = "openroad_step_smoke",
+    file1 = "goodbye.txt",
+    file2 = "goodbye.txt.golden",
 )
 
 flow_binary(
