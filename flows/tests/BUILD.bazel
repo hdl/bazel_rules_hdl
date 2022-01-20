@@ -14,6 +14,7 @@
 
 # Modular hardware flow tests
 
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//flows:flows.bzl", "flow_binary", "run_flow")
 load("//flows/place_and_route:build_defs.bzl", "openroad_step")
@@ -57,4 +58,19 @@ flow_binary(
         "hello_openroad",
         "goodbye_openroad",
     ],
+)
+
+run_flow(
+    name = "synth_sky130_adder",
+    constants = {"top": "adder"},
+    flow = ["//flows/yosys:synth_sky130"],
+    input_files = ["verilog_adder.v"],
+    input_names = ["rtl"],
+    output_files = ["sky130_adder_test.v"],
+    output_names = ["netlist"],
+)
+
+build_test(
+    name = "synth_sky130_smoke",
+    targets = [":synth_sky130_adder"],
 )
