@@ -1,0 +1,40 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Synthesis tool package.
+
+package(default_visibility = ["//flows:__subpackages__"])
+
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
+load("//flows:flows.bzl", "flow_binary")
+load("//flows/yosys:build_defs.bzl", "yosys_synth_file_step")
+
+exports_files(["synth.tcl"])
+
+yosys_synth_file_step(
+    name = "synth_sky130",
+    standard_cells = "@com_google_skywater_pdk_sky130_fd_sc_hd//:sky130_fd_sc_hd",
+)
+
+flow_binary(
+    name = "synth_sky130_bin",
+    flow = ["synth_sky130"],
+)
+
+pkg_tar(
+    name = "synth_sky130_pkg",
+    srcs = [":synth_sky130_bin"],
+    include_runfiles = True,
+    strip_prefix = "./",
+)
