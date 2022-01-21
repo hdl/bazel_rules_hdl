@@ -48,6 +48,10 @@ def assemble_openroad_step(
         "-no_init",
         "-no_splash",
         "-exit",
+        # Put metrics in a default file if the output location is not set.
+        "-metrics ${{OUTPUT_METRICS:-{name}_metrics.json}}".format(
+            name = ctx.attr.name,
+        ),
         "${RUNFILES}/" + script_file.short_path,
     ]
 
@@ -70,10 +74,13 @@ def assemble_openroad_step(
 
     openroad_runfiles = ctx.attr._openroad[DefaultInfo].default_runfiles
 
+    # Any openroad step can produce a metrics JSON file
+    full_outputs = outputs if "metrics" in outputs else outputs + ["metrics"]
+
     return [
         FlowStepInfo(
             inputs = inputs,
-            outputs = outputs,
+            outputs = full_outputs,
             constants = constants,
             executable_type = "openroad",
             arguments = [],  # ["-quiet"], # Run quietly when part of a larger flow.
