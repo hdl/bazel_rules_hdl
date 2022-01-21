@@ -1,4 +1,4 @@
-//Copyright 2021 Google LLC
+//Copyright 2022 Google LLC
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -13,12 +13,29 @@
 //limitations under the License.
 
 
-module adder(
-  input [7:0] x,
-  input [7:0] y,
-  input carry_in,
-  output carry_output_bit,
+module adder_reg(
+  input        clk,
+  input [7:0]  x,
+  input [7:0]  y,
+  input        carry_in,
+  output       carry_output_bit,
   output [7:0] sum,
 );
-  assign {carry_output_bit, sum} = x + y + carry_in;
+
+  reg [8:0]    full_sum_reg;
+  reg [7:0]    x_reg;
+  reg [7:0]    y_reg;
+  reg          carry_in_reg;
+
+  assign carry_output_bit = full_sum_reg[8];
+  assign sum = full_sum_reg[7:0];
+
+  always @(posedge clk)
+    begin
+      x_reg <= x;
+      y_reg <= y;
+      carry_in_reg <= carry_in;
+      full_sum_reg <= x_reg + y_reg + carry_in_reg;
+    end
+
 endmodule
