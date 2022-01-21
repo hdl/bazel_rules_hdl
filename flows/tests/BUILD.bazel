@@ -62,9 +62,9 @@ flow_binary(
 
 run_flow(
     name = "synth_sky130_adder",
-    constants = {"top": "adder"},
+    constants = {"top": "adder_reg"},
     flow = ["//flows/yosys:synth_sky130"],
-    input_files = ["verilog_adder.v"],
+    input_files = ["adder_reg.v"],
     input_names = ["rtl"],
     output_files = ["sky130_adder_test.v"],
     output_names = ["netlist"],
