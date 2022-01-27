@@ -30,6 +30,15 @@ def init(python_interpreter = None, python_interpreter_target = None):
     the default None value, but if the outside workspace has a custom Python
     toolchain configured, these must be set, otherwise @bazel_rules_hdl will
     not use the right Python toolchain when installing pip dependencies.
+
+    Args:
+      python_interpreter: Path to external Python interpreter to use with
+      `pip_install`. This can be an absolute path or relative to the host's
+      `PATH` environment variable.
+      python_interpreter_target: Bazel target of a Python interpreter to build
+      to use with `pip_install`. Using `python_interpreter_target` makes it
+      possible to have a hermetic Python toolchain. `python_interpreter_target`
+      takes precedence over `python_interpreter` if both are set.
     """
     pip_install(
         name = "rules_hdl_pip_deps",
