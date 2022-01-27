@@ -16,7 +16,7 @@
 
 load("//flows:flows.bzl", "FlowStepInfo", "script_prefix")
 
-def assemble_openroad_step(
+def _assemble_openroad_step(
         ctx,
         wrapper_name,
         script_file,
@@ -70,7 +70,7 @@ def assemble_openroad_step(
     ]
 
 def _openroad_step_impl(ctx):
-    return assemble_openroad_step(
+    return _assemble_openroad_step(
         ctx,
         ctx.attr.name,
         ctx.file.script,
