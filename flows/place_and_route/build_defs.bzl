@@ -29,25 +29,28 @@ def _openroad_step_impl(ctx):
     ]
 
     commands = [script_prefix]
+
     # TODO(amfv): Compute TCL_LIBRARY properly instead of hardcoding it.
     commands.append("export TCL_LIBRARY=${RUNFILES}/../tk_tcl/library")
 
     exec_openroad = """{openroad} {args} "$@"\n""".format(
         openroad = "${RUNFILES}/" + openroad_executable.short_path,
-        args = " ".join(openroad_args)
+        args = " ".join(openroad_args),
     )
     commands.append(exec_openroad)
 
-    ctx.actions.write(output = openroad_wrapper,
-                      content = "\n".join(commands) + "\n",
-                      is_executable = True)
+    ctx.actions.write(
+        output = openroad_wrapper,
+        content = "\n".join(commands) + "\n",
+        is_executable = True,
+    )
 
     return [
         FlowStepInfo(
             inputs = ctx.attr.inputs,
             outputs = ctx.attr.outputs,
             executable_type = "openroad",
-            arguments = [], # ["-quiet"], # Run quietly when part of a larger flow.
+            arguments = [],  # ["-quiet"], # Run quietly when part of a larger flow.
         ),
         DefaultInfo(
             executable = openroad_wrapper,
@@ -69,7 +72,6 @@ openroad_step = rule(
             doc = "OpenROAD Tcl script implementing this step.",
             allow_single_file = [".tcl"],
             mandatory = True,
-
         ),
         "inputs": attr.string_list(
             doc = "Name of logical inputs to the Tcl script",
