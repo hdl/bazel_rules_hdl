@@ -30,11 +30,11 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 FlowStepInfo = provider(
     "Provider that captures metadata about an individual flow step",
     fields = {
-        "inputs" : "Uppercase strings naming logical file inputs of a flow step.",
-        "outputs" : "Uppercase strings naming logical file outputs of a flow step.",
-        "executable_type" : "Type of executable implementing this flow step (e.g. openroad, yosys, etc.).",
-        "arguments" : "Extra arguments to pass when running this step as part of a larger flow",
-    }
+        "inputs": "Lowercase strings naming logical file inputs of a flow step.",
+        "outputs": "Lowercase strings naming logical file outputs of a flow step.",
+        "executable_type": "Type of executable implementing this flow step (e.g. openroad, yosys, etc.).",
+        "arguments": "Extra arguments to pass when running this step as part of a larger flow",
+    },
 )
 
 script_prefix = """
@@ -57,17 +57,19 @@ def _bind_step_inputs_impl(ctx):
     new_inputs = [i for i in step_inputs if i not in used_bindings.keys()]
 
     env_bindings = [
-        "export INPUT_{}=${{RUNFILES}}/{}".format (n,f.short_path)
-        for (n,f) in used_bindings.items()
+        "export INPUT_{}=${{RUNFILES}}/{}".format(n, f.short_path)
+        for (n, f) in used_bindings.items()
     ]
 
     step_executable = step[DefaultInfo].executable
     exec_step = """${{RUNFILES}}/{} "$@"\n""".format(step_executable.short_path)
 
     bind_script = ctx.actions.declare_file(ctx.attr.name)
-    ctx.actions.write(output=bind_script,
-                      content = "\n".join([script_prefix] + env_bindings + [exec_step]),
-                      is_executable = True)
+    ctx.actions.write(
+        output = bind_script,
+        content = "\n".join([script_prefix] + env_bindings + [exec_step]),
+        is_executable = True,
+    )
 
     new_runfiles = ctx.runfiles(files = [step_executable] + used_bindings.values())
 
@@ -89,24 +91,24 @@ def _bind_step_inputs_impl(ctx):
 bind_step_inputs = rule(
     implementation = _bind_step_inputs_impl,
     attrs = {
-        "step" : attr.label(
+        "step": attr.label(
             doc = "Base step with inputs to bind",
             executable = True,
             providers = [DefaultInfo, FlowStepInfo],
             mandatory = True,
             cfg = "exec",
-            ),
-        "input_names" : attr.string_list(
+        ),
+        "input_names": attr.string_list(
             doc = "Names of logical step inputs to bind. May include extra inputs",
-            ),
-        "input_files" : attr.label_list(
+        ),
+        "input_files": attr.label_list(
             allow_files = True,
             doc = "Files to use with the bound inputs. Must have the same length as input_names",
         ),
-    }
+    },
 )
 
-def _flow_to_step_impl(ctx):
+def _flow_binary_impl(ctx):
     flow_script = ctx.actions.declare_file(ctx.attr.name)
     flow_runfiles = ctx.runfiles(files = [flow_script])
 
@@ -128,6 +130,7 @@ def _flow_to_step_impl(ctx):
         for o in step[FlowStepInfo].outputs:
             if o not in flow_outputs:
                 flow_outputs.append(o)
+
                 # Now that OUTPUT_name has been written, INPUT_name is no longer free.
                 # Read INPUT_name from OUTPUT_name from this point forward.
                 commands.append("export INPUT_{name}=${{OUTPUT_{name}}}".format(name = o.upper()))
@@ -148,21 +151,21 @@ def _flow_to_step_impl(ctx):
     ]
 
 # Collapse a sequence of flow steps into a single-step executable.
-flow_to_step = rule(
-    implementation = _flow_to_step_impl,
+flow_binary = rule(
+    implementation = _flow_binary_impl,
     attrs = {
         "flow": attr.label_list(
             doc = "List of steps in the flow",
             providers = [DefaultInfo, FlowStepInfo],
             mandatory = True,
-            ),
-        },
+        ),
+    },
     executable = True,
 )
 
 def _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict):
     # inputs and output manifests are for the runfiles of the step executable.
-    (tool_inputs, input_manifests) = ctx.resolve_tools(tools=[step])
+    (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [step])
 
     #The inputs_env and inputs handle the named inputs of the step.
     inputs = []
@@ -179,7 +182,7 @@ def _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict):
     outputs_dict = {}
     outputs_env = {}
     for o in step[FlowStepInfo].outputs:
-        f = outputs_step_dict.get((step.label.name,o))
+        f = outputs_step_dict.get((step.label.name, o))
         if f == None:
             # TODO(amfv): Figure out if implicitly treating the logical name as an extension
             # is actually a good idea. I think it works for the output DB, but...
@@ -204,8 +207,13 @@ def _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict):
 
 def _run_flow_impl(ctx):
     if len(ctx.attr.output_names) != len(ctx.outputs.output_files):
-        fail("output_names ", ctx.attr.output_names, "and output_files ",
-        ctx.attr.output_files, "lists should have the same length")
+        fail(
+            "output_names ",
+            ctx.attr.output_names,
+            "and output_files ",
+            ctx.attr.output_files,
+            "lists should have the same length",
+        )
 
     outputs_dict = dict(zip(ctx.attr.output_names, ctx.outputs.output_files))
 
@@ -216,22 +224,27 @@ def _run_flow_impl(ctx):
     for rstep in reversed(ctx.attr.flow):
         for o in rstep[FlowStepInfo].outputs:
             if o in unhandled_outputs:
-                outputs_step_dict[(rstep.label.name,o)] = outputs_dict[o]
+                outputs_step_dict[(rstep.label.name, o)] = outputs_dict[o]
                 unhandled_outputs.remove(o)
 
     if unhandled_outputs:
         fail("no step of the flow produces these outputs:", unhandled_outputs)
 
     if len(ctx.attr.input_names) != len(ctx.attr.input_files):
-        fail("input_names ", ctx.attr.input_names, "and input_files ",
-        ctx.attr.input_files, "lists should have the same length")
+        fail(
+            "input_names ",
+            ctx.attr.input_names,
+            "and input_files ",
+            ctx.attr.input_files,
+            "lists should have the same length",
+        )
 
     inputs_dict = dict(zip(ctx.attr.input_names, ctx.attr.input_files))
 
     for step in ctx.attr.flow:
         inputs_dict = _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict)
 
-    return [ DefaultInfo(), ]
+    return [DefaultInfo()]
 
 run_flow = rule(
     implementation = _run_flow_impl,
