@@ -17,7 +17,7 @@
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//flows:flows.bzl", "flow_binary", "run_flow")
-load("//flows/place_and_route:build_defs.bzl", "openroad_step")
+load("//flows/openroad:build_defs.bzl", "openroad_step")
 
 openroad_step(
     name = "hello_openroad",
