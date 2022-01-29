@@ -16,7 +16,7 @@
 
 load("//flows:flows.bzl", "FlowStepInfo", "script_prefix")
 
-def _assemble_openroad_step(
+def assemble_openroad_step(
         ctx,
         wrapper_name,
         script_file,
@@ -24,6 +24,19 @@ def _assemble_openroad_step(
         inputs = [],
         outputs = ["db"],
         constants = []):
+    """Builds the executable script and FlowStepInfo for an OpenROAD step
+    from the required components. Requires an OpenROAD executable available
+    at ctx.attr._openroad.
+
+    Args:
+      ctx: Context object for the rule assembling this OpenROAD step.
+      wrapper_name: Name of the generated shell script that invokes OpenROAD.
+      script_file: File containing Tcl commands to execute to implement this step.
+      step_runfiles: Runfiles required by those Tcl commands.
+      inputs: Logical names for the file inputs required by this step.
+      outputs: Logical names for the file outputs produced by this step.
+      contants: Logical names for the string constants used by this step.
+    """
     openroad_executable = ctx.attr._openroad.files_to_run.executable
     openroad_wrapper = ctx.actions.declare_file(wrapper_name)
     runfiles = ctx.runfiles(files = [script_file, openroad_executable, openroad_wrapper])
@@ -70,7 +83,7 @@ def _assemble_openroad_step(
     ]
 
 def _openroad_step_impl(ctx):
-    return _assemble_openroad_step(
+    return assemble_openroad_step(
         ctx,
         ctx.attr.name,
         ctx.file.script,
