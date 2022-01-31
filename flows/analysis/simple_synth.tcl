@@ -12,6 +12,7 @@ yosys read_verilog -sv -defer $input_rtl
 
 # generic synthesis
 yosys synth -top $top
+setundef -zero
 
 # mapping to liberty
 set liberty $::env(LIBERTY)
