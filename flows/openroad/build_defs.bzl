@@ -25,11 +25,11 @@ def assemble_openroad_step(
         outputs = ["db"],
         constants = []):
     """Builds the executable script and FlowStepInfo for an OpenROAD step
-    from the required components. Requires an OpenROAD executable available
-    at ctx.attr._openroad.
+    from the required components.
 
     Args:
-      ctx: Context object for the rule assembling this OpenROAD step.
+      ctx: Context object for the rule assembling this OpenROAD step. Must
+      contain an OpenROAD executable at ctx.attr._openroad.
       wrapper_name: Name of the generated shell script that invokes OpenROAD.
       script_file: File containing Tcl commands to execute to implement this step.
       step_runfiles: Runfiles required by those Tcl commands.
