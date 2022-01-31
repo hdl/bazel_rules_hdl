@@ -44,6 +44,8 @@ script_prefix = """
 export RUNFILES="${RUNFILES:-$0.runfiles/rules_hdl}"
 """
 
+tcl_script_prefix = "set runfiles_dir $::env(RUNFILES)"
+
 def _bind_step_inputs_impl(ctx):
     bind_names = ctx.attr.input_names
     bind_files = ctx.attr.input_files
