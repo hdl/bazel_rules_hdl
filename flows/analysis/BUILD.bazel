@@ -34,3 +34,24 @@ analyze_rtl_binary(
     analysis_script = "pipeline_balance.tcl",
     constants = ["clock_port"],
 )
+
+analyze_rtl_binary(
+    name = "critical_path_asap7",
+    standard_cells = "@org_theopenroadproject_asap7//:asap7_rvt_1x",
+    analysis_script = "critical_path.tcl",
+    constants = ["clock_port"],
+)
+
+analyze_rtl_binary(
+    name = "reg2reg_path_asap7",
+    standard_cells = "@org_theopenroadproject_asap7//:asap7_rvt_1x",
+    analysis_script = "reg2reg_path.tcl",
+    constants = ["clock_port", "reg_start", "reg_end"],
+)
+
+analyze_rtl_binary(
+    name = "pipeline_balance_asap7",
+    standard_cells = "@org_theopenroadproject_asap7//:asap7_rvt_1x",
+    analysis_script = "pipeline_balance.tcl",
+    constants = ["clock_port"],
+)
