@@ -15,6 +15,7 @@
 """Reimplementing place-and-route using composable and externalizable pieces"""
 
 load("//flows:flows.bzl", "FlowStepInfo", "script_prefix")
+load("//pdk:build_defs.bzl", "StandardCellInfo")
 
 def assemble_openroad_step(
         ctx,
@@ -120,3 +121,40 @@ openroad_step = rule(
     },
     executable = True,
 )
+
+def read_standard_cells(ctx):
+    """Generate Tcl commands and runfiles to read standard cells with OpenROAD.
+
+    Args:
+      ctx: Context object fo the rule bulding an OpenROAD script. Must contain
+    the relevant StandardCellInfo at ctx.attr.standard_cells.
+    """
+
+    standard_cells = ctx.attr.standard_cells[StandardCellInfo]
+
+    tech_lef = standard_cells.tech_lef
+
+    commands = [
+        "read_lef [file join $runfiles_dir {tech_lef}]".format(
+            tech_lef = tech_lef.short_path,
+        ),
+    ]
+
+    std_cell_lef = standard_cells.cell_lef_definitions
+    for cell_lef in std_cell_lef:
+        commands.append(
+            "read_lef [file join $runfiles_dir {cell_lef}]".format(
+                cell_lef = cell_lef.short_path,
+            ),
+        )
+
+    liberty = standard_cells.default_corner.liberty
+    commands.extend([
+        "read_liberty [file join $runfiles_dir {liberty}]".format(
+            liberty = liberty.short_path,
+        ),
+    ])
+
+    runfiles = ctx.runfiles(files = [tech_lef, liberty] + std_cell_lef)
+
+    return (commands, runfiles)
