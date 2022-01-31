@@ -21,3 +21,10 @@ analyze_rtl_binary(
     constants = ["clock_port"],
 )
 
+analyze_rtl_binary(
+    name = "reg2reg_path_sky130",
+    standard_cells = "@com_google_skywater_pdk_sky130_fd_sc_hd//:sky130_fd_sc_hd",
+    analysis_script = "reg2reg_path.tcl",
+    constants = ["clock_port", "reg_start", "reg_end"],
+)
+
