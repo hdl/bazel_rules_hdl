@@ -1,4 +1,4 @@
-# Copyright 2021 Google LLC
+# Copyright 2021-2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,6 +44,15 @@ place_and_route(
 synthesize_rtl(
     name = "verilog_counter_synth",
     top_module = "counter",
+    deps = [
+        ":verilog_counter",
+    ],
+)
+
+synthesize_rtl(
+    name = "verilog_counter_asap7_synth",
+    top_module = "counter",
+    standard_cells = "@org_theopenroadproject_asap7//:asap7_rvt_1x",
     deps = [
         ":verilog_counter",
     ],
