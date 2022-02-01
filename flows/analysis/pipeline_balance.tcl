@@ -41,14 +41,14 @@ set critical_path_length [get_worst_path_length $all_timing_paths]
 puts stderr "Critical path length is $critical_path_length\n"
 
 set start_nets [get_nets "p0_*"]
-puts stderr "Pipeline stage 0: [llength $start_nets] nets"
+# puts stderr "Pipeline stage 0: [llength $start_nets] nets"
 set start_instances [get_register_instances $start_nets]
-puts stderr "Pipeline stage 0: [llength $start_instances] instances\n"
+# puts stderr "Pipeline stage 0: [llength $start_instances] instances\n"
 
 set end_nets [get_nets "p1_*"]
-puts stderr "Pipeline stage 1: [llength $end_nets] nets"
+# puts stderr "Pipeline stage 1: [llength $end_nets] nets"
 set end_instances [get_register_instances $end_nets]
-puts stderr "Pipeline stage 1: [llength $end_instances] instances"
+# puts stderr "Pipeline stage 1: [llength $end_instances] instances"
 
 set stage 1
 while {[llength $start_instances] > 0} {
@@ -59,8 +59,8 @@ while {[llength $start_instances] > 0} {
 
     if {[llength $end_instances] > 0} {
             if { $stage > 1 } {
-                puts stderr "Pipeline stage $stage [llength $end_nets] nets"
-                puts stderr "Pipeline stage $stage [llength $end_instances] instances"
+                # puts stderr "Pipeline stage $stage [llength $end_nets] nets"
+                # puts stderr "Pipeline stage $stage [llength $end_instances] instances"
             }
         set stage_paths [find_timing_paths -from $start_instances -to $end_instances -sort_by_slack -endpoint_count 101 -group_count 101]
 
