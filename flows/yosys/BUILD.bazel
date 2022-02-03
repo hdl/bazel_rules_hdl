@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Synthesis tool package.
-
-package(default_visibility = ["//flows:__subpackages__"])
+# Yosys synthesis step for modular flows.
 
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("//flows:flows.bzl", "flow_binary")
 load("//flows/yosys:build_defs.bzl", "yosys_synth_file_step")
+
+package(default_visibility = ["//flows:__subpackages__"])
 
 exports_files(["synth.tcl"])
 
