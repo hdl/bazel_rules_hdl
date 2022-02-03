@@ -32,8 +32,8 @@ def _yosys_synth_file_step_impl(ctx):
     cell_runfiles = ctx.runfiles(files = [synth_tcl, liberty, yosys_wrapper])
 
     yosys_args = [
-        # "-q", # quiet mode only errors printed to stderr
-        # "-q", # second q don't print warnings
+        "-q",  # quiet mode only errors printed to stderr
+        "-q",  # second q don't print warnings
         "-Q",  # Don't print header
         "-T",  # Don't print footer
         "-c ${RUNFILES}/" + synth_tcl.short_path,
