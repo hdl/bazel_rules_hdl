@@ -70,7 +70,26 @@ run_flow(
     output_names = ["netlist"],
 )
 
+# TODO(amfv): This only tests that adding the clock period constant
+# does not break synthesis. Figure out how to test that the clock
+# period is actually used properly.
+run_flow(
+    name = "synth_sky130_adder_with_clock_period",
+    constants = {
+        "clock_period_ps": "2000",
+        "top": "adder",
+    },
+    flow = ["//flows/yosys:synth_sky130"],
+    input_files = ["verilog_adder.v"],
+    input_names = ["rtl"],
+    output_files = ["sky130_adder_with_clock_period_test.v"],
+    output_names = ["netlist"],
+)
+
 build_test(
     name = "synth_sky130_smoke",
-    targets = [":synth_sky130_adder"],
+    targets = [
+        ":synth_sky130_adder",
+        ":synth_sky130_adder_with_clock_period",
+    ],
 )

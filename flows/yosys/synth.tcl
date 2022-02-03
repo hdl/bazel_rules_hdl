@@ -16,11 +16,11 @@ yosys synth -top $top
 set liberty $::env(LIBERTY)
 dfflibmap -liberty $liberty
 
-#if { [info exists ::env(CLOCK_PERIOD) ] } {
-#  abc -liberty $liberty -dff -g aig -D $::env(CLOCK_PERIOD)
-#} else {
-  abc -liberty $liberty -dff -g aig
-#}
+if { [info exists ::env(CONSTANT_CLOCK_PERIOD_PS) ] } {
+    abc -liberty $liberty -dff -g aig -D $::env(CONSTANT_CLOCK_PERIOD_PS)
+} else {
+    abc -liberty $liberty -dff -g aig
+}
 
 # write synthesized design
 set output $::env(OUTPUT_NETLIST)
