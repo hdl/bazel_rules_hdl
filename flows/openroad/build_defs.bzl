@@ -25,8 +25,7 @@ def assemble_openroad_step(
         inputs = [],
         outputs = ["db"],
         constants = []):
-    """Builds the executable script and FlowStepInfo for an OpenROAD step
-    from the required components.
+    """Builds the executable script and FlowStepInfo for an OpenROAD step from the required components.
 
     Args:
       ctx: Context object for the rule assembling this OpenROAD step. Must
@@ -36,7 +35,10 @@ def assemble_openroad_step(
       step_runfiles: Runfiles required by those Tcl commands.
       inputs: Logical names for the file inputs required by this step.
       outputs: Logical names for the file outputs produced by this step.
-      contants: Logical names for the string constants used by this step.
+      constants: Logical names for the string constants used by this step.
+
+    Returns:
+      FlowStepInfo and DefaultInfo providers for the assembled step.
     """
     openroad_executable = ctx.attr._openroad.files_to_run.executable
     openroad_wrapper = ctx.actions.declare_file(wrapper_name)
@@ -128,6 +130,10 @@ def read_standard_cells(ctx):
     Args:
       ctx: Context object fo the rule bulding an OpenROAD script. Must contain
     the relevant StandardCellInfo at ctx.attr.standard_cells.
+
+    Returns:
+      A tuple of the generated Tcl commands and associated runfiles for reading
+    the standard cells from ctx.attr.standard_cells.
     """
 
     standard_cells = ctx.attr.standard_cells[StandardCellInfo]

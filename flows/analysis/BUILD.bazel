@@ -16,42 +16,50 @@ load("//flows/analysis:build_defs.bzl", "analyze_rtl_binary")
 
 analyze_rtl_binary(
     name = "critical_path_sky130",
-    standard_cells = "@com_google_skywater_pdk_sky130_fd_sc_hd//:sky130_fd_sc_hd",
     analysis_script = "critical_path.tcl",
     constants = ["clock_port"],
+    standard_cells = "@com_google_skywater_pdk_sky130_fd_sc_hd//:sky130_fd_sc_hd",
 )
 
 analyze_rtl_binary(
     name = "reg2reg_path_sky130",
-    standard_cells = "@com_google_skywater_pdk_sky130_fd_sc_hd//:sky130_fd_sc_hd",
     analysis_script = "reg2reg_path.tcl",
-    constants = ["clock_port", "reg_start", "reg_end"],
+    constants = [
+        "clock_port",
+        "reg_start",
+        "reg_end",
+    ],
+    standard_cells = "@com_google_skywater_pdk_sky130_fd_sc_hd//:sky130_fd_sc_hd",
 )
 
 analyze_rtl_binary(
     name = "pipeline_balance_sky130",
-    standard_cells = "@com_google_skywater_pdk_sky130_fd_sc_hd//:sky130_fd_sc_hd",
     analysis_script = "pipeline_balance.tcl",
     constants = ["clock_port"],
+    standard_cells = "@com_google_skywater_pdk_sky130_fd_sc_hd//:sky130_fd_sc_hd",
 )
 
 analyze_rtl_binary(
     name = "critical_path_asap7",
-    standard_cells = "@org_theopenroadproject_asap7//:asap7_rvt_1x",
     analysis_script = "critical_path.tcl",
     constants = ["clock_port"],
+    standard_cells = "@org_theopenroadproject_asap7//:asap7_rvt_1x",
 )
 
 analyze_rtl_binary(
     name = "reg2reg_path_asap7",
-    standard_cells = "@org_theopenroadproject_asap7//:asap7_rvt_1x",
     analysis_script = "reg2reg_path.tcl",
-    constants = ["clock_port", "reg_start", "reg_end"],
+    constants = [
+        "clock_port",
+        "reg_start",
+        "reg_end",
+    ],
+    standard_cells = "@org_theopenroadproject_asap7//:asap7_rvt_1x",
 )
 
 analyze_rtl_binary(
     name = "pipeline_balance_asap7",
-    standard_cells = "@org_theopenroadproject_asap7//:asap7_rvt_1x",
     analysis_script = "pipeline_balance.tcl",
     constants = ["clock_port"],
+    standard_cells = "@org_theopenroadproject_asap7//:asap7_rvt_1x",
 )
