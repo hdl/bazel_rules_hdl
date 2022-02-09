@@ -14,7 +14,7 @@
 
 """Design analysis utilities written using modular hardware flows."""
 
-load("//flows:flows.bzl", "FlowStepInfo", "flow_binary", "tcl_script_prefix")
+load("//flows:flows.bzl", "flow_binary", "tcl_script_prefix")
 load("//flows/openroad:build_defs.bzl", "assemble_openroad_step", "read_standard_cells")
 load("//flows/yosys:build_defs.bzl", "yosys_synth_file_step")
 load("//pdk:build_defs.bzl", "StandardCellInfo")
@@ -92,6 +92,18 @@ def analyze_rtl_binary(
         outputs = [],
         constants = [],
         yosys_script = "//flows/analysis:simple_synth.tcl"):
+    """Build an RTL analysis binary out of a flow that includes Yosys synthesis and OpenROAD analysis.
+
+    Args:
+      name: Name for the generated analysis binary.
+      standard_cells: StandardCellInfo provider for the cells used by Yosys and OpenROAD.
+      analysis_script: Tcl script used for OpenROAD analysis.
+      inputs: Names of logical inputs for the generated flow (beyond the rtl input for synthesis).
+      outputs: Names of logical outputs for the generated flow.
+      constants: Names of string constants required by the flow (beyond top).
+      yosys_script: Tcl script used for Yosys synthesis, defaults to //flows/analysis:simple_synth.tcl
+    """
+
     yosys_step = name + "_yosys_step"
     yosys_synth_file_step(name = yosys_step, standard_cells = standard_cells, synth_tcl = yosys_script)
 
