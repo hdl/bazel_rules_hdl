@@ -77,10 +77,10 @@ run_flow(
     name = "synth_sky130_adder_with_clock_period",
     constants = {
         "clock_period_ps": "2000",
-        "top": "adder",
+        "top": "adder_reg",
     },
     flow = ["//flows/yosys:synth_sky130"],
-    input_files = ["verilog_adder.v"],
+    input_files = ["adder_reg.v"],
     input_names = ["rtl"],
     output_files = ["sky130_adder_with_clock_period_test.v"],
     output_names = ["netlist"],
