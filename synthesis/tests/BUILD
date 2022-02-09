@@ -51,8 +51,8 @@ synthesize_rtl(
 
 synthesize_rtl(
     name = "verilog_counter_asap7_synth",
-    top_module = "counter",
     standard_cells = "@org_theopenroadproject_asap7//:asap7_rvt_1x",
+    top_module = "counter",
     deps = [
         ":verilog_counter",
     ],
