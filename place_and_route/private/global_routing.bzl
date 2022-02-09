@@ -20,20 +20,6 @@ load("//place_and_route:private/report_area.bzl", "generate_area_results")
 load("//place_and_route:private/report_power.bzl", "generate_power_results")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
 
-def _generate_power_results(output_file, liberty):
-    return [
-        "set power_result [sta::design_power [sta::parse_corner {}]]",
-        "set fp [open \"{output_file}\" w+]".format(
-            output_file = output_file.path,
-        ),
-        "puts $fp \"total_package_power_watts: [lindex $power_result 3]\"",
-        "puts $fp \"corner: \\\"{corner}\\\"\"".format(
-            corner = liberty.basename[:-(len(liberty.extension) + 1)],
-        ),
-        "puts $fp \"power_maginitude: \\\"[sta::unit_scale_abreviation \"power\"]\\\"\"",
-        "close $fp",
-    ]
-
 def _global_routing_layer_adjustments(adjustments):
     adjustment_command = "{"
     for layer, value in adjustments.items():

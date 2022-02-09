@@ -17,7 +17,7 @@
 
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 
-def iverilog_compile(srcs, flags = "", name = ""):
+def iverilog_compile(srcs, flags = ""):
     """Compiles the first .v files given in srcs into a .vvp file.
 
     Passes the flags to iverilog.
