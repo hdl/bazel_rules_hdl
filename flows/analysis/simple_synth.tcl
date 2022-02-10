@@ -7,7 +7,6 @@ puts stderr "Yosys synthesis started for module $top in $input_rtl."
 yosys -import
 
 # read design
-
 yosys read_verilog -sv -defer $input_rtl
 
 # generic synthesis
