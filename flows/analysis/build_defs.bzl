@@ -104,10 +104,15 @@ def analyze_rtl_binary(
       yosys_script: Tcl script used for Yosys synthesis, defaults to //flows/analysis:simple_synth.tcl
     """
 
-    yosys_step = name + "_yosys_step"
-    yosys_synth_file_step(name = yosys_step, standard_cells = standard_cells, synth_tcl = yosys_script)
+    yosys_step = "_" + name + "_yosys_step"
+    yosys_synth_file_step(
+        name = yosys_step,
+        standard_cells = standard_cells,
+        synth_tcl = yosys_script,
+        visibility = ["//visibility:private"],
+    )
 
-    analysis_step = name + "_analysis_step"
+    analysis_step = "_" + name + "_analysis_step"
     analyze_netlist_step(
         name = analysis_step,
         inputs = ["netlist"] + inputs,
@@ -115,6 +120,7 @@ def analyze_rtl_binary(
         constants = ["top"] + constants,
         analysis_script = analysis_script,
         standard_cells = standard_cells,
+        visibility = ["//visibility:private"],
     )
 
     flow_binary(name = name, flow = [yosys_step, analysis_step])
