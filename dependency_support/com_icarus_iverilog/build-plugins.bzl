@@ -17,7 +17,7 @@
 
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 
-def iverilog_compile(srcs, flags = ""):
+def iverilog_compile(srcs, flags = "", name = ""):
     """Compiles the first .v files given in srcs into a .vvp file.
 
     Passes the flags to iverilog.
@@ -38,7 +38,7 @@ def iverilog_compile(srcs, flags = ""):
 
     # Creates a dummy test which will force the .vvp file production.
     native.sh_test(
-        name = "force_on_test_build_" + vvp_file,
+        name = "dummy_iverilog_compile_test_" + name + "_" + vvp_file,
         srcs = ["@rules_hdl//dependency_support/com_icarus_iverilog:dummy.sh"],
         data = [vvp_file],
     )
