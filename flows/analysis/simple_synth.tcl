@@ -19,7 +19,7 @@ dfflibmap -liberty $liberty
 
 # -keepff ensures that there will be nets for the source registers
 # in the netlist output, supporting further analysis
-abc -liberty $liberty -dff -g aig -keepff
+abc -liberty $liberty -g aig -keepff
 
 # write synthesized design
 set output $::env(OUTPUT_NETLIST)
