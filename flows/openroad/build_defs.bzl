@@ -15,8 +15,9 @@
 """Reimplementing place-and-route using composable and externalizable pieces"""
 
 load("//flows:flows.bzl", "FlowStepInfo", "script_prefix")
+load("//pdk:build_defs.bzl", "StandardCellInfo")
 
-def _assemble_openroad_step(
+def assemble_openroad_step(
         ctx,
         wrapper_name,
         script_file,
@@ -24,6 +25,21 @@ def _assemble_openroad_step(
         inputs = [],
         outputs = ["db"],
         constants = []):
+    """Builds the executable script and FlowStepInfo for an OpenROAD step from the required components.
+
+    Args:
+      ctx: Context object for the rule assembling this OpenROAD step. Must
+      contain an OpenROAD executable at ctx.attr._openroad.
+      wrapper_name: Name of the generated shell script that invokes OpenROAD.
+      script_file: File containing Tcl commands to execute to implement this step.
+      step_runfiles: Runfiles required by those Tcl commands.
+      inputs: Logical names for the file inputs required by this step.
+      outputs: Logical names for the file outputs produced by this step.
+      constants: Logical names for the string constants used by this step.
+
+    Returns:
+      FlowStepInfo and DefaultInfo providers for the assembled step.
+    """
     openroad_executable = ctx.attr._openroad.files_to_run.executable
     openroad_wrapper = ctx.actions.declare_file(wrapper_name)
     runfiles = ctx.runfiles(files = [script_file, openroad_executable, openroad_wrapper])
@@ -32,6 +48,10 @@ def _assemble_openroad_step(
         "-no_init",
         "-no_splash",
         "-exit",
+        # Put metrics in a default file if the output location is not set.
+        "-metrics ${{OUTPUT_METRICS:-{name}_metrics.json}}".format(
+            name = ctx.attr.name,
+        ),
         "${RUNFILES}/" + script_file.short_path,
     ]
 
@@ -54,10 +74,13 @@ def _assemble_openroad_step(
 
     openroad_runfiles = ctx.attr._openroad[DefaultInfo].default_runfiles
 
+    # Any openroad step can produce a metrics JSON file
+    full_outputs = outputs if "metrics" in outputs else outputs + ["metrics"]
+
     return [
         FlowStepInfo(
             inputs = inputs,
-            outputs = outputs,
+            outputs = full_outputs,
             constants = constants,
             executable_type = "openroad",
             arguments = [],  # ["-quiet"], # Run quietly when part of a larger flow.
@@ -70,7 +93,7 @@ def _assemble_openroad_step(
     ]
 
 def _openroad_step_impl(ctx):
-    return _assemble_openroad_step(
+    return assemble_openroad_step(
         ctx,
         ctx.attr.name,
         ctx.file.script,
@@ -107,3 +130,44 @@ openroad_step = rule(
     },
     executable = True,
 )
+
+def read_standard_cells(ctx):
+    """Generate Tcl commands and runfiles to read standard cells with OpenROAD.
+
+    Args:
+      ctx: Context object fo the rule bulding an OpenROAD script. Must contain
+    the relevant StandardCellInfo at ctx.attr.standard_cells.
+
+    Returns:
+      A tuple of the generated Tcl commands and associated runfiles for reading
+    the standard cells from ctx.attr.standard_cells.
+    """
+
+    standard_cells = ctx.attr.standard_cells[StandardCellInfo]
+
+    tech_lef = standard_cells.tech_lef
+
+    commands = [
+        "read_lef [file join $runfiles_dir {tech_lef}]".format(
+            tech_lef = tech_lef.short_path,
+        ),
+    ]
+
+    std_cell_lef = standard_cells.cell_lef_definitions
+    for cell_lef in std_cell_lef:
+        commands.append(
+            "read_lef [file join $runfiles_dir {cell_lef}]".format(
+                cell_lef = cell_lef.short_path,
+            ),
+        )
+
+    liberty = standard_cells.default_corner.liberty
+    commands.extend([
+        "read_liberty [file join $runfiles_dir {liberty}]".format(
+            liberty = liberty.short_path,
+        ),
+    ])
+
+    runfiles = ctx.runfiles(files = [tech_lef, liberty] + std_cell_lef)
+
+    return (commands, runfiles)

@@ -20,7 +20,6 @@ load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load(":cell_libraries.bzl", "CELL_LIBRARIES")
 
 def _build_file(workspace_name, library_name):
-    library = CELL_LIBRARIES[library_name]
     return """
 load("@rules_hdl//dependency_support/com_google_skywater_pdk:declare_cell_library.bzl", "declare_cell_library")
 declare_cell_library("{}", "{}")
