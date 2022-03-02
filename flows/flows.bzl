@@ -44,6 +44,8 @@ script_prefix = """
 export RUNFILES="${RUNFILES:-$0.runfiles/rules_hdl}"
 """
 
+tcl_script_prefix = "set runfiles_dir $::env(RUNFILES)"
+
 def _bind_step_inputs_impl(ctx):
     bind_names = ctx.attr.input_names
     bind_files = ctx.attr.input_files
@@ -215,6 +217,13 @@ def _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict):
 
     return dicts.add(inputs_dict, outputs_dict)
 
+def target_to_file(target):
+    all_files = target.files.to_list()
+    if len(all_files) != 1:
+        fail("Input target", target, "should provide exactly one file instead of", all_files)
+
+    return all_files[0]
+
 def _run_flow_impl(ctx):
     if len(ctx.attr.output_names) != len(ctx.outputs.output_files):
         fail(
@@ -249,7 +258,9 @@ def _run_flow_impl(ctx):
             "lists should have the same length",
         )
 
-    inputs_dict = dict(zip(ctx.attr.input_names, ctx.attr.input_files))
+    input_files = [target_to_file(target) for target in ctx.attr.input_files]
+
+    inputs_dict = dict(zip(ctx.attr.input_names, input_files))
 
     for step in ctx.attr.flow:
         inputs_dict = _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict)
