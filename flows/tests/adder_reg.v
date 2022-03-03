@@ -19,7 +19,7 @@ module adder_reg(
   input [7:0]  y,
   input        carry_in,
   output       carry_output_bit,
-  output [7:0] sum,
+  output [7:0] sum
 );
 
   reg [8:0]    full_sum_reg;

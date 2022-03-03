@@ -67,7 +67,10 @@ analyze_rtl_binary(
 analyze_rtl_binary(
     name = "characterize_sky130",
     analysis_script = "characterize.tcl",
-    constants = ["clock_port", "clock_period_ps"],
+    constants = [
+        "clock_port",
+        "clock_period_ps",
+    ],
     outputs = ["metrics"],
     standard_cells = "@com_google_skywater_pdk_sky130_fd_sc_hd//:sky130_fd_sc_hd",
 )
@@ -75,7 +78,10 @@ analyze_rtl_binary(
 analyze_rtl_binary(
     name = "characterize_asap7",
     analysis_script = "characterize.tcl",
-    constants = ["clock_port", "clock_period_ps"],
+    constants = [
+        "clock_port",
+        "clock_period_ps",
+    ],
     outputs = ["metrics"],
     standard_cells = "@org_theopenroadproject_asap7//:asap7_rvt_1x",
 )
