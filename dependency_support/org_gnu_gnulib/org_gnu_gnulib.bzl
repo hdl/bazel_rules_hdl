@@ -119,6 +119,8 @@ static const char * _replaced_get_charset_aliases (void)
         "static _Noreturn void": "static _Noreturn __attribute_noreturn__ void",
     })
 
+    ctx.patch(Label("@rules_hdl//dependency_support/org_gnu_gnulib:stop_using_sigstksz.patch"))
+
 _org_gnu_gnulib = repository_rule(
     __org_gnu_gnulib,
 )
