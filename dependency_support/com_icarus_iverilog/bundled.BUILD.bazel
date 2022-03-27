@@ -372,9 +372,11 @@ cc_binary(
     linkopts = [
         "-ldl",
         "-Wl,-u," + ",-u,".join(ivl_def),
-        "-Wl,--export-dynamic",
         "-Wl,-no-pie",
-    ],
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": ["-Wl,-export_dynamic"],
+        "//conditions:default": ["-Wl,--export-dynamic"],
+    }),
     deps = [
         "ivl-misc",
         ":shared_headers",
@@ -529,8 +531,10 @@ cc_binary(
     linkopts = [
         "-ldl",
         "-Wl,-u," + ",-u,".join(vvp_def),
-        "-Wl,--export-dynamic",
-    ],
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": ["-Wl,-export_dynamic"],
+        "//conditions:default": ["-Wl,--export-dynamic"],
+    }),
     deps = [
         ":shared_headers",
         ":vpi_user",
