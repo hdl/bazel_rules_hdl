@@ -15,7 +15,7 @@
 """Global placement openROAD commands"""
 
 load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command")
-load("//pdk:open_road_configuration.bzl", "get_open_road_configuration")
+load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
 
 def global_placement(ctx, open_road_info):

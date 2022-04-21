@@ -14,8 +14,17 @@
 
 """Rules for synthesizing (System)Verilog code."""
 
-load("//pdk:build_defs.bzl", "StandardCellInfo")
+load("@rules_hdl//pdk:build_defs.bzl", "StandardCellInfo")
 load("//verilog:providers.bzl", "VerilogInfo")
+
+# There are no rules to generate this provider, but it does provide the mechansim to build
+# rules based on surelog in the open source world.
+UhdmInfo = provider(
+    "Surelog/UHDM based RTL representation",
+    fields = {
+        "uhdm": "UHDM file representing the rtl circuit",
+    },
+)
 
 # Args:
 #    standard_cell_info: The StandardCellInfo provider this target was synthesized against.
@@ -29,13 +38,32 @@ def _transitive_srcs(deps):
         transitive = [dep[VerilogInfo].dag for dep in deps],
     )
 
-def _synthesize_design_impl(ctx):
-    transitive_srcs = _transitive_srcs(ctx.attr.deps)
-    verilog_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs.to_list()]
+def _create_flist(ctx, flist_tag, files):
+    flist = ctx.actions.declare_file("{}_{}.flist".format(flist_tag, ctx.attr.name))
+    ctx.actions.write(flist, "\n".join([f.path for f in files]) + "\n")
+    return flist
 
+def _synthesize_design_impl(ctx):
+    transitive_srcs = _transitive_srcs([dep for dep in ctx.attr.deps if VerilogInfo in dep])
+    verilog_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs.to_list()]
     verilog_files = [src for sub_tuple in verilog_srcs for src in sub_tuple]
-    verilog_flist = ctx.actions.declare_file("{}.flist".format(ctx.attr.name))
-    ctx.actions.write(verilog_flist, "\n".join([f.path for f in verilog_files]) + "\n")
+
+    verilog_flist = _create_flist(
+        ctx,
+        flist_tag = "verilog",
+        files = verilog_files,
+    )
+
+    uhdm_files = depset(
+        [],
+        transitive = [dep[UhdmInfo].uhdm for dep in ctx.attr.deps if UhdmInfo in dep],
+    ).to_list()
+
+    uhdm_flist = _create_flist(
+        ctx,
+        flist_tag = "uhdm",
+        files = uhdm_files,
+    )
 
     output_file = ctx.actions.declare_file("{}_synth_output.v".format(ctx.attr.name))
     default_liberty_file = ctx.attr.standard_cells[StandardCellInfo].default_corner.liberty
@@ -45,6 +73,8 @@ def _synthesize_design_impl(ctx):
     inputs = []
     inputs.extend(verilog_files)
     inputs.append(verilog_flist)
+    inputs.append(uhdm_flist)
+    inputs.extend(uhdm_files)
     inputs.append(synth_tcl)
 
     (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr.yosys_tool])
@@ -63,6 +93,7 @@ def _synthesize_design_impl(ctx):
 
     env = {
         "FLIST": verilog_flist.path,
+        "UHDM_FLIST": uhdm_flist.path,
         "TOP": ctx.attr.top_module,
         "OUTPUT": output_file.path,
         "LIBERTY": default_liberty_file.path,
@@ -101,7 +132,7 @@ synthesize_rtl = rule(
             providers = [StandardCellInfo],
             default = "@com_google_skywater_pdk_sky130_fd_sc_hd//:sky130_fd_sc_hd",
         ),
-        "deps": attr.label_list(providers = [VerilogInfo]),
+        "deps": attr.label_list(providers = [[VerilogInfo], [UhdmInfo]]),
         "top_module": attr.string(default = "top"),
         "yosys_tool": attr.label(
             default = Label("@at_clifford_yosys//:yosys"),

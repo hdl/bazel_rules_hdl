@@ -15,7 +15,7 @@
 """These build rules run automated place and route on a synthesized netlist"""
 
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
-load("//pdk:open_road_configuration.bzl", "assert_has_open_road_configuration")
+load("@rules_hdl//pdk:open_road_configuration.bzl", "assert_has_open_road_configuration")
 load("//place_and_route:private/floorplan.bzl", "init_floor_plan")
 load("//place_and_route:private/place_pins.bzl", "place_pins")
 load("//place_and_route:private/pdn_gen.bzl", "pdn_gen")
@@ -81,12 +81,12 @@ place_and_route = rule(
             doc = "Whether to run detailed routing on a remote executor. If the detailed routing exceeds 15 minutes flip this setting.",
         ),
         "clock_period": attr.string(
-            mandatory = True,
             doc = """
           The amount of time a single clock period lasts. Bazel doesn't support floats so enter the clock period as a decimal in string form.
           The units currently depend on the PDK you're targeting. The default PDK is sky130 and it uses nano seconds for ASAP7 it is pico seconds.
           """,
         ),
+        "clocks": attr.string_dict(),
         "die_width_microns": attr.int(),
         "die_height_microns": attr.int(),
         "core_padding_microns": attr.int(mandatory = True),

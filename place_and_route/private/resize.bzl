@@ -16,7 +16,7 @@
 
 load("//place_and_route:open_road.bzl", "OpenRoadInfo", "format_openroad_do_not_use_list", "merge_open_road_info", "openroad_command")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
-load("//pdk:open_road_configuration.bzl", "get_open_road_configuration")
+load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
 
 def resize(ctx, open_road_info):
     """Performs resizing operation of the standard cells.
@@ -33,13 +33,22 @@ def resize(ctx, open_road_info):
     liberty = netlist_target[SynthesisInfo].standard_cell_info.default_corner.liberty
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
 
+    clock_commands = [
+        "create_clock [get_ports {clock_name}] -period {period}".format(
+            period = ctx.attr.clocks[clock_name],
+            clock_name = clock_name,
+        )
+        for clock_name in ctx.attr.clocks
+    ]
+
+    if not clock_commands:
+        clock_commands = ["create_clock [get_ports clk] -period {period}".format(period = ctx.attr.clock_period)]
+
     open_road_commands = [
         "read_liberty {liberty_file}".format(
             liberty_file = liberty.path,
         ),
-        "create_clock [get_ports clk] -period {period}".format(
-            period = ctx.attr.clock_period,
-        ),
+    ] + clock_commands + [
         "set_wire_rc -signal -layer \"{signal_layer}\"".format(
             signal_layer = open_road_configuration.wire_rc_signal_metal_layer,
         ),
