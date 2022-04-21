@@ -24,6 +24,19 @@ foreach src $srcs {
     yosys read_verilog -sv -defer $src
 }
 
+# read UHDM designs
+set srcs_uhdm_flist_path $::env(UHDM_FLIST)
+set srcs_uhdm_flist_file [open $srcs_uhdm_flist_path "r"]
+set srcs_uhdm_flist_data [read $srcs_uhdm_flist_file]
+set srcs [split $srcs_uhdm_flist_data "\n"]
+puts $srcs
+foreach src $srcs {
+    # Skip empty lines, including the implict one after the last \n delimiter
+    # for files that end with a newline.
+    if {$src eq ""} continue
+    read_uhdm $src
+}
+
 # generic synthesis
 set top $::env(TOP)
 yosys synth -top $top

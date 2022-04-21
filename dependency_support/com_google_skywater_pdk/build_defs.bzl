@@ -17,8 +17,8 @@
 These rules generate PDK providers for downstream tools.
 """
 
-load("//pdk:build_defs.bzl", "CornerInfo", "StandardCellInfo")
-load("//pdk:open_road_configuration.bzl", "OpenRoadPdkInfo")
+load("@rules_hdl//pdk:build_defs.bzl", "CornerInfo", "StandardCellInfo")
+load("@rules_hdl//pdk:open_road_configuration.bzl", "OpenRoadPdkInfo")
 
 def _skywater_corner_impl(ctx):
     # Choose user supplied root, or default to build directory.
