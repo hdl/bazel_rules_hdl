@@ -120,9 +120,9 @@ genlex = rule(
         "_flex": attr.label(
             default = "@com_github_westes_flex//:flex",
             executable = True,
-            cfg = "host",
+            cfg = "exec",
         ),
-        "_m4": attr.label(default = "@org_gnu_m4//:m4", executable = True, cfg = "host"),
+        "_m4": attr.label(default = "@org_gnu_m4//:m4", executable = True, cfg = "exec"),
     },
     output_to_genfiles = True,
 )
