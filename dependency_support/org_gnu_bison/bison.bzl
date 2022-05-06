@@ -80,11 +80,11 @@ genyacc = rule(
         "_bison": attr.label(
             default = "@org_gnu_bison//:bison",
             executable = True,
-            cfg = "host",
+            cfg = "exec",
         ),
         "_bison_data": attr.label(default = "@org_gnu_bison//:bison_runtime_data"),
         "_bison_data_path": attr.label(default = "@org_gnu_bison//:data", allow_single_file = True),
-        "_m4": attr.label(default = "@org_gnu_m4//:m4", executable = True, cfg = "host"),
+        "_m4": attr.label(default = "@org_gnu_m4//:m4", executable = True, cfg = "exec"),
     },
     output_to_genfiles = True,
 )
