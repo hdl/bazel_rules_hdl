@@ -22,9 +22,9 @@ def edu_berkeley_abc():
         http_archive,
         name = "edu_berkeley_abc",
         urls = [
-            "https://github.com/berkeley-abc/abc/archive/06094ade87fbec6000619bf007aaad596e8bc0a2.tar.gz",  # 2012-12-16
+            "https://github.com/berkeley-abc/abc/archive/fdf08d2aad5f1c49d3f0e6778137a9b8a99100b2.tar.gz",  # 2012-12-16
         ],
-        strip_prefix = "abc-06094ade87fbec6000619bf007aaad596e8bc0a2",
-        sha256 = "cfb3d803f74441a94b8dfb6961460a31d9321b34042cfecbce35f59440c41dd2",
+        strip_prefix = "abc-fdf08d2aad5f1c49d3f0e6778137a9b8a99100b2",
+        sha256 = "6450938cb694b256db0dc43221bb6cfc9a73858e04bfe28faa710b24c3f5fcb8",
         build_file = Label("@rules_hdl//dependency_support:edu_berkeley_abc/bundled.BUILD.bazel"),
     )

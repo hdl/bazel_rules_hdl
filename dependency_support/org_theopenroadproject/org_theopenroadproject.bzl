@@ -21,7 +21,7 @@ def org_theopenroadproject():
     maybe(
         new_git_repository,
         name = "org_theopenroadproject",
-        commit = "0e03065d0e9fb1416933c704e43593c11191c80b",
+        commit = "34e0ea3858d6bdcdc1656d91bdd35e430e03d9fb",
         init_submodules = True,
         remote = "https://github.com/The-OpenROAD-Project/OpenROAD.git",
         build_file = Label("@rules_hdl//dependency_support/org_theopenroadproject:bundled.BUILD.bazel"),
@@ -31,5 +31,5 @@ def org_theopenroadproject():
         patch_args = [
             "-p1",
         ],
-        shallow_since = "1640117028 -0800",
+        shallow_since = "1649354925 -0300",
     )
