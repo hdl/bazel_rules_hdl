@@ -22,7 +22,7 @@ def org_swig():
         http_archive,
         name = "org_swig",
         urls = [
-            "https://newcontinuum.dl.sourceforge.net/project/swig/swig/swig-4.0.0/swig-4.0.0.tar.gz",
+            "https://downloads.sourceforge.net/swig/swig-4.0.0.tar.gz",
         ],
         strip_prefix = "swig-4.0.0",
         sha256 = "e8a39cd6437e342cdcbd5af27a9bf11b62dc9efec9248065debcb8276fcbb925",
