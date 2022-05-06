@@ -102,6 +102,9 @@ cc_binary(
         #Distributed
         ":dst_swig",
         ":dst_tcl",
+        #Dpo
+        ":dpo_swig",
+        ":dpo_tcl",
     ],
     copts = [
         "-fexceptions",
@@ -139,9 +142,12 @@ cc_library(
             "src/ifp/src/*.cc",
             #GUI Disabled
             "src/gui/src/stub.cpp",
+            "src/gui/src/stub_heatMap.cpp",
             #DbSTA
             "src/dbSta/src/*.cc",
+            "src/dbSta/src/*.cpp",
             "src/dbSta/src/*.hh",
+            "src/dbSta/src/*.h",
             #ioPlacer
             "src/ppl/src/*.cpp",
             "src/ppl/src/*.h",
@@ -191,6 +197,8 @@ cc_library(
             "src/par/src/MLPart/src/*.cpp",
             #PDNGen
             "src/pdn/src/*.cc",
+            "src/pdn/src/*.cpp",
+            "src/pdn/src/*.h",
             #STT
             "src/stt/src/*.cpp",
             "src/stt/src/pdr/src/*.h",
@@ -204,6 +212,10 @@ cc_library(
             #Distributed
             "src/dst/src/*.cc",
             "src/dst/src/*.h",
+            #Dpo
+            "src/dpo/src/*.cpp",
+            "src/dpo/src/*.cxx",
+            "src/dpo/src/*.h",
         ],
         exclude = [
             "src/Main.cc",
@@ -277,6 +289,8 @@ cc_library(
             "src/rmp/include/rmp/*.h",
             #Distributed
             "src/dst/include/dst/*.h",
+            #Dpo
+            "src/dpo/include/dpo/*.h",
         ],
         exclude = [
             "src/utl/include/utl/Logger.h",
@@ -367,6 +381,9 @@ cc_library(
         #Distributed
         "src/dst/include",
         "src/dst/include/dst",
+        #Dpo
+        "src/dpo/include",
+        "src/dpo/include/dpo",
     ],
     defines = [
       "OPENROAD_GIT_DESCRIBE=\\\"bazel_rules_hdl\\\""
@@ -386,6 +403,7 @@ cc_library(
         "@boost//:polygon",
         "@boost//:graph",
         "@boost//:asio",
+        "@edu_berkeley_abc//:abc-lib",
         "@org_tuxfamily_eigen//:eigen3",
         "@com_github_quantamhd_lemon//:lemon",
         "@com_github_gabime_spdlog//:spdlog",
@@ -640,6 +658,7 @@ tcl_encode(
     name = "pdngen_tcl",
     srcs = [
         "src/pdn/src/PdnGen.tcl",
+        "src/pdn/src/pdn.tcl",
     ],
     char_array_name = "pdn_tcl_inits",
 )
@@ -683,6 +702,14 @@ tcl_encode(
         "src/stt/src/SteinerTreeBuilder.tcl",
     ],
     char_array_name = "stt_tcl_inits",
+)
+
+tcl_encode(
+    name = "dpo_tcl",
+    srcs = [
+        "src/dpo/src/Optdp.tcl",
+    ],
+    char_array_name = "dpo_tcl_inits",
 )
 
 tcl_wrap_cc(
@@ -948,11 +975,16 @@ tcl_wrap_cc(
     srcs = [
         "src/pdn/src/PdnGen.i",
         ":error_swig",
-    ],
+    ] + glob([
+        "src/odb/src/swig/tcl/*.i",
+        "src/odb/src/swig/common/*.i",
+        "src/odb/include/odb/*.h",
+    ]),
     module = "pdn",
     namespace_prefix = "pdn",
     root_swig_src = "src/pdn/src/PdnGen.i",
     swig_includes = [
+        "src/odb/src/swig/tcl",
         "src/pdn/src",
     ],
 )
@@ -1010,6 +1042,20 @@ tcl_wrap_cc(
     root_swig_src = "src/stt/src/SteinerTreeBuilder.i",
     swig_includes = [
         "src/stt/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "dpo_swig",
+    srcs = [
+        "src/dpo/src/Optdp.i",
+        ":error_swig",
+    ],
+    module = "dpo",
+    namespace_prefix = "dpo",
+    root_swig_src = "src/dpo/src/Optdp.i",
+    swig_includes = [
+        "src/dpo/src",
     ],
 )
 
