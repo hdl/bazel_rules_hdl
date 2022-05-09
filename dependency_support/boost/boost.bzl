@@ -33,5 +33,6 @@ def boost():
             # toolchain. The patch below selects the same Python headers
             # that the rest of XLS uses.
             Label("@rules_hdl//dependency_support/boost:add_python.patch"),
+            Label("@rules_hdl//dependency_support/boost:libbacktrace.patch"),
         ],
     )

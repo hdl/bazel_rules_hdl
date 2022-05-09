@@ -1,0 +1,12 @@
+diff --git BUILD.boost BUILD.boost
+index e23893b..1e70e11 100644
+--- BUILD.boost
++++ BUILD.boost
+@@ -1874,6 +1874,7 @@ boost_library(
+         ":lexical_cast",
+         ":static_assert",
+         ":type_traits",
++        "@com_github_libbacktrace//:libbacktrace",
+     ],
+ )
+ 
