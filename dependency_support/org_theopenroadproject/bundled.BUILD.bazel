@@ -126,6 +126,7 @@ cc_binary(
         ":openroad_version",
         ":opensta_lib",
         "@tk_tcl//:tcl",
+        "@boost//:stacktrace",
     ],
 )
 
@@ -403,6 +404,7 @@ cc_library(
         "@boost//:polygon",
         "@boost//:graph",
         "@boost//:asio",
+        "@boost//:stacktrace",
         "@edu_berkeley_abc//:abc-lib",
         "@org_tuxfamily_eigen//:eigen3",
         "@com_github_quantamhd_lemon//:lemon",
