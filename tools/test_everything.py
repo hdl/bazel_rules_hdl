@@ -30,6 +30,7 @@ ALL_TARGETS = [
   '@com_github_fmtlib_fmt//...',
   '@com_github_gabime_spdlog//...',
   '@com_github_libbacktrace//...',
+  '@com_github_ninja_build_ninja//...',
   '@com_github_quantamhd_lemon//...',
   '@com_github_yosyshq_nextpnr//...',
   '@com_github_yosyshq_prjtrellis//...',
