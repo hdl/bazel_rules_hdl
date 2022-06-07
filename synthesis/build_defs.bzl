@@ -112,11 +112,14 @@ def _synthesize_design_impl(ctx):
         tools = tool_inputs,
         input_manifests = input_manifests,
         env = env,
-        mnemonic = "SythesizingRTL",
+        mnemonic = "SynthesizingRTL",
     )
 
     return [
-        DefaultInfo(files = depset([output_file, log_file])),
+        DefaultInfo(
+            runfiles = ctx.runfiles(files = [output_file, log_file]),
+            files = depset([output_file]),
+        ),
         SynthesisInfo(
             standard_cell_info = ctx.attr.standard_cells[StandardCellInfo],
             synthesized_netlist = output_file,
