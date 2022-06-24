@@ -14,6 +14,9 @@
 
 """File encapsulating the open road command"""
 
+load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
+load("//synthesis:build_defs.bzl", "SynthesisInfo")
+
 OpenRoadInfo = provider(
     "Provider to support running openroad outside of bazel",
     fields = [
@@ -29,6 +32,99 @@ OpenRoadInfo = provider(
         "logs",
     ],
 )
+
+def timing_setup_commands(ctx):
+    """Create command list for timing setup information.
+
+    Args:
+        ctx: Bazel Context
+
+    Returns:
+        Struct with params inputs and commands. Both return values are lists.
+    """
+    inputs = []
+    commands = []
+
+    netlist_target = ctx.attr.synthesized_rtl
+    liberty = netlist_target[SynthesisInfo].standard_cell_info.default_corner.liberty
+    open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
+    rc_script = open_road_configuration.rc_script_configuration
+
+    # Liberty Setup
+    inputs.append(liberty)
+    commands.append("read_liberty {liberty_file}".format(
+        liberty_file = liberty.path,
+    ))
+
+    # SDC/Clock Setup
+    clock_commands_struct = clock_commands(ctx)
+    commands.extend(clock_commands_struct.commands)
+    inputs.extend(clock_commands_struct.inputs)
+
+    # RC Layer Value Setup
+    if rc_script:
+        inputs.append(rc_script)
+        commands.append("source {}".format(rc_script.path))
+
+    commands.extend([
+        "set_wire_rc -signal -layer \"{signal_layer}\"".format(
+            signal_layer = open_road_configuration.wire_rc_signal_metal_layer,
+        ),
+        "set_wire_rc -clock  -layer \"{clock_layer}\"".format(
+            clock_layer = open_road_configuration.wire_rc_clock_metal_layer,
+        ),
+    ])
+
+    return struct(inputs = inputs, commands = commands)
+
+def placement_padding_commands(ctx):
+    """Generate placement padding commands
+
+    Args:
+        ctx: Bazel Context
+
+    Returns:
+        Struct with params inputs and commands. Both return values are lists.
+    """
+    open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
+    placement_padding = open_road_configuration.placement_padding_tcl
+
+    commands = ["set_placement_padding -global -left 2 -right 2"]
+    inputs = []
+    if placement_padding:
+        commands = ["source {}".format(placement_padding.path)]
+        inputs = [placement_padding]
+
+    return struct(inputs = inputs, commands = commands)
+
+def clock_commands(ctx):
+    """Generate clock arguments based on bazel configuration.
+
+    Generates a struct of required file inputs and open road comamnd lists.
+
+    Args:
+        ctx: Bazel Context
+
+    Returns:
+        Struct with params inputs and commands. Both return values are lists.
+    """
+    if not clock_commands:
+        return struct(inputs = [], commands = ["create_clock [get_ports clk] -period {period}".format(period = ctx.attr.clock_period)])
+
+    sdc = ctx.file.sdc
+    if sdc:
+        return struct(inputs = [sdc], commands = ["read_sdc {}".format(sdc.path)])
+
+    return struct(
+        inputs = [],
+        commands = [
+            "create_clock [get_ports {clock_name}] -period {period}".format(
+                period = ctx.attr.clocks[clock_name],
+                clock_name = clock_name,
+            )
+            for clock_name in ctx.attr.clocks
+        ],
+    )
 
 def format_openroad_do_not_use_list(do_not_use_list):
     if do_not_use_list:
@@ -154,6 +250,7 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
             "TCL_LIBRARY": openroad_runfiles_dir + "/tk_tcl/library",
         },
         execution_requirements = execution_requirements,
+        mnemonic = "OpenROAD",
     )
 
     return struct(db = output_db, log_file = log_file)

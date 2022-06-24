@@ -86,6 +86,7 @@ place_and_route = rule(
           The units currently depend on the PDK you're targeting. The default PDK is sky130 and it uses nano seconds for ASAP7 it is pico seconds.
           """,
         ),
+        "sdc": attr.label(allow_single_file = True),
         "clocks": attr.string_dict(),
         "die_width_microns": attr.int(),
         "die_height_microns": attr.int(),

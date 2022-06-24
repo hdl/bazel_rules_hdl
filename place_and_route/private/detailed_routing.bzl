@@ -14,8 +14,7 @@
 
 """Detailed Routing openROAD commands"""
 
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command")
-load("//synthesis:build_defs.bzl", "SynthesisInfo")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
 
 def _triton_route_parameter_file(ctx, open_road_info):
     triton_route_parameter_file = ctx.actions.declare_file("{}_triton_route_params.params".format(ctx.attr.name))
@@ -59,14 +58,13 @@ def detailed_routing(ctx, open_road_info):
 
     """
 
-    liberty = ctx.attr.synthesized_rtl[SynthesisInfo].standard_cell_info.default_corner.liberty
+    timing_setup_command_struct = timing_setup_commands(ctx)
+    inputs = timing_setup_command_struct.inputs
+
     trition_route_params = _triton_route_parameter_file(ctx, open_road_info)
     routed_def = ctx.actions.declare_file("{}_detail_routed.def".format(ctx.attr.name))
 
-    open_road_commands = [
-        "read_liberty {liberty_file}".format(
-            liberty_file = liberty.path,
-        ),
+    open_road_commands = timing_setup_command_struct.commands + [
         "set_thread_count [exec getconf _NPROCESSORS_ONLN]",
         "detailed_route -param {tr_parameter_file}".format(
             tr_parameter_file = trition_route_params["triton_route_parameter_file"].path,
@@ -76,11 +74,10 @@ def detailed_routing(ctx, open_road_info):
         ),
     ]
 
-    inputs = [
-        liberty,
+    inputs.extend([
         trition_route_params["triton_route_parameter_file"],
         open_road_info.routing_guide,
-    ]
+    ])
 
     execution_requirements = {}
     if ctx.attr.local_detailed_routing_execution:

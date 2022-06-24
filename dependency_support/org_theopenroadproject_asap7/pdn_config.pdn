@@ -40,3 +40,5 @@ add_pdn_stripe -grid {top} -layer {M6} -width {1.1520} -spacing {0.384} -pitch {
 add_pdn_connect -grid {top} -layers {M1 M2}
 add_pdn_connect -grid {top} -layers {M2 M5}
 add_pdn_connect -grid {top} -layers {M5 M6}
+
+pdn::allow_repair_channels true

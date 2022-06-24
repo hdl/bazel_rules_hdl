@@ -14,7 +14,7 @@
 
 """Clock Tree Synthesis openROAD commands"""
 
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "format_openroad_do_not_use_list", "merge_open_road_info", "openroad_command")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "format_openroad_do_not_use_list", "merge_open_road_info", "openroad_command", "placement_padding_commands", "timing_setup_commands")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
 load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
 
@@ -29,38 +29,27 @@ def clock_tree_synthesis(ctx, open_road_info):
        open_road_info: OpenRoadInfo provider from a previous step.
 
     """
-    netlist_target = ctx.attr.synthesized_rtl
-    liberty = netlist_target[SynthesisInfo].standard_cell_info.default_corner.liberty
+
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
-    rc_script = open_road_configuration.rc_script_configuration
 
-    inputs = [
-        liberty,
-    ]
+    timing_setup_command_struct = timing_setup_commands(ctx)
+    placement_padding_struct = placement_padding_commands(ctx)
 
-    if rc_script:
-        inputs.append(rc_script)
+    inputs = timing_setup_command_struct.inputs + placement_padding_struct.inputs
 
-    open_road_commands = [
-        "read_liberty {liberty_file}".format(
-            liberty_file = liberty.path,
-        ),
-        "source {}".format(rc_script.path) if rc_script else "",
-        "remove_buffers",
-        "set_wire_rc -signal -layer \"{}\"".format(open_road_configuration.wire_rc_signal_metal_layer),
-        "set_wire_rc -clock  -layer \"{}\"".format(open_road_configuration.wire_rc_clock_metal_layer),
+    open_road_commands = timing_setup_command_struct.commands + [
         format_openroad_do_not_use_list(open_road_configuration.do_not_use_cell_list),
-        "configure_cts_characterization",
         "estimate_parasitics -placement",
         "repair_clock_inverters",
         "clock_tree_synthesis -root_buf \"{cts_buffer}\" -buf_list \"{cts_buffer}\" -sink_clustering_enable".format(
             cts_buffer = open_road_configuration.cts_buffer_cell,
         ),
+        "set_propagated_clock [all_clocks]",
         "repair_clock_nets",
         "estimate_parasitics -placement",
-        "set_propagated_clock [all_clocks]",
-        "repair_timing",
+    ] + placement_padding_struct.commands + [
         "detailed_placement",
+        "repair_timing",
         "report_checks -path_delay min_max -format full_clock_expanded -fields {input_pin slew capacitance} -digits 3",
         "detailed_placement",
         "filler_placement \"{filler_cells}\"".format(
