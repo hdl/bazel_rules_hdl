@@ -14,7 +14,7 @@
 
 """Global placement openROAD commands"""
 
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
 load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
 
@@ -30,24 +30,12 @@ def global_placement(ctx, open_road_info):
 
     """
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
-    liberty = ctx.attr.synthesized_rtl[SynthesisInfo].standard_cell_info.default_corner.liberty
-    rc_script = open_road_configuration.rc_script_configuration
+    timing_setup_command_struct = timing_setup_commands(ctx)
 
-    input_open_road_files = [
-        liberty,
-    ]
+    inputs = timing_setup_command_struct.inputs
 
-    if rc_script:
-        input_open_road_files.append(rc_script)
-
-    open_road_commands = [
-        "read_liberty {liberty}".format(
-            liberty = liberty.path,
-        ),
-        "source {}".format(rc_script.path) if rc_script else "",
-        "set_wire_rc -signal -layer \"{}\"".format(open_road_configuration.wire_rc_signal_metal_layer),
-        "set_wire_rc -clock  -layer \"{}\"".format(open_road_configuration.wire_rc_clock_metal_layer),
-        "global_placement -timing_driven -density {density} -init_density_penalty 8e-5 -pad_left {pad_left} -pad_right {pad_right}".format(
+    open_road_commands = timing_setup_command_struct.commands + [
+        "global_placement -timing_driven -routability_driven -density {density} -pad_left {pad_left} -pad_right {pad_right}".format(
             density = ctx.attr.placement_density,  #TODO(bazel): When bazel 4.0.0 is avaliable use float command
             pad_left = open_road_configuration.global_placement_cell_pad,
             pad_right = open_road_configuration.global_placement_cell_pad,
@@ -59,12 +47,12 @@ def global_placement(ctx, open_road_info):
         commands = open_road_commands,
         input_db = open_road_info.output_db,
         step_name = "global_placement",
-        inputs = input_open_road_files,
+        inputs = inputs,
     )
 
     global_place_open_road_info = OpenRoadInfo(
         commands = open_road_commands,
-        input_files = depset(input_open_road_files),
+        input_files = depset(inputs),
         output_db = command_output.db,
         logs = depset([command_output.log_file]),
     )

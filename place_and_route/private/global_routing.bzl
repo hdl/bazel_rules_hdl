@@ -15,7 +15,7 @@
 """Global Routing openROAD commands"""
 
 load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
 load("//place_and_route:private/report_area.bzl", "generate_area_results")
 load("//place_and_route:private/report_power.bzl", "generate_power_results")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
@@ -42,19 +42,15 @@ def global_routing(ctx, open_road_info):
        open_road_info: OpenRoadInfo provider from a previous step.
 
     """
-    netlist_target = ctx.attr.synthesized_rtl
-    liberty = netlist_target[SynthesisInfo].standard_cell_info.default_corner.liberty
+    open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
+    timing_setup_command_struct = timing_setup_commands(ctx)
+    inputs = timing_setup_command_struct.inputs
 
     route_guide = ctx.actions.declare_file("{}.route_guide".format(ctx.attr.name))
     general_routing_power_results = ctx.actions.declare_file("{}_general_routing_power_results.textproto".format(ctx.attr.name))
     general_routing_area_results = ctx.actions.declare_file("{}_general_routing_area_results.textproto".format(ctx.attr.name))
 
-    open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
-
-    open_road_commands = [
-        "read_liberty {liberty_file}".format(
-            liberty_file = liberty.path,
-        ),
+    open_road_commands = timing_setup_command_struct.commands + [
         """
 foreach layer_adjustment {global_routing_layer_adjustments} {{
     lassign $layer_adjustment layer adjustment
@@ -81,10 +77,6 @@ foreach layer_adjustment {global_routing_layer_adjustments} {{
     ]
     open_road_commands.extend(generate_power_results(ctx, general_routing_power_results))
     open_road_commands.extend(generate_area_results(general_routing_area_results))
-
-    inputs = [
-        liberty,
-    ]
 
     command_output = openroad_command(
         ctx,

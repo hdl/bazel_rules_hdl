@@ -35,6 +35,7 @@ def pdn_gen(ctx, open_road_info):
         "source {pdn_script}".format(
             pdn_script = open_road_configuration.pdn_config.path,
         ),
+        "pdngen -verbose",
     ]
 
     inputs = [

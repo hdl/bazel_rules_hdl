@@ -14,7 +14,7 @@
 
 """Resize openROAD commands"""
 
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "format_openroad_do_not_use_list", "merge_open_road_info", "openroad_command")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "format_openroad_do_not_use_list", "merge_open_road_info", "openroad_command", "placement_padding_commands", "timing_setup_commands")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
 load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
 
@@ -29,34 +29,17 @@ def resize(ctx, open_road_info):
        open_road_info: OpenRoadInfo provider from a previous step.
 
     """
-    netlist_target = ctx.attr.synthesized_rtl
-    liberty = netlist_target[SynthesisInfo].standard_cell_info.default_corner.liberty
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
 
-    clock_commands = [
-        "create_clock [get_ports {clock_name}] -period {period}".format(
-            period = ctx.attr.clocks[clock_name],
-            clock_name = clock_name,
-        )
-        for clock_name in ctx.attr.clocks
-    ]
+    timing_setup_command_struct = timing_setup_commands(ctx)
+    placement_padding_struct = placement_padding_commands(ctx)
 
-    if not clock_commands:
-        clock_commands = ["create_clock [get_ports clk] -period {period}".format(period = ctx.attr.clock_period)]
+    inputs = timing_setup_command_struct.inputs + placement_padding_struct.inputs
 
-    open_road_commands = [
-        "read_liberty {liberty_file}".format(
-            liberty_file = liberty.path,
-        ),
-    ] + clock_commands + [
-        "set_wire_rc -signal -layer \"{signal_layer}\"".format(
-            signal_layer = open_road_configuration.wire_rc_signal_metal_layer,
-        ),
-        "set_wire_rc -clock  -layer \"{clock_layer}\"".format(
-            clock_layer = open_road_configuration.wire_rc_clock_metal_layer,
-        ),
+    open_road_commands = timing_setup_command_struct.commands + [
         format_openroad_do_not_use_list(open_road_configuration.do_not_use_cell_list),
         "estimate_parasitics -placement",
+        "buffer_ports",
         "repair_design",
         "repair_tie_fanout -separation {separation} \"{high_cell}\"".format(
             separation = open_road_configuration.tie_separation,
@@ -64,18 +47,15 @@ def resize(ctx, open_road_info):
         ),
         "repair_tie_fanout -separation {separation} \"{low_cell}\"".format(
             separation = open_road_configuration.tie_separation,
-            low_cell = open_road_configuration.tie_high_port,
+            low_cell = open_road_configuration.tie_low_port,
         ),
-        "set_placement_padding -global -left 2 -right 2",
+    ] + placement_padding_struct.commands + [
         "detailed_placement",
+        "improve_placement",
         "optimize_mirroring",
         "check_placement -verbose",
         "report_checks -path_delay min_max -format full_clock_expanded -fields {input_pin slew capacitance} -digits 3",
         "report_check_types -max_slew -max_capacitance -max_fanout -violators",
-    ]
-
-    inputs = [
-        liberty,
     ]
 
     command_output = openroad_command(

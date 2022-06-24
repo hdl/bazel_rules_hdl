@@ -38,6 +38,8 @@ OpenRoadPdkInfo = provider(
         "tie_high_port": "Tie high port",
         "tie_separation": "Tie sepearation value",
         "rc_script_configuration": "RC script for the various metal layers",
+        "tapcell_tcl": "TCL file that sets tapcell options. This overrides other tapcell attributes in this rule.",
+        "placement_padding_tcl": "TCL Script for handling the placement padding of cells",
     },
 )
 
@@ -65,6 +67,8 @@ def _open_road_pdk_configuration_impl(ctx):
             tie_high_port = ctx.attr.tie_high_port,
             tie_separation = ctx.attr.tie_separation,
             rc_script_configuration = ctx.file.rc_script_configuration,
+            tapcell_tcl = ctx.file.tapcell_tcl,
+            placement_padding_tcl = ctx.file.placement_padding_tcl,
         ),
     ]
 
@@ -74,11 +78,11 @@ open_road_pdk_configuration = rule(
         "cell_site": attr.string(mandatory = True, doc = "LEF standard cell site name."),
         "tracks_file": attr.label(mandatory = True, allow_single_file = True, doc = "Track setup script."),
         "pdn_config": attr.label(mandatory = True, allow_single_file = True, doc = "PDN Config."),
-        "tap_cell": attr.string(mandatory = True),
+        "tap_cell": attr.string(),
         "pin_horizontal_metal_layer": attr.string(mandatory = True),
         "pin_vertical_metal_layer": attr.string(mandatory = True),
-        "tapcell_distance": attr.int(mandatory = True),
-        "endcap_cell": attr.string(mandatory = True),
+        "tapcell_distance": attr.int(),
+        "endcap_cell": attr.string(),
         "wire_rc_signal_metal_layer": attr.string(mandatory = True),
         "wire_rc_clock_metal_layer": attr.string(mandatory = True),
         "global_placement_cell_pad": attr.int(mandatory = True),
@@ -92,6 +96,8 @@ open_road_pdk_configuration = rule(
         "tie_high_port": attr.string(mandatory = True),
         "tie_separation": attr.int(mandatory = True),
         "rc_script_configuration": attr.label(allow_single_file = True),
+        "tapcell_tcl": attr.label(allow_single_file = True, doc = "TCL file that sets tapcell options. This overrides other tapcell attributes in this rule."),
+        "placement_padding_tcl": attr.label(allow_single_file = True, doc = "TCL Script for handling the placement padding of cells"),
     },
 )
 
