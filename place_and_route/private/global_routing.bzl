@@ -46,7 +46,6 @@ def global_routing(ctx, open_road_info):
     timing_setup_command_struct = timing_setup_commands(ctx)
     inputs = timing_setup_command_struct.inputs
 
-    route_guide = ctx.actions.declare_file("{}.route_guide".format(ctx.attr.name))
     general_routing_power_results = ctx.actions.declare_file("{}_general_routing_power_results.textproto".format(ctx.attr.name))
     general_routing_area_results = ctx.actions.declare_file("{}_general_routing_area_results.textproto".format(ctx.attr.name))
 
@@ -63,9 +62,7 @@ foreach layer_adjustment {global_routing_layer_adjustments} {{
             global_routing_layers = open_road_configuration.global_routing_signal_layers,
             global_routing_clock_layers = open_road_configuration.global_routing_clock_layers,
         ),
-        "global_route -guide_file \"{route_guide}\" -congestion_iterations 100".format(
-            route_guide = route_guide.path,
-        ),
+        "global_route -congestion_iterations 100",
         "estimate_parasitics -global_routing",
         "report_checks -path_delay min_max -format full_clock_expanded -fields {input_pin slew capacitance} -digits 3",
         "report_wns",
@@ -84,7 +81,6 @@ foreach layer_adjustment {global_routing_layer_adjustments} {{
         input_db = open_road_info.output_db,
         inputs = inputs,
         outputs = [
-            route_guide,
             general_routing_power_results,
             general_routing_area_results,
         ],
@@ -96,7 +92,6 @@ foreach layer_adjustment {global_routing_layer_adjustments} {{
         input_files = depset(inputs),
         output_db = command_output.db,
         logs = depset([command_output.log_file]),
-        routing_guide = route_guide,
         general_routing_power_results = general_routing_power_results,
         general_routing_area_results = general_routing_area_results,
     )

@@ -41,7 +41,7 @@ def place_pins(ctx, open_road_info):
     )
 
     if open_road_configuration.tapcell_tcl:
-        inputs = [
+        inputs = inputs + [
             open_road_configuration.tapcell_tcl,
         ]
         tapcell_command = "source {}".format(open_road_configuration.tapcell_tcl.path)
