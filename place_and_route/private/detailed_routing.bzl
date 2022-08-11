@@ -16,36 +16,6 @@
 
 load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
 
-def _triton_route_parameter_file(ctx, open_road_info):
-    triton_route_parameter_file = ctx.actions.declare_file("{}_triton_route_params.params".format(ctx.attr.name))
-    output_guide = ctx.actions.declare_file("{}_output_guide".format(ctx.attr.name))
-    output_drc = ctx.actions.declare_file("{}_output_drc".format(ctx.attr.name))
-
-    ctx.actions.write(
-        triton_route_parameter_file,
-        content = "\n".join([
-            "guide:{route_guide}".format(
-                route_guide = open_road_info.routing_guide.path,
-            ),
-            "outputguide:{output_guide}".format(
-                output_guide = output_guide.path,
-            ),
-            "outputDRC:{output_drc}".format(
-                output_drc = output_drc.path,
-            ),
-            "verbose:0",
-            "gap:0",
-            "timeout:2400",
-            "",
-        ]),
-    )
-
-    return {
-        "output_guide": output_guide,
-        "output_drc": output_drc,
-        "triton_route_parameter_file": triton_route_parameter_file,
-    }
-
 def detailed_routing(ctx, open_road_info):
     """Performs detailed routing.
 
@@ -61,23 +31,15 @@ def detailed_routing(ctx, open_road_info):
     timing_setup_command_struct = timing_setup_commands(ctx)
     inputs = timing_setup_command_struct.inputs
 
-    trition_route_params = _triton_route_parameter_file(ctx, open_road_info)
+    output_drc = ctx.actions.declare_file("{}_output_drc".format(ctx.attr.name))
     routed_def = ctx.actions.declare_file("{}_detail_routed.def".format(ctx.attr.name))
 
     open_road_commands = timing_setup_command_struct.commands + [
-        "set_thread_count [exec getconf _NPROCESSORS_ONLN]",
-        "detailed_route -param {tr_parameter_file}".format(
-            tr_parameter_file = trition_route_params["triton_route_parameter_file"].path,
-        ),
+        "detailed_route -output_drc {}".format(output_drc.path),
         "write_def {}".format(
             routed_def.path,
         ),
     ]
-
-    inputs.extend([
-        trition_route_params["triton_route_parameter_file"],
-        open_road_info.routing_guide,
-    ])
 
     execution_requirements = {}
     if ctx.attr.local_detailed_routing_execution:
@@ -90,8 +52,7 @@ def detailed_routing(ctx, open_road_info):
         inputs = inputs,
         outputs = [
             routed_def,
-            trition_route_params["output_guide"],
-            trition_route_params["output_drc"],
+            output_drc,
         ],
         execution_requirements = execution_requirements,
         step_name = "detailed_routing",
@@ -102,7 +63,6 @@ def detailed_routing(ctx, open_road_info):
         input_files = depset(inputs),
         output_db = command_output.db,
         logs = depset([command_output.log_file]),
-        routing_guide = trition_route_params["output_guide"],
         routed_def = routed_def,
     )
 

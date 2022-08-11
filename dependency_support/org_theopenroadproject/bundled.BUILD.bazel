@@ -154,6 +154,7 @@ cc_library(
             "src/ppl/src/*.h",
             #Resizer
             "src/rsz/src/*.cc",
+            "src/rsz/src/*.hh",
             #OpenDP
             "src/dpl/src/*.cpp",
             "src/dpl/src/*.h",
@@ -251,7 +252,6 @@ cc_library(
             #ioPlacer
             "src/ppl/include/ppl/*.h",
             #Resizer
-            "src/rsz/include/rsz/*.hh",
             "src/rsz/include/rsz/*.hh",
             #OpenDP
             "src/dpl/include/dpl/*.h",
@@ -405,6 +405,7 @@ cc_library(
         "@boost//:graph",
         "@boost//:asio",
         "@boost//:stacktrace",
+        "@boost//:thread",
         "@edu_berkeley_abc//:abc-lib",
         "@org_tuxfamily_eigen//:eigen3",
         "@com_github_quantamhd_lemon//:lemon",
@@ -441,9 +442,11 @@ cc_library(
     name = "logger",
     srcs = [
         "src/utl/src/Logger.cpp",
+        "src/utl/src/Metrics.cpp",
     ],
     hdrs = [
         "src/utl/include/utl/Logger.h",
+        "src/utl/include/utl/Metrics.h",
     ],
     copts = [
         "-Wno-error",
@@ -986,6 +989,7 @@ tcl_wrap_cc(
     namespace_prefix = "pdn",
     root_swig_src = "src/pdn/src/PdnGen.i",
     swig_includes = [
+        "src/odb/src/swig/common",
         "src/odb/src/swig/tcl",
         "src/pdn/src",
     ],
@@ -1173,6 +1177,7 @@ cc_library(
         "@boost//:fusion",
         "@boost//:bind",
         "@boost//:algorithm",
+        "@boost//:thread",
     ],
 )
 

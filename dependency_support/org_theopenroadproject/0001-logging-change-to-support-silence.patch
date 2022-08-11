@@ -1,22 +1,8 @@
-From f88fef676c6d99e49d6998aba0024fbfe228a119 Mon Sep 17 00:00:00 2001
-From: QuantamHD <emahintorabi@gmail.com>
-Date: Thu, 21 Oct 2021 08:40:13 -0700
-Subject: [PATCH] logging change to support silence
-
----
- src/Main.cc                      | 15 ++++++++++++++-
- src/OpenRoad.cc                  |  4 +++-
- src/utl/include/utl/Logger.h     | 23 ++++++++++++++++++++---
- src/utl/include/utl/MakeLogger.h |  5 ++---
- src/utl/src/Logger.cpp           | 26 ++++++++++++++++++++++----
- src/utl/src/MakeLogger.cpp       |  7 +++----
- 6 files changed, 64 insertions(+), 16 deletions(-)
-
 diff --git a/src/Main.cc b/src/Main.cc
-index c4d00af52..d89a5b872 100755
+index c0167bf7d..4e33b7636 100755
 --- a/src/Main.cc
 +++ b/src/Main.cc
-@@ -87,6 +87,8 @@ int cmd_argc;
+@@ -89,6 +89,8 @@ int cmd_argc;
  char **cmd_argv;
  const char* log_filename = nullptr;
  const char* metrics_filename = nullptr;
@@ -25,7 +11,7 @@ index c4d00af52..d89a5b872 100755
  
  static const char *init_filename = ".openroad";
  
-@@ -180,6 +182,14 @@ main(int argc,
+@@ -195,6 +197,14 @@ main(int argc,
      remove(metrics_filename);
    }
  
@@ -40,7 +26,7 @@ index c4d00af52..d89a5b872 100755
    cmd_argc = argc;
    cmd_argv = argv;
  #ifdef ENABLE_PYTHON3
-@@ -217,6 +227,7 @@ main(int argc,
+@@ -232,6 +242,7 @@ main(int argc,
    }
  #endif
  
@@ -48,7 +34,7 @@ index c4d00af52..d89a5b872 100755
    // Set argc to 1 so Tcl_Main doesn't source any files.
    // Tcl_Main never returns.
    Tcl_Main(1, argv, ord::tclAppInit);
-@@ -367,7 +378,7 @@ ord::tclAppInit(Tcl_Interp *interp)
+@@ -385,7 +396,7 @@ ord::tclAppInit(Tcl_Interp *interp)
  static void
  showUsage(const char *prog, const char *init_filename)
  {
@@ -57,7 +43,7 @@ index c4d00af52..d89a5b872 100755
    printf("  -help              show help and exit\n");
    printf("  -version           show version and exit\n");
    printf("  -no_init           do not read %s init file\n", init_filename);
-@@ -379,6 +390,8 @@ showUsage(const char *prog, const char *init_filename)
+@@ -397,6 +408,8 @@ showUsage(const char *prog, const char *init_filename)
    printf("  -python            start with python interpreter [limited to db operations]\n");
  #endif
    printf("  -log <file_name>   write a log in <file_name>\n");
@@ -67,10 +53,10 @@ index c4d00af52..d89a5b872 100755
  }
  
 diff --git a/src/OpenRoad.cc b/src/OpenRoad.cc
-index 56876d932..a37f98275 100755
+index d5e1a6ed9..01e023493 100755
 --- a/src/OpenRoad.cc
 +++ b/src/OpenRoad.cc
-@@ -96,6 +96,8 @@ extern int Odbtcl_Init(Tcl_Interp *interp);
+@@ -98,6 +98,8 @@ extern int Odbtcl_Init(Tcl_Interp *interp);
  // Main.cc set by main()
  extern const char* log_filename;
  extern const char* metrics_filename;
@@ -79,7 +65,7 @@ index 56876d932..a37f98275 100755
  
  namespace ord {
  
-@@ -206,7 +208,7 @@ OpenRoad::init(Tcl_Interp *tcl_interp)
+@@ -204,7 +206,7 @@ OpenRoad::init(Tcl_Interp *tcl_interp)
    tcl_interp_ = tcl_interp;
  
    // Make components.
@@ -89,10 +75,10 @@ index 56876d932..a37f98275 100755
    sta_ = makeDbSta();
    verilog_network_ = makeDbVerilogNetwork();
 diff --git a/src/utl/include/utl/Logger.h b/src/utl/include/utl/Logger.h
-index 25129d48f..9597f4f25 100644
+index de27099ce..989cc2b79 100644
 --- a/src/utl/include/utl/Logger.h
 +++ b/src/utl/include/utl/Logger.h
-@@ -86,12 +86,22 @@ enum ToolId
+@@ -95,12 +95,22 @@ enum ToolId
   SIZE // the number of tools, do not put anything after this
  };
  
@@ -117,7 +103,7 @@ index 25129d48f..9597f4f25 100644
    ~Logger();
    static ToolId findToolId(const char *tool_name);
  
-@@ -99,7 +109,13 @@ class Logger
+@@ -108,7 +118,13 @@ class Logger
      inline void report(const std::string& message,
                         const Args&... args)
      {
@@ -132,10 +118,10 @@ index 25129d48f..9597f4f25 100644
      }
  
    // Do NOT call this directly, use the debugPrint macro  instead (defined below)
-@@ -257,6 +273,7 @@ class Logger
+@@ -283,6 +299,7 @@ class Logger
    std::vector<spdlog::sink_ptr> sinks_;
    std::shared_ptr<spdlog::logger> logger_;
-   std::shared_ptr<spdlog::logger> metrics_logger_;
+   std::stack<std::string> metrics_stages_;
 +  LogMode log_mode_;
  
    // This matrix is pre-allocated so it can be safely updated
@@ -157,17 +143,18 @@ index 543d48054..d4953d2b7 100644
  initLogger(utl::Logger *logger,
             Tcl_Interp *tcl_interp);
 diff --git a/src/utl/src/Logger.cpp b/src/utl/src/Logger.cpp
-index fa743559d..1a17bf6f4 100644
+index be99dabb9..febef1829 100644
 --- a/src/utl/src/Logger.cpp
 +++ b/src/utl/src/Logger.cpp
-@@ -35,18 +35,22 @@
+@@ -35,6 +35,7 @@
  
  #include "utl/Logger.h"
  
 +#include <memory>
  #include <mutex>
  #include <atomic>
- 
+ #include <fstream>
+@@ -42,12 +43,14 @@
  #include "spdlog/sinks/basic_file_sink.h"
  #include "spdlog/sinks/stdout_color_sinks.h"
  #include "spdlog/spdlog.h"
@@ -179,12 +166,11 @@ index fa743559d..1a17bf6f4 100644
  int Logger::max_message_print = 1000;
  
 -Logger::Logger(const char* log_filename, const char *metrics_filename)
-+Logger::Logger(const char* log_filename, const char *metrics_filename,
-+              const bool quiet_logs, const bool silent_logs)
-   : debug_on_(false),
-     first_metric_(true)
++Logger::Logger(const char* log_filename, const char *metrics_filename, const bool quiet_logs, const bool silent_logs)
+   : debug_on_(false)
  {
-@@ -55,10 +59,24 @@ Logger::Logger(const char* log_filename, const char *metrics_filename)
+   // This ensures it is safe to update the message counters
+@@ -55,10 +58,24 @@ Logger::Logger(const char* log_filename, const char *metrics_filename)
    static_assert(std::atomic<MessageCounter::value_type>::is_always_lock_free,
                  "message counter should be atomic");
  
@@ -230,6 +216,3 @@ index 05ee22281..9ff5785ee 100644
  }
  
  void
--- 
-2.34.0.384.gca35af8252-goog
-
