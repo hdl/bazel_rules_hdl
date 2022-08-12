@@ -115,8 +115,8 @@ cc_binary(
         "-Wcast-qual",
         "-Wredundant-decls",
         "-Wformat-security",
+        "-fopenmp",
         "-std=c++17",
-        "-fopenmp"
     ],
     features = ["-use_header_modules"],
     visibility = ["//visibility:public"],
@@ -308,6 +308,7 @@ cc_library(
         "-Wredundant-decls",
         "-Wformat-security",
         "-Iexternal/com_github_quantamhd_lemon",
+        "-std=c++17",
     ],
     features = ["-use_header_modules"],
     includes = [
@@ -457,6 +458,7 @@ cc_library(
         "-Wcast-qual",
         "-Wredundant-decls",
         "-Wformat-security",
+        "-std=c++17",
     ],
     includes = [
         "src/utl/include",
@@ -1214,6 +1216,7 @@ cc_library(
     copts = [
         "-fexceptions",
         "-Wno-error",
+        "-std=c++17",
     ],
     features = ["-use_header_modules"],
     includes = [
@@ -1259,6 +1262,7 @@ cc_library(
     copts = [
         "-fexceptions",
         "-Wno-error",
+        "-std=c++17",
     ],
     features = ["-use_header_modules"],
     includes = [
