@@ -486,6 +486,7 @@ cc_library(
         "-Wcast-qual",
         "-Wredundant-decls",
         "-Wformat-security",
+        "-std=c++17",
     ],
     features = ["-use_header_modules"],
     includes = [
