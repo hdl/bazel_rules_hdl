@@ -118,6 +118,9 @@ cc_binary(
         "-fopenmp",
         "-std=c++17",
     ],
+    linkopts = [
+        "-fopenmp",
+    ],
     features = ["-use_header_modules"],
     visibility = ["//visibility:public"],
     deps = [
