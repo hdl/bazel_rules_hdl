@@ -115,6 +115,7 @@ cc_binary(
         "-Wcast-qual",
         "-Wredundant-decls",
         "-Wformat-security",
+        "-std=c++17",
         "-fopenmp"
     ],
     features = ["-use_header_modules"],
