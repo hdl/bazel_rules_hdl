@@ -411,7 +411,7 @@ cc_library(
         "@com_github_quantamhd_lemon//:lemon",
         "@com_github_gabime_spdlog//:spdlog",
         "@tk_tcl//:tcl",
-        "@org_llvm_openmp//:openmp",
+        #"@org_llvm_openmp//:openmp",
     ],
     alwayslink = True,
 )
