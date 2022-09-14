@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+package bazel_rules_hdl.pdk;
+
+message PdkInfoProto {
+  repeated string cell_lef_paths = 1;
+  optional string tech_lef_path = 2;
+  optional string liberty_path = 3;
+  optional string tracks_file_path = 4;
+  optional string pin_horizontal_metal_layer = 5;
+  optional string pin_vertical_metal_layer = 6;
+  optional string tap_cell = 7;
+  optional int64 tapcell_distance = 8;
+  optional string endcap_cell = 9;
+  optional string pdn_config_path = 10;
+  optional string wire_rc_signal_metal_layer = 11;
+  optional string wire_rc_clock_metal_layer = 12;
+  optional int64 global_placement_cell_pad = 13;
+  repeated string do_not_use_cell_list = 14;
+  optional string tie_low_port = 15;
+  optional string tie_high_port = 16;
+  optional int64 tie_separation = 17;
+  optional string cts_buffer_cell = 18;
+  optional string global_routing_clock_layers = 19;
+  optional string global_routing_signal_layers = 20;
+  repeated string fill_cells = 21;
+  optional string rc_script_configuration_path = 22;
+  map<string, float> global_routing_layer_adjustments = 23;
+  optional string cell_site = 24;
+  optional string tapcell_tcl_path = 25;
+  optional string placement_padding_tcl_path = 26;
+}
