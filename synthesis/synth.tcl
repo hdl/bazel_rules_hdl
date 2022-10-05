@@ -56,4 +56,4 @@ set output $::env(OUTPUT)
 write_verilog $output
 
 # print stats
-stat
+stat -liberty $liberty
