@@ -27,4 +27,4 @@ set output $::env(OUTPUT_NETLIST)
 write_verilog $output
 
 # print stats
-stat
+stat -liberty $liberty
