@@ -5,6 +5,7 @@
 # User-defined synthesis scripts need to consult the following environment
 # variables for their parameters:
 # FLIST = a file that lists verilog sources (one file per line)
+# UHDM_FLIST = a file that lists UHDM sources (one file per line)
 # TOP = top module for synthesis
 # LIBERTY = liberty file for the target technology library
 # OUTPUT = verilog file for synthesis output
