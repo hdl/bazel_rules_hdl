@@ -1,6 +1,6 @@
 --- kernel/yosys.cc
 +++ kernel/yosys.cc
-@@ -863,13 +863,12 @@ void init_share_dirname()
+@@ -930,13 +930,12 @@ void init_share_dirname()
  		yosys_share_dirname = proc_share_path;
  		return;
  	}
