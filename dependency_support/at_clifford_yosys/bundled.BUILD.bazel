@@ -448,6 +448,9 @@ cc_library(
         "libs/fst/fstapi.h",
         "libs/fst/lz4.h",
     ],
+    deps = [
+        "@net_zlib//:zlib",
+    ],
     licenses = ["notice"],
 )
 
