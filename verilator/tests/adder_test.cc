@@ -1,10 +1,10 @@
-#include <memory>
-
-#include "gtest/gtest.h"
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 
+#include <memory>
+
 #include "Vadder.h"
+#include "gtest/gtest.h"
 
 namespace {
 
