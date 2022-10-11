@@ -113,6 +113,7 @@ genlex = rule(
                   "file to define external functions named 'prefix'text, " +
                   "'prefix'in, etc.  The default is the basename of the source" +
                   "file without the .lex extension.",
+            default = "yy",
         ),
         "lexopts": attr.string_list(
             doc = "A list of options to be added to the flex command line.",

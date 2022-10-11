@@ -59,6 +59,7 @@ load("@rules_hdl//dependency_support/org_theopenroadproject_asap7:org_theopenroa
 load("@rules_hdl//dependency_support/org_tuxfamily_eigen:org_tuxfamily_eigen.bzl", "org_tuxfamily_eigen")
 load("@rules_hdl//dependency_support/pybind11:pybind11.bzl", "pybind11")
 load("@rules_hdl//dependency_support/tk_tcl:tk_tcl.bzl", "tk_tcl")
+load("@rules_hdl//dependency_support/verilator:verilator.bzl", "verilator")
 
 def dependency_support():
     """ Registers dependencies """
@@ -103,3 +104,4 @@ def dependency_support():
     org_tuxfamily_eigen()
     pybind11()
     tk_tcl()
+    verilator()
