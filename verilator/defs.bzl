@@ -105,7 +105,6 @@ def _verilator_cc_library(ctx):
     verilog_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs.to_list()]
     verilog_files = [src for sub_tuple in verilog_srcs for src in sub_tuple]
 
-
     verilator_output = ctx.actions.declare_directory(ctx.label.name + "-gen")
     verilator_output_cpp = ctx.actions.declare_directory(ctx.label.name + ".cpp")
     verilator_output_hpp = ctx.actions.declare_directory(ctx.label.name + ".h")
@@ -185,17 +184,17 @@ verilator_cc_library = rule(
             cfg = "exec",
             default = Label("@verilator_v4.224//:verilator_executable"),
         ),
-        "_verilator_lib" : attr.label(
+        "_verilator_lib": attr.label(
             doc = "Verilator library",
             default = Label("@verilator_v4.224//:libverilator"),
         ),
-        "_verilator_svdpi" : attr.label(
+        "_verilator_svdpi": attr.label(
             doc = "Verilator svdpi lib",
-            default = Label("@verilator_v4.224//:svdpi")
+            default = Label("@verilator_v4.224//:svdpi"),
         ),
-        "_zlib" : attr.label(
+        "_zlib": attr.label(
             doc = "zlib dependency",
-            default = Label("@net_zlib//:zlib")
+            default = Label("@net_zlib//:zlib"),
         ),
     },
     provides = [

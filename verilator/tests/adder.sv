@@ -13,12 +13,12 @@
 //limitations under the License.
 
 
-module adder(
-  input [7:0] x,
-  input [7:0] y,
-  input carry_in,
-  output carry_output_bit,
-  output [7:0] sum
+module adder (
+    input [7:0] x,
+    input [7:0] y,
+    input carry_in,
+    output carry_output_bit,
+    output [7:0] sum
 );
   logic [8:0] result;
   /* verilator lint_off WIDTH */

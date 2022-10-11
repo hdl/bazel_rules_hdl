@@ -112,15 +112,19 @@ genrule(
     name = "verilator_bison",
     srcs = [
         "src/verilog.y",
-        "@org_gnu_bison//:data"
+        "@org_gnu_bison//:data",
     ],
     outs = [
         "V3ParseBison.c",
         "V3ParseBison.h",
     ],
     cmd = "M4=$(location @org_gnu_m4//:m4) BISON_PKGDATADIR=$(location @org_gnu_bison//:data) ./$(location :bisonpremod)" +
-      " --yacc $(location @org_gnu_bison//:bison) -d -v -o $(location V3ParseBison.c) $(location src/verilog.y)",
-    tools = [":bisonpremod", "@org_gnu_bison//:bison", "@org_gnu_m4//:m4"],
+          " --yacc $(location @org_gnu_bison//:bison) -d -v -o $(location V3ParseBison.c) $(location src/verilog.y)",
+    tools = [
+        ":bisonpremod",
+        "@org_gnu_bison//:bison",
+        "@org_gnu_m4//:m4",
+    ],
 )
 
 cc_library(
@@ -177,9 +181,9 @@ cc_library(
         ":V3ParseBison.c",
     ],
     deps = [
-        ":verilated_trace_defs", # Needed for V3TraceDecl.cpp
+        ":verilated_trace_defs",  # Needed for V3TraceDecl.cpp
         ":verilatedos",
-        "@com_github_westes_flex//:FlexLexer"
+        "@com_github_westes_flex//:FlexLexer",
     ],
 )
 
@@ -215,6 +219,8 @@ cc_library(
         "include/verilated_types.h",
         "include/verilated_funcs.h",
     ],
+    # TODO: Remove these once upstream fixes these warnings
+    copts = ["-Wno-unused-const-variable"],
     includes = ["include"],
     strip_include_prefix = "include/",
     textual_hdrs = [
@@ -223,8 +229,6 @@ cc_library(
         "include/gtkwave/lz4.c",
     ],
     visibility = ["//visibility:public"],
-    # TODO: Remove these once upstream fixes these warnings
-    copts = ["-Wno-unused-const-variable"],
 )
 
 cc_library(

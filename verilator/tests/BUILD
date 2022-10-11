@@ -19,5 +19,5 @@ cc_test(
     deps = [
         ":adder_verilator",
         "@com_google_googletest//:gtest_main",
-    ]
+    ],
 )
