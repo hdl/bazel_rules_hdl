@@ -8,6 +8,13 @@ _CONFIG_HEADER = """
 #include "lib/config.in.h"
 #include "lib/arg-nonnull.h"
 
+#ifdef BAZEL_VERSION_INFO
+#include "bazel_version_info.h"
+#else
+#define PACKAGE_VERSION "redacted"
+#define VERSION "redacted"
+#endif
+
 #define PRODUCT "redacted"
 #define PACKAGE "redacted"
 #define PACKAGE_BUGREPORT "redacted"
@@ -16,8 +23,7 @@ _CONFIG_HEADER = """
 #define PACKAGE_STRING "redacted"
 #define PACKAGE_TARNAME "redacted"
 #define PACKAGE_URL "redacted"
-#define PACKAGE_VERSION "redacted"
-#define VERSION "redacted"
+
 
 #define RENAME_OPEN_FILE_WORKS 0
 #define HAVE_TMPFILE 1
