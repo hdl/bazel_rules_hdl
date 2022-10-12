@@ -12,6 +12,7 @@
 #
 # Original implementation by Kevin Kiningham (@kkiningh) in kkiningh/rules_verilator.
 # Ported to bazel_rules_hdl by Stephen Tridgell (@stridge-cruxml)
+"""Download and build verilator"""
 
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
