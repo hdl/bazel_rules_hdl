@@ -88,6 +88,15 @@ touch(
     ),
 )
 
+touch(
+    name = "bazel_version_info",
+    out = "bison-lib/bazel_version_info.h",
+    contents = dict(
+        PACKAGE_VERSION = '"3.5"',
+        VERSION = '"3.5"',
+    )
+)
+
 # Note: This target is used by the Bazel "genyacc" rule, as well as by the
 # explictly-declared dependencies.
 cc_binary(
@@ -98,6 +107,7 @@ cc_binary(
         "bison-lib/get-errno.h",
         "bison-lib/path-join.c",
         "bison-lib/path-join.h",
+        "bison-lib/bazel_version_info.h",
         "src/AnnotationList.c",
         "src/InadequacyList.c",
         "src/Sbitset.c",
@@ -151,6 +161,7 @@ cc_binary(
         # This is defined in gnulib's stdio.h, but we don't need anything else
         # from that file.
         "-D_GL_ATTRIBUTE_FORMAT_PRINTF(A,B)=",
+        "-DBAZEL_VERSION_INFO",
     ],
     data = [":bison_runtime_data"],
     output_licenses = ["unencumbered"],
