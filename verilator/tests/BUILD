@@ -11,6 +11,7 @@ verilog_library(
 verilator_cc_library(
     name = "adder_verilator",
     module = ":adder",
+    module_top = "adder",
 )
 
 cc_test(
@@ -18,6 +19,75 @@ cc_test(
     srcs = ["adder_test.cc"],
     deps = [
         ":adder_verilator",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+verilog_library(
+    name = "load_and_count",
+    srcs = [
+        "load_and_count.sv",
+        "test_data.dat",
+    ],
+)
+
+verilator_cc_library(
+    name = "load_and_count_verilator",
+    module = ":load_and_count",
+    module_top = "load_and_count",
+)
+
+cc_test(
+    name = "load_and_count_test",
+    srcs = [
+        "load_and_count_test.cc",
+    ],
+    deps = [
+        ":load_and_count_verilator",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+verilog_library(
+    name = "nested_module_0",
+    srcs = [
+        "nested_module_0.sv",
+    ],
+)
+
+verilog_library(
+    name = "nested_module_1",
+    srcs = [
+        "nested_module_1.sv",
+    ],
+    deps = [
+        ":nested_module_0",
+    ],
+)
+
+verilog_library(
+    name = "nested_module_2",
+    srcs = [
+        "nested_module_2.sv",
+    ],
+    deps = [
+        ":nested_module_1",
+    ],
+)
+
+verilator_cc_library(
+    name = "nested_module_2_verilator",
+    module = ":nested_module_2",
+    module_top = "nested_module_2",
+)
+
+cc_test(
+    name = "nested_module_test",
+    srcs = [
+        "nested_module_test.cc",
+    ],
+    deps = [
+        ":nested_module_2_verilator",
         "@com_google_googletest//:gtest_main",
     ],
 )
