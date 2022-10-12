@@ -53,7 +53,7 @@ genrule(
         "V3AstNodes__gen_macros.h",
     ],
     cmd = """
-    python3 $(location src/astgen) -I$$(dirname $(location src/V3Ast.h)) --classes
+    python3 $(location src/astgen) -I $$(dirname $(location src/V3Ast.h)) --classes
     cp V3Ast__gen_classes.h $(@D)
     cp V3Ast__gen_impl.h $(@D)
     cp V3Ast__gen_report.txt $(@D)
@@ -75,7 +75,7 @@ genrule(
     ],
     outs = ["V3Const__gen.cpp"],
     cmd = """
-    python3 $(location src/astgen) -I$$(dirname $(location src/V3Const.cpp)) V3Const.cpp
+    python3 $(location src/astgen) -I $$(dirname $(location src/V3Const.cpp)) V3Const.cpp
     cp V3Const__gen.cpp $(@D)
     """,
 )
