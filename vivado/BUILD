@@ -1,0 +1,9 @@
+exports_files([
+    "create_project.tcl.template",
+    "synthesis.tcl.template",
+    "synth_optimize.tcl.template",
+    "placement.tcl.template",
+    "place_optimize.tcl.template",
+    "route.tcl.template",
+    "write_bitstream.tcl.template",
+])

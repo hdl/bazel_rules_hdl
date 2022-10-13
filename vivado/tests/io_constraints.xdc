@@ -1,0 +1,8 @@
+set_property -dict {PACKAGE_PIN AR13 IOSTANDARD LVCMOS18} [get_ports {led[0]}]
+set_property -dict {PACKAGE_PIN AP13 IOSTANDARD LVCMOS18} [get_ports {led[1]}]
+set_property -dict {PACKAGE_PIN AR16 IOSTANDARD LVCMOS18} [get_ports {led[2]}]
+set_property -dict {PACKAGE_PIN AP16 IOSTANDARD LVCMOS18} [get_ports {led[3]}]
+set_property -dict {PACKAGE_PIN AP15 IOSTANDARD LVCMOS18} [get_ports {led[4]}]
+set_property -dict {PACKAGE_PIN AN16 IOSTANDARD LVCMOS18} [get_ports {led[5]}]
+set_property -dict {PACKAGE_PIN AN17 IOSTANDARD LVCMOS18} [get_ports {led[6]}]
+set_property -dict {PACKAGE_PIN AV15 IOSTANDARD LVCMOS18} [get_ports {led[7]}]

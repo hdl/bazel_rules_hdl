@@ -1,0 +1,54 @@
+
+create_project project_1 {{PROJECT_DIR}} -part {{PART_NUMBER}}
+
+{{HDL_SOURCE_CONTENT}}
+
+{{TCL_CONTENT}}
+
+{{CONSTRAINTS_CONTENT}}
+
+set_property top {{MODULE_TOP}} [current_fileset]
+
+if {{{WITH_SYNTH}}} {
+    # Generate all board design files.
+    foreach bd [get_files -quiet "*.bd"] {
+    if {![get_property IS_GENERATED $bd]} {
+        generate_target all $bd
+        create_ip_run $bd
+    }
+    }
+
+    # Synth all IP. This has to be done in project mode.
+    set run_synth [get_runs "synth_1"]
+    set run_list [get_runs -quiet \
+                -filter "IS_SYNTHESIS == true && NAME != $run_synth"]
+
+    if {[llength $run_list] != 0} {
+    foreach run $run_list {
+        reset_run $run
+    }
+    launch_runs $run_list -jobs {{JOBS}}
+    foreach run $run_list {
+        wait_on_run $run
+        if {[get_property PROGRESS $run] != "100%"} {
+            puts "ERROR: OOC Synthesis of ${run} failed"
+            exit 2
+        }
+    }
+    }
+
+    set_property strategy "{{SYNTH_STRATEGY}}" $run_synth
+    set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-verilog_define __SYNTHESIS__} -objects $run_synth
+
+    launch_runs $run_synth -jobs {{JOBS}}
+    wait_on_run $run_synth
+    if {[get_property PROGRESS $run_synth] != "100%"} {
+    puts "ERROR: Synthesis failed"
+    exit 2
+    }
+
+    open_run "synth_1"
+    write_checkpoint -force {{SYNTH_CHECKPOINT}}
+    report_timing_summary -file {{TIMING_SUMMARY_REPORT}}
+    report_utilization -file {{UTILIZATION_REPORT}}
+}

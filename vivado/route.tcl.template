@@ -1,0 +1,15 @@
+set_param general.maxThreads {{THREADS}}
+open_checkpoint {{CHECKPOINT_IN}}
+
+route_design -directive {{ROUTE_DIRECTIVE}}
+report_timing_summary -file {{TIMING_REPORT}}
+report_utilization -file {{UTIL_REPORT}}
+report_route_status -file {{STATUS_REPORT}}
+report_io -file {{IO_REPORT}}
+report_power -file {{POWER_REPORT}}
+report_design_analysis -logic_level_distribution \
+ -of_timing_paths [get_timing_paths -max_paths 10000 \
+  -slack_lesser_than 0] \
+   -file {{DESIGN_ANALYSIS_REPORT}}
+
+write_checkpoint -force {{CHECKPOINT_OUT}}

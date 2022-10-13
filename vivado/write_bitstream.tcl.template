@@ -1,0 +1,11 @@
+set_param general.maxThreads {{THREADS}}
+open_checkpoint {{CHECKPOINT_IN}}
+
+set WNS [get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -setup]]
+puts "Post Route WNS = $WNS"
+
+if {$WNS >= 0} {
+    write_bitstream -force {{BITSTREAM}}
+} else {
+    puts "Failed to make timing, refusing to make bitstream"
+}

@@ -1,0 +1,7 @@
+set_param general.maxThreads {{THREADS}}
+open_checkpoint {{CHECKPOINT_IN}}
+
+phys_opt_design -directive {{PHYS_OPT_DIRECTIVE}}
+report_timing_summary -file {{TIMING_REPORT}}
+report_utilization -file {{UTIL_REPORT}}
+write_checkpoint -force {{CHECKPOINT_OUT}}
