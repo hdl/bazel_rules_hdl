@@ -229,6 +229,9 @@ cc_library(
         "include/gtkwave/lz4.c",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "@net_zlib//:zlib",
+    ],
 )
 
 cc_library(
