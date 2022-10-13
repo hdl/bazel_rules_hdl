@@ -15,6 +15,8 @@
 """ A BUILD file for m4 based on FSF stock source. """
 
 load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_hdl//dependency_support:copy.bzl", "touch")
+
 
 package(
     default_visibility = ["//visibility:public"],
@@ -28,14 +30,30 @@ licenses(["restricted"])  # GPLv3
 
 exports_files(["COPYING"])
 
+touch(
+    name = "bazel_version_info",
+    out = "src/bazel_version_info.h",
+    contents = dict(
+        PACKAGE_VERSION = '"1.4.18"',
+        VERSION = '"1.4.18"',
+    )
+)
+
+
 cc_binary(
     name = "m4",
-    srcs = glob(["src/*.c", "src/*.h"]),
+    srcs = glob(["src/*.c", "src/*.h"]) + [
+        "src/bazel_version_info.h"
+    ],
     deps = [
         "@org_gnu_gnulib//:gnulib",
+    ],
+    includes = [
+        "src/",
     ],
     output_licenses = ["unencumbered"],
     copts = [
         "-w",
+        "-DBAZEL_VERSION_INFO",
     ],
 )

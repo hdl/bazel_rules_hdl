@@ -31,7 +31,7 @@ exports_files(["LICENSE"])
 genrule(
     name = "version_src",
     outs = ["kernel/version.cc"],
-    cmd = "echo 'namespace Yosys { extern const char *yosys_version_str; const char *yosys_version_str=\"Yosys 0.8+\"; }' >$@",
+    cmd = "echo 'namespace Yosys { extern const char *yosys_version_str; const char *yosys_version_str=\"Yosys 0.22\"; }' >$@",
 )
 
 cc_library(
@@ -204,6 +204,7 @@ cc_library(
         ":minisat",
         ":sha1",
         ":subcircuit",
+        ":fst",
         "@org_gnu_readline//:readline",
         "@edu_berkeley_abc//:abc-lib",
         "@org_sourceware_libffi//:libffi",
@@ -431,6 +432,25 @@ cc_library(
         "libs/subcircuit/subcircuit.cc",
     ],
     hdrs = ["libs/subcircuit/subcircuit.h"],
+    licenses = ["notice"],
+)
+
+cc_library(
+    name = "fst",
+    srcs = [
+        "libs/fst/fastlz.cc",
+        "libs/fst/fstapi.cc",
+        "libs/fst/lz4.cc",
+    ],
+    hdrs = [
+        "libs/fst/config.h",
+        "libs/fst/fastlz.h",
+        "libs/fst/fstapi.h",
+        "libs/fst/lz4.h",
+    ],
+    deps = [
+        "@net_zlib//:zlib",
+    ],
     licenses = ["notice"],
 )
 

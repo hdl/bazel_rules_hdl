@@ -40,6 +40,6 @@ def touch(name, out, contents = None):
     native.genrule(
         name = name,
         outs = [out],
-        cmd = "echo " + repr(contents) + " > $@",
+        cmd = "echo -e " + repr(contents) + " > $@",
         message = "Touch $@",
     )
