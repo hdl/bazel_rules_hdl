@@ -32,14 +32,6 @@ def _verilator_repository_impl(ctx):
     }
     ctx.template("src/config_build.h", "src/config_build.h.in", replace, executable = False)
 
-    # TODO(stridge-crumxl) Find a better solution for this.
-    # For some reason the version is showing up as "redacted" in bison --version.
-    # Very hacky way to correct it where it will read hardcoded 3.5 instead.
-    replace = {
-        "out = str(sp.stdout.read())": "out = \"3.5\"",
-    }
-    ctx.template("src/bisonpremod", "src/bisonpre", replace, executable = True)
-
     ctx.file(
         "src/config_rev.h",
         "static const char* const DTVERSION_rev = \"v4.224\";\n",
