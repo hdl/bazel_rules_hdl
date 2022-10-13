@@ -31,8 +31,8 @@ sh_binary(
 )
 
 sh_binary(
-    name = "bisonpremod",
-    srcs = ["src/bisonpremod"],
+    name = "bisonpre",
+    srcs = ["src/bisonpre"],
 )
 
 genrule(
@@ -118,10 +118,10 @@ genrule(
         "V3ParseBison.c",
         "V3ParseBison.h",
     ],
-    cmd = "M4=$(location @org_gnu_m4//:m4) BISON_PKGDATADIR=$(location @org_gnu_bison//:data) ./$(location :bisonpremod)" +
+    cmd = "M4=$(location @org_gnu_m4//:m4) BISON_PKGDATADIR=$(location @org_gnu_bison//:data) ./$(location :bisonpre)" +
           " --yacc $(location @org_gnu_bison//:bison) -d -v -o $(location V3ParseBison.c) $(location src/verilog.y)",
     tools = [
-        ":bisonpremod",
+        ":bisonpre",
         "@org_gnu_bison//:bison",
         "@org_gnu_m4//:m4",
     ],
