@@ -1,0 +1,8 @@
+set_param general.maxThreads {{THREADS}}
+open_checkpoint {{CHECKPOINT_IN}}
+
+opt_design -directive {{OPT_DIRECTIVE}}
+report_timing_summary -file {{TIMING_REPORT}}
+report_utilization -file {{UTIL_REPORT}}
+report_drc -file {{DRC_REPORT}}
+write_checkpoint -force {{CHECKPOINT_OUT}}
