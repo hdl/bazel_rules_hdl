@@ -210,15 +210,15 @@ verilator_cc_library = rule(
             doc = "Verilator binary.",
             executable = True,
             cfg = "exec",
-            default = Label("@verilator_v4.224//:verilator_executable"),
+            default = Label("@verilator//:verilator_executable"),
         ),
         "_verilator_lib": attr.label(
             doc = "Verilator library",
-            default = Label("@verilator_v4.224//:libverilator"),
+            default = Label("@verilator//:libverilator"),
         ),
         "_verilator_svdpi": attr.label(
             doc = "Verilator svdpi lib",
-            default = Label("@verilator_v4.224//:svdpi"),
+            default = Label("@verilator//:svdpi"),
         ),
         "_zlib": attr.label(
             doc = "zlib dependency",
