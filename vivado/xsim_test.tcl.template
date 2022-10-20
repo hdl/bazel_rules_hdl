@@ -1,0 +1,37 @@
+create_project project_1 {{PROJECT_DIR}} -part {{PART_NUMBER}}
+
+{{HDL_SOURCE_CONTENT}}
+
+{{TCL_CONTENT}}
+
+{{CONSTRAINTS_CONTENT}}
+
+set_property top {{MODULE_TOP}} [current_fileset]
+
+# Generate all board design files.
+foreach bd [get_files -quiet "*.bd"] {
+    if {![get_property IS_GENERATED $bd]} {
+        generate_target all $bd
+        create_ip_run $bd
+    }
+}
+
+update_compile_order -fileset sources_1
+
+set_property top {{MODULE_TOP}} [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+if { {{WITH_WAVEFORM}} } {
+    set_property -name {xsim.simulate.log_all_signals} -value {true} -objects [get_filesets sim_1]
+    set_property -name {xsim.simulate.wdb} -value "{{WAVE_DB}}" -objects [get_filesets sim_1]
+}
+
+launch_simulation
+
+run all
+
+if { {{WITH_WAVEFORM}} } {
+    puts "To open waveform in vivado, run in tcl console:\n"
+    puts "> current_fileset"
+    puts "> open_wave_database {{WAVE_DB}}\n"
+    puts "You can then add signals to the wave window."
+}

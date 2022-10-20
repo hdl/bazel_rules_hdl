@@ -158,3 +158,34 @@ write_bitstream(
 ```
 
 It has the optional argument `_write_bitstream_tcl_template` which by default loads [write_bitstream.tcl.template](write_bitstream.tcl.template). This can be modified.
+
+## xsim_test
+
+Executes a test bench using the vivado simulator, xsim.
+
+Example from `vivado/tests`:
+```
+xsim_test(
+    name = "xsim_smoke_test",
+    module = ":xsim_smoke_tb",
+    module_top = "xsim_smoke_tb",
+    part_number = "xczu28dr-ffvg1517-2-e",
+    xilinx_env = ":xilinx_env.sh",
+    with_waveform = True,
+    tags = ["manual"],
+)
+```
+
+It has the optional argument `_xsim_test_template` which by default loads [_xsim_test_template.tcl.template](_xsim_test_template.tcl.template). This can be modified.
+
+It is tagged as `manual` so it is not run by CI tools. They do not have vivado installed.
+
+To get a waveform, do not use `bazel test`, use `bazel run` instead. For example
+`bazel run //vivado/tests:xsim_smoke_test` will then generate something like `bazel-out/k8-fastbuild/bin/vivado/tests/xsim_smoke_test.wdb`.
+
+To open this waveform in vivado:
+
+```
+current_fileset
+open_wave_database bazel-out/k8-fastbuild/bin/vivado/tests/xsim_smoke_test.wdb
+```

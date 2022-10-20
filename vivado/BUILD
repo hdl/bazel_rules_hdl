@@ -6,4 +6,5 @@ exports_files([
     "place_optimize.tcl.template",
     "route.tcl.template",
     "write_bitstream.tcl.template",
+    "xsim_test.tcl.template",
 ])
