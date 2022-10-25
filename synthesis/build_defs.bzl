@@ -30,7 +30,11 @@ UhdmInfo = provider(
 #    standard_cell_info: The StandardCellInfo provider this target was synthesized against.
 #    synthesized_netlist: The structural verilog syntheized with standard_cell_info
 #    top_module: The name of the top level module of the synthesized netlist
-SynthesisInfo = provider("Information about the synthesis target", fields = ["standard_cell_info", "synthesized_netlist", "top_module"])
+#    log_file: Log output file from the synthesis step.
+SynthesisInfo = provider(
+    "Information about the synthesis target",
+    fields = ["standard_cell_info", "synthesized_netlist", "top_module", "log_file"],
+)
 
 def _transitive_srcs(deps):
     return depset(
@@ -118,12 +122,13 @@ def _synthesize_design_impl(ctx):
     return [
         DefaultInfo(
             runfiles = ctx.runfiles(files = [output_file, log_file]),
-            files = depset([output_file]),
+            files = depset([output_file, log_file]),
         ),
         SynthesisInfo(
             standard_cell_info = ctx.attr.standard_cells[StandardCellInfo],
             synthesized_netlist = output_file,
             top_module = ctx.attr.top_module,
+            log_file = log_file,
         ),
     ]
 
@@ -149,4 +154,74 @@ synthesize_rtl = rule(
         ),
         "target_clock_period_pico_seconds": attr.int(doc = "target clock period in picoseconds"),
     },
+)
+
+def _benchmark_synth_impl(ctx):
+    """Implementation of the 'benchmark_synth' rule.
+
+    Computes and prints various metrics about a synth target.
+
+    Args:
+      ctx: The current rule's context object.
+    Returns:
+      DefaultInfo provider
+    """
+    synth_info = ctx.attr.synth_target[SynthesisInfo]
+
+    synth_log = synth_info.log_file.short_path
+    grep = "zgrep" if ("log.gz" in synth_log) else "grep"
+    cmd = "{grep} Chip.area {log}".format(grep = grep, log = synth_log)
+
+    info = "echo 'Using {info}'".format(info = synth_info.standard_cell_info.default_corner.liberty.short_path)
+
+    executable_file = ctx.actions.declare_file(ctx.label.name + ".sh")
+
+    runfiles = ctx.runfiles(files = [
+        synth_info.log_file,
+    ])
+
+    ctx.actions.write(
+        output = executable_file,
+        content = "\n".join([
+            "#!/bin/bash",
+            "set -e",
+            info,
+            cmd,
+            "exit 0",
+        ]),
+        is_executable = True,
+    )
+
+    return [
+        DefaultInfo(
+            runfiles = runfiles,
+            files = depset(
+                direct = [executable_file],
+                transitive = [],
+            ),
+            executable = executable_file,
+        ),
+    ]
+
+benchmark_synth_attrs = {
+    "synth_target": attr.label(
+        doc = "The synth target to benchmark.",
+        providers = [SynthesisInfo, DefaultInfo],
+    ),
+}
+
+benchmark_synth = rule(
+    doc = """Computes and prints various metrics about a synth target.
+
+Example:
+    ```
+    benchmark_synth(
+        name = "picorv32_benchmark_synth",
+        synth_target = ":picorv32_synth",
+    )
+    ```
+    """,
+    implementation = _benchmark_synth_impl,
+    attrs = benchmark_synth_attrs,
+    executable = True,
 )
