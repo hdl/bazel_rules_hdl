@@ -120,7 +120,7 @@ def create_and_synth(
         "{{SYNTH_CHECKPOINT}}": synth_path,
         "{{TIMING_SUMMARY_REPORT}}": timing_path,
         "{{UTILIZATION_REPORT}}": util_path,
-        "{{JOBS}}": "4",
+        "{{JOBS}}": "{}".format(ctx.attr.jobs),
         "{{WITH_SYNTH}}": with_synth_str,
     }
 
@@ -133,11 +133,11 @@ def create_and_synth(
         outputs,
     )
 
-def _create_project_impl(ctx):
+def _vivado_create_project_impl(ctx):
     return create_and_synth(ctx, 0)
 
-create_project = rule(
-    implementation = _create_project_impl,
+vivado_create_project = rule(
+    implementation = _vivado_create_project_impl,
     attrs = {
         "module": attr.label(
             doc = "The top level build.",
@@ -158,6 +158,10 @@ create_project = rule(
             mandatory = True,
             allow_single_file = [".sh"],
         ),
+        "jobs": attr.int(
+            doc = "Jobs to pass to vivado which defines the amount of parallelism.",
+            default = 4
+        ),
         "_create_project_tcl_template": attr.label(
             doc = "The create project tcl template",
             default = "@rules_hdl//vivado:create_project.tcl.template",
@@ -166,7 +170,7 @@ create_project = rule(
     },
 )
 
-def _synthesize_impl(ctx):
+def _vivado_synthesize_impl(ctx):
     synth_checkpoint = ctx.actions.declare_file("{}_synth.dcp".format(ctx.label.name))
     timing_summary_report = ctx.actions.declare_file("{}_synth_timing.rpt".format(ctx.label.name))
     util_report = ctx.actions.declare_file("{}_synth_util.rpt".format(ctx.label.name))
@@ -185,8 +189,8 @@ def _synthesize_impl(ctx):
         VivadoSynthCheckpointInfo(checkpoint = synth_checkpoint),
     ]
 
-synthesize = rule(
-    implementation = _synthesize_impl,
+vivado_synthesize = rule(
+    implementation = _vivado_synthesize_impl,
     attrs = {
         "module": attr.label(
             doc = "The top level build.",
@@ -211,6 +215,10 @@ synthesize = rule(
             mandatory = True,
             allow_single_file = [".sh"],
         ),
+        "jobs": attr.int(
+            doc = "Jobs to pass to vivado which defines the amount of parallelism.",
+            default = 4
+        ),
         "_create_project_tcl_template": attr.label(
             doc = "The create project tcl template",
             default = "@rules_hdl//vivado:create_project.tcl.template",
@@ -223,7 +231,7 @@ synthesize = rule(
     ],
 )
 
-def _synthesis_optimize_impl(ctx):
+def _vivado_synthesis_optimize_impl(ctx):
     synth_checkpoint = ctx.actions.declare_file("{}_synth.dcp".format(ctx.label.name))
     timing_summary_report = ctx.actions.declare_file("{}_synth_timing.rpt".format(ctx.label.name))
     util_report = ctx.actions.declare_file("{}_synth_util.rpt".format(ctx.label.name))
@@ -232,7 +240,7 @@ def _synthesis_optimize_impl(ctx):
     checkpoint_in = ctx.attr.checkpoint[VivadoSynthCheckpointInfo].checkpoint
 
     substitutions = {
-        "{{THREADS}}": "8",
+        "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{CHECKPOINT_IN}}": checkpoint_in.path,
         "{{OPT_DIRECTIVE}}": ctx.attr.opt_directive,
         "{{TIMING_REPORT}}": timing_summary_report.path,
@@ -257,8 +265,8 @@ def _synthesis_optimize_impl(ctx):
         VivadoSynthCheckpointInfo(checkpoint = synth_checkpoint),
     ]
 
-synthesis_optimize = rule(
-    implementation = _synthesis_optimize_impl,
+vivado_synthesis_optimize = rule(
+    implementation = _vivado_synthesis_optimize_impl,
     attrs = {
         "checkpoint": attr.label(
             doc = "Synthesis checkpoint.",
@@ -275,6 +283,10 @@ synthesis_optimize = rule(
             doc = "The optimization directive.",
             default = "Explore",
         ),
+        "threads": attr.int(
+            doc = "Threads to pass to vivado which defines the amount of parallelism.",
+            default = 8
+        ),
         "_synthesis_optimize_template": attr.label(
             doc = "The synthesis optimzation tcl template",
             default = "@rules_hdl//vivado:synth_optimize.tcl.template",
@@ -287,7 +299,7 @@ synthesis_optimize = rule(
     ],
 )
 
-def _placement_impl(ctx):
+def _vivado_placement_impl(ctx):
     placement_checkpoint = ctx.actions.declare_file("{}_place.dcp".format(ctx.label.name))
     timing_summary_report = ctx.actions.declare_file("{}_synth_timing.rpt".format(ctx.label.name))
     util_report = ctx.actions.declare_file("{}_synth_util.rpt".format(ctx.label.name))
@@ -295,7 +307,7 @@ def _placement_impl(ctx):
     checkpoint_in = ctx.attr.checkpoint[VivadoSynthCheckpointInfo].checkpoint
 
     substitutions = {
-        "{{THREADS}}": "8",
+        "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{CHECKPOINT_IN}}": checkpoint_in.path,
         "{{PLACEMENT_DIRECTIVE}}": ctx.attr.placement_directive,
         "{{TIMING_REPORT}}": timing_summary_report.path,
@@ -319,8 +331,8 @@ def _placement_impl(ctx):
         VivadoPlacementCheckpointInfo(checkpoint = placement_checkpoint),
     ]
 
-placement = rule(
-    implementation = _placement_impl,
+vivado_placement = rule(
+    implementation = _vivado_placement_impl,
     attrs = {
         "checkpoint": attr.label(
             doc = "Synthesis checkpoint.",
@@ -337,6 +349,10 @@ placement = rule(
             doc = "The optimization directive.",
             default = "Explore",
         ),
+        "threads": attr.int(
+            doc = "Threads to pass to vivado which defines the amount of parallelism.",
+            default = 8
+        ),
         "_placement_template": attr.label(
             doc = "The placement tcl template",
             default = "@rules_hdl//vivado:placement.tcl.template",
@@ -349,7 +365,7 @@ placement = rule(
     ],
 )
 
-def _place_optimize_impl(ctx):
+def _vivado_place_optimize_impl(ctx):
     placement_checkpoint = ctx.actions.declare_file("{}_place.dcp".format(ctx.label.name))
     timing_summary_report = ctx.actions.declare_file("{}_synth_timing.rpt".format(ctx.label.name))
     util_report = ctx.actions.declare_file("{}_synth_util.rpt".format(ctx.label.name))
@@ -357,7 +373,7 @@ def _place_optimize_impl(ctx):
     checkpoint_in = ctx.attr.checkpoint[VivadoPlacementCheckpointInfo].checkpoint
 
     substitutions = {
-        "{{THREADS}}": "8",
+        "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{CHECKPOINT_IN}}": checkpoint_in.path,
         "{{PHYS_OPT_DIRECTIVE}}": ctx.attr.phys_opt_directive,
         "{{TIMING_REPORT}}": timing_summary_report.path,
@@ -381,8 +397,8 @@ def _place_optimize_impl(ctx):
         VivadoPlacementCheckpointInfo(checkpoint = placement_checkpoint),
     ]
 
-place_optimize = rule(
-    implementation = _place_optimize_impl,
+vivado_place_optimize = rule(
+    implementation = _vivado_place_optimize_impl,
     attrs = {
         "checkpoint": attr.label(
             doc = "Placement checkpoint.",
@@ -399,6 +415,10 @@ place_optimize = rule(
             doc = "The optimization directive.",
             default = "AggressiveExplore",
         ),
+        "threads": attr.int(
+            doc = "Threads to pass to vivado which defines the amount of parallelism.",
+            default = 8
+        ),
         "_place_optimize_template": attr.label(
             doc = "The placement tcl template",
             default = "@rules_hdl//vivado:place_optimize.tcl.template",
@@ -411,7 +431,7 @@ place_optimize = rule(
     ],
 )
 
-def _routing_impl(ctx):
+def _vivado_routing_impl(ctx):
     route_checkpoint = ctx.actions.declare_file("{}_route.dcp".format(ctx.label.name))
     timing_summary_report = ctx.actions.declare_file("{}_synth_timing.rpt".format(ctx.label.name))
     util_report = ctx.actions.declare_file("{}_synth_util.rpt".format(ctx.label.name))
@@ -423,7 +443,7 @@ def _routing_impl(ctx):
     checkpoint_in = ctx.attr.checkpoint[VivadoPlacementCheckpointInfo].checkpoint
 
     substitutions = {
-        "{{THREADS}}": "8",
+        "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{CHECKPOINT_IN}}": checkpoint_in.path,
         "{{ROUTE_DIRECTIVE}}": ctx.attr.route_directive,
         "{{TIMING_REPORT}}": timing_summary_report.path,
@@ -459,8 +479,8 @@ def _routing_impl(ctx):
         VivadoRoutingCheckpointInfo(checkpoint = route_checkpoint),
     ]
 
-routing = rule(
-    implementation = _routing_impl,
+vivado_routing = rule(
+    implementation = _vivado_routing_impl,
     attrs = {
         "checkpoint": attr.label(
             doc = "Placement checkpoint.",
@@ -477,6 +497,10 @@ routing = rule(
             doc = "The routing directive.",
             default = "Explore",
         ),
+        "threads": attr.int(
+            doc = "Threads to pass to vivado which defines the amount of parallelism.",
+            default = 8
+        ),
         "_route_template": attr.label(
             doc = "The placement tcl template",
             default = "@rules_hdl//vivado:route.tcl.template",
@@ -489,13 +513,13 @@ routing = rule(
     ],
 )
 
-def _write_bitstream_impl(ctx):
+def _vivado_write_bitstream_impl(ctx):
     bitstream = ctx.actions.declare_file("{}.bit".format(ctx.label.name))
 
     checkpoint_in = ctx.attr.checkpoint[VivadoRoutingCheckpointInfo].checkpoint
 
     substitutions = {
-        "{{THREADS}}": "8",
+        "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{CHECKPOINT_IN}}": checkpoint_in.path,
         "{{BITSTREAM}}": bitstream.path,
     }
@@ -511,8 +535,8 @@ def _write_bitstream_impl(ctx):
         outputs,
     )
 
-write_bitstream = rule(
-    implementation = _write_bitstream_impl,
+vivado_write_bitstream = rule(
+    implementation = _vivado_write_bitstream_impl,
     attrs = {
         "checkpoint": attr.label(
             doc = "Routed checkpoint.",
@@ -524,6 +548,10 @@ write_bitstream = rule(
                   "point to license server",
             mandatory = True,
             allow_single_file = [".sh"],
+        ),
+        "threads": attr.int(
+            doc = "Threads to pass to vivado which defines the amount of parallelism.",
+            default = 8,
         ),
         "_write_bitstream_template": attr.label(
             doc = "The write bitstream tcl template",
@@ -547,7 +575,7 @@ def vivado_flow(name, module, module_top, part_number, xilinx_env, tags = []):
         xilinx_env: The shell script to setup the Xilinx/vivado environment.
         tags: Optional tags to use for the rules.
     """
-    synthesize(
+    vivado_synthesize(
         name = "{}_synth".format(name),
         module = module,
         module_top = module_top,
@@ -556,35 +584,35 @@ def vivado_flow(name, module, module_top, part_number, xilinx_env, tags = []):
         tags = tags,
     )
 
-    synthesis_optimize(
+    vivado_synthesis_optimize(
         name = "{}_synth_opt".format(name),
         checkpoint = ":{}_synth".format(name),
         xilinx_env = xilinx_env,
         tags = tags,
     )
 
-    placement(
+    vivado_placement(
         name = "{}_placement".format(name),
         checkpoint = "{}_synth_opt".format(name),
         xilinx_env = xilinx_env,
         tags = tags,
     )
 
-    place_optimize(
+    vivado_place_optimize(
         name = "{}_place_opt".format(name),
         checkpoint = "{}_placement".format(name),
         xilinx_env = xilinx_env,
         tags = tags,
     )
 
-    routing(
+    vivado_routing(
         name = "{}_route".format(name),
         checkpoint = "{}_place_opt".format(name),
         xilinx_env = xilinx_env,
         tags = tags,
     )
 
-    write_bitstream(
+    vivado_write_bitstream(
         name = name,
         checkpoint = "{}_route".format(name),
         xilinx_env = xilinx_env,
