@@ -40,7 +40,13 @@ OpenRoadPdkInfo = provider(
         "rc_script_configuration": "RC script for the various metal layers",
         "tapcell_tcl": "TCL file that sets tapcell options. This overrides other tapcell attributes in this rule.",
         "placement_padding_tcl": "TCL Script for handling the placement padding of cells",
+        "detailed_routing_configuration": "optional detailed routing configuration",
     },
+)
+
+DetailedRoutingInfo = provider(
+    "Detailed routing info params for OpenROAD",
+    fields = ["bottom_routing_layer", "top_routing_layer", "via_in_pin_bottom_layer", "via_in_pin_top_layer", "enable_via_gen"],
 )
 
 def _open_road_pdk_configuration_impl(ctx):
@@ -69,6 +75,7 @@ def _open_road_pdk_configuration_impl(ctx):
             rc_script_configuration = ctx.file.rc_script_configuration,
             tapcell_tcl = ctx.file.tapcell_tcl,
             placement_padding_tcl = ctx.file.placement_padding_tcl,
+            detailed_routing_configuration = ctx.attr.detailed_routing_configuration,
         ),
     ]
 
@@ -98,7 +105,29 @@ open_road_pdk_configuration = rule(
         "rc_script_configuration": attr.label(allow_single_file = True),
         "tapcell_tcl": attr.label(allow_single_file = True, doc = "TCL file that sets tapcell options. This overrides other tapcell attributes in this rule."),
         "placement_padding_tcl": attr.label(allow_single_file = True, doc = "TCL Script for handling the placement padding of cells"),
+        "detailed_routing_configuration": attr.label(providers = [DetailedRoutingInfo]),
     },
+)
+
+def detailed_routing_configuration_impl(ctx):
+    return [DetailedRoutingInfo(
+        bottom_routing_layer = ctx.attr.bottom_routing_layer,
+        top_routing_layer = ctx.attr.top_routing_layer,
+        via_in_pin_bottom_layer = ctx.attr.via_in_pin_bottom_layer,
+        via_in_pin_top_layer = ctx.attr.via_in_pin_top_layer,
+        enable_via_gen = ctx.attr.enable_via_gen,
+    )]
+
+detailed_routing_configuration = rule(
+    implementation = detailed_routing_configuration_impl,
+    attrs = {
+        "bottom_routing_layer": attr.string(mandatory = True, doc = "Minimum routing layer name"),
+        "top_routing_layer": attr.string(mandatory = True, doc = "Maximum routing layer name"),
+        "via_in_pin_bottom_layer": attr.string(doc = "via in pin bottom layer"),
+        "via_in_pin_top_layer": attr.string(doc = "via in pin top layer"),
+        "enable_via_gen": attr.bool(default = True),
+    },
+    provides = [DetailedRoutingInfo],
 )
 
 def assert_has_open_road_configuration(synthesis_info):

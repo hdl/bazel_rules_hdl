@@ -41,7 +41,7 @@ def clock_tree_synthesis(ctx, open_road_info):
         format_openroad_do_not_use_list(open_road_configuration.do_not_use_cell_list),
         "estimate_parasitics -placement",
         "repair_clock_inverters",
-        "clock_tree_synthesis -root_buf \"{cts_buffer}\" -buf_list \"{cts_buffer}\" -sink_clustering_enable".format(
+        "clock_tree_synthesis -root_buf \"{cts_buffer}\" -buf_list \"{cts_buffer}\" -sink_clustering_enable -post_cts_disable".format(
             cts_buffer = open_road_configuration.cts_buffer_cell,
         ),
         "set_propagated_clock [all_clocks]",

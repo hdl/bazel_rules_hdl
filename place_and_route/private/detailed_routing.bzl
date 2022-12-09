@@ -15,6 +15,8 @@
 """Detailed Routing openROAD commands"""
 
 load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
+load("@rules_hdl//pdk:open_road_configuration.bzl", "DetailedRoutingInfo", "get_open_road_configuration")
+load("//synthesis:build_defs.bzl", "SynthesisInfo")
 
 def detailed_routing(ctx, open_road_info):
     """Performs detailed routing.
@@ -34,8 +36,27 @@ def detailed_routing(ctx, open_road_info):
     output_drc = ctx.actions.declare_file("{}_output_drc".format(ctx.attr.name))
     routed_def = ctx.actions.declare_file("{}_detail_routed.def".format(ctx.attr.name))
 
+    open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
+
+    detailed_routing_configs = None
+    if open_road_configuration.detailed_routing_configuration:
+        detailed_routing_configs = open_road_configuration.detailed_routing_configuration[DetailedRoutingInfo]
+
+    detailed_routing_args = ""
+    if detailed_routing_configs:
+        if detailed_routing_configs.bottom_routing_layer:
+            detailed_routing_args += " -bottom_routing_layer " + detailed_routing_configs.bottom_routing_layer
+        if detailed_routing_configs.top_routing_layer:
+            detailed_routing_args += " -top_routing_layer " + detailed_routing_configs.top_routing_layer
+        if detailed_routing_configs.via_in_pin_bottom_layer:
+            detailed_routing_args += " -via_in_pin_bottom_layer " + detailed_routing_configs.via_in_pin_bottom_layer
+        if detailed_routing_configs.via_in_pin_top_layer:
+            detailed_routing_args += " -via_in_pin_top_layer " + detailed_routing_configs.via_in_pin_top_layer
+        if detailed_routing_configs.enable_via_gen:
+            detailed_routing_args += " -disable_via_gen "
+
     open_road_commands = timing_setup_command_struct.commands + [
-        "detailed_route -output_drc {}".format(output_drc.path),
+        "detailed_route -output_drc {} {}".format(output_drc.path, detailed_routing_args),
         "write_def {}".format(
             routed_def.path,
         ),
