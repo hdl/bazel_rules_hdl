@@ -234,6 +234,8 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
         arguments = [
             "-no_init",
             "-no_splash",
+            "-threads",
+            "max",
             "-exit",
             "-log",
             log_file.path,
