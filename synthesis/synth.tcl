@@ -55,5 +55,13 @@ if { [info exists ::env(CLOCK_PERIOD) ] } {
 set output $::env(OUTPUT)
 write_verilog $output
 
-# print stats
+# ====== print stats / info ======
 stat -liberty $liberty
+read_liberty -lib -ignore_miss_func $liberty
+ltp -noff $top
+
+yosys log -n Flop count:\ 
+yosys select -count t:*__df* t:DFF* t:*_DFF* t:*_SDFF* t:*_ADFF* t:*dff
+
+set base_liberty [file tail $liberty]
+yosys log Liberty: $base_liberty
