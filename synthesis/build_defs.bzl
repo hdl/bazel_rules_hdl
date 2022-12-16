@@ -91,7 +91,6 @@ def _synthesize_design_impl(ctx):
     args.add("-q")  # quiet mode only errors printed to stderr
     args.add("-q")  # second q don't print warnings
     args.add("-Q")  # Don't print header
-    args.add("-T")  # Don't print footer
     args.add_all("-l", [log_file])  # put output in log file
     args.add_all("-c", [synth_tcl])  # run synthesis tcl script
 
@@ -170,9 +169,11 @@ def _benchmark_synth_impl(ctx):
 
     synth_log = synth_info.log_file.short_path
     grep = "zgrep" if ("log.gz" in synth_log) else "grep"
-    cmd = "{grep} Chip.area {log}".format(grep = grep, log = synth_log)
-
-    info = "echo 'Using {info}'".format(info = synth_info.standard_cell_info.default_corner.liberty.short_path)
+    cmd1 = "{grep} Chip.area {log}".format(grep = grep, log = synth_log)
+    cmd2 = "{grep} Longest.topological.path {log}".format(grep = grep, log = synth_log)
+    cmd3 = "{grep} Flop.count {log}".format(grep = grep, log = synth_log)
+    cmd4 = "{grep} ^Liberty: {log}".format(grep = grep, log = synth_log)
+    cmd5 = "{grep} CPU:.user {log}".format(grep = grep, log = synth_log)
 
     executable_file = ctx.actions.declare_file(ctx.label.name + ".sh")
 
@@ -185,8 +186,11 @@ def _benchmark_synth_impl(ctx):
         content = "\n".join([
             "#!/bin/bash",
             "set -e",
-            info,
-            cmd,
+            cmd1,
+            cmd2,
+            cmd3,
+            cmd4,
+            cmd5,
             "exit 0",
         ]),
         is_executable = True,
