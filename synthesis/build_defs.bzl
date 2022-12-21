@@ -26,6 +26,17 @@ UhdmInfo = provider(
     },
 )
 
+ExternalSynthesisInfo = provider(
+    "Surelog/UHDM based RTL representation",
+    fields = {
+        "env": "Map of env variables",
+        "yosys_script": "yosys script file",
+        "inputs": "File inputs",
+        "verilog_files": "Verilog Inputs",
+        "uhdm_files": "UHDM files",
+    },
+)
+
 # Args:
 #    standard_cell_info: The StandardCellInfo provider this target was synthesized against.
 #    synthesized_netlist: The structural verilog syntheized with standard_cell_info
@@ -42,9 +53,12 @@ def _transitive_srcs(deps):
         transitive = [dep[VerilogInfo].dag for dep in deps],
     )
 
-def _create_flist(ctx, flist_tag, files):
+def _create_flist(ctx, flist_tag, files, short_path = False):
     flist = ctx.actions.declare_file("{}_{}.flist".format(flist_tag, ctx.attr.name))
-    ctx.actions.write(flist, "\n".join([f.path for f in files]) + "\n")
+    if short_path:
+        ctx.actions.write(flist, "\n".join([f.short_path for f in files]) + "\n")
+    else:
+        ctx.actions.write(flist, "\n".join([f.path for f in files]) + "\n")
     return flist
 
 def _synthesize_design_impl(ctx):
@@ -80,6 +94,7 @@ def _synthesize_design_impl(ctx):
     inputs.append(uhdm_flist)
     inputs.extend(uhdm_files)
     inputs.append(synth_tcl)
+    inputs.append(default_liberty_file)
 
     (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr.yosys_tool])
 
@@ -94,22 +109,31 @@ def _synthesize_design_impl(ctx):
     args.add_all("-l", [log_file])  # put output in log file
     args.add_all("-c", [synth_tcl])  # run synthesis tcl script
 
-    env = {
-        "FLIST": verilog_flist.path,
-        "UHDM_FLIST": uhdm_flist.path,
+    script_env_files = {
+        "FLIST": verilog_flist,
+        "UHDM_FLIST": uhdm_flist,
         "TOP": ctx.attr.top_module,
-        "OUTPUT": output_file.path,
-        "LIBERTY": default_liberty_file.path,
+        "OUTPUT": output_file,
+        "LIBERTY": default_liberty_file,
+    }
+
+    if ctx.attr.target_clock_period_pico_seconds:
+        script_env_files["CLOCK_PERIOD"] = str(ctx.attr.target_clock_period_pico_seconds)
+
+    env = {
         "YOSYS_DATDIR": yosys_runfiles_dir + "/at_clifford_yosys/techlibs/",
         "ABC": yosys_runfiles_dir + "/edu_berkeley_abc/abc",
     }
 
-    if ctx.attr.target_clock_period_pico_seconds:
-        env["CLOCK_PERIOD"] = str(ctx.attr.target_clock_period_pico_seconds)
+    for k, v in script_env_files.items():
+        if type(v) == "File":
+            env[k] = v.path
+        else:
+            env[k] = v
 
     ctx.actions.run(
         outputs = [output_file, log_file],
-        inputs = inputs + tool_inputs.to_list() + [default_liberty_file],
+        inputs = inputs + tool_inputs.to_list(),
         arguments = [args],
         executable = ctx.executable.yosys_tool,
         tools = tool_inputs,
@@ -129,7 +153,74 @@ def _synthesize_design_impl(ctx):
             top_module = ctx.attr.top_module,
             log_file = log_file,
         ),
+        ExternalSynthesisInfo(
+            env = script_env_files,
+            yosys_script = synth_tcl,
+            inputs = inputs,
+            verilog_files = verilog_files,
+            uhdm_files = uhdm_files,
+        ),
     ]
+
+def _synthesize_binary_impl(ctx):
+    script = ""
+    external_info = ctx.attr.synthesize_rtl_rule[ExternalSynthesisInfo]
+
+    env = dict(external_info.env)
+    env["FLIST"] = _create_flist(
+        ctx,
+        flist_tag = "verilog",
+        files = external_info.verilog_files,
+        short_path = True,
+    )
+
+    env["UHDM_FLIST"] = _create_flist(
+        ctx,
+        flist_tag = "uhdm",
+        files = external_info.uhdm_files,
+        short_path = True,
+    )
+
+    env["OUTPUT"] = "/tmp/{}.v".format(ctx.attr.name)
+
+    script += "#!/bin/bash\n"
+
+    for k, v in env.items():
+        script += "export {}='{}'\n".format(k, v.short_path if type(v) == "File" else v)
+
+    yosys_runfiles_dir = ctx.executable.yosys_tool.short_path + ".runfiles"
+
+    script += "export YOSYS_DATDIR='{}/at_clifford_yosys/techlibs/'\n".format(yosys_runfiles_dir)
+    yosys = ctx.attr.yosys_tool[DefaultInfo]
+    script += "${{PREFIX_COMMAND}} {} -c {}\n".format(ctx.executable.yosys_tool.short_path, external_info.yosys_script.short_path)
+
+    binary = ctx.actions.declare_file("{}_synth_binary.sh".format(ctx.attr.name))
+    ctx.actions.write(binary, script, is_executable = True)
+
+    return [
+        DefaultInfo(
+            executable = binary,
+            runfiles = yosys.default_runfiles.merge_all(
+                [
+                    ctx.runfiles(external_info.inputs),
+                    ctx.runfiles([env["UHDM_FLIST"], env["FLIST"]]),
+                ],
+            ),
+        ),
+    ]
+
+synthesis_binary = rule(
+    implementation = _synthesize_binary_impl,
+    attrs = {
+        "synthesize_rtl_rule": attr.label(providers = [ExternalSynthesisInfo]),
+        "yosys_tool": attr.label(
+            default = Label("@at_clifford_yosys//:yosys"),
+            executable = True,
+            cfg = "target",
+        ),
+    },
+    executable = True,
+)
 
 synthesize_rtl = rule(
     implementation = _synthesize_design_impl,

@@ -107,12 +107,21 @@ def clock_commands(ctx):
     Returns:
         Struct with params inputs and commands. Both return values are lists.
     """
-    if not clock_commands:
-        return struct(inputs = [], commands = ["create_clock [get_ports clk] -period {period}".format(period = ctx.attr.clock_period)])
-
     sdc = ctx.file.sdc
+
     if sdc:
         return struct(inputs = [sdc], commands = ["read_sdc {}".format(sdc.path)])
+
+    # If no name is passed, the clock is assumed to be named "clk".
+    if ctx.attr.clock_period:
+        return struct(
+            inputs = [],
+            commands = [
+                "create_clock [get_ports clk] -period {period}".format(
+                    period = ctx.attr.clock_period,
+                ),
+            ],
+        )
 
     return struct(
         inputs = [],
