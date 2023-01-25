@@ -84,7 +84,8 @@ def generate_file_load_tcl(module):
         elif file.extension == "xdc":
             constraints_content += "read_xdc " + file.path + "\n"
         else:
-            fail("Unknown file type: " + file.path)
+            # Try generic "add_files" for that type.
+            hdl_source_content += "add_files " + file.path + "\n"
 
     return [
         all_files,
