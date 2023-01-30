@@ -199,9 +199,9 @@ vivado_create_project = rule(
 )
 
 def _vivado_synthesize_impl(ctx):
-    synth_checkpoint = ctx.actions.declare_file("{}_synth.dcp".format(ctx.label.name))
-    timing_summary_report = ctx.actions.declare_file("{}_synth_timing.rpt".format(ctx.label.name))
-    util_report = ctx.actions.declare_file("{}_synth_util.rpt".format(ctx.label.name))
+    synth_checkpoint = ctx.actions.declare_file("{}.dcp".format(ctx.label.name))
+    timing_summary_report = ctx.actions.declare_file("{}_timing.rpt".format(ctx.label.name))
+    util_report = ctx.actions.declare_file("{}_util.rpt".format(ctx.label.name))
 
     default_info = create_and_synth(
         ctx,
@@ -260,9 +260,9 @@ vivado_synthesize = rule(
 )
 
 def _vivado_synthesis_optimize_impl(ctx):
-    synth_checkpoint = ctx.actions.declare_file("{}_synth.dcp".format(ctx.label.name))
-    timing_summary_report = ctx.actions.declare_file("{}_synth_timing.rpt".format(ctx.label.name))
-    util_report = ctx.actions.declare_file("{}_synth_util.rpt".format(ctx.label.name))
+    synth_checkpoint = ctx.actions.declare_file("{}.dcp".format(ctx.label.name))
+    timing_summary_report = ctx.actions.declare_file("{}_timing.rpt".format(ctx.label.name))
+    util_report = ctx.actions.declare_file("{}_util.rpt".format(ctx.label.name))
     drc_report = ctx.actions.declare_file("{}_drc.rpt".format(ctx.label.name))
 
     checkpoint_in = ctx.attr.checkpoint[VivadoSynthCheckpointInfo].checkpoint
@@ -328,9 +328,9 @@ vivado_synthesis_optimize = rule(
 )
 
 def _vivado_placement_impl(ctx):
-    placement_checkpoint = ctx.actions.declare_file("{}_place.dcp".format(ctx.label.name))
-    timing_summary_report = ctx.actions.declare_file("{}_synth_timing.rpt".format(ctx.label.name))
-    util_report = ctx.actions.declare_file("{}_synth_util.rpt".format(ctx.label.name))
+    placement_checkpoint = ctx.actions.declare_file("{}.dcp".format(ctx.label.name))
+    timing_summary_report = ctx.actions.declare_file("{}_timing.rpt".format(ctx.label.name))
+    util_report = ctx.actions.declare_file("{}_util.rpt".format(ctx.label.name))
 
     checkpoint_in = ctx.attr.checkpoint[VivadoSynthCheckpointInfo].checkpoint
 
@@ -394,9 +394,9 @@ vivado_placement = rule(
 )
 
 def _vivado_place_optimize_impl(ctx):
-    placement_checkpoint = ctx.actions.declare_file("{}_place.dcp".format(ctx.label.name))
-    timing_summary_report = ctx.actions.declare_file("{}_synth_timing.rpt".format(ctx.label.name))
-    util_report = ctx.actions.declare_file("{}_synth_util.rpt".format(ctx.label.name))
+    placement_checkpoint = ctx.actions.declare_file("{}.dcp".format(ctx.label.name))
+    timing_summary_report = ctx.actions.declare_file("{}_timing.rpt".format(ctx.label.name))
+    util_report = ctx.actions.declare_file("{}_util.rpt".format(ctx.label.name))
 
     checkpoint_in = ctx.attr.checkpoint[VivadoPlacementCheckpointInfo].checkpoint
 
@@ -460,9 +460,9 @@ vivado_place_optimize = rule(
 )
 
 def _vivado_routing_impl(ctx):
-    route_checkpoint = ctx.actions.declare_file("{}_route.dcp".format(ctx.label.name))
-    timing_summary_report = ctx.actions.declare_file("{}_synth_timing.rpt".format(ctx.label.name))
-    util_report = ctx.actions.declare_file("{}_synth_util.rpt".format(ctx.label.name))
+    route_checkpoint = ctx.actions.declare_file("{}.dcp".format(ctx.label.name))
+    timing_summary_report = ctx.actions.declare_file("{}_timing.rpt".format(ctx.label.name))
+    util_report = ctx.actions.declare_file("{}_util.rpt".format(ctx.label.name))
     status_report = ctx.actions.declare_file("{}_status.rpt".format(ctx.label.name))
     io_report = ctx.actions.declare_file("{}_io.rpt".format(ctx.label.name))
     power_report = ctx.actions.declare_file("{}_power.rpt".format(ctx.label.name))
