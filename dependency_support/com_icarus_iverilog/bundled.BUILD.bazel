@@ -373,8 +373,8 @@ cc_binary(
         "-ldl",
         "-Wl,-u," + ",-u,".join(ivl_def),
     ] + select({
-        "@bazel_tools//src/conditions:darwin": ["-Wl,-export_dynamic", "-no_pie"],
-        "//conditions:default": ["-Wl,--export-dynamic", "-no-pie"],
+        "@bazel_tools//src/conditions:darwin": ["-Wl,-export_dynamic", "-Wl,-no_pie"],
+        "//conditions:default": ["-Wl,--export-dynamic", "-Wl,-no-pie"],
     }),
     deps = [
         "ivl-misc",
