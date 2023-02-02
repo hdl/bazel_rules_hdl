@@ -372,10 +372,9 @@ cc_binary(
     linkopts = [
         "-ldl",
         "-Wl,-u," + ",-u,".join(ivl_def),
-        "-Wl,-no-pie",
     ] + select({
-        "@bazel_tools//src/conditions:darwin": ["-Wl,-export_dynamic"],
-        "//conditions:default": ["-Wl,--export-dynamic"],
+        "@bazel_tools//src/conditions:darwin": ["-Wl,-export_dynamic", "-Wl,-no_pie"],
+        "//conditions:default": ["-Wl,--export-dynamic", "-Wl,-no-pie"],
     }),
     deps = [
         "ivl-misc",

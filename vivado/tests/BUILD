@@ -4,6 +4,7 @@ load(
     "//vivado:defs.bzl",
     "vivado_flow",
     "xsim_test",
+    "vivado_create_ip",
 )
 
 verilog_library(
@@ -60,6 +61,16 @@ vivado_flow(
     module = ":johnson_counter_top",
     module_top = "johnson_counter_top",
     part_number = "xczu28dr-ffvg1517-2-e",
+    tags = ["manual"],
+    xilinx_env = ":xilinx_env.sh",
+)
+
+vivado_create_ip(
+    name = "johnson_counter_ip",
+    module = ":johnson_counter",
+    module_top = "johnson_counter",
+    part_number = "xczu28dr-ffvg1517-2-e",
+    ip_version = "0.1",
     tags = ["manual"],
     xilinx_env = ":xilinx_env.sh",
 )

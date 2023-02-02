@@ -741,3 +741,129 @@ xsim_test = rule(
         ),
     },
 )
+
+def generate_encrypt_tcl(module, keyfile_path):
+    """Generate the commands to encrypt all sources.
+
+    Args:
+      module: The top level verilog module
+      keyfile_path: Path to the key file used to encrypt.
+
+    Returns:
+      encrypt_content: A string to encypt all sources.
+    """
+    transitive_srcs = depset([], transitive = [module[VerilogInfo].dag])
+    all_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs.to_list()]
+    all_files = [src for sub_tuple in all_srcs for src in sub_tuple]
+
+    encrypt_content = ""
+    for file in all_files:
+        if file.extension == "v":
+            encrypt_content += "encrypt -key {} -lang verilog {}\n".format(keyfile_path, file.path)
+        elif file.extension == "sv":
+            encrypt_content += "encrypt -key {} -lang verilog {}\n".format(keyfile_path, file.path)
+        elif file.extension in ["vhd", "vhdl"]:
+            encrypt_content += "encrypt -key {} -lang vhdl {}\n".format(keyfile_path, file.path)
+
+    return [
+        encrypt_content,
+    ]
+
+def _vivado_create_ip_impl(ctx):
+    all_files, hdl_source_content, constraints_content, tcl_content = generate_file_load_tcl(ctx.attr.module)
+
+    xci_name = ctx.label.name
+    project_dir = ctx.actions.declare_directory("{}_project".format(ctx.label.name))
+    ip_dir = ctx.actions.declare_directory("{}_repo".format(ctx.label.name))
+    xci_file = ctx.actions.declare_file("{}.xci".format(xci_name))
+
+    outputs = [ip_dir, project_dir]
+
+    if ctx.attr.encrypt:
+      encrypt_content = generate_encrypt_tcl(ctx.attr.module, ctx.file._keyfile.path)[0]
+    else:
+      encrypt_content = ""
+
+    substitutions = {
+        "{{PART_NUMBER}}": ctx.attr.part_number,
+        "{{HDL_SOURCE_CONTENT}}": hdl_source_content,
+        "{{TCL_CONTENT}}": tcl_content,
+        "{{CONSTRAINTS_CONTENT}}": constraints_content,
+        "{{MODULE_TOP}}": ctx.attr.module_top,
+        "{{PROJECT_DIR}}": project_dir.path,
+        "{{IP_OUTPUT_DIR}}": ip_dir.path,
+        "{{IP_VERSION}}": ctx.attr.ip_version,
+        "{{JOBS}}": "{}".format(ctx.attr.jobs),
+        "{{ENCRYPT_CONTENT}}": encrypt_content,
+        "{{IP_VENDOR}}": "cruxml.com.au",
+        "{{IP_LIBRARY}}": "cruxml",
+        "{{XCI_NAME}}": xci_name,
+    }
+
+    default_info = run_tcl_template(
+        ctx,
+        ctx.file._create_ip_block_template,
+        substitutions,
+        ctx.file.xilinx_env,
+        all_files + [ctx.file._keyfile],
+        outputs,
+    )
+
+    ctx.actions.run_shell(
+        command = "cp {}/{}/{}.xci {}".format(ip_dir.path, xci_name, xci_name, xci_file.path),
+        inputs = [ip_dir],
+        outputs = [xci_file],
+        progress_message = "Copying xci over.",
+    )
+
+    return [
+        DefaultInfo(files = depset([xci_file])),
+    ]
+
+vivado_create_ip = rule(
+    implementation = _vivado_create_ip_impl,
+    doc = "Use vivado to package a module into an IP core",
+    attrs = {
+        "module": attr.label(
+            doc = "The top level build.",
+            providers = [VerilogInfo],
+            mandatory = True,
+        ),
+        "module_top": attr.string(
+            doc = "The name of the top level verilog module.",
+            mandatory = True,
+        ),
+        "part_number": attr.string(
+            doc = "The targeted xilinx part.",
+            mandatory = True,
+        ),
+        "ip_version": attr.string(
+            doc = "The version of this ip core.",
+            mandatory = True,
+        ),
+        "encrypt": attr.bool(
+            doc = "Encrypt the sources. Note: This requires a license. See: https://support.xilinx.com/s/article/68071?language=en_US",
+            default = False,
+        ),
+        "jobs": attr.int(
+            doc = "Jobs to pass to vivado which defines the amount of parallelism.",
+            default = 4,
+        ),
+        "xilinx_env": attr.label(
+            doc = "A shell script to source the vivado environment and " +
+                  "point to license server",
+            mandatory = True,
+            allow_single_file = [".sh"],
+        ),
+        "_create_ip_block_template": attr.label(
+            doc = "The create project tcl template",
+            default = "@rules_hdl//vivado:create_ip_block.tcl.template",
+            allow_single_file = [".template"],
+        ),
+        "_keyfile": attr.label(
+            doc = "The keyfile to use when optionally encrypting",
+            default = "@rules_hdl//vivado:xilinx_keyfile.txt",
+            allow_single_file = [".txt"],
+        ),
+    },
+)
