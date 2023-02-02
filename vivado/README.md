@@ -189,3 +189,24 @@ To open this waveform in vivado:
 current_fileset
 open_wave_database bazel-out/k8-fastbuild/bin/vivado/tests/xsim_smoke_test.wdb
 ```
+
+## vivado_create_ip
+
+Creates and IP block from a module for vivado.
+
+Example from `vivado/tests`:
+```
+vivado_create_ip(
+    name = "weights_replay_ip",
+    module = ":weights_replay",
+    module_top = "weights_replay",
+    part_number = "xczu28dr-ffvg1517-2-e",
+    ip_version = "0.1",
+    ip_library = "test",
+    ip_vendor = "test_vendor",
+    tags = ["manual"],
+    xilinx_env = ":xilinx_env.sh",
+)
+```
+
+This will generate an ip repository directory that can be included in vivado projects.

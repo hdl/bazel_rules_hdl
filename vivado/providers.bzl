@@ -20,3 +20,10 @@ VivadoRoutingCheckpointInfo = provider(
         "checkpoint": "A vivado checkpoint.",
     },
 )
+
+VivadoIPBlockInfo = provider(
+    doc = "Info for a vivado ip block",
+    fields = {
+        "repo": "Repo containing ip block.",
+    },
+)
