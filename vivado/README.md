@@ -189,3 +189,22 @@ To open this waveform in vivado:
 current_fileset
 open_wave_database bazel-out/k8-fastbuild/bin/vivado/tests/xsim_smoke_test.wdb
 ```
+
+## vivado_create_ip
+
+Creates and IP block from a module for vivado.
+
+```
+vivado_create_ip(
+    name = "johnson_counter_ip",
+    module = ":johnson_counter",
+    module_top = "johnson_counter",
+    part_number = "xczu28dr-ffvg1517-2-e",
+    ip_version = "0.1",
+    tags = ["manual"],
+    xilinx_env = ":xilinx_env.sh",
+)
+```
+
+This will output `johnson_counter_ip.xci` which can be imported or used in
+vivado projects.
