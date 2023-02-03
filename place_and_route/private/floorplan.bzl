@@ -67,6 +67,8 @@ def init_floor_plan(ctx):
     std_cell_lef = netlist_target[SynthesisInfo].standard_cell_info.cell_lef_definitions
     verilog_based_power_results = ctx.actions.declare_file("{}_verilog_based_power_results.textproto".format(ctx.attr.name))
     verilog_based_area_results = ctx.actions.declare_file("{}_verilog_based_area_results.textproto".format(ctx.attr.name))
+    tieoneport = open_road_configuration.tie_high_port
+    tiezeroport = open_road_configuration.tie_low_port
 
     open_road_commands = [
         "read_lef {tech_lef}".format(
@@ -88,6 +90,12 @@ def init_floor_plan(ctx):
         _initialize_floorplan_command(ctx),
         "source {tracks_file}".format(
             tracks_file = open_road_configuration.tracks_file.path,
+        ),
+        "insert_tiecells {port} -prefix \"TIE_ONE_\"".format(
+            port = tieoneport,
+        ),
+        "insert_tiecells {port} -prefix \"TIE_ZERO_\"".format(
+            port = tiezeroport,
         ),
     ])
     open_road_commands.extend(generate_power_results(ctx, verilog_based_power_results))
