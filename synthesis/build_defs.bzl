@@ -83,7 +83,10 @@ def _synthesize_design_impl(ctx):
         files = uhdm_files,
     )
 
-    output_file = ctx.actions.declare_file("{}_synth_output.v".format(ctx.attr.name))
+    output_file_name = "{}_synth_output.v".format(ctx.attr.name)
+    if ctx.attr.output_file_name:
+        output_file_name = ctx.attr.output_file_name
+    output_file = ctx.actions.declare_file(output_file_name)
     default_liberty_file = ctx.attr.standard_cells[StandardCellInfo].default_corner.liberty
 
     synth_tcl = ctx.file.synth_tcl
@@ -243,6 +246,7 @@ synthesize_rtl = rule(
             doc = "Tcl synthesis script compatible with the environment-variable API of synth.tcl",
         ),
         "target_clock_period_pico_seconds": attr.int(doc = "target clock period in picoseconds"),
+        "output_file_name": attr.string(doc = "The output file name."),
     },
 )
 
