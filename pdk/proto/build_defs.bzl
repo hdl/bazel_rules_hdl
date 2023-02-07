@@ -86,7 +86,9 @@ def _extract_lef_and_liberty_impl(ctx):
     content.append("cts_buffer_cell: \"{}\"".format(open_road_configuration.cts_buffer_cell))
 
     for fill_cell in open_road_configuration.fill_cells:
-        content.append("fill_cells: \"{}\"".format(fill_cell))
+        # Poor hack to proxy string escaping.
+        escaped_fill_cell = fill_cell.replace("\\", "\\\\")
+        content.append("fill_cells: \"{}\"".format(escaped_fill_cell))
 
     for layer, value in open_road_configuration.global_routing_layer_adjustments.items():
         content.append(
