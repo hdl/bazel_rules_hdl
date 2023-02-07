@@ -81,7 +81,7 @@ def cc_compile_and_link_static_library(ctx, srcs, hdrs, deps, runfiles, includes
 
 _CPP_SRC = ["cc", "cpp", "cxx", "c++"]
 _HPP_SRC = ["h", "hh", "hpp"]
-_RUNFILES = ["dat"]
+_RUNFILES = ["dat", "mem"]
 
 def _only_cpp(f):
     """Filter for just C++ source/headers"""
