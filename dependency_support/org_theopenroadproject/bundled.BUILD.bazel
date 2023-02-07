@@ -1518,6 +1518,7 @@ cc_binary(
         ":opensta_lib",
         "@tk_tcl//:tcl",
     ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(

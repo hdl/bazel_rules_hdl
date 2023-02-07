@@ -32,6 +32,8 @@ def _run_opensta_impl(ctx):
     liberty_file = synth_info.standard_cell_info.default_corner.liberty
 
     (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr._opensta])
+    opensta_runfiles_dir = ctx.executable._opensta.path + ".runfiles"
+
     sta_tcl = ctx.file.sta_tcl
     sta_log = ctx.actions.declare_file("sta.log")
 
@@ -40,6 +42,7 @@ def _run_opensta_impl(ctx):
         "TOP": synth_info.top_module,
         "LOGFILE": sta_log.path,
         "LIBERTY": liberty_file.path,
+        "TCL_LIBRARY": opensta_runfiles_dir + "/tk_tcl/library",
     }
 
     ctx.actions.run(
