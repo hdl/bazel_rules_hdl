@@ -13,6 +13,7 @@
 # limitations under the License.
 
 load("//synthesis:build_defs.bzl", "synthesize_rtl")
+load("//static_timing:build_defs.bzl", "run_opensta")
 load("//place_and_route:build_defs.bzl", "place_and_route")
 load("//verilog:providers.bzl", "verilog_library")
 
@@ -41,12 +42,22 @@ place_and_route(
     synthesized_rtl = ":verilog_counter_synth",
 )
 
+run_opensta(
+    name = "verilog_counter_synth_sta",
+    synth_target = ":verilog_counter_synth",
+)
+
 synthesize_rtl(
     name = "verilog_counter_synth",
     top_module = "counter",
     deps = [
         ":verilog_counter",
     ],
+)
+
+run_opensta(
+    name = "verilog_counter_asap7_synth_sta",
+    synth_target = ":verilog_counter_asap7_synth",
 )
 
 synthesize_rtl(
