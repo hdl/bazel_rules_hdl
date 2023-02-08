@@ -35,7 +35,7 @@ def _run_opensta_impl(ctx):
     opensta_runfiles_dir = ctx.executable._opensta.path + ".runfiles"
 
     sta_tcl = ctx.file.sta_tcl
-    sta_log = ctx.actions.declare_file("sta.log")
+    sta_log = ctx.actions.declare_file("{}_sta.log".format(ctx.attr.name))
 
     env = {
         "NETLIST": netlist.path,
