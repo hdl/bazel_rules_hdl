@@ -68,7 +68,7 @@ def _run_opensta_impl(ctx):
 run_opensta_attrs = {
     "synth_target": attr.label(
         doc = "The synth target to benchmark.",
-        providers = [SynthesisInfo, DefaultInfo],
+        providers = [SynthesisInfo],
     ),
     "sta_tcl": attr.label(
         default = Label("//static_timing:sta.tcl"),
