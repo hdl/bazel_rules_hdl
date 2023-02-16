@@ -31,7 +31,7 @@ exports_files(["LICENSE"])
 genrule(
     name = "version_src",
     outs = ["kernel/version.cc"],
-    cmd = "echo 'namespace Yosys { extern const char *yosys_version_str; const char *yosys_version_str=\"Yosys 0.22\"; }' >$@",
+    cmd = "echo 'namespace Yosys { extern const char *yosys_version_str; const char *yosys_version_str=\"Yosys 0.26\"; }' >$@",
 )
 
 cc_library(
