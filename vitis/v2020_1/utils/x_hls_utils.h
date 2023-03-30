@@ -32,8 +32,8 @@
 #ifndef X_HLS_UTILS_H
 #define X_HLS_UTILS_H
 #include <stdint.h>
-#include "ap_fixed.h"
-#include "vivado/v2020_1/hls_half.h"
+#include "vitis/v2020_1/ap_fixed.h"
+#include "vitis/v2020_1/hls_half.h"
 #include <limits>
 #ifndef __SYNTHESIS__
 #include <iostream>

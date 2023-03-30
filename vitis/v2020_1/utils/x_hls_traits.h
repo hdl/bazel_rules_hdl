@@ -34,7 +34,7 @@
 
 #include "ap_fixed.h"
 #include "ap_int.h"
-#include "vivado/v2020_1/hls_half.h"
+#include "vitis/v2020_1/hls_half.h"
 #include "x_hls_utils.h"
 #include "x_hls_defines.h"
 #include <stdint.h>
