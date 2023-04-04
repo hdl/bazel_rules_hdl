@@ -66,8 +66,10 @@ def _vitis_generate_impl(ctx):
     vitis_command = "source " + ctx.file.xilinx_env.path + " && "
     if ctx.attr.use_vivado_hls:
         vitis_command += "vivado_hls " + vitis_tcl.path
+        cflags += " --std=c++11"
     else:
         vitis_command += "vitis_hls " + vitis_tcl.path
+        cflags += " --std=c++17"
     vitis_command += " -l " + vitis_log.path
     vitis_command += " && tar -czvf " + ctx.outputs.out.path + " -C "
     vitis_command += ctx.label.name + "/sol1/impl/verilog ."
