@@ -34,7 +34,10 @@ vitis_hls_files_aspect = aspect(
 
 def _vitis_generate_impl(ctx):
     all_files = []
-    cflags = "-D__SYNTHESIS__=1 --std=c++17"
+    if ctx.attr.use_vivado_hls:
+        cflags = "-D__SYNTHESIS__=1 --std=c++11"
+    else:
+        cflags = "-D__SYNTHESIS__=1 --std=c++17"
     for dep in ctx.attr.deps:
         for file in dep[HlsFileInfo].files:
             external_path = "/".join([file.root.path, file.owner.workspace_root]) if file.root.path else file.owner.workspace_root
