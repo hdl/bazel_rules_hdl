@@ -1449,6 +1449,7 @@ tcl_wrap_cc(
     srcs = [
         ":sta_swig_files",
     ],
+    namespace_prefix = "sta",
     root_swig_src = "src/sta/app/StaApp.i",
     swig_includes = [
         "src/sta/dcalc",
