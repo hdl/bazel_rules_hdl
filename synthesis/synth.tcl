@@ -39,6 +39,13 @@ foreach src $srcs {
 
 # generic synthesis
 set top $::env(TOP)
+hierarchy -check -top $top
+# Move proc_mux at the end of `yosys proc` to avoid inferred latches.
+# See https://github.com/YosysHQ/yosys/issues/3456
+# Ideally the bug would be solved in UHDM/Yosys.
+yosys proc -nomux
+yosys proc_mux
+yosys flatten
 yosys synth -top $top
 
 # mapping to liberty

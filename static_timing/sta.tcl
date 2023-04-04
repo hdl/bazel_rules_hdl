@@ -15,12 +15,12 @@ set netlist $::env(NETLIST)
 set liberty $::env(LIBERTY)
 set top $::env(TOP)
 
-redirect_file_begin $sta_log
+sta::redirect_file_begin $sta_log
 read_verilog $netlist
 read_liberty $liberty
 link_design  $top
 report_checks -unconstrained
-redirect_file_end
+sta::redirect_file_end
 
 # also output to stdout
 report_checks -unconstrained
