@@ -79,11 +79,16 @@ def _skywater_cell_library_impl(ctx):
     if ctx.attr.tech_lef:
         tech_lef = ctx.file.tech_lef
 
+    default_corner = corners.get(ctx.attr.default_corner, None)
+    default_lib_depset = []
+    if default_corner:
+        default_lib_depset = [default_corner.liberty]
+
     return [
-        DefaultInfo(files = depset([])),
+        DefaultInfo(files = depset(default_lib_depset)),
         StandardCellInfo(
             corners = corners,
-            default_corner = corners.get(ctx.attr.default_corner, None),
+            default_corner = default_corner,
             open_road_configuration = open_road_configuration,
             tech_lef = tech_lef,
             cell_lef_definitions = cell_lef_files,
