@@ -2,25 +2,25 @@
 
 The following are defined in `//vivado:defs.bzl`:
 
-* `create_project`
-* `synthesize`
-* `synthesis_optimize`
-* `placement`
-* `place_optimize`
-* `routing`
-* `write_bitstream`
+* `vivado_create_project`
+* `vivado_synthesize`
+* `vivado_synthesis_optimize`
+* `vivado_placement`
+* `vivado_place_optimize`
+* `vivado_routing`
+* `vivado_write_bitstream`
 * `vivado_flow`
 
 ## Quickstart
 
 `vivado_flow` macro creates a bitstream by running the following steps:
 
-* `synthesize`
-* `synthesis_optimize`
-* `placement`
-* `place_optimize`
-* `routing`
-* `write_bitstream`
+* `vivado_synthesize`
+* `vivado_synthesis_optimize`
+* `vivado_placement`
+* `vivado_place_optimize`
+* `vivado_routing`
+* `vivado_write_bitstream`
 
 Example from `vivado/tests`:
 ```
@@ -50,7 +50,7 @@ Creates a vivado project from the sources. This is useful to experiment or check
 
 Example from `vivado/tests`:
 ```
-create_project(
+vivado_create_project(
     name = "johnson_counter_project",
     module = ":johnson_counter_top",
     module_top = "johnson_counter_top",
@@ -67,7 +67,7 @@ Creates a synthesized checkpoint.
 
 Example from `vivado/tests`:
 ```
-synthesize(
+vivado_synthesize(
     name = "johnson_counter_synth",
     module = ":johnson_counter_top",
     module_top = "johnson_counter_top",
@@ -86,7 +86,7 @@ Runs `opt_design` on the synthesis checkpoint. Outputs a new synthesis checkpoin
 
 Example from `vivado/tests`:
 ```
-synthesis_optimize(
+vivado_synthesis_optimize(
     name = "johnson_counter_synth_opt",
     checkpoint = ":johnson_counter_synth",
     xilinx_env = ":xilinx_env.sh",
@@ -103,7 +103,7 @@ Place the design. Accepts a synthesis checkpoint and generates a placement check
 
 Example from `vivado/tests`:
 ```
-placement(
+vivado_placement(
     name = "johnson_counter_placement",
     checkpoint = ":johnson_counter_synth_opt",
     xilinx_env = ":xilinx_env.sh",
@@ -118,7 +118,7 @@ Runs `phys_opt_design`. Accepts a placement checkpoint and generates a placement
 
 Example from `vivado/tests`:
 ```
-place_optimize(
+vivado_place_optimize(
     name = "johnson_counter_place_opt",
     checkpoint = ":johnson_counter_placement",
     xilinx_env = ":xilinx_env.sh",
@@ -133,7 +133,7 @@ Routes the design. Accepts a placement checkpoint and generates a routed checkpo
 
 Example from `vivado/tests`:
 ```
-routing(
+vivado_routing(
     name = "johnson_counter_route",
     checkpoint = ":johnson_counter_place_opt",
     xilinx_env = ":xilinx_env.sh",
@@ -150,7 +150,7 @@ Writes a bitstream. Accepts a routed checkpoint and generates a bitstream.
 
 Example from `vivado/tests`:
 ```
-write_bitstream(
+vivado_write_bitstream(
     name = "johnson_counter_bit",
     checkpoint = ":johnson_counter_route",
     xilinx_env = ":xilinx_env.sh",
