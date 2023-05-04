@@ -13,6 +13,7 @@ def run_tcl_template(ctx, template, substitutions, xilinx_env, input_files, outp
         xilinx_env: A shell script to source the vivado environment with.
         input_files: A list of input files that vivado needs to run.
         output_files: A list of expected outputs from the tcl script running on vivado.
+        post_processing_command: A bash command to run after vivado.
 
     Returns:
         DefaultInfo - The files that were created.
