@@ -1,11 +1,16 @@
 
 create_project project_1 {{PROJECT_DIR}} -part {{PART_NUMBER}}
 
+set_property verilog_define __SYNTHESIS__ [current_fileset]
+
 {{HDL_SOURCE_CONTENT}}
+
+{{IP_BLOCK_TCL}}
 
 {{TCL_CONTENT}}
 
 {{CONSTRAINTS_CONTENT}}
+
 
 set_property top {{MODULE_TOP}} [current_fileset]
 
