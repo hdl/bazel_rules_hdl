@@ -1,4 +1,5 @@
 exports_files([
+    "create_ip_block.tcl.template",
     "create_project.tcl.template",
     "synthesis.tcl.template",
     "synth_optimize.tcl.template",
@@ -7,4 +8,5 @@ exports_files([
     "route.tcl.template",
     "write_bitstream.tcl.template",
     "xsim_test.tcl.template",
+    "xilinx_keyfile.txt",
 ])
