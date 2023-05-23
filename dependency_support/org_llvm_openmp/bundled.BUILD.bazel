@@ -14,7 +14,10 @@
 
 cc_library(
     name = "openmp",
-    hdrs = ["runtime/src/include/omp.h"],
+    hdrs = [
+      "runtime/src/include/omp.h",
+      "runtime/src/include/omp-tools.h",
+    ],
     srcs = [
       "runtime/src/kmp.h",
       "runtime/src/kmp_alloc.cpp",
@@ -112,6 +115,19 @@ genrule(
       "-e 's/@LIBOMP_VERSION_BUILD@/0/g' " +
       "-e 's/@LIBOMP_BUILD_DATE@/20200907/g' " +
       "$(location runtime/src/include/omp.h.var) " +
+      "> $@"
+    )
+)
+
+genrule(
+    name = "omp_tools_header",
+    srcs = [
+        "runtime/src/include/omp-tools.h.var",
+    ],
+    outs = ["runtime/src/include/omp-tools.h"],
+    cmd = (
+      "cat " +
+      "$(location runtime/src/include/omp-tools.h.var) " +
       "> $@"
     )
 )
