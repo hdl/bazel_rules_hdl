@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # BSD 3-Clause License
 #
 # Copyright (c) 2018-2023, The Regents of the University of California
@@ -28,12 +30,27 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pya
+import klayout.db as db
 import re
 import json
 import copy
 import sys
 import os
+import argparse
+
+parser = argparse.ArgumentParser(description="GDS writer script")
+parser.add_argument("-n", "--design-name",    required=True,  help="Name of the top module in the design")
+parser.add_argument("-d", "--input-def",      required=True,  help="Path to def file of the implemented design after detailed routing step")
+parser.add_argument("-l", "--input-lef",      required=True,  help="Path to lef file, specify one argument for each input LEF file", action="append")
+parser.add_argument("-t", "--tech-file",      required=True,  help="Path to KLayout technology file, a mapping from LEF/DEF to GDS. Specify one argument for each input GDS file")
+parser.add_argument("-o", "--out",            required=True,  help="Path to output GDS file")
+parser.add_argument("-g", "--input-gds",      required=False, help="Paths to additional input GDS files", action="append")
+parser.add_argument("-m", "--layer-map",      required=False, help="Path to layer map file", default="")
+parser.add_argument("-e", "--gds-allow-empty",required=False, help="regex to allow empty GDS for matched cells")
+parser.add_argument("-f", "--fill-config",    required=False, help="Path to JSON rule file for metal fill during chip finishing", default="")
+parser.add_argument("-s", "--seal",           required=False, help="Path to seal GDS/OAS file", default="")
+
+args = parser.parse_args()
 
 errors = 0
 
@@ -53,8 +70,8 @@ def expand_cfg_layers(cfg):
     del layers[layer]
 
 def read_cfg():
-  print('INFO: Reading config file: ' + config_file)
-  with open(config_file, 'r') as f:
+  print('INFO: Reading config file: ' + args.fill_config)
+  with open(args.fill_config, 'r') as f:
     cfg = json.load(f)
 
   expand_cfg_layers(cfg)
@@ -92,14 +109,14 @@ rect_pat = re.compile(r'''
                       re.VERBOSE)
 
 def read_fills(top):
-  if config_file == '':
+  if args.fill_config == '':
     print('WARNING: no fill config file specified')
     return
   # KLayout doesn't support FILL in DEF so we have to side load them :(
   cfg = read_cfg()
   in_fills = False
   units = None
-  with open(in_def) as fp:
+  with open(args.input_def) as fp:
     for line in fp:
       if in_fills:
         if re.match('END FILLS', line):
@@ -118,7 +135,7 @@ def read_fills(top):
         ylo = int(m.group('ylo')) / units
         xhi = int(m.group('xhi')) / units
         yhi = int(m.group('yhi')) / units
-        top.shapes(layer).insert(pya.DBox(xlo, ylo, xhi, yhi))
+        top.shapes(layer).insert(db.DBox(xlo, ylo, xhi, yhi))
       elif re.match('FILLS \d+ ;', line):
         in_fills = True
       elif not units:
@@ -127,27 +144,27 @@ def read_fills(top):
           units = float(m.group(1))
 
 # Load technology file
-tech = pya.Technology()
-tech.load(tech_file)
+tech = db.Technology()
+tech.load(args.tech_file)
 layoutOptions = tech.load_layout_options
-if len(layer_map) > 0:
-  layoutOptions.lefdef_config.map_file = layer_map
+if len(args.layer_map) > 0:
+  layoutOptions.lefdef_config.map_file = args.layer_map
 
 # Load def file
-main_layout = pya.Layout()
+main_layout = db.Layout()
 print("[INFO] Reporting cells prior to loading DEF ...")
 for i in main_layout.each_cell():
   print("[INFO] '{0}'".format(i.name))
 
 print("[INFO] Reading DEF ...")
-main_layout.read(in_def, layoutOptions)
+main_layout.read(args.input_def, layoutOptions)
 
 #print("[INFO] Reporting cells after loading DEF ...")
 #for i in main_layout.each_cell():
 #  print("[INFO] '{0}'".format(i.name))
 
 # Clear cells
-top_cell_index = main_layout.cell(design_name).cell_index()
+top_cell_index = main_layout.cell(args.design_name).cell_index()
 
 # remove orphan cell BUT preserve cell with VIA_
 #  - KLayout is prepending VIA_ when reading DEF that instantiates LEF's via
@@ -159,30 +176,30 @@ for i in main_layout.each_cell():
 
 # Load in the gds to merge
 print("[INFO] Merging GDS/OAS files...")
-for fil in in_files.split():
+for fil in args.input_gds:
   print("\t{0}".format(fil))
   main_layout.read(fil)
 
 # Copy the top level only to a new layout
-print("[INFO] Copying toplevel cell '{0}'".format(design_name))
-top_only_layout = pya.Layout()
+print("[INFO] Copying toplevel cell '{0}'".format(args.design_name))
+top_only_layout = db.Layout()
 top_only_layout.dbu = main_layout.dbu
-top = top_only_layout.create_cell(design_name)
-top.copy_tree(main_layout.cell(design_name))
+top = top_only_layout.create_cell(args.design_name)
+top.copy_tree(main_layout.cell(args.design_name))
 
 read_fills(top)
 
 print("[INFO] Checking for missing cell from GDS/OAS...")
 missing_cell = False
 regex = None
-if 'GDS_ALLOW_EMPTY' in os.environ:
-    print("[INFO] Found GDS_ALLOW_EMPTY variable.")
-    regex = os.getenv('GDS_ALLOW_EMPTY')
+if args.gds_allow_empty:
+    print("[INFO] Found gds_allow_empty")
+    regex = args.gds_allow_empty
 for i in top_only_layout.each_cell():
   if i.is_empty():
     missing_cell = True
     if regex is not None and re.match(regex, i.name):
-        print("[WARNING] LEF Cell '{0}' ignored. Matches GDS_ALLOW_EMPTY.".format(i.name))
+        print("[WARNING] LEF Cell '{0}' ignored. Matches gds_allow_empty.".format(i.name))
     else:
         print("[ERROR] LEF Cell '{0}' has no matching GDS/OAS cell."
               " Cell will be empty.".format(i.name))
@@ -194,7 +211,7 @@ if not missing_cell:
 print("[INFO] Checking for orphan cell in the final layout...")
 orphan_cell = False
 for i in top_only_layout.each_cell():
-  if i.name != design_name and i.parent_cells() == 0:
+  if i.name != args.design_name and i.parent_cells() == 0:
     orphan_cell = True
     print("[ERROR] Found orphan cell '{0}'".format(i.name))
     errors += 1
@@ -203,21 +220,21 @@ if not orphan_cell:
   print("[INFO] No orphan cells")
 
 
-if seal_file:
+if args.seal:
 
   top_cell = top_only_layout.top_cell()
 
   print("[INFO] Reading seal GDS/OAS file...")
-  print("\t{0}".format(seal_file))
-  top_only_layout.read(seal_file)
+  print("\t{0}".format(args.seal))
+  top_only_layout.read(args.seal)
 
   for cell in top_only_layout.top_cells():
     if cell != top_cell:
       print("[INFO] Merging '{0}' as child of '{1}'".format(cell.name, top_cell.name))
-      top.insert(pya.CellInstArray(cell.cell_index(), pya.Trans()))
+      top.insert(db.CellInstArray(cell.cell_index(), db.Trans()))
 
 # Write out the GDS
-print("[INFO] Writing out GDS/OAS '{0}'".format(out_file))
-top_only_layout.write(out_file)
+print("[INFO] Writing out GDS/OAS '{0}'".format(args.out))
+top_only_layout.write(args.out)
 
 sys.exit(errors)
