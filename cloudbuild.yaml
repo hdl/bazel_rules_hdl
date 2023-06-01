@@ -33,7 +33,7 @@ steps:
     path: /root/.ssh
 
 # Run the build
-- name: l.gcr.io/google/bazel:3.5.0
+- name: gcr.io/cloud-builders/bazel@sha256:4d94007baccd0cc0d3552b3ad3daae9ed3626c924a8c6ae88c70a58dcd08639e
   entrypoint: 'bash'
   args:
   - '-c'
