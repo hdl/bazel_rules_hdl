@@ -22,9 +22,9 @@ def com_github_gabime_spdlog():
         http_archive,
         name = "com_github_gabime_spdlog",
         urls = [
-            "https://github.com/gabime/spdlog/archive/refs/tags/v1.9.2.tar.gz",
+            "https://github.com/gabime/spdlog/archive/refs/tags/v1.11.0.tar.gz",
         ],
-        strip_prefix = "spdlog-1.9.2",
-        sha256 = "6fff9215f5cb81760be4cc16d033526d1080427d236e86d70bb02994f85e3d38",
+        strip_prefix = "spdlog-1.11.0",
+        sha256 = "ca5cae8d6cac15dae0ec63b21d6ad3530070650f68076f3a4a862ca293a858bb",
         build_file = Label("@rules_hdl//dependency_support/com_github_gabime_spdlog:bundled.BUILD.bazel"),
     )
