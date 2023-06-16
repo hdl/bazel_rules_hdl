@@ -15,6 +15,7 @@
 load("//synthesis:build_defs.bzl", "synthesize_rtl")
 load("//static_timing:build_defs.bzl", "run_opensta")
 load("//place_and_route:build_defs.bzl", "place_and_route")
+load("//gds_write:build_defs.bzl", "gds_write")
 load("//verilog:providers.bzl", "verilog_library")
 
 synthesize_rtl(
@@ -36,10 +37,17 @@ place_and_route(
     name = "counter_place_and_route",
     clock_period = "10",
     core_padding_microns = 20,
+    density_fill_config = "fill.json",
     die_height_microns = 200,
     die_width_microns = 200,
     placement_density = "0.7",
     synthesized_rtl = ":verilog_counter_synth",
+)
+
+gds_write(
+    name = "counter_asic",
+    implemented_rtl = ":counter_place_and_route",
+    klayout_lyt = "klayout.lyt",
 )
 
 run_opensta(
