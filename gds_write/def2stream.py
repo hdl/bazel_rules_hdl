@@ -160,6 +160,13 @@ def read_fills(top):
 tech = db.Technology()
 tech.load(args.tech_file)
 layoutOptions = tech.load_layout_options
+# Don't read all LEF files stored in the same directory as input DEF file
+layoutOptions.lefdef_config.read_lef_with_def = False
+# Read only those from `layoutOptions.lefdef_config.lef_files`
+# and overwrite ones specified under <lef-files></lef-files> in KLayout LYT file
+layoutOptions.lefdef_config.lef_files = args.input_lef
+# Ensure correct paths
+layoutOptions.lefdef_config.paths_relative_to_cwd = True
 if len(args.layer_map) > 0:
   layoutOptions.lefdef_config.map_file = args.layer_map
 
