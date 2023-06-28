@@ -60,7 +60,6 @@ parser.add_argument("-o", "--out",            required=True,  help="Path to outp
 parser.add_argument("-g", "--input-gds",      required=False, help="Paths to additional input GDS files", action="append")
 parser.add_argument("-m", "--layer-map",      required=False, help="Path to layer map file", default="")
 parser.add_argument("-e", "--gds-allow-empty",required=False, help="regex to allow empty GDS for matched cells")
-parser.add_argument("-s", "--seal",           required=False, help="Path to seal GDS/OAS file", default="")
 
 args = parser.parse_args()
 
@@ -146,20 +145,6 @@ for i in top_only_layout.each_cell():
 
 if not orphan_cell:
   print("[INFO] No orphan cells")
-
-
-if args.seal:
-
-  top_cell = top_only_layout.top_cell()
-
-  print("[INFO] Reading seal GDS/OAS file...")
-  print("\t{0}".format(args.seal))
-  top_only_layout.read(args.seal)
-
-  for cell in top_only_layout.top_cells():
-    if cell != top_cell:
-      print("[INFO] Merging '{0}' as child of '{1}'".format(cell.name, top_cell.name))
-      top.insert(db.CellInstArray(cell.cell_index(), db.Trans()))
 
 # Write out the GDS
 print("[INFO] Writing out GDS/OAS '{0}'".format(args.out))
