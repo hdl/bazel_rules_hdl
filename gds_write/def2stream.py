@@ -45,10 +45,6 @@ The script allows writing GDS layout files. The required inputs are:
 
 import klayout.db as db
 import re
-import json
-import copy
-import sys
-import os
 import argparse
 
 parser = argparse.ArgumentParser(description="GDS writer script")
