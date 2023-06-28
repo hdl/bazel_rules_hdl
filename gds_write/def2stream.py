@@ -88,17 +88,6 @@ for i in main_layout.each_cell():
 print("[INFO] Reading DEF ...")
 main_layout.read(args.input_def, layoutOptions)
 
-# Clear cells
-top_cell_index = main_layout.cell(args.design_name).cell_index()
-
-# remove orphan cell BUT preserve cell with VIA_
-#  - KLayout is prepending VIA_ when reading DEF that instantiates LEF's via
-print("[INFO] Clearing cells...")
-for i in main_layout.each_cell():
-  if i.cell_index() != top_cell_index:
-    if not i.name.startswith("VIA_"):
-      i.clear()
-
 # Load in the gds to merge
 print("[INFO] Merging GDS/OAS files...")
 for fil in args.input_gds:
