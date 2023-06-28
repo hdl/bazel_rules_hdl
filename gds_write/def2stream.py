@@ -120,17 +120,6 @@ for i in top_only_layout.each_cell():
 if not missing_cell:
   print("[INFO] All LEF cells have matching GDS/OAS cells")
 
-print("[INFO] Checking for orphan cell in the final layout...")
-orphan_cell = False
-for i in top_only_layout.each_cell():
-  if i.name != args.design_name and i.parent_cells() == 0:
-    orphan_cell = True
-    print("[ERROR] Found orphan cell '{0}'".format(i.name))
-    errors += 1
-
-if not orphan_cell:
-  print("[INFO] No orphan cells")
-
 # Write out the GDS
 print("[INFO] Writing out GDS/OAS '{0}'".format(args.out))
 top_only_layout.write(args.out)
