@@ -120,8 +120,9 @@ for i in top_only_layout.each_cell():
 if not missing_cell:
   print("[INFO] All LEF cells have matching GDS/OAS cells")
 
+if (errors > 0):
+  raise LookupError("{} LEF {} no matching GDS/OAS cell".format(errors, "cells have" if (errors > 1) else "cell has"))
+
 # Write out the GDS
 print("[INFO] Writing out GDS/OAS '{0}'".format(args.out))
 top_only_layout.write(args.out)
-
-sys.exit(errors)
