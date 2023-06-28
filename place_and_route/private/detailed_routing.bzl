@@ -55,12 +55,20 @@ def detailed_routing(ctx, open_road_info):
         if detailed_routing_configs.enable_via_gen:
             detailed_routing_args += " -disable_via_gen "
 
-    open_road_commands = timing_setup_command_struct.commands + [
-        "detailed_route -output_drc {} {}".format(output_drc.path, detailed_routing_args),
-        "write_def {}".format(
-            routed_def.path,
-        ),
-    ]
+    open_road_commands = timing_setup_command_struct.commands
+    open_road_commands.append("detailed_route -output_drc {} {}".format(output_drc.path, detailed_routing_args))
+    if ctx.file.density_fill_config:
+        open_road_commands.append("set db [ord::get_db]")
+        open_road_commands.append("set chip [$db getChip]")
+        open_road_commands.append("set block [$chip getBlock]")
+        open_road_commands.append("set obstructions [$block getObstructions]")
+
+        open_road_commands.append("foreach obstruction $obstructions {\n" +
+                                  "    odb::dbObstruction_destroy $obstruction" +
+                                  "\n}")
+        open_road_commands.append("density_fill -rules {}".format(ctx.file.density_fill_config.path))
+        inputs.append(ctx.file.density_fill_config)
+    open_road_commands.append("write_def {}".format(routed_def.path))
 
     execution_requirements = {}
     if ctx.attr.local_detailed_routing_execution:

@@ -94,5 +94,6 @@ place_and_route = rule(
         "core_padding_microns": attr.int(mandatory = True),
         "target_die_utilization_percentage": attr.string(doc = "string float value from 0-100 which sets the die area based on an estimated die area target utilization"),
         "placement_density": attr.string(default = "0.69", doc = "When performing global placement this is how densely our cells should be packaged on the die parameter is (0-1]"),
+        "density_fill_config": attr.label(allow_single_file = True),
     },
 )
