@@ -88,10 +88,6 @@ for i in main_layout.each_cell():
 print("[INFO] Reading DEF ...")
 main_layout.read(args.input_def, layoutOptions)
 
-#print("[INFO] Reporting cells after loading DEF ...")
-#for i in main_layout.each_cell():
-#  print("[INFO] '{0}'".format(i.name))
-
 # Clear cells
 top_cell_index = main_layout.cell(args.design_name).cell_index()
 
