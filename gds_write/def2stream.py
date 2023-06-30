@@ -30,6 +30,19 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+"""
+This script was imported from OpenROAD-flow-scripts project: https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts
+The import took place:
+    * at 04.07.2023,
+    * at git hash: 99e8d3e9b399c7703fab26bef2b5770d39a2f724
+    * from https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/blob/99e8d3e9b399c7703fab26bef2b5770d39a2f724/flow/util/def2stream.py
+
+The script allows writing GDS layout files. The required inputs are:
+    * DEF file of the implemented design
+    * Set of LEF files
+    * KLayout technology file
+"""
+
 import klayout.db as db
 import re
 import json
