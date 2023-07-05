@@ -18,7 +18,12 @@
 
 set -eu
 
-dir=$(dirname $(find . -name iverilog-bin | head -n 1))
+iverilog_path="$(find . -name iverilog-bin | head -n 1)"
+if [ "$iverilog_path" == "" ]; then
+  iverilog_path="$(command -v iverilog-bin)"
+fi
+
+dir=$(dirname "$iverilog_path")
 
 if [[ ! -d "$dir" ]]; then
   echo "Unable to find dependencies (looking under $dir)." 1>&2
