@@ -32,7 +32,7 @@ def _dict_to_argstring(data, argname):
     return result
 
 def _files_to_argstring(data, argname):
-    return _list_to_argstring(data, argname, "path")
+    return _list_to_argstring(data, argname, "short_path")
 
 def _pymodules_to_argstring(data, argname):
     remove_py = lambda s: s.removesuffix(".py")
