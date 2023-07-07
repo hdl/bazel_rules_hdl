@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_hdl_pip_deps//:requirements.bzl", "requirement")
-
 py_binary(
     name = "cocotb_wrapper",
     srcs = ["cocotb_wrapper.py"],
     python_version = "PY3",
     srcs_version = "PY3",
     visibility = ["//visibility:public"],
-    deps = [requirement("cocotb")],
+    deps = [],
 )
