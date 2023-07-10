@@ -22,6 +22,7 @@ asap7_cell_library(
     srcs = glob(["asap7sc7p5t_27/LIB/CCS/*.lib.gz"]),
     cell_lef = "asap7sc7p5t_27/LEF/scaled/asap7sc7p5t_27_R_4x_201211.lef",
     cell_type = "RVT",
+    platform_gds = "asap7sc7p5t_27/GDS/asap7sc7p5t_27_R_201211.gds",
     default_corner_delay_model = "ccs",
     default_corner_swing = "SS",
     openroad_configuration = ":open_road_asap7_1x",
