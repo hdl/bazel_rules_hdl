@@ -53,6 +53,7 @@ def _asap7_cell_library_impl(ctx):
             corners = [],
             cell_lef_definitions = [ctx.file.cell_lef],
             tech_lef = ctx.file.tech_lef,
+            platform_gds = ctx.files.platform_gds,
             default_corner = CornerInfo(
                 liberty = default_output_liberty,
             ),
@@ -71,6 +72,7 @@ asap7_cell_library = rule(
         #TODO(b/212480812): Support multiple VTs in a single design.
         "openroad_configuration": attr.label(providers = [OpenRoadPdkInfo]),
         "cell_lef": attr.label(allow_single_file = True, mandatory = True, doc = "The lef file for the standard cells"),
+        "platform_gds": attr.label(allow_single_file = True, mandatory = True, doc = "Platform GDS files"),
         "_combine_liberty": attr.label(
             default = Label("@rules_hdl//pdk/liberty:combine_liberty"),
             executable = True,
