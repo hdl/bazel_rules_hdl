@@ -61,7 +61,7 @@ def _collect_verilog_files(ctx):
     ]
     verilog_files = depset(
         [src for sub_tuple in verilog_srcs for src in sub_tuple] +
-        ctx.files.verilog_sources
+        ctx.files.verilog_sources,
     )
     return verilog_files.to_list()
 
@@ -100,7 +100,7 @@ def _cocotb_test_impl(ctx):
 
     command = (
         "PATH={}:$PATH ".format(path) +
-        "python {}".format(ctx.executable._cocotb_wrapper.short_path) +
+        "python {}".format(ctx.executable.cocotb_wrapper.short_path) +
         " --sim {}".format(ctx.attr.sim_name) +
         " --hdl_library {}".format(ctx.attr.hdl_library) +
         " --hdl_toplevel {}".format(ctx.attr.hdl_toplevel) +
@@ -128,12 +128,12 @@ def _cocotb_test_impl(ctx):
     transitive_files = depset(
         direct = [py_toolchain.interpreter],
         transitive = [dep[PyInfo].transitive_sources for dep in ctx.attr.deps] +
-                     [ctx.attr._cocotb_wrapper[PyInfo].transitive_sources] +
+                     [ctx.attr.cocotb_wrapper[PyInfo].transitive_sources] +
                      [py_toolchain.files],
     )
 
     runfiles = ctx.runfiles(
-        files = ctx.files._cocotb_wrapper +
+        files = ctx.files.cocotb_wrapper +
                 verilog_files +
                 vhdl_files +
                 ctx.files.test_module,
@@ -249,7 +249,7 @@ _cocotb_test_attrs = {
         doc = "The list of python libraries to be linked in to the simulation target",
         providers = [PyInfo],
     ),
-    "_cocotb_wrapper": attr.label(
+    "cocotb_wrapper": attr.label(
         cfg = "exec",
         executable = True,
         doc = "Cocotb wrapper script",
