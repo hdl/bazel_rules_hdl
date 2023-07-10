@@ -74,6 +74,7 @@ def _skywater_cell_library_impl(ctx):
         open_road_configuration = ctx.attr.openroad_configuration[OpenRoadPdkInfo]
 
     cell_lef_files = [lef_file for lef_file in ctx.files.srcs if lef_file.extension == "lef"]
+    platform_gds_files = [gds_file for gds_file in ctx.files.srcs if gds_file.extension == "gds"]
 
     tech_lef = None
     if ctx.attr.tech_lef:
@@ -92,6 +93,7 @@ def _skywater_cell_library_impl(ctx):
             open_road_configuration = open_road_configuration,
             tech_lef = tech_lef,
             cell_lef_definitions = cell_lef_files,
+            platform_gds = platform_gds_files,
         ),
     ]
 
