@@ -54,6 +54,7 @@ def declare_cell_library(workspace_name, name):
         srcs = native.glob(
             include = [
                 "cells/**/*.lef",
+                "cells/**/*.gds",
             ],
             # There are two types of lefs in the PDK. One for magic a layout
             # tool that requires some different properties set in the LEF that
