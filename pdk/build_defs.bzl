@@ -22,6 +22,7 @@ StandardCellInfo = provider(
         "default_corner": "A default corner info defined for the PDK.",
         "tech_lef": "Tech LEF file for the PDK",
         "cell_lef_definitions": "list of Abstract LEFs files for each standard cell.",
+        "platform_gds": "list of Platform GDS files.",
         "parasitic_extraction_benchmark": "Optional calibration file for OpenRCX.",
         "open_road_configuration": "OpenROAD PDK configuration.",
     },
