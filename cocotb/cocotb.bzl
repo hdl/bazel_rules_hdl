@@ -88,6 +88,7 @@ def _cocotb_test_impl(ctx):
     parameters_args = _dict_to_argstring(ctx.attr.parameters, "parameters")
 
     verbose_args = " --verbose" if ctx.attr.verbose else ""
+    waves_args = " --waves" if ctx.attr.waves else ""
     seed_args = " --seed {}".format(ctx.attr.seed) if ctx.attr.seed != "" else ""
 
     test_module_args = _pymodules_to_argstring(ctx.files.test_module, "test_module")
@@ -117,6 +118,7 @@ def _cocotb_test_impl(ctx):
         defines_args +
         parameters_args +
         verbose_args +
+        waves_args +
         seed_args +
         test_module_args
     )
