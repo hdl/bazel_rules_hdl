@@ -36,89 +36,152 @@ The import took place:
     * at 04.07.2023,
     * at git hash: 99e8d3e9b399c7703fab26bef2b5770d39a2f724
     * from https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/blob/99e8d3e9b399c7703fab26bef2b5770d39a2f724/flow/util/def2stream.py
-
-The script allows writing GDS layout files. The required inputs are:
-    * DEF file of the implemented design
-    * Set of LEF files
-    * KLayout technology file
 """
 
 import klayout.db as db
 import re
 import argparse
 
-parser = argparse.ArgumentParser(description="GDS writer script")
-parser.add_argument("-n", "--design-name",    required=True,  help="Name of the top module in the design")
-parser.add_argument("-d", "--input-def",      required=True,  help="Path to def file of the implemented design after detailed routing step")
-parser.add_argument("-l", "--input-lef",      required=True,  help="Path to lef file, specify one argument for each input LEF file", action="append")
-parser.add_argument("-t", "--tech-file",      required=True,  help="Path to KLayout technology file, a mapping from LEF/DEF to GDS. Specify one argument for each input GDS file")
-parser.add_argument("-o", "--out",            required=True,  help="Path to output GDS file")
-parser.add_argument("-g", "--input-gds",      required=False, help="Paths to additional input GDS files", action="append")
-parser.add_argument("-m", "--layer-map",      required=False, help="Path to layer map file", default="")
-parser.add_argument("-e", "--gds-allow-empty",required=False, help="regex to allow empty GDS for matched cells")
+class GDSWriter():
+    """
+    GDSWrite allows writing GDS layout files.
+    It uses KLayout Python Module. The required inputs are:
+    * DEF file of the implemented design
+    * Set of LEF files
+    * KLayout technology file
+    """
+    def __init__(self):
+        self.parser = self.__setup_argparse()
+        self.args = self.parser.parse_args()
 
-args = parser.parse_args()
+    def __setup_argparse(self):
+        parser = argparse.ArgumentParser(description="GDS writer script")
+        parser.add_argument("-n", "--design-name",    required=True,  help="Name of the top module in the design")
+        parser.add_argument("-d", "--input-def",      required=True,  help="Path to def file of the implemented design after detailed routing step")
+        parser.add_argument("-l", "--input-lef",      required=True,  help="Path to lef file, specify one argument for each input LEF file", action="append")
+        parser.add_argument("-t", "--tech-file",      required=True,  help="Path to KLayout technology file, a mapping from LEF/DEF to GDS. Specify one argument for each input GDS file")
+        parser.add_argument("-o", "--out",            required=True,  help="Path to output GDS file")
+        parser.add_argument("-g", "--input-gds",      required=False, help="Paths to additional input GDS files", action="append")
+        parser.add_argument("-m", "--layer-map",      required=False, help="Path to layer map file", default="")
+        parser.add_argument("-e", "--gds-allow-empty",required=False, help="regex to allow empty GDS for matched cells")
+        return parser
 
-errors = 0
+    def __load_layout_options(self):
+        """
+        Load KLayout technology file with default layout options.
+        Override some of the options to ensure that correct LEF files
+        will be read while creating layout
+        """
+        # Load technology file
+        tech = db.Technology()
+        tech.load(self.args.tech_file)
+        self.layout_options = tech.load_layout_options
+        # Don't read all LEF files stored in the same directory as input DEF file
+        self.layout_options.lefdef_config.read_lef_with_def = False
+        # Read only those from `layoutOptions.lefdef_config.lef_files`
+        # and overwrite ones specified under <lef-files></lef-files> in KLayout LYT file
+        self.layout_options.lefdef_config.lef_files = self.args.input_lef
+        # Ensure correct paths
+        self.layout_options.lefdef_config.paths_relative_to_cwd = True
+        if len(self.args.layer_map) > 0:
+            self.layout_options.lefdef_config.map_file = self.args.layer_map
 
-# Load technology file
-tech = db.Technology()
-tech.load(args.tech_file)
-layoutOptions = tech.load_layout_options
-# Don't read all LEF files stored in the same directory as input DEF file
-layoutOptions.lefdef_config.read_lef_with_def = False
-# Read only those from `layoutOptions.lefdef_config.lef_files`
-# and overwrite ones specified under <lef-files></lef-files> in KLayout LYT file
-layoutOptions.lefdef_config.lef_files = args.input_lef
-# Ensure correct paths
-layoutOptions.lefdef_config.paths_relative_to_cwd = True
-if len(args.layer_map) > 0:
-  layoutOptions.lefdef_config.map_file = args.layer_map
+    def __read_def(self, layout, layout_options, input_def):
+        """
+        Load input DEF file with implemented design to the layout,
+        use previously loaded and modified layout options
+        """
+        print("[INFO] Reading DEF ...")
+        layout.read(input_def, layout_options)
 
-# Load def file
-main_layout = db.Layout()
-print("[INFO] Reporting cells prior to loading DEF ...")
-for i in main_layout.each_cell():
-  print("[INFO] '{0}'".format(i.name))
+    def __read_gds(self, layout, input_gds):
+        """
+        Provide cell definitions in GDS format to the layout
+        """
+        print("[INFO] Merging GDS/OAS files...")
+        for fil in input_gds:
+          print("\t{0}".format(fil))
+          layout.read(fil)
 
-print("[INFO] Reading DEF ...")
-main_layout.read(args.input_def, layoutOptions)
+    def __prepare_layout(self):
+        """
+        Load main layout for the implemented design
+        """
+        self.main_layout = db.Layout()
 
-# Load in the gds to merge
-print("[INFO] Merging GDS/OAS files...")
-for fil in args.input_gds:
-  print("\t{0}".format(fil))
-  main_layout.read(fil)
+        print("[INFO] Reporting cells prior to loading DEF ...")
+        for i in self.main_layout.each_cell():
+          print("[INFO] '{0}'".format(i.name))
 
-# Copy the top level only to a new layout
-print("[INFO] Copying toplevel cell '{0}'".format(args.design_name))
-top_only_layout = db.Layout()
-top_only_layout.dbu = main_layout.dbu
-top = top_only_layout.create_cell(args.design_name)
-top.copy_tree(main_layout.cell(args.design_name))
+        self.__read_def(self.main_layout, self.layout_options, self.args.input_def)
+        self.__read_gds(self.main_layout, self.args.input_gds)
 
-print("[INFO] Checking for missing cell from GDS/OAS...")
-missing_cell = False
-regex = None
-if args.gds_allow_empty:
-    print("[INFO] Found gds_allow_empty")
-    regex = args.gds_allow_empty
-for i in top_only_layout.each_cell():
-  if i.is_empty():
-    missing_cell = True
-    if regex is not None and re.match(regex, i.name):
-        print("[WARNING] LEF Cell '{0}' ignored. Matches gds_allow_empty.".format(i.name))
-    else:
-        print("[ERROR] LEF Cell '{0}' has no matching GDS/OAS cell."
-              " Cell will be empty.".format(i.name))
-        errors += 1
 
-if not missing_cell:
-  print("[INFO] All LEF cells have matching GDS/OAS cells")
+    def __prepare_top_layout(self):
+        """
+        Create new layout based on main layout. Copy only the top cell tree.
+        """
+        design_name = self.args.design_name
+        print("[INFO] Copying toplevel cell '{0}'".format(design_name))
+        self.top_only_layout = db.Layout()
+        self.top_only_layout.dbu = self.main_layout.dbu
+        top = self.top_only_layout.create_cell(design_name)
+        top.copy_tree(self.main_layout.cell(design_name))
 
-if (errors > 0):
-  raise LookupError("{} LEF {} no matching GDS/OAS cell".format(errors, "cells have" if (errors > 1) else "cell has"))
+    def __check_cell_definitions(self):
+        """
+        Verify if there is any LEF cell in top layout that does not have
+        a matching definition in GDS files.
+        """
+        errors = 0
+        missing_cell = False
+        regex = None
+        print("[INFO] Checking for missing cell from GDS/OAS...")
+        if self.args.gds_allow_empty:
+            print("[INFO] Found gds_allow_empty")
+            regex = self.args.gds_allow_empty
+        for i in self.top_only_layout.each_cell():
+          if i.is_empty():
+            missing_cell = True
+            if regex is not None and re.match(regex, i.name):
+                print("[WARNING] LEF Cell '{0}' ignored. Matches gds_allow_empty.".format(i.name))
+            else:
+                print("[ERROR] LEF Cell '{0}' has no matching GDS/OAS cell."
+                      " Cell will be empty.".format(i.name))
+                errors += 1
 
-# Write out the GDS
-print("[INFO] Writing out GDS/OAS '{0}'".format(args.out))
-top_only_layout.write(args.out)
+        if not missing_cell:
+          print("[INFO] All LEF cells have matching GDS/OAS cells")
+
+        if (errors > 0):
+          raise LookupError("{} LEF {} no matching GDS/OAS cell".format(errors, "cells have" if (errors > 1) else "cell has"))
+
+    def __finish_gds(self):
+        """
+        Write prepared top layout to GDS file
+        """
+        gds_output = self.args.out
+        print("[INFO] Writing out GDS/OAS '{0}'".format(gds_output))
+        self.top_only_layout.write(gds_output)
+
+    def write_gds(self):
+        """
+        Perform full GDS write flow:
+            * Load layout configuration
+            * Read input DEF, LEF and GDS files to create design layout
+            * Copy top cell of the layout to new layout
+            * Verify LEF cells mapping into GDS cells
+            * Write GDS file with implemented design layout
+        """
+        self.__load_layout_options()
+        self.__prepare_layout()
+        self.__prepare_top_layout()
+        self.__check_cell_definitions()
+        self.__finish_gds()
+
+def main():
+    writer = GDSWriter()
+    writer.write_gds()
+
+if __name__ == '__main__':
+    main()
