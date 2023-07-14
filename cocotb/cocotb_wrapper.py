@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import argparse
-from cocotb.runner import get_runner
+from cocotb.runner import get_runner, check_results_file
 
 
 cocotb_build_flags = [
@@ -167,6 +167,6 @@ if __name__ == "__main__":
     test_flags = filter_args(vars(args), cocotb_test_flags)
 
     runner = get_runner(args.sim)
-
     runner.build(**build_flags)
-    runner.test(**test_flags),
+    results_xml = runner.test(**test_flags)
+    check_results_file(results_xml)
