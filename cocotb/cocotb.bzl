@@ -17,6 +17,8 @@
 load("//verilog:providers.bzl", "VerilogInfo")
 load("@rules_python//python:defs.bzl", "PyInfo")
 
+## Helpers for parsing arguments
+
 def _list_to_argstring(data, argname, attr = None, operation = None):
     result = " --{}".format(argname) if data else ""
     for value in data:
@@ -45,6 +47,8 @@ def _remove_duplicates_from_list(data):
             result.append(e)
     return result
 
+# Helpers for collecting information from context
+
 def _collect_verilog_files(ctx):
     transitive_srcs_list = [
         dep
@@ -59,21 +63,58 @@ def _collect_verilog_files(ctx):
         verilog_info_struct.srcs
         for verilog_info_struct in transitive_srcs_depset.to_list()
     ]
-    verilog_files = depset(
+
+    return depset(
         [src for sub_tuple in verilog_srcs for src in sub_tuple] +
         ctx.files.verilog_sources,
     )
-    return verilog_files.to_list()
 
 def _collect_vhdl_files(ctx):
-    return ctx.files.vhdl_sources
+    return depset(direct = ctx.files.vhdl_sources)
 
-def _cocotb_test_impl(ctx):
-    # prepare arguments for the test command
-    vhdl_files = _collect_vhdl_files(ctx)
+def _collect_python_transitive_imports(ctx):
+    return depset(transitive = [
+        dep[PyInfo].imports
+        for dep in ctx.attr.deps
+        if PyInfo in dep
+    ])
+
+def _collect_python_direct_imports(ctx):
+    return depset(direct = [module.dirname for module in ctx.files.test_module])
+
+def _collect_transitive_files(ctx):
+    py_toolchain = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
+    return depset(
+        direct = [py_toolchain.interpreter],
+        transitive = [dep[PyInfo].transitive_sources for dep in ctx.attr.deps] +
+                     [ctx.attr.cocotb_wrapper[PyInfo].transitive_sources] +
+                     [py_toolchain.files],
+    )
+
+def _collect_transitive_runfiles(ctx):
+    return ctx.runfiles().merge_all(
+        [dep.default_runfiles for dep in ctx.attr.deps] +
+        [dep.default_runfiles for dep in ctx.attr.sim],
+    )
+
+# Helpers for preparing test script and its environment
+
+def _get_pythonpath_to_set(ctx):
+    direct_imports = _collect_python_direct_imports(ctx).to_list()
+    transitive_imports = [
+        "../" + path
+        for path in _collect_python_transitive_imports(ctx).to_list()
+    ]
+    imports = _remove_duplicates_from_list(transitive_imports + direct_imports)
+    return ":".join(imports)
+
+def _get_path_to_set(ctx):
+    sim_paths = _remove_duplicates_from_list([dep.label.workspace_root for dep in ctx.attr.sim])
+    path = ":".join(["$PWD/" + str(p) for p in sim_paths])
+    return path
+
+def _get_test_command(ctx, verilog_files, vhdl_files):
     vhdl_sources_args = _files_to_argstring(vhdl_files, "vhdl_sources")
-
-    verilog_files = _collect_verilog_files(ctx)
     verilog_sources_args = _files_to_argstring(verilog_files, "verilog_sources")
 
     includes_args = _list_to_argstring(ctx.attr.includes, "includes")
@@ -86,21 +127,14 @@ def _cocotb_test_impl(ctx):
 
     defines_args = _dict_to_argstring(ctx.attr.defines, "defines")
     parameters_args = _dict_to_argstring(ctx.attr.parameters, "parameters")
-
     verbose_args = " --verbose" if ctx.attr.verbose else ""
     waves_args = " --waves" if ctx.attr.waves else ""
     seed_args = " --seed {}".format(ctx.attr.seed) if ctx.attr.seed != "" else ""
 
     test_module_args = _pymodules_to_argstring(ctx.files.test_module, "test_module")
 
-    # define a script and a command
-    runner_script = ctx.actions.declare_file("cocotb_runner.sh")
-
-    sim_paths = _remove_duplicates_from_list([dep.label.workspace_root for dep in ctx.attr.sim])
-    path = ":".join(["$PWD/" + str(p) for p in sim_paths])
-
     command = (
-        "PATH={}:$PATH ".format(path) +
+        "PATH={}:$PATH ".format(_get_path_to_set(ctx)) +
         "python {}".format(ctx.executable.cocotb_wrapper.short_path) +
         " --sim {}".format(ctx.attr.sim_name) +
         " --hdl_library {}".format(ctx.attr.hdl_library) +
@@ -123,33 +157,32 @@ def _cocotb_test_impl(ctx):
         test_module_args
     )
 
-    ctx.actions.write(output = runner_script, content = command)
+    return command
 
-    # specify dependencies for the script
-    py_toolchain = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
-    transitive_files = depset(
-        direct = [py_toolchain.interpreter],
-        transitive = [dep[PyInfo].transitive_sources for dep in ctx.attr.deps] +
-                     [ctx.attr.cocotb_wrapper[PyInfo].transitive_sources] +
-                     [py_toolchain.files],
+def _cocotb_test_impl(ctx):
+    verilog_files = _collect_verilog_files(ctx).to_list()
+    vhdl_files = _collect_vhdl_files(ctx).to_list()
+
+    # create test script
+    runner_script = ctx.actions.declare_file("cocotb_runner.sh")
+    ctx.actions.write(
+        output = runner_script,
+        content = _get_test_command(ctx, verilog_files, vhdl_files),
     )
 
+    # specify dependencies for the script
     runfiles = ctx.runfiles(
         files = ctx.files.cocotb_wrapper +
                 verilog_files +
                 vhdl_files +
                 ctx.files.test_module,
-        transitive_files = transitive_files,
-    ).merge_all(
-        [dep.default_runfiles for dep in ctx.attr.deps] +
-        [dep.default_runfiles for dep in ctx.attr.test_module] +
-        [dep.default_runfiles for dep in ctx.attr.sim],
+        transitive_files = _collect_transitive_files(ctx),
+    ).merge(
+        _collect_transitive_runfiles(ctx),
     )
 
-    # specify pythonpath for the script
-    test_module_paths = _remove_duplicates_from_list([module.dirname for module in ctx.files.test_module])
-    pypath = ":".join([str(p) for p in test_module_paths])
-    env = {"PYTHONPATH": pypath}
+    # specify PYTHONPATH for the script
+    env = {"PYTHONPATH": _get_pythonpath_to_set(ctx)}
 
     # return the information about testing script and its dependencies
     return [
