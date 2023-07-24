@@ -71,7 +71,7 @@
    <macro-resolution-mode>default</macro-resolution-mode>
    <separate-groups>false</separate-groups>
    <map-file/>
-   <lef-files>klayout_tech.lef</lef-files>
+   <lef-files>merged.lef</lef-files>
   </lefdef>
   <dxf>
    <dbu>0.001</dbu>

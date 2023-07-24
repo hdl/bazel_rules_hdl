@@ -16,8 +16,13 @@
 
 load("//place_and_route:open_road.bzl", "OpenRoadInfo")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
+load("@rules_hdl//pdk:open_road_configuration.bzl", "assert_has_open_road_configuration", "get_open_road_configuration")
 
 def _gds_write_impl(ctx):
+    # Throws an error if there is no OpenROAD configuration
+    assert_has_open_road_configuration(ctx.attr.implemented_rtl[SynthesisInfo])
+    open_road_configuration = get_open_road_configuration(ctx.attr.implemented_rtl[SynthesisInfo])
+
     final_gds = ctx.actions.declare_file("{}.gds".format(ctx.attr.name))
 
     # KLayout technology file
@@ -48,6 +53,10 @@ def _gds_write_impl(ctx):
     if ctx.attr.gds_allow_empty:
         gds_allow_empty_args = " --gds-allow-empty {}".format(ctx.attr.gds_allow_empty)
 
+    klayout_lyt = open_road_configuration.klayout_tech_file.files.to_list()[0]
+    if ctx.file.klayout_lyt:
+        klayout_lyt = ctx.file.klayout_lyt
+
     ctx.actions.run_shell(
         outputs = [
             final_gds,
@@ -59,7 +68,7 @@ def _gds_write_impl(ctx):
             platform_gds +
             [
                 ctx.attr.implemented_rtl[OpenRoadInfo].routed_def,
-                ctx.file.klayout_lyt,
+                klayout_lyt,
                 tech_lef,
             ],
         ),
@@ -68,7 +77,7 @@ def _gds_write_impl(ctx):
                   " --input-def {}".format(ctx.attr.implemented_rtl[OpenRoadInfo].routed_def.path) +
                   lef_args +
                   gds_args +
-                  " --tech-file {}".format(ctx.file.klayout_lyt.path) +
+                  " --tech-file {}".format(klayout_lyt.path) +
                   gds_allow_empty_args +
                   " --out {}".format(final_gds.path),
         tools = depset([ctx.executable._gds_write]),
@@ -80,7 +89,7 @@ gds_write = rule(
     implementation = _gds_write_impl,
     attrs = {
         "implemented_rtl": attr.label(mandatory = True, providers = [OpenRoadInfo, SynthesisInfo]),
-        "klayout_lyt": attr.label(mandatory = True, allow_single_file = True),
+        "klayout_lyt": attr.label(allow_single_file = True),
         "input_lef": attr.label_list(allow_files = True),
         "input_gds": attr.label_list(allow_files = True),
         "gds_allow_empty": attr.string(),

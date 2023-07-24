@@ -46,7 +46,6 @@ place_and_route(
 gds_write(
     name = "counter_asic",
     implemented_rtl = ":counter_place_and_route",
-    klayout_lyt = "klayout.lyt",
 )
 
 run_opensta(
