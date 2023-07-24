@@ -1,11 +1,15 @@
 load("//pdk:open_road_configuration.bzl", "open_road_pdk_configuration")
 
-exports_files(["pdk.patch"])
+exports_files([
+    "pdk.patch",
+    "fill.json", # Imported from OpenROAD-flow-scripts on 24.07.2023 at 6ec980e1d49a1a8dcdd1e25ed81255b4bb8285c8 from: https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/blob/6ec980e1d49a1a8dcdd1e25ed81255b4bb8285c8/flow/platforms/sky130hd/fill.json
+])
 
 open_road_pdk_configuration(
     name = "open_road_sky130_fd_sc_hd",
     cell_site = "unithd",
     cts_buffer_cell = "sky130_fd_sc_hd__clkbuf_1",
+    density_fill_config = "fill.json",
     do_not_use_cell_list = [
         "sky130_fd_sc_hd__probe_p_*",
         "sky130_fd_sc_hd__probec_p_*",
