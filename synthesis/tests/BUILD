@@ -37,7 +37,6 @@ place_and_route(
     name = "counter_place_and_route",
     clock_period = "10",
     core_padding_microns = 20,
-    density_fill_config = "fill.json",
     die_height_microns = 200,
     die_width_microns = 200,
     placement_density = "0.7",

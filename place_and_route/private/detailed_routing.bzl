@@ -57,7 +57,13 @@ def detailed_routing(ctx, open_road_info):
 
     open_road_commands = timing_setup_command_struct.commands
     open_road_commands.append("detailed_route -output_drc {} {}".format(output_drc.path, detailed_routing_args))
+    density_fill_config = None
+    if open_road_configuration.density_fill_config:
+       density_fill_config = open_road_configuration.density_fill_config.files.to_list()[0]
     if ctx.file.density_fill_config:
+       density_fill_config = ctx.file.density_fill_config
+
+    if density_fill_config:
         open_road_commands.append("set db [ord::get_db]")
         open_road_commands.append("set chip [$db getChip]")
         open_road_commands.append("set block [$chip getBlock]")
@@ -66,8 +72,8 @@ def detailed_routing(ctx, open_road_info):
         open_road_commands.append("foreach obstruction $obstructions {\n" +
                                   "    odb::dbObstruction_destroy $obstruction" +
                                   "\n}")
-        open_road_commands.append("density_fill -rules {}".format(ctx.file.density_fill_config.path))
-        inputs.append(ctx.file.density_fill_config)
+        open_road_commands.append("density_fill -rules {}".format(density_fill_config.path))
+        inputs.append(density_fill_config)
     open_road_commands.append("write_def {}".format(routed_def.path))
 
     execution_requirements = {}
