@@ -66,9 +66,25 @@ run_opensta(
     synth_target = ":verilog_counter_asap7_synth",
 )
 
+gds_write(
+    name = "counter_asap7_asic",
+    implemented_rtl = ":counter_asap7_place_and_route",
+)
+
+place_and_route(
+    name = "counter_asap7_place_and_route",
+    core_padding_microns = 1,
+    die_height_microns = 20,
+    die_width_microns = 20,
+    placement_density = "0.65",
+    sdc = "constraint.sdc",
+    synthesized_rtl = ":verilog_counter_asap7_synth",
+)
+
 synthesize_rtl(
     name = "verilog_counter_asap7_synth",
     standard_cells = "@org_theopenroadproject_asap7//:asap7_rvt_1x",
+    target_clock_period_pico_seconds = 10000,
     top_module = "counter",
     deps = [
         ":verilog_counter",
