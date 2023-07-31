@@ -47,6 +47,11 @@ open_road_pdk_configuration(
     endcap_cell = "TAPCELL_ASAP7_75t_R",
     fill_cells = [
         "FILLERxp5_ASAP7_75t_R",
+        "DECAPx1_ASAP7_75t_R",
+        "DECAPx2_ASAP7_75t_R",
+        "DECAPx4_ASAP7_75t_R",
+        "DECAPx6_ASAP7_75t_R",
+        "DECAPx10_ASAP7_75t_R",
     ],
     global_placement_cell_pad = 2,
     global_routing_clock_layers = "M2-M7",
