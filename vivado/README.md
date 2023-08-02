@@ -59,7 +59,7 @@ vivado_create_project(
 )
 ```
 
-It has the optional argument `_create_project_tcl_template` which by default loads [create_project.tcl.template](create_project.tcl.template). This can be modified.
+It has the optional argument `create_project_tcl_template` which by default loads [create_project.tcl.template](create_project.tcl.template). This can be modified.
 
 ## synthesize
 
@@ -76,7 +76,7 @@ vivado_synthesize(
 )
 ```
 
-It has the optional argument `_create_project_tcl_template` which by default loads [create_project.tcl.template](create_project.tcl.template). This can be modified.
+It has the optional argument `create_project_tcl_template` which by default loads [create_project.tcl.template](create_project.tcl.template). This can be modified.
 
 There is another optional argument `synth_strategy` which defaults to `Vivado Synthesis Defaults`. Look at synthesis strategies in vivado to see different options.
 
@@ -93,7 +93,7 @@ vivado_synthesis_optimize(
 )
 ```
 
-It has the optional argument `_synth_optimize_tcl_template` which by default loads [synth_optimize.tcl.template](synth_optimize.tcl.template). This can be modified.
+It has the optional argument `synth_optimize_tcl_template` which by default loads [synth_optimize.tcl.template](synth_optimize.tcl.template). This can be modified.
 
 There is an optional argument `opt_directive` which defaults to `Explore`.
 
@@ -110,7 +110,7 @@ vivado_placement(
 )
 ```
 
-It has the optional argument `_placement_tcl_template` which by default loads [placement.tcl.template](placement.tcl.template). This can be modified.
+It has the optional argument `placement_tcl_template` which by default loads [placement.tcl.template](placement.tcl.template). This can be modified.
 
 ## place_optimize
 
@@ -125,7 +125,7 @@ vivado_place_optimize(
 )
 ```
 
-It has the optional argument `_place_optimize_tcl_template` which by default loads [place_optimize.tcl.template](place_optimize.tcl.template). This can be modified.
+It has the optional argument `place_optimize_tcl_template` which by default loads [place_optimize.tcl.template](place_optimize.tcl.template). This can be modified.
 
 ## routing
 
@@ -140,7 +140,7 @@ vivado_routing(
 )
 ```
 
-It has the optional argument `_route_tcl_template` which by default loads [route.tcl.template](route.tcl.template). This can be modified.
+It has the optional argument `route_tcl_template` which by default loads [route.tcl.template](route.tcl.template). This can be modified.
 
 There is an optional argument `route_directive` which defaults to `Explore`.
 
@@ -157,7 +157,7 @@ vivado_write_bitstream(
 )
 ```
 
-It has the optional argument `_write_bitstream_tcl_template` which by default loads [write_bitstream.tcl.template](write_bitstream.tcl.template). This can be modified.
+It has the optional argument `write_bitstream_tcl_template` which by default loads [write_bitstream.tcl.template](write_bitstream.tcl.template). This can be modified.
 
 ## xsim_test
 
@@ -176,7 +176,7 @@ xsim_test(
 )
 ```
 
-It has the optional argument `_xsim_test_template` which by default loads [_xsim_test_template.tcl.template](_xsim_test_template.tcl.template). This can be modified.
+It has the optional argument `xsim_test_template` which by default loads [xsim_test_template.tcl.template](xsim_test_template.tcl.template). This can be modified.
 
 It is tagged as `manual` so it is not run by CI tools. They do not have vivado installed.
 
