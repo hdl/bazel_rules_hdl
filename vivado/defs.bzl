@@ -188,7 +188,7 @@ def create_and_synth(
 
     return run_tcl_template(
         ctx,
-        ctx.file._create_project_tcl_template,
+        ctx.file.create_project_tcl_template,
         substitutions,
         ctx.file.xilinx_env,
         all_files + ip_block_dirs,
@@ -230,7 +230,7 @@ vivado_create_project = rule(
             doc = "Jobs to pass to vivado which defines the amount of parallelism.",
             default = 4,
         ),
-        "_create_project_tcl_template": attr.label(
+        "create_project_tcl_template": attr.label(
             doc = "The create project tcl template",
             default = "@rules_hdl//vivado:create_project.tcl.template",
             allow_single_file = [".template"],
@@ -292,7 +292,7 @@ vivado_synthesize = rule(
             doc = "Jobs to pass to vivado which defines the amount of parallelism.",
             default = 4,
         ),
-        "_create_project_tcl_template": attr.label(
+        "create_project_tcl_template": attr.label(
             doc = "The create project tcl template",
             default = "@rules_hdl//vivado:create_project.tcl.template",
             allow_single_file = [".template"],
@@ -326,7 +326,7 @@ def _vivado_synthesis_optimize_impl(ctx):
 
     default_info = run_tcl_template(
         ctx,
-        ctx.file._synthesis_optimize_template,
+        ctx.file.synthesis_optimize_template,
         substitutions,
         ctx.file.xilinx_env,
         [checkpoint_in],
@@ -360,7 +360,7 @@ vivado_synthesis_optimize = rule(
             doc = "Threads to pass to vivado which defines the amount of parallelism.",
             default = 8,
         ),
-        "_synthesis_optimize_template": attr.label(
+        "synthesis_optimize_template": attr.label(
             doc = "The synthesis optimzation tcl template",
             default = "@rules_hdl//vivado:synth_optimize.tcl.template",
             allow_single_file = [".template"],
@@ -392,7 +392,7 @@ def _vivado_placement_impl(ctx):
 
     default_info = run_tcl_template(
         ctx,
-        ctx.file._placement_template,
+        ctx.file.placement_template,
         substitutions,
         ctx.file.xilinx_env,
         [checkpoint_in],
@@ -426,7 +426,7 @@ vivado_placement = rule(
             doc = "Threads to pass to vivado which defines the amount of parallelism.",
             default = 8,
         ),
-        "_placement_template": attr.label(
+        "placement_template": attr.label(
             doc = "The placement tcl template",
             default = "@rules_hdl//vivado:placement.tcl.template",
             allow_single_file = [".template"],
@@ -458,7 +458,7 @@ def _vivado_place_optimize_impl(ctx):
 
     default_info = run_tcl_template(
         ctx,
-        ctx.file._place_optimize_template,
+        ctx.file.place_optimize_template,
         substitutions,
         ctx.file.xilinx_env,
         [checkpoint_in],
@@ -492,7 +492,7 @@ vivado_place_optimize = rule(
             doc = "Threads to pass to vivado which defines the amount of parallelism.",
             default = 8,
         ),
-        "_place_optimize_template": attr.label(
+        "place_optimize_template": attr.label(
             doc = "The placement tcl template",
             default = "@rules_hdl//vivado:place_optimize.tcl.template",
             allow_single_file = [".template"],
@@ -540,7 +540,7 @@ def _vivado_routing_impl(ctx):
 
     default_info = run_tcl_template(
         ctx,
-        ctx.file._route_template,
+        ctx.file.route_template,
         substitutions,
         ctx.file.xilinx_env,
         [checkpoint_in],
@@ -574,7 +574,7 @@ vivado_routing = rule(
             doc = "Threads to pass to vivado which defines the amount of parallelism.",
             default = 8,
         ),
-        "_route_template": attr.label(
+        "route_template": attr.label(
             doc = "The placement tcl template",
             default = "@rules_hdl//vivado:route.tcl.template",
             allow_single_file = [".template"],
@@ -601,7 +601,7 @@ def _vivado_write_bitstream_impl(ctx):
 
     default_info = run_tcl_template(
         ctx,
-        ctx.file._write_bitstream_template,
+        ctx.file.write_bitstream_template,
         substitutions,
         ctx.file.xilinx_env,
         [checkpoint_in],
@@ -627,7 +627,7 @@ vivado_write_bitstream = rule(
             doc = "Threads to pass to vivado which defines the amount of parallelism.",
             default = 8,
         ),
-        "_write_bitstream_template": attr.label(
+        "write_bitstream_template": attr.label(
             doc = "The write bitstream tcl template",
             default = "@rules_hdl//vivado:write_bitstream.tcl.template",
             allow_single_file = [".template"],
@@ -722,7 +722,7 @@ def _xsim_test_impl(ctx):
 
     _, vivado_log, vivado_journal = run_tcl_template(
         ctx,
-        ctx.file._xsim_test_template,
+        ctx.file.xsim_test_template,
         substitutions,
         ctx.file.xilinx_env,
         all_files,
@@ -781,7 +781,7 @@ xsim_test = rule(
             mandatory = True,
             allow_single_file = [".sh"],
         ),
-        "_xsim_test_template": attr.label(
+        "xsim_test_template": attr.label(
             doc = "The tcl template to run on vivado.",
             default = "@rules_hdl//vivado:xsim_test.tcl.template",
             allow_single_file = [".template"],
@@ -843,7 +843,7 @@ def _vivado_create_ip_impl(ctx):
         encrypt_content, encrypted_files, post_processing_command = generate_encrypt_tcl(
             ctx,
             all_files,
-            ctx.file._keyfile.path,
+            ctx.file.keyfile.path,
             ip_src_dir,
         )
         outputs += encrypted_files
@@ -866,10 +866,10 @@ def _vivado_create_ip_impl(ctx):
 
     ip_block_outputs = run_tcl_template(
         ctx,
-        ctx.file._create_ip_block_template,
+        ctx.file.create_ip_block_template,
         substitutions,
         ctx.file.xilinx_env,
-        all_files + [ctx.file._keyfile],
+        all_files + [ctx.file.keyfile],
         outputs,
         post_processing_command,
     )
@@ -922,12 +922,12 @@ vivado_create_ip = rule(
             mandatory = True,
             allow_single_file = [".sh"],
         ),
-        "_create_ip_block_template": attr.label(
+        "create_ip_block_template": attr.label(
             doc = "The create project tcl template",
             default = "@rules_hdl//vivado:create_ip_block.tcl.template",
             allow_single_file = [".template"],
         ),
-        "_keyfile": attr.label(
+        "keyfile": attr.label(
             doc = "The keyfile to use when optionally encrypting",
             default = "@rules_hdl//vivado:xilinx_keyfile.txt",
             allow_single_file = [".txt"],
