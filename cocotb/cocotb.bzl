@@ -131,6 +131,18 @@ def _get_test_command(ctx, verilog_files, vhdl_files):
     waves_args = " --waves" if ctx.attr.waves else ""
     seed_args = " --seed {}".format(ctx.attr.seed) if ctx.attr.seed != "" else ""
 
+    timescale_args = ""
+    if ctx.attr.timescale:
+        if "unit" not in ctx.attr.timescale:
+            fail("Time unit not specified for the timescale attribute")
+        if "precision" not in ctx.attr.timescale:
+            fail("Time precision not specified for the timescale attribute")
+
+        timescale_args = " --timescale='({},{})'".format(
+            ctx.attr.timescale["unit"],
+            ctx.attr.timescale["precision"],
+        )
+
     test_module_args = _pymodules_to_argstring(ctx.files.test_module, "test_module")
 
     command = (
@@ -154,6 +166,7 @@ def _get_test_command(ctx, verilog_files, vhdl_files):
         verbose_args +
         waves_args +
         seed_args +
+        timescale_args +
         test_module_args
     )
 
@@ -279,6 +292,10 @@ _cocotb_test_attrs = {
     "waves": attr.bool(
         doc = "Record signal traces",
         default = True,
+    ),
+    "timescale": attr.string_dict(
+        doc = "Contains time unit and time precision for the simulator",
+        default = {},
     ),
     "deps": attr.label_list(
         doc = "The list of python libraries to be linked in to the simulation target",

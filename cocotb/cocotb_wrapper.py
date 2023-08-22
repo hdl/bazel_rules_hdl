@@ -28,6 +28,8 @@ cocotb_build_flags = [
     "always",
     "build_dir",
     "verbose",
+    "timescale",
+    "waves",
 ]
 
 
@@ -63,6 +65,9 @@ def cocotb_argument_parser():
             for value in values:
                 key, value = value.split("=")
                 getattr(namespace, self.dest)[key] = value
+
+    def tuple_type(strings):
+        return tuple(strings.replace("(", "").replace(")", "").split(","))
 
     parser = argparse.ArgumentParser(description="Runs the Cocotb framework from Bazel")
 
@@ -154,6 +159,12 @@ def cocotb_argument_parser():
         "--results_xml",
         default="results.xml",
         help="Name of xUnit XML file to store test results in",
+    )
+    parser.add_argument(
+        "--timescale",
+        default=None,
+        type=tuple_type,
+        help="Tuple containing time unit and time precision for simulation",
     )
 
     return parser
