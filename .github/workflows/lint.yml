@@ -7,11 +7,12 @@ on:
 jobs:
   buildifier:
     runs-on: ubuntu-20.04
-
+    env:
+      BUILDIFIER_VERSION: v6.3.3
     steps:
       - uses: actions/checkout@v2
 
-      - run: sudo wget https://github.com/bazelbuild/buildtools/releases/latest/download/buildifier-linux-amd64 -O /usr/local/bin/buildifier
+      - run: sudo wget https://github.com/bazelbuild/buildtools/releases/download/${{env.BUILDIFIER_VERSION}}/buildifier-linux-amd64 -O /usr/local/bin/buildifier
       - run: sudo chmod +x /usr/local/bin/buildifier
 
       - run: buildifier -lint warn -r .
