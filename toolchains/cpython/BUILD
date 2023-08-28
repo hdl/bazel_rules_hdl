@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:defs.bzl", "py_runtime")
 load("@bazel_tools//tools/python:toolchain.bzl", "py_runtime_pair")
+load("@rules_python//python:defs.bzl", "py_runtime")
 
 py_runtime(
     name = "cpython_runtime",

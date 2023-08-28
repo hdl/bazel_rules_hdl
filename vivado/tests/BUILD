@@ -1,5 +1,5 @@
-load("//verilog:providers.bzl", "verilog_library")
 load("//verilator:defs.bzl", "verilator_cc_library")
+load("//verilog:providers.bzl", "verilog_library")
 load(
     "//vivado:defs.bzl",
     "vivado_create_ip",

@@ -15,8 +15,8 @@
 """Internal helper function that is used by the BUILD files for each
 cell library workspace to set things up."""
 
-load(":cell_libraries.bzl", "CELL_LIBRARIES")
 load("@rules_hdl//dependency_support/com_google_skywater_pdk:build_defs.bzl", "skywater_cell_library", "skywater_corner")
+load(":cell_libraries.bzl", "CELL_LIBRARIES")
 
 def declare_cell_library(workspace_name, name):
     """This should be called from the BUILD file of a cell library workspace. It sets up the targets for the generated files of the given library.

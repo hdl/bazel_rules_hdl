@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("//synthesis:build_defs.bzl", "synthesize_rtl")
-load("//static_timing:build_defs.bzl", "run_opensta")
-load("//place_and_route:build_defs.bzl", "place_and_route")
 load("//gds_write:build_defs.bzl", "gds_write")
+load("//place_and_route:build_defs.bzl", "place_and_route")
+load("//static_timing:build_defs.bzl", "run_opensta")
+load("//synthesis:build_defs.bzl", "synthesize_rtl")
 load("//verilog:providers.bzl", "verilog_library")
 
 synthesize_rtl(

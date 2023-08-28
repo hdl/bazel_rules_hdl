@@ -14,8 +14,8 @@
 
 """Detailed Routing openROAD commands"""
 
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
 load("@rules_hdl//pdk:open_road_configuration.bzl", "DetailedRoutingInfo", "get_open_road_configuration")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
 
 def detailed_routing(ctx, open_road_info):
@@ -59,9 +59,9 @@ def detailed_routing(ctx, open_road_info):
     open_road_commands.append("detailed_route -output_drc {} {}".format(output_drc.path, detailed_routing_args))
     density_fill_config = None
     if open_road_configuration.density_fill_config:
-       density_fill_config = open_road_configuration.density_fill_config.files.to_list()[0]
+        density_fill_config = open_road_configuration.density_fill_config.files.to_list()[0]
     if ctx.file.density_fill_config:
-       density_fill_config = ctx.file.density_fill_config
+        density_fill_config = ctx.file.density_fill_config
 
     if density_fill_config:
         open_road_commands.append("set db [ord::get_db]")

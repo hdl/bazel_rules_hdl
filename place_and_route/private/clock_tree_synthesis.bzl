@@ -14,9 +14,9 @@
 
 """Clock Tree Synthesis openROAD commands"""
 
+load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
 load("//place_and_route:open_road.bzl", "OpenRoadInfo", "format_openroad_do_not_use_list", "merge_open_road_info", "openroad_command", "placement_padding_commands", "timing_setup_commands")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
-load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
 
 def clock_tree_synthesis(ctx, open_road_info):
     """Performs clock tree synthesis.

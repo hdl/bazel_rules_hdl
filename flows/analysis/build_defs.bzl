@@ -14,10 +14,10 @@
 
 """Design analysis utilities written using modular hardware flows."""
 
+load("@rules_hdl//pdk:build_defs.bzl", "StandardCellInfo")
 load("//flows:flows.bzl", "flow_binary", "tcl_script_prefix")
 load("//flows/openroad:build_defs.bzl", "assemble_openroad_step", "read_standard_cells")
 load("//flows/yosys:build_defs.bzl", "yosys_synth_file_step")
-load("@rules_hdl//pdk:build_defs.bzl", "StandardCellInfo")
 
 def _analyze_netlist_step_impl(ctx):
     tcl_commands = [tcl_script_prefix]
