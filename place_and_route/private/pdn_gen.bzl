@@ -14,8 +14,8 @@
 
 """PDN openROAD commands"""
 
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command")
 load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
 
 def pdn_gen(ctx, open_road_info):

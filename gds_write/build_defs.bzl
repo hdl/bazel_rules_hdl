@@ -14,9 +14,9 @@
 
 """These build rules run automated GDS write on an implemented design"""
 
+load("@rules_hdl//pdk:open_road_configuration.bzl", "assert_has_open_road_configuration", "get_open_road_configuration")
 load("//place_and_route:open_road.bzl", "OpenRoadInfo")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
-load("@rules_hdl//pdk:open_road_configuration.bzl", "assert_has_open_road_configuration", "get_open_road_configuration")
 
 def _gds_write_impl(ctx):
     # Throws an error if there is no OpenROAD configuration

@@ -14,8 +14,8 @@
 
 """Rules for running tests using Cocotb framework"""
 
-load("//verilog:providers.bzl", "VerilogInfo")
 load("@rules_python//python:defs.bzl", "PyInfo")
+load("//verilog:providers.bzl", "VerilogInfo")
 
 ## Helpers for parsing arguments
 

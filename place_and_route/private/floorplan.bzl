@@ -14,11 +14,11 @@
 
 """Floorplaning openROAD commands"""
 
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "openroad_command")
 load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
-load("//synthesis:build_defs.bzl", "SynthesisInfo")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "openroad_command")
 load("//place_and_route:private/report_area.bzl", "generate_area_results")
 load("//place_and_route:private/report_power.bzl", "generate_power_results")
+load("//synthesis:build_defs.bzl", "SynthesisInfo")
 
 def _initialize_floorplan_command(ctx):
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])

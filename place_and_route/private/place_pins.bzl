@@ -14,8 +14,8 @@
 
 """Pin Placement openROAD commands"""
 
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
 load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
 
 def place_pins(ctx, open_road_info):

@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_hdl_pip_deps//:requirements.bzl", "requirement")
 load("//cocotb:cocotb.bzl", "cocotb_test")
 load("//verilog:providers.bzl", "verilog_library")
-load("@rules_hdl_pip_deps//:requirements.bzl", "requirement")
 
 verilog_library(
     name = "counter",
