@@ -159,6 +159,8 @@ vivado_write_bitstream(
 
 It has the optional argument `write_bitstream_tcl_template` which by default loads [write_bitstream.tcl.template](write_bitstream.tcl.template). This can be modified.
 
+Optionally set `with_xsa = True` to generate the `.xsa` file.
+
 ## xsim_test
 
 Executes a test bench using the vivado simulator, xsim.
