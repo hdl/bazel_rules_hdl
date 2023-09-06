@@ -438,7 +438,7 @@ vivado_placement = rule(
     ],
 )
 
-def _vivado_place_optimize_impl(ctx):
+def _vivado_place_optimi    outputs = [bitstream]ze_impl(ctx):
     placement_checkpoint = ctx.actions.declare_file("{}.dcp".format(ctx.label.name))
     timing_summary_report = ctx.actions.declare_file("{}_timing.rpt".format(ctx.label.name))
     util_report = ctx.actions.declare_file("{}_util.rpt".format(ctx.label.name))
@@ -591,13 +591,24 @@ def _vivado_write_bitstream_impl(ctx):
 
     checkpoint_in = ctx.attr.checkpoint[VivadoRoutingCheckpointInfo].checkpoint
 
+    outputs = [bitstream]
+
+    if ctx.with_xsa:
+        with_xsa_str = "1"
+        xsa_out = ctx.actions.declare_file("{}.xsa".format(ctx.label.name))
+        xsa_path = xsa_out.path
+        outputs.append(xsa_out)
+    else:
+        with_xsa_str = "0"
+        xsa_path = "nothing.xsa"
+
     substitutions = {
         "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{CHECKPOINT_IN}}": checkpoint_in.path,
         "{{BITSTREAM}}": bitstream.path,
+        "{{WRITE_XSA}}": with_xsa_str,
+        "{{XSA_PATH}}": xsa_path,
     }
-
-    outputs = [bitstream]
 
     default_info = run_tcl_template(
         ctx,
@@ -626,6 +637,10 @@ vivado_write_bitstream = rule(
         "threads": attr.int(
             doc = "Threads to pass to vivado which defines the amount of parallelism.",
             default = 8,
+        ),
+        "with_xsa": attr.bool(
+            doc = "Generate xsa too",
+            default = False,
         ),
         "write_bitstream_template": attr.label(
             doc = "The write bitstream tcl template",

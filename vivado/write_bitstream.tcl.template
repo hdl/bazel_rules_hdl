@@ -6,6 +6,9 @@ puts "Post Route WNS = $WNS"
 
 if {$WNS >= 0} {
     write_bitstream -force {{BITSTREAM}}
+    if {{{WRITE_XSA}}} {
+        write_hw_platform -fixed -include_bit -force -file {{XSA_PATH}}
+    }
 } else {
     puts "Failed to make timing, refusing to make bitstream"
 }
