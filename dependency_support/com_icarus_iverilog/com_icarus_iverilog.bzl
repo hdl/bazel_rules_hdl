@@ -22,9 +22,9 @@ def com_icarus_iverilog():
         http_archive,
         name = "com_icarus_iverilog",
         urls = [
-            "https://github.com/steveicarus/iverilog/archive/v10_3.tar.gz",
+	    "https://github.com/steveicarus/iverilog/archive/v12_0.tar.gz",
         ],
-        strip_prefix = "iverilog-10_3",
-        sha256 = "4b884261645a73b37467242d6ae69264fdde2e7c4c15b245d902531efaaeb234",
+        strip_prefix = "iverilog-12_0",
+        sha256 = "a68cb1ef7c017ef090ebedb2bc3e39ef90ecc70a3400afb4aa94303bc3beaa7d",
         build_file = Label("@rules_hdl//dependency_support:com_icarus_iverilog/bundled.BUILD.bazel"),
     )
