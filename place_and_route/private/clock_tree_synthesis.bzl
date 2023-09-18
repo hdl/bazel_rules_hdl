@@ -41,8 +41,10 @@ def clock_tree_synthesis(ctx, open_road_info):
         format_openroad_do_not_use_list(open_road_configuration.do_not_use_cell_list),
         "estimate_parasitics -placement",
         "repair_clock_inverters",
-        "clock_tree_synthesis -root_buf \"{cts_buffer}\" -buf_list \"{cts_buffer}\" -sink_clustering_enable -post_cts_disable".format(
+        "clock_tree_synthesis -root_buf \"{cts_buffer}\" -buf_list \"{cts_buffer}\" -sink_clustering_enable {sink_clustering_size} {sink_clustering_max_diameter}".format(
             cts_buffer = open_road_configuration.cts_buffer_cell,
+            sink_clustering_size = "-sink_clustering_size {}".format(ctx.attr.sink_clustering_size) if ctx.attr.sink_clustering_size else "",
+            sink_clustering_max_diameter = "-sink_clustering_max_diameter {}".format(ctx.attr.sink_clustering_max_diameter) if ctx.attr.sink_clustering_max_diameter else "",
         ),
         "set_propagated_clock [all_clocks]",
         "repair_clock_nets",
