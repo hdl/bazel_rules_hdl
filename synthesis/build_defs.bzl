@@ -112,12 +112,19 @@ def _synthesize_design_impl(ctx):
     args.add_all("-l", [log_file])  # put output in log file
     args.add_all("-c", [synth_tcl])  # run synthesis tcl script
 
+    dont_use_args = ""
+    or_config = ctx.attr.standard_cells[StandardCellInfo].open_road_configuration
+    if or_config:
+        for dont_use_pattern in or_config.do_not_use_cell_list:
+            dont_use_args += " -dont_use {} ".format(dont_use_pattern)
+
     script_env_files = {
         "FLIST": verilog_flist,
         "UHDM_FLIST": uhdm_flist,
         "TOP": ctx.attr.top_module,
         "OUTPUT": output_file,
         "LIBERTY": default_liberty_file,
+        "DONT_USE_ARGS": dont_use_args,
     }
 
     if ctx.attr.target_clock_period_pico_seconds:
