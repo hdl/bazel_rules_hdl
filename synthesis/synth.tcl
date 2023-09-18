@@ -8,6 +8,7 @@
 # TOP = top module for synthesis
 # LIBERTY = liberty file for the target technology library
 # OUTPUT = verilog file for synthesis output
+# STATS_JSON = json file for structured stats output
 
 yosys -import
 
@@ -84,6 +85,10 @@ write_verilog $output
 
 # ====== print stats / info ======
 stat -liberty $liberty
+if { [info exists ::env(STATS_JSON) ] } {
+  tee -q -o $::env(STATS_JSON) stat -liberty $liberty -json
+  yosys log Structured stats: $::env(STATS_JSON)
+}
 read_liberty -lib -ignore_miss_func $liberty
 ltp -noff $top
 
