@@ -17,6 +17,7 @@
 load("@rules_hdl//pdk:open_road_configuration.bzl", "assert_has_open_road_configuration")
 load("//place_and_route:private/clock_tree_synthesis.bzl", "clock_tree_synthesis")
 load("//place_and_route:private/detailed_routing.bzl", "detailed_routing")
+load("//place_and_route:private/export_def.bzl", "export_def")
 load("//place_and_route:private/floorplan.bzl", "init_floor_plan")
 load("//place_and_route:private/global_placement.bzl", "global_placement")
 load("//place_and_route:private/global_routing.bzl", "global_routing")
@@ -32,16 +33,21 @@ def _place_and_route_impl(ctx):
     output_files = []
 
     open_road_provider = init_floor_plan(ctx)
+    open_road_provider, output_def = export_def(ctx, open_road_provider, "pre_pnr")
+    output_files.append(output_def)
     open_road_provider = place_pins(ctx, open_road_provider)
     open_road_provider = pdn_gen(ctx, open_road_provider)
     open_road_provider = global_placement(ctx, open_road_provider)
+    open_road_provider, output_def = export_def(ctx, open_road_provider, "global_placement")
+    output_files.append(output_def)
     open_road_provider = resize(ctx, open_road_provider)
     open_road_provider = clock_tree_synthesis(ctx, open_road_provider)
     open_road_provider = global_routing(ctx, open_road_provider)
     if not ctx.attr.skip_detailed_routing:
         open_road_provider = detailed_routing(ctx, open_road_provider)
         output_files.append(open_road_provider.routed_def)
-
+    open_road_provider, output_def = export_def(ctx, open_road_provider, "post_pnr")
+    output_files.append(output_def)
     output_files.append(open_road_provider.output_db)
     output_files.extend(open_road_provider.logs.to_list())
 
