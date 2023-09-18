@@ -30,6 +30,6 @@ def generate_power_results(ctx, output_file):
         "puts $fp \"corner: \\\"{corner}\\\"\"".format(
             corner = liberty.basename[:-(len(liberty.extension) + 1)],
         ),
-        "puts $fp \"power_maginitude: \\\"[sta::unit_scale_abreviation \"power\"]\\\"\"",
+        "puts $fp \"power_maginitude: \\\"[sta::unit_scale_abbreviation \"power\"]\\\"\"",
         "close $fp",
     ]
