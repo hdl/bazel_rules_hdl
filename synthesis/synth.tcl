@@ -22,7 +22,11 @@ foreach src $srcs {
     # Skip empty lines, including the implict one after the last \n delimiter
     # for files that end with a newline.
     if {$src eq ""} continue
-    yosys read_verilog -sv -defer $src
+    if {[info exists ::env(USE_SURELOG_FRONTEND)]} {
+      yosys read_systemverilog $src
+    } else {
+      yosys read_verilog -sv -defer $src
+    }
 }
 
 # read UHDM designs
