@@ -88,6 +88,7 @@ place_and_route = rule(
           """,
         ),
         "sdc": attr.label(allow_single_file = True),
+        "pin_placement_script": attr.label(allow_single_file = [".tcl"], doc = "See https://openroad.readthedocs.io/en/latest/main/src/ppl/README.html for syntax"),
         "clocks": attr.string_dict(),
         "die_width_microns": attr.int(),
         "die_height_microns": attr.int(),
@@ -95,5 +96,8 @@ place_and_route = rule(
         "target_die_utilization_percentage": attr.string(doc = "string float value from 0-100 which sets the die area based on an estimated die area target utilization"),
         "placement_density": attr.string(default = "0.69", doc = "When performing global placement this is how densely our cells should be packaged on the die parameter is (0-1]"),
         "density_fill_config": attr.label(allow_single_file = True),
+        "sink_clustering_size": attr.int(doc = "Clock tree synthesis sink group size"),
+	"sink_clustering_max_diameter": attr.int(doc = "Clock tree synthesis sink group desired diamater in microns"),
+	"min_pin_distance": attr.string(doc = "The minimum distance in microns between pins around the outside of the block."),
     },
 )
