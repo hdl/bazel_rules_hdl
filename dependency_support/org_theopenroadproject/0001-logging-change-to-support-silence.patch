@@ -1,17 +1,17 @@
 diff --git a/src/Main.cc b/src/Main.cc
-index c0167bf7d..4e33b7636 100755
+index 4285d3850..638690e9c 100644
 --- a/src/Main.cc
 +++ b/src/Main.cc
-@@ -89,6 +89,8 @@ int cmd_argc;
- char **cmd_argv;
+@@ -124,6 +124,8 @@ int cmd_argc;
+ char** cmd_argv;
  const char* log_filename = nullptr;
  const char* metrics_filename = nullptr;
 +bool quiet_logs = false;
 +bool silent_logs = false;
  
- static const char *init_filename = ".openroad";
+ static const char* init_filename = ".openroad";
  
-@@ -195,6 +197,14 @@ main(int argc,
+@@ -262,6 +264,14 @@ int main(int argc, char* argv[])
      remove(metrics_filename);
    }
  
@@ -26,37 +26,20 @@ index c0167bf7d..4e33b7636 100755
    cmd_argc = argc;
    cmd_argv = argv;
  #ifdef ENABLE_PYTHON3
-@@ -232,6 +242,7 @@ main(int argc,
-   }
- #endif
- 
-+
-   // Set argc to 1 so Tcl_Main doesn't source any files.
-   // Tcl_Main never returns.
-   Tcl_Main(1, argv, ord::tclAppInit);
-@@ -385,7 +396,7 @@ ord::tclAppInit(Tcl_Interp *interp)
- static void
- showUsage(const char *prog, const char *init_filename)
- {
--  printf("Usage: %s [-help] [-version] [-no_init] [-exit] [-gui] [-threads count|max] [-log file_name] cmd_file\n", prog);
-+  printf("Usage: %s [-help] [-version] [-no_init] [-exit] [-gui] [-threads count|max] [-log file_name] [-silent] [-quiet] cmd_file\n", prog);
-   printf("  -help              show help and exit\n");
-   printf("  -version           show version and exit\n");
-   printf("  -no_init           do not read %s init file\n", init_filename);
-@@ -397,6 +408,8 @@ showUsage(const char *prog, const char *init_filename)
-   printf("  -python            start with python interpreter [limited to db operations]\n");
- #endif
-   printf("  -log <file_name>   write a log in <file_name>\n");
+@@ -485,6 +495,8 @@ static void showUsage(const char* prog, const char* init_filename)
+   printf("  -log <file_name>      write a log in <file_name>\n");
+   printf(
+       "  -metrics <file_name>  write metrics in <file_name> in JSON format\n");
 +  printf("  -quiet             only emit warnings and above to the console\n");
 +  printf("  -silent            do not emit logs to console.\n");
-   printf("  cmd_file           source cmd_file\n");
+   printf("  cmd_file              source cmd_file\n");
  }
  
 diff --git a/src/OpenRoad.cc b/src/OpenRoad.cc
-index d5e1a6ed9..01e023493 100755
+index 519c7a9e4..833bb0fef 100644
 --- a/src/OpenRoad.cc
 +++ b/src/OpenRoad.cc
-@@ -98,6 +98,8 @@ extern int Odbtcl_Init(Tcl_Interp *interp);
+@@ -103,6 +103,8 @@ extern int Upf_Init(Tcl_Interp* interp);
  // Main.cc set by main()
  extern const char* log_filename;
  extern const char* metrics_filename;
@@ -65,7 +48,7 @@ index d5e1a6ed9..01e023493 100755
  
  namespace ord {
  
-@@ -204,7 +206,7 @@ OpenRoad::init(Tcl_Interp *tcl_interp)
+@@ -182,7 +184,7 @@ void OpenRoad::init(Tcl_Interp* tcl_interp)
    tcl_interp_ = tcl_interp;
  
    // Make components.
@@ -75,11 +58,11 @@ index d5e1a6ed9..01e023493 100755
    sta_ = makeDbSta();
    verilog_network_ = makeDbVerilogNetwork();
 diff --git a/src/utl/include/utl/Logger.h b/src/utl/include/utl/Logger.h
-index de27099ce..989cc2b79 100644
+index c96abbe49..0f8511944 100644
 --- a/src/utl/include/utl/Logger.h
 +++ b/src/utl/include/utl/Logger.h
-@@ -95,12 +95,22 @@ enum ToolId
-  SIZE // the number of tools, do not put anything after this
+@@ -104,19 +104,33 @@ enum ToolId
+       SIZE  // the number of tools, do not put anything after this
  };
  
 +enum LogMode {
@@ -88,37 +71,33 @@ index de27099ce..989cc2b79 100644
 +  SILENT,
 +};
 +
++
  class Logger
  {
   public:
    // Use nullptr if messages or metrics are not logged to a file.
--  Logger(const char* filename = nullptr,
--         const char *metrics_filename = nullptr);
-+  // Passing in true for quiet_logs will set the log level of stdout to warning
-+  // and above.
-+  //
-+  // Passing in true for silent_logs will disable stdout logging.
-+  Logger(const char* filename = nullptr, const char* metrics_filename = nullptr,
+   Logger(const char* filename = nullptr,
+-         const char* metrics_filename = nullptr);
++         const char* metrics_filename = nullptr,
 +         const bool quiet_logs = false, const bool silent_logs = false);
    ~Logger();
-   static ToolId findToolId(const char *tool_name);
+   static ToolId findToolId(const char* tool_name);
  
-@@ -108,7 +118,13 @@ class Logger
-     inline void report(const std::string& message,
-                        const Args&... args)
-     {
--      logger_->log(spdlog::level::level_enum::off, message, args...);
-+      spdlog::level::level_enum report_level = spdlog::level::level_enum::off;
+   template <typename... Args>
+   inline void report(const std::string& message, const Args&... args)
+   {
+-    logger_->log(spdlog::level::level_enum::off, FMT_RUNTIME(message), args...);
++    spdlog::level::level_enum report_level = spdlog::level::level_enum::off;
 +
-+      if (log_mode_ == LogMode::QUIET || log_mode_ == LogMode::SILENT) {
-+        report_level = spdlog::level::level_enum::info;
-+      }
++    if (log_mode_ == LogMode::QUIET || log_mode_ == LogMode::SILENT) {
++      report_level = spdlog::level::level_enum::info;
++    }
 +
-+      logger_->log(report_level, message, args...);
-     }
++    logger_->log(report_level, FMT_RUNTIME(message), args...);
+   }
  
-   // Do NOT call this directly, use the debugPrint macro  instead (defined below)
-@@ -283,6 +299,7 @@ class Logger
+   // Do NOT call this directly, use the debugPrint macro  instead (defined
+@@ -302,6 +316,7 @@ class Logger
    std::vector<spdlog::sink_ptr> sinks_;
    std::shared_ptr<spdlog::logger> logger_;
    std::stack<std::string> metrics_stages_;
@@ -127,34 +106,24 @@ index de27099ce..989cc2b79 100644
    // This matrix is pre-allocated so it can be safely updated
    // from multiple threads without locks.
 diff --git a/src/utl/include/utl/MakeLogger.h b/src/utl/include/utl/MakeLogger.h
-index 543d48054..d4953d2b7 100644
+index 34fd71210..996982708 100644
 --- a/src/utl/include/utl/MakeLogger.h
 +++ b/src/utl/include/utl/MakeLogger.h
-@@ -45,9 +45,8 @@ struct Tcl_Interp;
+@@ -45,7 +45,8 @@ struct Tcl_Interp;
  
  namespace ord {
  
--utl::Logger *
--makeLogger(const char *log_filename,
--           const char *metrics_filename);
+-utl::Logger* makeLogger(const char* log_filename, const char* metrics_filename);
 +utl::Logger *makeLogger(const char *log_filename, const char *metrics_filename,
 +                        const bool quiet_logs, const bool silent_logs);
- void
- initLogger(utl::Logger *logger,
-            Tcl_Interp *tcl_interp);
+ void initLogger(utl::Logger* logger, Tcl_Interp* tcl_interp);
+ 
+ }  // namespace ord
 diff --git a/src/utl/src/Logger.cpp b/src/utl/src/Logger.cpp
-index be99dabb9..febef1829 100644
+index e7afdc316..ee4929ee8 100644
 --- a/src/utl/src/Logger.cpp
 +++ b/src/utl/src/Logger.cpp
-@@ -35,6 +35,7 @@
- 
- #include "utl/Logger.h"
- 
-+#include <memory>
- #include <mutex>
- #include <atomic>
- #include <fstream>
-@@ -42,12 +43,14 @@
+@@ -42,12 +42,14 @@
  #include "spdlog/sinks/basic_file_sink.h"
  #include "spdlog/sinks/stdout_color_sinks.h"
  #include "spdlog/spdlog.h"
@@ -165,17 +134,16 @@ index be99dabb9..febef1829 100644
  
  int Logger::max_message_print = 1000;
  
--Logger::Logger(const char* log_filename, const char *metrics_filename)
+-Logger::Logger(const char* log_filename, const char* metrics_filename)
 +Logger::Logger(const char* log_filename, const char *metrics_filename, const bool quiet_logs, const bool silent_logs)
-   : debug_on_(false)
+     : debug_on_(false)
  {
    // This ensures it is safe to update the message counters
-@@ -55,10 +58,24 @@ Logger::Logger(const char* log_filename, const char *metrics_filename)
+@@ -55,7 +57,20 @@ Logger::Logger(const char* log_filename, const char* metrics_filename)
    static_assert(std::atomic<MessageCounter::value_type>::is_always_lock_free,
                  "message counter should be atomic");
  
-- sinks_.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
--  if (log_filename)
+-  sinks_.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
 +  log_mode_ = LogMode::FULL;
 +  auto stdout = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 +
@@ -190,24 +158,18 @@ index be99dabb9..febef1829 100644
 +    sinks_.push_back(stdout);
 +  }
 +
-+  if (log_filename) {
-     sinks_.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_filename));
--  
-+  }
-+
-   logger_ = std::make_shared<spdlog::logger>("logger", sinks_.begin(), sinks_.end());
-   logger_->set_pattern(pattern_);
-   logger_->set_level(spdlog::level::level_enum::debug);
+   if (log_filename)
+     sinks_.push_back(
+         std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_filename));
 diff --git a/src/utl/src/MakeLogger.cpp b/src/utl/src/MakeLogger.cpp
-index 05ee22281..9ff5785ee 100644
+index 942ee7999..2f20ea5da 100644
 --- a/src/utl/src/MakeLogger.cpp
 +++ b/src/utl/src/MakeLogger.cpp
-@@ -46,10 +46,9 @@ namespace ord {
+@@ -47,9 +47,9 @@ namespace ord {
  
  using utl::Logger;
  
--Logger *
--makeLogger(const char *log_filename, const char *metrics_filename)
+-Logger* makeLogger(const char* log_filename, const char* metrics_filename)
 -{
 -  return new Logger(log_filename, metrics_filename);
 +Logger *makeLogger(const char *log_filename, const char *metrics_filename,
@@ -215,4 +177,4 @@ index 05ee22281..9ff5785ee 100644
 +  return new Logger(log_filename, metrics_filename, quiet_logs, silent_logs);
  }
  
- void
+ void initLogger(Logger* logger, Tcl_Interp* tcl_interp)

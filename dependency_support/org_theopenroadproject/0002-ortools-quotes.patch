@@ -1,0 +1,53 @@
+diff --git a/src/gpl/src/mbff.cpp b/src/gpl/src/mbff.cpp
+index 795d9c453..0c3e2f5a1 100644
+--- a/src/gpl/src/mbff.cpp
++++ b/src/gpl/src/mbff.cpp
+@@ -37,11 +37,11 @@
+ #include <lemon/maps.h>
+ #include <lemon/network_simplex.h>
+ #include <omp.h>
+-#include <ortools/base/logging.h>
+-#include <ortools/linear_solver/linear_solver.h>
+-#include <ortools/sat/cp_model.h>
+-#include <ortools/sat/cp_model.pb.h>
+-#include <ortools/sat/cp_model_solver.h>
++#include "ortools/base/logging.h"
++#include "ortools/linear_solver/linear_solver.h"
++#include "ortools/sat/cp_model.h"
++#include "ortools/sat/cp_model.pb.h"
++#include "ortools/sat/cp_model_solver.h"
+ 
+ #include <algorithm>
+ #include <chrono>
+diff --git a/src/mpl2/src/bus_synthesis.cpp b/src/mpl2/src/bus_synthesis.cpp
+index cbb4d36d4..0e2c9f5f7 100644
+--- a/src/mpl2/src/bus_synthesis.cpp
++++ b/src/mpl2/src/bus_synthesis.cpp
+@@ -33,7 +33,7 @@
+ 
+ #include "bus_synthesis.h"
+ 
+-#include <ortools/linear_solver/linear_solver.h>
++#include "ortools/linear_solver/linear_solver.h"
+ 
+ #include <algorithm>
+ #include <iostream>
+diff --git a/src/par/src/Utilities.cpp b/src/par/src/Utilities.cpp
+index 34c246e21..1a82bea9e 100644
+--- a/src/par/src/Utilities.cpp
++++ b/src/par/src/Utilities.cpp
+@@ -37,10 +37,10 @@
+ ///////////////////////////////////////////////////////////////////////////////
+ #include "Utilities.h"
+ 
+-#include <ortools/base/commandlineflags.h>
+-#include <ortools/base/logging.h>
+-#include <ortools/linear_solver/linear_solver.h>
+-#include <ortools/linear_solver/linear_solver.pb.h>
++#include "ortools/base/commandlineflags.h"
++#include "ortools/base/logging.h"
++#include "ortools/linear_solver/linear_solver.h"
++#include "ortools/linear_solver/linear_solver.pb.h"
+ 
+ #include <algorithm>
+ #include <cassert>

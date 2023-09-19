@@ -12,12 +12,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_hdl//dependency_support/org_theopenroadproject:tcl_wrap_cc.bzl", "tcl_wrap_cc")
-load("@rules_hdl//dependency_support/org_theopenroadproject:tcl_encode.bzl", "tcl_encode")
-load("@rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex")
-load("@rules_hdl//dependency_support/org_gnu_bison:bison.bzl", "genyacc")
+# load("", "py_extension")
+# load("", "py_library")
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 
-package(features = ["-parse_headers"])
+load("@rules_hdl//dependency_support/org_gnu_bison:bison.bzl", "genyacc")
+load("@rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex")
+
+load(
+    "@rules_hdl//dependency_support/org_theopenroadproject:build_helper.bzl",
+    "OPENROAD_BINARY_DEPS",
+    "OPENROAD_BINARY_SRCS",
+    "OPENROAD_BINARY_SRCS_WITHOUT_MAIN",
+    "OPENROAD_COPTS",
+    "OPENROAD_LIBRARY_DEPS",
+    "OPENROAD_LIBRARY_HDRS_INCLUDE",
+    "OPENROAD_LIBRARY_INCLUDES",
+    "OPENROAD_LIBRARY_SRCS_EXCLUDE",
+    "OPENROAD_LIBRARY_SRCS_INCLUDE",
+)
+load("@rules_hdl//dependency_support/org_theopenroadproject:tcl_encode.bzl", "tcl_encode")
+
+load("@rules_hdl//dependency_support/org_theopenroadproject:tcl_wrap_cc.bzl", "tcl_wrap_cc")
+
+package(
+    features = [
+        "-parse_headers",
+        "-layering_check",
+        # TODO(b/299593765): Fix strict ordering.
+        "-libcxx_strict_weak_ordering_check",
+    ],
+)
 
 # OpenRoad Physical Synthesis
 licenses(["restricted"])
@@ -27,393 +52,96 @@ exports_files([
     "src/sta/etc/TclEncode.tcl",
 ])
 
-cc_binary(
-    name = "openroad",
-    srcs = [
-        #Root OpenRoad
-        "src/Main.cc",
-        ":openroad_swig",
-        ":openroad_tcl",
-        #Utility
-        ":logger_swig",
-        #InitFp
-        ":init_floorplan_swig",
-        ":init_floorplan_tcl",
-        #OpenDB
-        ":opendb_tcl",
-        ":opendb_tcl_common",
-        #DbSTA
-        ":db_sta_tcl",
-        ":dbsta_swig",
-        #ioPlacer
-        ":ioplacer_tcl",
-        ":ioplacer_swig",
-        #Resizer
-        ":resizer_swig",
-        ":resizer_tcl",
-        #OpenDP
-        ":opendp_swig",
-        ":opendp_tcl",
-        #finale
-        ":finale_swig",
-        ":finale_tcl",
-        #TritionMP
-        ":tritonmp_swig",
-        ":tritonmp_tcl",
-        #antenna_checker
-        ":ant_swig",
-        ":ant_tcl",
-        #FastRoute
-        ":fastroute_swig",
-        ":fastroute_tcl",
-        #Replace
-        ":replace_swig",
-        ":replace_tcl",
-        #TritonCTS
-        ":triton_cts_tcl",
-        ":triton_cts_swig",
-        #Tapcell
-        ":tapcell_swig",
-        ":tapcell_tcl",
-        #OpenRCX
-        ":rcx_swig",
-        ":rcx_tcl",
-        #TritonRoute
-        ":triton_route_swig",
-        ":triton_route_tcl",
-        #PDNSim
-        ":pdn_sim_swig",
-        ":pdn_sim_tcl",
-        #PartitionManager
-        ":partition_manager_swig",
-        ":partition_manager_tcl",
-        #PDNGen
-        ":pdngen_tcl",
-        ":pdngen_swig",
-        #MPL2
-        ":mpl2_swig",
-        ":mpl2_tcl",
-        #RMP
-        ":rmp_swig",
-        ":rmp_tcl",
-        #STT
-        ":stt_swig",
-        ":stt_tcl",
-        #Distributed
-        ":dst_swig",
-        ":dst_tcl",
-        #Dpo
-        ":dpo_swig",
-        ":dpo_tcl",
-    ],
-    copts = [
-        "-fexceptions",
-        "-Wno-error",
-        "-Wall",
-        "-Wextra",
-        "-pedantic",
-        "-Wcast-qual",
-        "-Wredundant-decls",
-        "-Wformat-security",
-        "-fopenmp"
-    ],
-    features = ["-use_header_modules"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":logger",
-        ":opendb_lib",
-        ":openroad_lib",
-        ":openroad_version",
-        ":opensta_lib",
-        "@tk_tcl//:tcl",
-        "@boost//:stacktrace",
+string_flag(
+    name = "platform",
+    build_setting_default = "cli",
+    values = [
+        "cli",
     ],
 )
 
+config_setting(
+    name = "platform_cli",
+    flag_values = {
+        ":platform": "cli",
+    },
+)
+
+cc_binary(
+    name = "openroad",
+    srcs = OPENROAD_BINARY_SRCS + select({
+        ":platform_cli": [],
+    }),
+    copts = OPENROAD_COPTS,
+    features = ["-use_header_modules"],
+    linkopts = select({
+        ":platform_cli": [],
+    }),
+    visibility = ["//visibility:public"],
+    deps = OPENROAD_BINARY_DEPS + select({
+        ":platform_cli": [":openroad_lib_private"],
+    }),
+)
+
 cc_library(
-    name = "openroad_lib",
+    name = "openroad_lib_private",
     srcs = glob(
-        include = [
-            #Root OpenRoad
-            "src/*.cc",
-            "src/*.cpp",
-            #Utility
-            "src/utl/src/*.cpp",
-            #InitFp
-            "src/ifp/src/*.cc",
+        include = OPENROAD_LIBRARY_SRCS_INCLUDE + [
             #GUI Disabled
             "src/gui/src/stub.cpp",
             "src/gui/src/stub_heatMap.cpp",
-            #DbSTA
-            "src/dbSta/src/*.cc",
-            "src/dbSta/src/*.cpp",
-            "src/dbSta/src/*.hh",
-            "src/dbSta/src/*.h",
-            #ioPlacer
-            "src/ppl/src/*.cpp",
-            "src/ppl/src/*.h",
-            #Resizer
-            "src/rsz/src/*.cc",
-            "src/rsz/src/*.hh",
-            #OpenDP
-            "src/dpl/src/*.cpp",
-            "src/dpl/src/*.h",
-            #finale
-            "src/fin/src/*.cpp",
-            "src/fin/src/*.h",
-            #TritionMP
-            "src/mpl/src/*.cpp",
-            "src/mpl/src/*.h",
-            #antenna_checker
-            "src/ant/src/*.cc",
-            #FastRoute
-            "src/grt/src/fastroute/src/*.cpp",
-            "src/grt/src/fastroute/src/*.h",
-            "src/grt/src/*.h",
-            "src/grt/src/*.cpp",
-            #Replace
-            "src/gpl/src/*.cpp",
-            "src/gpl/src/*.h",
-            #TritonCTS
-            "src/cts/src/*.h",
-            "src/cts/src/*.cpp",
-            #Tapcell
-            "src/tap/src/*.cpp",
-            #OpenRCX
-            "src/rcx/src/*.cpp",
-            #TritonRoute
-            "src/drt/src/*.cpp",
-            "src/drt/src/*.h",
-            "src/drt/src/**/*.h",
-            "src/drt/src/**/*.cpp",
-            "src/drt/src/**/*.cc",
-            #PDNSim
-            "src/psm/src/*.cpp",
-            "src/psm/src/*.h",
-            #PartitionManager
-            "src/par/src/*.cpp",
-            "src/par/src/MLPart/mlpart/**/*.cxx",
-            "src/par/src/MLPart/mlpart/**/*.h",
-            "src/par/src/MLPart/mlpart/**/*.inl",
-            "src/par/src/MLPart/src/*.h",
-            "src/par/src/MLPart/src/*.cpp",
-            #PDNGen
-            "src/pdn/src/*.cc",
-            "src/pdn/src/*.cpp",
-            "src/pdn/src/*.h",
-            #STT
-            "src/stt/src/*.cpp",
-            "src/stt/src/pdr/src/*.h",
-            "src/stt/src/pdr/src/*.cpp",
-            "src/stt/src/flt/*.cpp",
-            #MPL2
-            "src/mpl2/src/*.cpp",
-            "src/mpl2/src/*.h",
-            #RMP
-            "src/rmp/src/*.cpp",
-            #Distributed
-            "src/dst/src/*.cc",
-            "src/dst/src/*.h",
-            #Dpo
-            "src/dpo/src/*.cpp",
-            "src/dpo/src/*.cxx",
-            "src/dpo/src/*.h",
         ],
-        exclude = [
-            "src/Main.cc",
-            "src/rsz/src/Unused.cc",
-            "src/drt/src/main.cpp",
-            "src/utl/src/Logger.cpp",
-            "src/par/src/MLPart/mlpart/ABKCommon/abkrand_templ.cxx",
-            "src/par/src/MLPart/mlpart/Partitioners/aGreedMoveMan.cxx",
-            "src/par/src/MLPart/mlpart/Combi/grayPermut.cxx",
-        ],
+        exclude = OPENROAD_LIBRARY_SRCS_EXCLUDE,
     ) + [
         "src/stt/src/flt/etc/POST9.cpp",
         "src/stt/src/flt/etc/POWV9.cpp",
     ],
-    textual_hdrs = [
-      "src/par/src/MLPart/mlpart/ABKCommon/abkrand_templ.cxx",
-      "src/par/src/MLPart/mlpart/Partitioners/aGreedMoveMan.cxx",
-    ],
     hdrs = glob(
-        include = [
-            #Root OpenRoad
-            "include/ord/*.h",
-            "include/ord/*.hh",
-            #Utility
-            "src/utl/include/utl/*.h",
-            #InitFp
-            "src/ifp/include/ifp/*.hh",
-            #GUI
-            "src/gui/include/gui/*.h",
-            #DbSTA
-            "src/dbSta/include/db_sta/*.hh",
-            #ioPlacer
-            "src/ppl/include/ppl/*.h",
-            #Resizer
-            "src/rsz/include/rsz/*.hh",
-            #OpenDP
-            "src/dpl/include/dpl/*.h",
-            #finale
-            "src/fin/include/fin/*.h",
-            #TritonMP
-            "src/mpl/include/mpl/*.h",
-            #antenna_checker
-            "src/ant/include/ant/*.hh",
-            #FastRoute
-            "src/grt/src/fastroute/include/*.h",
-            "src/grt/include/grt/*.h",
-            #Replace
-            "src/gpl/include/gpl/*.h",
-            #TritonCTS
-            "src/cts/include/cts/*.h",
-            #Tapcell
-            "src/tap/include/tap/*.h",
-            #OpenRCX
-            "src/rcx/include/rcx/*.h",
-            #TritonRoute
-            "src/drt/include/triton_route/*.h",
-            #PDNSim
-            "src/psm/include/psm/*.h",
-            "src/psm/include/psm/*.hh",
-            #PartitionManager
-            "src/par/src/*.h",
-            "src/par/include/par/*.h",
-            #PDNGen
-            "src/pdn/include/pdn/*.hh",
-            #STT
-            "src/stt/include/stt/*.h",
-            #MPL2
-            "src/mpl2/include/mpl2/*.h",
-            #RMP
-            "src/rmp/include/rmp/*.h",
-            #Distributed
-            "src/dst/include/dst/*.h",
-            #Dpo
-            "src/dpo/include/dpo/*.h",
-        ],
+        include = OPENROAD_LIBRARY_HDRS_INCLUDE,
         exclude = [
             "src/utl/include/utl/Logger.h",
+            "src/utl/include/utl/CFileUtils.h",
         ],
     ),
-    copts = [
-        "-fexceptions",
-        "-Wno-error",
-        "-Wall",
-        "-Wextra",
-        "-pedantic",
-        "-Wcast-qual",
-        "-Wredundant-decls",
-        "-Wformat-security",
-        "-Iexternal/com_github_quantamhd_lemon",
+    copts = OPENROAD_COPTS,
+    defines = [
+        "OPENROAD_GIT_DESCRIBE=\\\"bazel_rules_hdl\\\"",
+        "ENABLE_MPL2",
     ],
     features = ["-use_header_modules"],
-    includes = [
-        #Root OpenRoad
-        "include",
-        #OpenDBTCL
-        "src/odb/src/swig/common",
-        #DbSTA
-        "src/dbSta/include",
-        "src/dbSta/include/db_sta",
-        #GUI
-        "src/gui/include",
-        #InitFp
-        "src/ifp/include",
-        #ioPlacer
-        "src/ppl/include",
-        "src/ppl/include/ppl",
-        "src/ppl/src",
-        #Resizer
-        "src/rsz/include",
-        "src/rsz/include/rsz",
-        #OpenDP
-        "src/dpl/include",
-        "src/dpl/include/dpl",
-        #finale
-        "src/fin/include",
-        "src/fin/include/fin",
-        #TritonMP
-        "src/mpl/include",
-        "src/mpl/include/mpl",
-        #antenna_checker
-        "src/ant/include",
-        "src/ant/include/ant",
-        #FastRoute
-        "src/grt/src/fastroute/include",
-        "src/grt/include/grt",
-        "src/grt/include",
-        #Replace
-        "src/gpl/include/gpl",
-        "src/gpl/include",
-        #TritonCTS
-        "src/cts/src",
-        "src/cts/include",
-        #Tapcell
-        "src/tap/include/tap",
-        "src/tap/include",
-        #OpenRCX
-        "src/rcx/include/rcx",
-        "src/rcx/include",
-        #TritonRoute
-        "src/drt/include/triton_route",
-        "src/drt/src",
-        "src/drt/include",
-        #PDNSim
-        "src/psm/include/psm",
-        "src/psm/include",
-        #PartitionManager
-        "src/par/include",
-        "src/par/include/par",
-        "src/par/src/MLPart/src",
-        "src/par/src/MLPart/mlpart",
-        "src/par/src/MLPart/mlpart/ABKCommon",
-        #PDNGen
-        "src/pdn/include",
-        "src/pdn/include/pdn",
-        #MPL2
-        "src/mpl2/include",
-        #RMP
-        "src/rmp/include",
-        #STT
-        "src/stt/include",
-        "src/stt/include/stt",
-        #Distributed
-        "src/dst/include",
-        "src/dst/include/dst",
-        #Dpo
-        "src/dpo/include",
-        "src/dpo/include/dpo",
+    includes = OPENROAD_LIBRARY_INCLUDES,
+    deps = OPENROAD_LIBRARY_DEPS,
+)
+
+cc_library(
+    name = "openroad_lib",
+    srcs = OPENROAD_BINARY_SRCS_WITHOUT_MAIN + glob(
+        include = OPENROAD_LIBRARY_SRCS_INCLUDE + [
+            #GUI Disabled
+            "src/gui/src/stub.cpp",
+            "src/gui/src/stub_heatMap.cpp",
+        ],
+        exclude = OPENROAD_LIBRARY_SRCS_EXCLUDE,
+    ) + [
+        "src/stt/src/flt/etc/POST9.cpp",
+        "src/stt/src/flt/etc/POWV9.cpp",
     ],
+    hdrs = glob(
+        include = OPENROAD_LIBRARY_HDRS_INCLUDE,
+        exclude = [
+            "src/utl/include/utl/Logger.h",
+            "src/utl/include/utl/CFileUtils.h",
+        ],
+    ),
+    copts = OPENROAD_COPTS,
     defines = [
-      "OPENROAD_GIT_DESCRIBE=\\\"bazel_rules_hdl\\\""
+        "OPENROAD_GIT_DESCRIBE=\\\"bazel_rules_hdl\\\"",
+        "ENABLE_MPL2",
     ],
-    linkstatic = True,
-    deps = [
-        ":ParquetFP",
-        ":logger",
-        ":munkres",
-        ":opendb_lib",
-        ":openroad_version",
-        ":opensta_lib",
-        "@boost//:geometry",
-        "@boost//:multi_array",
-        "@boost//:property_tree",
-        "@boost//:icl",
-        "@boost//:polygon",
-        "@boost//:graph",
-        "@boost//:asio",
-        "@boost//:stacktrace",
-        "@boost//:thread",
-        "@edu_berkeley_abc//:abc-lib",
-        "@org_tuxfamily_eigen//:eigen3",
-        "@com_github_quantamhd_lemon//:lemon",
-        "@com_github_gabime_spdlog//:spdlog",
-        "@tk_tcl//:tcl",
-        "@org_llvm_openmp//:openmp",
-    ],
-    alwayslink = True,
+    features = ["-use_header_modules"],
+    includes = OPENROAD_LIBRARY_INCLUDES,
+    visibility = ["//visibility:public"],
+    deps = OPENROAD_LIBRARY_DEPS,
 )
 
 genrule(
@@ -449,17 +177,23 @@ cc_library(
         "src/utl/include/utl/Metrics.h",
     ],
     copts = [
+        "-fexceptions",
         "-Wno-error",
         "-Wall",
         "-Wextra",
         "-pedantic",
-        "-Wcast-qual",
+        "-Wno-cast-qual",  # typically from TCL swigging
+        "-Wno-missing-braces",  # typically from TCL swigging
         "-Wredundant-decls",
         "-Wformat-security",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
     ],
+    features = ["-use_header_modules"],
     includes = [
         "src/utl/include",
         "src/utl/include/utl",
+        "src/utl/src",
     ],
     visibility = ["@org_theopenroadproject//:__subpackages__"],
     deps = [
@@ -482,9 +216,12 @@ cc_library(
         "-Wall",
         "-Wextra",
         "-pedantic",
-        "-Wcast-qual",
+        "-Wno-cast-qual",  # typically from TCL swigging
+        "-Wno-missing-braces",  # typically from TCL swigging
         "-Wredundant-decls",
         "-Wformat-security",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
     ],
     features = ["-use_header_modules"],
     includes = [
@@ -662,7 +399,6 @@ tcl_encode(
 tcl_encode(
     name = "pdngen_tcl",
     srcs = [
-        "src/pdn/src/PdnGen.tcl",
         "src/pdn/src/pdn.tcl",
     ],
     char_array_name = "pdn_tcl_inits",
@@ -672,9 +408,16 @@ tcl_encode(
     name = "openroad_tcl",
     srcs = [":tcl_util"] + [
         "src/OpenRoad.tcl",
-        "src/pad/src/pad.tcl",
     ],
     char_array_name = "openroad_swig_tcl_inits",
+)
+
+tcl_encode(
+    name = "pad_tcl",
+    srcs = [
+        "src/pad/src/pad.tcl",
+    ],
+    char_array_name = "pad_tcl_inits",
 )
 
 tcl_encode(
@@ -717,6 +460,30 @@ tcl_encode(
     char_array_name = "dpo_tcl_inits",
 )
 
+tcl_encode(
+    name = "gui_tcl",
+    srcs = [
+        "src/gui/src/gui.tcl",
+    ],
+    char_array_name = "gui_tcl_inits",
+)
+
+tcl_encode(
+    name = "upf_tcl",
+    srcs = [
+        "src/upf/src/upf.tcl",
+    ],
+    char_array_name = "upf_tcl_inits",
+)
+
+tcl_encode(
+    name = "dft_tcl",
+    srcs = [
+        "src/dft/src/dft.tcl",
+    ],
+    char_array_name = "dft_tcl_inits",
+)
+
 tcl_wrap_cc(
     name = "dst_swig",
     srcs = [
@@ -736,12 +503,17 @@ tcl_wrap_cc(
     srcs = [
         "src/ifp/src/InitFloorplan.i",
         ":error_swig",
-    ],
+    ] + glob([
+        "src/odb/src/swig/tcl/*.i",
+        "src/odb/src/swig/common/*.i",
+    ]),
     module = "ifp",
     namespace_prefix = "ifp",
     root_swig_src = "src/ifp/src/InitFloorplan.i",
     swig_includes = [
         "src/ifp/src",
+        "src/odb/src/swig/common",
+        "src/odb/src/swig/tcl",
     ],
 )
 
@@ -756,8 +528,8 @@ tcl_wrap_cc(
     namespace_prefix = "sta",
     root_swig_src = "src/dbSta/src/dbSta.i",
     swig_includes = [
-        "src/odb/src/swig/common",
         "src/dbSta/src",
+        "src/odb/src/swig/common",
         "src/sta",
     ],
     deps = [
@@ -811,6 +583,7 @@ tcl_wrap_cc(
     name = "logger_swig",
     srcs = [
         "src/utl/src/Logger.i",
+        "src/utl/src/LoggerCommon.h",
         ":error_swig",
     ],
     module = "utl",
@@ -910,11 +683,17 @@ tcl_wrap_cc(
     srcs = [
         "src/tap/src/tapcell.i",
         ":error_swig",
-    ],
+    ] + glob([
+        "src/odb/src/swig/tcl/*.i",
+        "src/odb/src/swig/common/*.i",
+        "src/odb/include/odb/*.h",
+    ]),
     module = "tap",
     namespace_prefix = "tap",
     root_swig_src = "src/tap/src/tapcell.i",
     swig_includes = [
+        "src/odb/src/swig/common",
+        "src/odb/src/swig/tcl",
         "src/tap/src",
     ],
 )
@@ -1010,6 +789,27 @@ tcl_wrap_cc(
 )
 
 tcl_wrap_cc(
+    name = "pad_swig",
+    srcs = [
+        "src/pad/src/pad.i",
+        ":error_swig",
+    ] + glob([
+        "src/odb/src/swig/tcl/*.i",
+        "src/odb/src/swig/common/*.i",
+        "src/odb/include/odb/*.h",
+    ]),
+    module = "pad",
+    namespace_prefix = "pad",
+    root_swig_src = "src/pad/src/pad.i",
+    swig_includes = [
+        "src/odb/include",
+        "src/odb/src/swig/common",
+        "src/odb/src/swig/tcl",
+        "src/pad/src",
+    ],
+)
+
+tcl_wrap_cc(
     name = "mpl2_swig",
     srcs = [
         "src/mpl2/src/mpl.i",
@@ -1065,6 +865,35 @@ tcl_wrap_cc(
     ],
 )
 
+tcl_wrap_cc(
+    name = "dft_swig",
+    srcs = [
+        "src/dft/src/dft.i",
+        ":error_swig",
+    ],
+    module = "dft",
+    namespace_prefix = "dft",
+    root_swig_src = "src/dft/src/dft.i",
+    swig_includes = [
+        "src/dft/src",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "gui_swig",
+    srcs = [
+        "src/gui/src/gui.i",
+        ":error_swig",
+    ],
+    module = "gui",
+    namespace_prefix = "gui",
+    root_swig_src = "src/gui/src/gui.i",
+    #runtime_header = "src/gui/src/tclSwig.h",
+    swig_includes = [
+        "src/gui/src",
+    ],
+)
+
 filegroup(
     name = "error_swig",
     srcs = [
@@ -1096,12 +925,12 @@ tcl_wrap_cc(
         "src/odb/src/swig/tcl/*.i",
         "src/odb/src/swig/common/*.i",
         "src/odb/include/odb/*.h",
-    ]),
+    ]) + ["src/Exception.i"],
     module = "odbtcl",
     namespace_prefix = "odb",
     root_swig_src = "src/odb/src/swig/common/odb.i",
     swig_includes = [
-      "src/odb/include",
+        "src/odb/include",
         "src/odb/include/odb",
         "src/odb/src/swig/tcl",
     ],
@@ -1111,6 +940,23 @@ tcl_wrap_cc(
         # following warnings. They can be derived by attemtpting to compile without them and fixing
         # the warnings one by one.
         "-w509,503,501,472,467,402,401,317,325,378,383,389,365,362,314,258,240,203,201",
+    ],
+)
+
+tcl_wrap_cc(
+    name = "upf_swig",
+    srcs = glob([
+        "src/odb/include/odb/*.h",
+        "src/upf/include/upf/*.h",
+    ]) + [
+        "src/upf/src/upf.i",
+    ],
+    module = "upf",
+    namespace_prefix = "upf",
+    root_swig_src = "src/upf/src/upf.i",
+    swig_includes = [
+        "src/odb/include",
+        "src/upf/include",
     ],
 )
 
@@ -1138,8 +984,8 @@ cc_library(
         "src/odb/include/odb/*.hpp",
     ]) + [
         "src/odb/src/def/def/defiAlias.hpp",
-        "src/odb/src/def/def/defwWriter.hpp",
         "src/odb/src/def/def/defrReader.hpp",
+        "src/odb/src/def/def/defwWriter.hpp",
         "src/odb/src/lef/lef/lefiDebug.hpp",
         "src/odb/src/lef/lef/lefiUtil.hpp",
         "src/odb/src/lef/lef/lefrReader.hpp",
@@ -1149,7 +995,7 @@ cc_library(
         "-Wno-error",
     ],
     features = [
-      "-use_header_modules",
+        "-use_header_modules",
     ],
     includes = [
         "src/odb/include",
@@ -1166,18 +1012,18 @@ cc_library(
         ":logger",
         ":opendb_def",
         ":opendb_lef",
+        "@boost//:algorithm",
+        "@boost//:bind",
+        "@boost//:config",
+        "@boost//:fusion",
+        "@boost//:lambda",
+        "@boost//:optional",
+        "@boost//:phoenix",
+        "@boost//:polygon",
+        "@boost//:spirit",
         "@com_github_gabime_spdlog//:spdlog_with_exceptions",
         "@tk_tcl//:tcl",
         "@net_zlib//:zlib",
-        "@boost//:iostreams",
-        "@boost//:foreach",
-        "@boost//:variant",
-        "@boost//:spirit",
-        "@boost//:lambda",
-        "@boost//:fusion",
-        "@boost//:bind",
-        "@boost//:algorithm",
-        "@boost//:thread",
     ],
 )
 
@@ -1196,12 +1042,12 @@ cc_library(
             "src/odb/src/lef/lef/lefrReader.hpp",
         ],
     ) + [
-        "src/odb/src/lef/lef/lef_parser.hpp",
         "src/odb/src/lef/lef/lef_parser.cpp",
+        "src/odb/src/lef/lef/lef_parser.hpp",
     ],
     hdrs = glob([
-        "src/odb/include/opendb/*.h",
-        "src/odb/include/opendb/*.hpp",
+        "src/odb/include/odb/*.h",
+        "src/odb/include/odb/*.hpp",
     ]) + [
         "src/odb/src/lef/lef/lefiDebug.hpp",
         "src/odb/src/lef/lef/lefiUtil.hpp",
@@ -1214,11 +1060,13 @@ cc_library(
     ],
     features = ["-use_header_modules"],
     includes = [
-        "src/odb/include/opendb",
+        "src/odb/include/odb",
         "src/odb/src/lef/lef",
         "src/odb/src/lef/lefzlib",
     ],
-    visibility = ["//visibility:private"],
+    visibility = [
+    	"//visibility:private",
+    ],
     deps = [
         "@net_zlib//:zlib",
     ],
@@ -1239,18 +1087,18 @@ cc_library(
             "src/odb/src/def/def/defiUtil.hpp",
         ],
     ) + [
-        "src/odb/src/def/def/def_parser.hpp",
         "src/odb/src/def/def/def_parser.cpp",
+        "src/odb/src/def/def/def_parser.hpp",
     ],
     hdrs = glob([
-        "src/odb/include/opendb/*.h",
-        "src/odb/include/opendb/*.hpp",
+        "src/odb/include/odb/*.h",
+        "src/odb/include/odb/*.hpp",
     ]) + [
+        "src/odb/src/def/def/defiAlias.hpp",
         "src/odb/src/def/def/defiComponent.hpp",
         "src/odb/src/def/def/defiUtil.hpp",
-        "src/odb/src/def/def/defiAlias.hpp",
-        "src/odb/src/def/def/defwWriter.hpp",
         "src/odb/src/def/def/defrReader.hpp",
+        "src/odb/src/def/def/defwWriter.hpp",
         "src/odb/src/def/defzlib/defzlib.hpp",
     ],
     copts = [
@@ -1259,11 +1107,13 @@ cc_library(
     ],
     features = ["-use_header_modules"],
     includes = [
-        "src/odb/include/opendb",
+        "src/odb/include/odb",
         "src/odb/src/def/def",
         "src/odb/src/def/defzlib",
     ],
-    visibility = ["//visibility:private"],
+    visibility = [
+    	"//visibility:private",
+    ],
     deps = [
         "@net_zlib//:zlib",
     ],
@@ -1369,46 +1219,55 @@ genyacc(
 
 # The order here is very important as the script to encode these relies on it
 tcl_srcs = [
+    "src/sta/tcl/Init.tcl",
     "src/sta/tcl/Util.tcl",
+    "src/sta/tcl/CmdArgs.tcl",
+    "src/sta/tcl/CmdUtil.tcl",
     "src/sta/tcl/Graph.tcl",
     "src/sta/tcl/Liberty.tcl",
     "src/sta/tcl/Link.tcl",
     "src/sta/tcl/Network.tcl",
     "src/sta/tcl/NetworkEdit.tcl",
+    "src/sta/tcl/Property.tcl",
     "src/sta/tcl/Sdc.tcl",
     "src/sta/tcl/Search.tcl",
-    "src/sta/tcl/Cmds.tcl",
-    "src/sta/tcl/Variables.tcl",
     "src/sta/tcl/Sta.tcl",
-    "src/sta/tcl/Power.tcl",
+    "src/sta/tcl/Variables.tcl",
+    "src/sta/tcl/WritePathSpice.tcl",
     "src/sta/tcl/Splash.tcl",
     "src/sta/dcalc/DelayCalc.tcl",
     "src/sta/parasitics/Parasitics.tcl",
+    "src/sta/power/Power.tcl",
     "src/sta/sdf/Sdf.tcl",
     "src/sta/verilog/Verilog.tcl",
 ]
 
 exported_tcl = [
+    "src/sta/dcalc/DelayCalc.tcl",
+    "src/sta/parasitics/Parasitics.tcl",
+    "src/sta/power/Power.tcl",
+    "src/sta/sdf/Sdf.tcl",
+    "src/sta/tcl/CmdArgs.tcl",
+    "src/sta/tcl/CmdUtil.tcl",
     "src/sta/tcl/Graph.tcl",
     "src/sta/tcl/Liberty.tcl",
     "src/sta/tcl/Network.tcl",
     "src/sta/tcl/NetworkEdit.tcl",
+    "src/sta/tcl/Property.tcl",
     "src/sta/tcl/Sdc.tcl",
     "src/sta/tcl/Search.tcl",
-    "src/sta/tcl/Cmds.tcl",
-    "src/sta/tcl/Variables.tcl",
-    "src/sta/tcl/Sta.tcl",
-    "src/sta/tcl/Power.tcl",
     "src/sta/tcl/Splash.tcl",
-    "src/sta/dcalc/DelayCalc.tcl",
-    "src/sta/parasitics/Parasitics.tcl",
-    "src/sta/sdf/Sdf.tcl",
+    "src/sta/tcl/Sta.tcl",
+    "src/sta/tcl/Variables.tcl",
+    "src/sta/tcl/WritePathSpice.tcl",
 ]
 
 filegroup(
     name = "tcl_scripts",
     srcs = exported_tcl,
-    visibility = ["@org_theopenroadproject//:__subpackages__"],
+    visibility = [
+    	"@org_theopenroadproject//:__subpackages__",
+    ],
 )
 
 tcl_encode(
@@ -1425,7 +1284,8 @@ genrule(
     #define STA_VERSION "2.2.1"
     #define STA_GIT_SHA1 "53d4d57cb8550d2ceed18adad75b73bba7858f4f"
     #define CUDD 0
-    #define SSTA 0' > \"$@\"
+    #define SSTA 0 
+    #define ZLIB_FOUND' > \"$@\"
     """,
 )
 
@@ -1435,6 +1295,7 @@ filegroup(
         "src/sta/app/StaApp.i",
         "src/sta/dcalc/DelayCalc.i",
         "src/sta/parasitics/Parasitics.i",
+        "src/sta/power/Power.i",
         "src/sta/sdf/Sdf.i",
         "src/sta/tcl/Exception.i",
         "src/sta/tcl/NetworkEdit.i",
@@ -1454,6 +1315,7 @@ tcl_wrap_cc(
     swig_includes = [
         "src/sta/dcalc",
         "src/sta/parasitics",
+        "src/sta/power",
         "src/sta/sdf",
         "src/sta/tcl",
         "src/sta/verilog",
@@ -1504,9 +1366,12 @@ cc_binary(
         "-Wall",
         "-Wextra",
         "-pedantic",
-        "-Wcast-qual",
+        "-Wno-cast-qual",  # typically from TCL swigging
+        "-Wno-missing-braces",  # typically from TCL swigging
         "-Wredundant-decls",
         "-Wformat-security",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
     ],
     features = ["-use_header_modules"],
     includes = [
@@ -1515,11 +1380,11 @@ cc_binary(
         "src/sta/include/sta",
         "src/sta/util",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":opensta_lib",
         "@tk_tcl//:tcl",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -1533,6 +1398,7 @@ cc_library(
         "src/sta/sdf/*.hh",
         "src/sta/search/*.hh",
         "src/sta/verilog/*.hh",
+        "src/sta/power/*.hh",
     ]) + glob(
         include = [
             "src/sta/app/StaMain.cc",
@@ -1546,6 +1412,7 @@ cc_library(
             "src/sta/sdf/*.cc",
             "src/sta/search/*.cc",
             "src/sta/verilog/*.cc",
+            "src/sta/power/*.cc",
         ],
         exclude = [
             "src/sta/search/WriteSpice.cc",
@@ -1554,8 +1421,8 @@ cc_library(
             "src/sta/util/Machine*.cc",
         ],
     ) + [
-        ":StaConfig",
         "src/sta/util/Machine.cc",
+        ":StaConfig",
     ],
     hdrs = glob(
         include = ["src/sta/include/sta/*.hh"],
@@ -1568,9 +1435,12 @@ cc_library(
         "-Wall",
         "-Wextra",
         "-pedantic",
-        "-Wcast-qual",
+        "-Wno-cast-qual",  # typically from TCL swigging
+        "-Wno-missing-braces",  # typically from TCL swigging
         "-Wredundant-decls",
         "-Wformat-security",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
     ],
     features = [
         "-use_header_modules",
@@ -1585,6 +1455,7 @@ cc_library(
     visibility = ["@org_theopenroadproject//:__subpackages__"],
     deps = [
         "@tk_tcl//:tcl",
+        "@net_zlib//:zlib",
     ],
 )
 
