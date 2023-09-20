@@ -77,6 +77,7 @@ cc_library(
         "src/aig/gia/giaCSat2.c",
         "src/aig/gia/giaCSat3.c",
         "src/aig/gia/giaCSatOld.c",
+        "src/aig/gia/giaCSatP.c",
         "src/aig/gia/giaCTas.c",
         "src/aig/gia/giaCex.c",
         "src/aig/gia/giaClp.c",
@@ -134,6 +135,7 @@ cc_library(
         "src/aig/gia/giaResub.c",
         "src/aig/gia/giaResub2.c",
         "src/aig/gia/giaResub3.c",
+        "src/aig/gia/giaResub6.c",
         "src/aig/gia/giaRetime.c",
         "src/aig/gia/giaRex.c",
         "src/aig/gia/giaSat3.c",
@@ -141,6 +143,7 @@ cc_library(
         "src/aig/gia/giaSatLE.c",
         "src/aig/gia/giaSatLut.c",
         "src/aig/gia/giaSatMap.c",
+        "src/aig/gia/giaSatSyn.c",
         "src/aig/gia/giaSatoko.c",
         "src/aig/gia/giaScl.c",
         "src/aig/gia/giaScript.c",
@@ -148,6 +151,7 @@ cc_library(
         "src/aig/gia/giaShrink.c",
         "src/aig/gia/giaShrink6.c",
         "src/aig/gia/giaShrink7.c",
+        "src/aig/gia/giaSif.c",
         "src/aig/gia/giaSim.c",
         "src/aig/gia/giaSim2.c",
         "src/aig/gia/giaSimBase.c",
@@ -165,8 +169,11 @@ cc_library(
         "src/aig/gia/giaSwitch.c",
         "src/aig/gia/giaTim.c",
         "src/aig/gia/giaTis.c",
+        "src/aig/gia/giaTranStoch.c",
+        "src/aig/gia/giaTransduction.cpp",
         "src/aig/gia/giaTruth.c",
         "src/aig/gia/giaTsim.c",
+        "src/aig/gia/giaTtopt.cpp",
         "src/aig/gia/giaUnate.c",
         "src/aig/gia/giaUtil.c",
         "src/aig/hop/hopBalance.c",
@@ -297,6 +304,7 @@ cc_library(
         "src/base/abci/abcNpnSave.c",
         "src/base/abci/abcNtbdd.c",
         "src/base/abci/abcOdc.c",
+        "src/base/abci/abcOrchestration.c",
         "src/base/abci/abcOrder.c",
         "src/base/abci/abcPart.c",
         "src/base/abci/abcPrint.c",
@@ -402,6 +410,7 @@ cc_library(
         "src/base/io/ioWriteBook.c",
         "src/base/io/ioWriteCnf.c",
         "src/base/io/ioWriteDot.c",
+        "src/base/io/ioWriteEdgelist.c",
         "src/base/io/ioWriteEqn.c",
         "src/base/io/ioWriteGml.c",
         "src/base/io/ioWriteList.c",
@@ -409,7 +418,6 @@ cc_library(
         "src/base/io/ioWriteSmv.c",
         "src/base/io/ioWriteVerilog.c",
         "src/base/main/libSupport.c",
-        "src/base/main/main.c",
         "src/base/main/mainFrame.c",
         "src/base/main/mainInit.c",
         "src/base/main/mainLib.c",
@@ -972,6 +980,7 @@ cc_library(
         "src/proof/cec/cecSat.c",
         "src/proof/cec/cecSatG.c",
         "src/proof/cec/cecSatG2.c",
+        "src/proof/cec/cecSatG3.c",
         "src/proof/cec/cecSeq.c",
         "src/proof/cec/cecSim.c",
         "src/proof/cec/cecSolve.c",
@@ -1162,25 +1171,31 @@ cc_library(
     ],
     hdrs = [
         "src/base/abc/abc.h",
+        "src/base/main/main.h",
         "src/misc/util/abc_global.h",
     ],
     copts = [
         "-O2",
+        "-Wno-dangling-else",
+        "-Wno-empty-body",
         "-Wno-format-overflow",
         "-Wno-implicit-int-float-conversion",
+        "-Wno-maybe-uninitialized",  # This is possibly concerning.
         "-Wno-misleading-indentation",
+        "-Wno-non-virtual-dtor",
         "-Wno-nonnull",
         "-Wno-self-assign",
         "-Wno-sign-compare",
+        "-Wno-sometimes-uninitialized",  # This is possibly concerning.
         "-Wno-strict-aliasing",
+        "-Wno-string-plus-char",
         "-Wno-stringop-overflow",
+        "-Wno-tautological-constant-out-of-range-compare",  # cnf_reader.c
+        "-Wno-unknown-warning-option",  # Clang and GCC warn differently.
         "-Wno-unused-but-set-variable",
         "-Wno-unused-function",
         "-Wno-unused-variable",
         "-Wno-write-strings",
-        "-Wno-maybe-uninitialized",  # This is possibly concerning.
-        "-Wno-sometimes-uninitialized",  # This is possibly concerning.
-        "-Wno-unknown-warning-option",  # Clang and GCC warn differently.
     ],
     defines = [
         "LIN64",
@@ -1204,6 +1219,8 @@ cc_library(
     ),
     deps = [
         "@org_gnu_readline//:readline",
+	"@net_zlib//:zlib",
+	# FIXME: This needs bz2lib?
     ],
     visibility = ["//visibility:public"],
 )
