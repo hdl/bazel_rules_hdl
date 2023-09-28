@@ -26,8 +26,8 @@ build:ciremotebuild --tls_client_key=/root/.ssh/buildbuddy-key.pem
 build:ciremotebuild --build_metadata=VISIBILITY=PUBLIC
 
 test:ciremotebuild --crosstool_top=@llvm_toolchain//:toolchain
-test:ciremotebuild --bes_backend=grpcs://remote.buildbuddy.io
-test:ciremotebuild --remote_cache=grpcs://remote.buildbuddy.io
+test:ciremotebuild --bes_backend=grpcs://cloud.buildbuddy.io
+test:ciremotebuild --remote_cache=grpcs://cloud.buildbuddy.io
 test:ciremotebuild --google_default_credentials
 test:ciremotebuild --noremote_upload_local_results # Uploads logs & artifacts without writing to cache
 test:ciremotebuild --tls_client_certificate=/root/.ssh/buildbuddy-cert.pem
