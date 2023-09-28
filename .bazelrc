@@ -26,10 +26,11 @@ build:ciremotebuild --tls_client_key=/root/.ssh/buildbuddy-key.pem
 build:ciremotebuild --build_metadata=VISIBILITY=PUBLIC
 
 test:ciremotebuild --crosstool_top=@llvm_toolchain//:toolchain
-test:ciremotebuild --bes_backend=grpcs://cloud.buildbuddy.io
-test:ciremotebuild --remote_cache=https://storage.googleapis.com/bazel-cache-rules-hdl
+test:ciremotebuild --bes_backend=grpcs://remote.buildbuddy.io
+test:ciremotebuild --remote_cache=grpcs://remote.buildbuddy.io
 test:ciremotebuild --google_default_credentials
-test:ciremotebuild --remote_download_toplevel
+test:ciremotebuild --noremote_upload_local_results # Uploads logs & artifacts without writing to cache
 test:ciremotebuild --tls_client_certificate=/root/.ssh/buildbuddy-cert.pem
 test:ciremotebuild --tls_client_key=/root/.ssh/buildbuddy-key.pem
 test:ciremotebuild --build_metadata=VISIBILITY=PUBLIC
+test:ciremotebuild --remote_timeout=3600
