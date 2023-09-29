@@ -29,9 +29,13 @@ cocotb_test(
     parameters = {"COUNTER_WIDTH": "8"},
     seed = "1234567890",
     test_module = ["cocotb_counter.py"],
+    timescale = {
+        "unit": "1ns",
+        "precision": "1ps"
+    },
     verilog_sources = [
         ":counter",
-        "wavedump.v",
     ],
+    waves = True,
     deps = [requirement("cocotb")],
 )
