@@ -653,7 +653,7 @@ vivado_write_bitstream = rule(
     ],
 )
 
-def vivado_flow(name, module, module_top, part_number, xilinx_env, tags = [], ip_blocks = [], with_xsa=False):
+def vivado_flow(name, module, module_top, part_number, xilinx_env, tags = [], ip_blocks = [], with_xsa = False):
     """Runs the entire bitstream flow as a convenience macro.
 
     Args:
