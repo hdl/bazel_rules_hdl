@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,3 +11,48 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+
+compile_pip_requirements(name = "pip_requirements")
+
+genrule(
+    name = "clean_requirements",
+    srcs = ["@rules_hdl_pip_deps//:requirements.bzl"],
+    outs = ["requirements.clean.bzl"],
+    cmd = " | ".join([
+        "cat $<",
+        # Replace the bazel 6.0.0 specific comment with something that bazel 5.4.0 would produce.
+        # This enables this example to be run as a test under bazel 5.4.0.
+        """sed -e 's#@rules_hdl//#@//#'""",
+    ]) + " >$@",
+)
+
+write_file(
+    name = "gen_update",
+    out = "update.sh",
+    content = [
+        # This depends on bash, would need tweaks for Windows
+        "#!/usr/bin/env bash",
+        # Bazel gives us a way to access the source folder!
+        "cd $BUILD_WORKSPACE_DIRECTORY",
+        "cp -fv bazel-bin/dependency_support/requirements.clean.bzl dependency_support/requirements.bzl",
+    ],
+)
+
+sh_binary(
+    name = "vendor_requirements",
+    srcs = ["update.sh"],
+    data = [":clean_requirements"],
+)
+
+# Similarly ensures that the requirements.bzl file is updated
+# based on the requirements.txt lockfile.
+diff_test(
+    name = "test_vendored",
+    failure_message = "Please run:  bazel run //dependency_support:vendor_requirements",
+    file1 = "requirements.bzl",
+    file2 = ":clean_requirements",
+)
