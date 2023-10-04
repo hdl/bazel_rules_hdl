@@ -21,15 +21,14 @@ def org_theopenroadproject():
     maybe(
         new_git_repository,
         name = "org_theopenroadproject",
-        commit = "21b84678f4eb0eae2e38b897e4e0d36e145f99cd",
+        commit = "03f219802d0ee569eb86846529260e15a020c26c",
         init_submodules = True,
         remote = "https://github.com/The-OpenROAD-Project/OpenROAD.git",
         build_file = Label("@rules_hdl//dependency_support/org_theopenroadproject:bundled.BUILD.bazel"),
+        shallow_since = "1649354925 -0300",
         patches = [
             Label("@rules_hdl//dependency_support/org_theopenroadproject:0001-logging-change-to-support-silence.patch"),
+            Label("@rules_hdl//dependency_support/org_theopenroadproject:0002-ortools-quotes.patch"),
         ],
-        patch_args = [
-            "-p1",
-        ],
-        shallow_since = "1659478013 -0700"
+        patch_args = ["-p1"],
     )
