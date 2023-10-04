@@ -103,7 +103,7 @@ place_and_route = rule(
         "placement_density": attr.string(default = "0.69", doc = "When performing global placement this is how densely our cells should be packaged on the die parameter is (0-1]"),
         "density_fill_config": attr.label(allow_single_file = True),
         "sink_clustering_size": attr.int(doc = "Clock tree synthesis sink group size"),
-	"sink_clustering_max_diameter": attr.int(doc = "Clock tree synthesis sink group desired diamater in microns"),
-	"min_pin_distance": attr.string(doc = "The minimum distance in microns between pins around the outside of the block."),
+        "sink_clustering_max_diameter": attr.int(doc = "Clock tree synthesis sink group desired diamater in microns"),
+        "min_pin_distance": attr.string(doc = "The minimum distance in microns between pins around the outside of the block."),
     },
 )

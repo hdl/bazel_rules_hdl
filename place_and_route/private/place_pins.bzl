@@ -55,7 +55,7 @@ def place_pins(ctx, open_road_info):
             hor_layers = open_road_configuration.pin_horizontal_metal_layer,
             ver_layers = open_road_configuration.pin_vertical_metal_layer,
             min_pin_distance = "-min_distance {}".format(ctx.attr.min_pin_distance) if ctx.attr.min_pin_distance else "",
-	),
+        ),
         tapcell_command,
     ]
 
