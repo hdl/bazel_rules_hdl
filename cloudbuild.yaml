@@ -16,6 +16,7 @@ timeout: 10800s
 options:
   machineType: 'N1_HIGHCPU_32'
   diskSizeGb: 100
+  logStreamingOption: STREAM_ON
 logsBucket: 'gs://bazel_rules_hdl'
 
 steps:
