@@ -54,6 +54,7 @@ cc_library(
       "-fexceptions",
     ],
     features = ["-use_header_modules"],  # Incompatible with -fexception.
+    includes = ["."],
     deps = ["@org_gnu_glpk//:glpk"],
     visibility = [
         "//visibility:public",
