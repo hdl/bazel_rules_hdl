@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Loads the Eigen C++ template library for linear algebra."""
+"""Registers Bazel workspaces for the GNU readline library."""
 
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-def org_tuxfamily_eigen():
+def com_google_protobuf():
     maybe(
-        new_git_repository,
-        name = "org_tuxfamily_eigen",
-        build_file = Label("@rules_hdl//dependency_support/org_tuxfamily_eigen:bundled.BUILD.bazel"),
-        commit = "eb71e5db988d4a23e619ed054efd3eb751cdd026",  # 2021-03-17
-        remote = "https://gitlab.com/libeigen/eigen.git",
-        shallow_since = "1615946824 +0100",
+        git_repository,
+        name = "com_google_protobuf",
+        tag = "v23.3",
+        patches = ["@com_google_ortools//patches:protobuf-v23.3.patch"],
+        patch_args = ["-p1"],
+        remote = "https://github.com/protocolbuffers/protobuf.git",
     )

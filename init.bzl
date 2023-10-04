@@ -15,7 +15,10 @@
 """ initializes the bazel_rules_hdl workspace """
 
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
 load("@rules_python//python:pip.bzl", "pip_parse")
+load("@rules_python//python:repositories.bzl", "py_repositories")
 load("//dependency_support:requirements.bzl", install_pip_deps = "install_deps")
 load("//dependency_support/boost:init_boost.bzl", "init_boost")
 load("//dependency_support/pybind11:init_pybind11.bzl", "init_pybind11")
@@ -49,6 +52,10 @@ def init(python_interpreter = None, python_interpreter_target = None):
       possible to have a hermetic Python toolchain. `python_interpreter_target`
       takes precedence over `python_interpreter` if both are set.
     """
+    rules_proto_dependencies()
+    rules_proto_toolchains()
+    py_repositories()
+
     # Used only by the rules that vendor requirements.bzl
     pip_parse(
         name = "rules_hdl_pip_deps",
@@ -61,5 +68,7 @@ def init(python_interpreter = None, python_interpreter_target = None):
 
     init_boost()
     init_pybind11()
+
+    protobuf_deps()
 
     bazel_skylib_workspace()

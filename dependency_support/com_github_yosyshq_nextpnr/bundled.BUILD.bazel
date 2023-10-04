@@ -43,7 +43,7 @@ DEPS = [
     "@boost//:system",
     "@boost//:thread",
     "@local_config_python//:python_headers",
-    "@org_tuxfamily_eigen//:eigen3",
+    "@eigen//:eigen3",
 ]
 
 DEFINES = [

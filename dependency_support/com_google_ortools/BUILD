@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Registers Bazel workspaces for the GNU readline library."""
-
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
-
-def com_google_absl():
-    maybe(
-        git_repository,
-        name = "com_google_absl",
-        tag = "20230125.3",
-        patches = ["@com_google_ortools//patches:abseil-cpp-20230125.3.patch"],
-        patch_args = ["-p1"],
-        remote = "https://github.com/abseil/abseil-cpp.git",
-    )
+# Required to make this a package.
