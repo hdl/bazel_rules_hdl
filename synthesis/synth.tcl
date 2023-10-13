@@ -52,6 +52,9 @@ yosys proc -nomux
 yosys proc_mux
 yosys flatten
 
+# Remove $print cells.
+yosys delete {*/t:$print}
+
 # Remove internal only aliases for public nets and then give created instances
 # useful names. At this stage it is mainly flipflops created by the `proc`
 # pass.
