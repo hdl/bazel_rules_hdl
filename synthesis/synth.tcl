@@ -52,7 +52,9 @@ yosys proc -nomux
 yosys proc_mux
 yosys flatten
 
-# Remove $print cells.
+# Remove $print cells.  These cells represent Verilog $display() tasks.
+# Some place and route tools cannot handle these in the output Verilog,
+# so remove them here.
 yosys delete {*/t:$print}
 
 # Remove internal only aliases for public nets and then give created instances
