@@ -132,10 +132,12 @@ def _get_test_command(ctx, verilog_files, vhdl_files):
     seed_args = " --seed {}".format(ctx.attr.seed) if ctx.attr.seed != "" else ""
 
     test_module_args = _pymodules_to_argstring(ctx.files.test_module, "test_module")
+    python_interpreter = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime.interpreter.path
 
     command = (
         "PATH={}:$PATH ".format(_get_path_to_set(ctx)) +
-        "python {}".format(ctx.executable.cocotb_wrapper.short_path) +
+        "{}".format(python_interpreter) +
+        " {}".format(ctx.executable.cocotb_wrapper.short_path) +
         " --sim {}".format(ctx.attr.sim_name) +
         " --hdl_library {}".format(ctx.attr.hdl_library) +
         " --hdl_toplevel {}".format(ctx.attr.hdl_toplevel) +
