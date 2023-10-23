@@ -16,9 +16,9 @@
 
 load("@pybind11_bazel//:python_configure.bzl", "python_configure")
 
-def init_pybind11():
+def init_pybind11(python_interpreter_target = None):
     python_configure(
         name = "local_config_python",
         python_version = "3",
-        python_interpreter_target = "@rules_hdl_cpython//:install/bin/python3",
+        python_interpreter_target = python_interpreter_target,
     )

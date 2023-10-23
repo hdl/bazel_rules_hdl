@@ -16,11 +16,6 @@ workspace(name = "rules_hdl")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
-load("//toolchains/cpython:cpython_toolchain.bzl", "register_cpython_repository")
-
-register_cpython_repository()
-
-register_toolchains("//toolchains/cpython:cpython_toolchain")
 
 http_archive(
     name = "com_grail_bazel_toolchain",
@@ -41,6 +36,25 @@ http_archive(
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 
 bazel_skylib_workspace()
+
+maybe(
+    http_archive,
+    name = "rules_python",
+    sha256 = "5868e73107a8e85d8f323806e60cad7283f34b32163ea6ff1020cf27abef6036",
+    strip_prefix = "rules_python-0.25.0",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.25.0/rules_python-0.25.0.tar.gz",
+)
+
+load("@rules_python//python:repositories.bzl", "python_register_toolchains")
+
+python_register_toolchains(
+    name = "python39",
+    python_version = "3.9",
+
+    # Required for our containerized CI environments; we do not recommend
+    # building bazel_rules_hdl as root normally.
+    ignore_root_user_error = True,
+)
 
 # This sysroot is used by github.com/vsco/bazel-toolchains.
 # Disabled for now waiting on https://github.com/pybind/pybind11_bazel/pull/29
@@ -114,14 +128,6 @@ maybe(
 
 maybe(
     http_archive,
-    name = "rules_python",
-    sha256 = "5868e73107a8e85d8f323806e60cad7283f34b32163ea6ff1020cf27abef6036",
-    strip_prefix = "rules_python-0.25.0",
-    url = "https://github.com/bazelbuild/rules_python/releases/download/0.25.0/rules_python-0.25.0.tar.gz",
-)
-
-maybe(
-    http_archive,
     name = "rules_pkg",
     sha256 = "a89e203d3cf264e564fcb96b6e06dd70bc0557356eb48400ce4b5d97c2c3720d",
     urls = [
@@ -144,6 +150,7 @@ load("//dependency_support:dependency_support.bzl", "dependency_support")
 dependency_support()
 # Third Party
 
+load("@python39//:defs.bzl", "interpreter")
 load("//:init.bzl", "init")
 
-init(python_interpreter_target = "@rules_hdl_cpython//:install/bin/python3")
+init(python_interpreter_target = interpreter)
