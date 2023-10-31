@@ -22,8 +22,10 @@ dir="$0.runfiles/com_icarus_iverilog"
 vvp_dir="${0/%iverilog/vvp}.runfiles/com_icarus_iverilog"
 
 if [[ ! -d "$dir" ]]; then
-  echo "Unable to find dependencies (looking under $dir)." 1>&2
-  exit 1
+  dir=$(dirname $0)  # use current directory it not launched directly from the :iverilog target.
+fi
+if [[ ! -d "$vvp_dir" ]]; then
+  vvp_dir=$(dirname $0)  # use current directory it not launched directly from the :iverilog target.
 fi
 
 exec "$dir/iverilog-bin" -B"$dir" -BM"$vvp_dir" -DIVERILOG "$@"

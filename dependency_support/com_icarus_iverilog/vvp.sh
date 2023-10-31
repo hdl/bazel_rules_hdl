@@ -19,10 +19,8 @@
 set -eu
 
 dir="$0.runfiles/com_icarus_iverilog"
-
 if [[ ! -d "$dir" ]]; then
-  echo "Unable to find dependencies (looking under $dir)." 1>&2
-  exit 1
+  dir=$(dirname $0)  # use current directory it not launched directly from the :vvp target.
 fi
 
 exec "$dir/vvp-bin" -M"$dir" "$@"
