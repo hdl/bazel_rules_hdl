@@ -16,19 +16,19 @@
 #   Icarus Verilog is a Verilog simulation and synthesis tool.
 #   Use :iverilog and :vvp targets in your genrules.
 
-load("@rules_hdl//dependency_support/com_icarus_iverilog:build-plugins.bzl", "vpi_binary", "iverilog_compile")
-load("@rules_hdl//dependency_support:copy.bzl", "copy", "touch")
-load("@rules_hdl//dependency_support:pseudo_configure.bzl", "pseudo_configure")
 load("@rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex")
 load("@rules_hdl//dependency_support/org_gnu_bison:bison.bzl", "genyacc")
+load("@rules_hdl//dependency_support/com_icarus_iverilog:build-plugins.bzl", "vpi_binary")
+load("@rules_hdl//dependency_support:copy.bzl", "copy", "touch")
+load("@rules_hdl//dependency_support:pseudo_configure.bzl", "pseudo_configure")
 
 # The only two exported labels are iverilog and vvp. They are enough
 # to run simple simulations.
 package(
     default_visibility = ["//visibility:private"],
     features = [
-        "-layering_check",
-        "-parse_headers",
+        "-layering_check",  # vpi/fastlz.c including itself
+        "-parse_headers",  # missing: `size_t` definition in stab.h, `using string` in parse_api.h
     ],
 )
 
@@ -46,11 +46,11 @@ sh_binary(
     name = "iverilog",
     srcs = ["@rules_hdl//dependency_support/com_icarus_iverilog:iverilog.sh"],
     data = [
-        "iverilog-bin",
-        "ivl",
-        "ivlpp",
         "vvp.conf",
-        "vvp.tgt",
+        ":iverilog-bin",
+        ":ivl",
+        ":ivlpp",
+        ":vvp_tgt",
     ],
     output_licenses = ["unencumbered"],
     visibility = ["//visibility:public"],
@@ -69,12 +69,14 @@ sh_binary(
     name = "vvp",
     srcs = ["@rules_hdl//dependency_support/com_icarus_iverilog:vvp.sh"],
     data = [
-        "system.vpi",
-        "v2005_math.vpi",
-        "va_math.vpi",
-        "vhdl_table.vpi",
-        "vpi_debug.vpi",
-        "vvp-bin",
+        ":system_vpi",
+        ":v2005_math_vpi",
+        ":v2009_vpi",
+        ":va_math_vpi",
+        ":vhdl_sys_vpi",
+        ":vhdl_textio_vpi",
+        ":vpi_debug_vpi",
+        ":vvp-bin",
     ],
     output_licenses = ["unencumbered"],
     visibility = ["//visibility:public"],
@@ -83,7 +85,7 @@ sh_binary(
 # API for writing VPI extensions.
 cc_library(
     name = "vpi_user",
-    srcs = ["_pli_types.h"],
+    srcs = [":_pli_types_h"],
     hdrs = ["vpi_user.h"],
     visibility = ["//visibility:public"],
 )
@@ -98,272 +100,28 @@ cc_library(
         "libmisc/LineInfo.h",
         "libmisc/StringHeap.h",
     ],
+    copts = ["-Wno-unused-variable"],
 )
-
-# A Bazel bug requires full enumeration of symbols to retain. The list comes
-# from ivl.def.
-ivl_def = [
-    "ivl_branch_island",
-    "ivl_branch_terminal",
-    "ivl_design_const",
-    "ivl_design_consts",
-    "ivl_design_discipline",
-    "ivl_design_disciplines",
-    "ivl_design_flag",
-    "ivl_design_process",
-    "ivl_design_root",
-    "ivl_design_roots",
-    "ivl_design_time_precision",
-    "ivl_const_bits",
-    "ivl_const_delay",
-    "ivl_const_real",
-    "ivl_const_signed",
-    "ivl_const_type",
-    "ivl_const_width",
-    "ivl_discipline_domain",
-    "ivl_discipline_flow",
-    "ivl_discipline_name",
-    "ivl_discipline_potential",
-    "ivl_event_any",
-    "ivl_event_basename",
-    "ivl_event_name",
-    "ivl_event_nany",
-    "ivl_event_neg",
-    "ivl_event_nneg",
-    "ivl_event_npos",
-    "ivl_event_pos",
-    "ivl_event_scope",
-    "ivl_expr_type",
-    "ivl_expr_bits",
-    "ivl_expr_branch",
-    "ivl_expr_def",
-    "ivl_expr_delay_val",
-    "ivl_expr_dvalue",
-    "ivl_expr_event",
-    "ivl_expr_file",
-    "ivl_expr_lineno",
-    "ivl_expr_name",
-    "ivl_expr_nature",
-    "ivl_expr_opcode",
-    "ivl_expr_oper1",
-    "ivl_expr_oper2",
-    "ivl_expr_oper3",
-    "ivl_expr_parameter",
-    "ivl_expr_parm",
-    "ivl_expr_parms",
-    "ivl_expr_repeat",
-    "ivl_expr_scope",
-    "ivl_expr_signal",
-    "ivl_expr_signed",
-    "ivl_expr_string",
-    "ivl_expr_uvalue",
-    "ivl_expr_value",
-    "ivl_expr_width",
-    "ivl_file_table_index",
-    "ivl_file_table_item",
-    "ivl_file_table_size",
-    "ivl_island_flag_set",
-    "ivl_island_flag_test",
-    "ivl_logic_attr",
-    "ivl_logic_attr_cnt",
-    "ivl_logic_attr_val",
-    "ivl_logic_basename",
-    "ivl_logic_delay",
-    "ivl_logic_drive0",
-    "ivl_logic_drive1",
-    "ivl_logic_name",
-    "ivl_logic_pin",
-    "ivl_logic_pins",
-    "ivl_logic_scope",
-    "ivl_logic_type",
-    "ivl_logic_udp",
-    "ivl_logic_width",
-    "ivl_lpm_array",
-    "ivl_lpm_aset_value",
-    "ivl_lpm_async_clr",
-    "ivl_lpm_async_set",
-    "ivl_lpm_base",
-    "ivl_lpm_basename",
-    "ivl_lpm_clk",
-    "ivl_lpm_data",
-    "ivl_lpm_datab",
-    "ivl_lpm_define",
-    "ivl_lpm_delay",
-    "ivl_lpm_enable",
-    "ivl_lpm_file",
-    "ivl_lpm_lineno",
-    "ivl_lpm_name",
-    "ivl_lpm_q",
-    "ivl_lpm_scope",
-    "ivl_lpm_select",
-    "ivl_lpm_selects",
-    "ivl_lpm_signed",
-    "ivl_lpm_size",
-    "ivl_lpm_sset_value",
-    "ivl_lpm_string",
-    "ivl_lpm_sync_clr",
-    "ivl_lpm_sync_set",
-    "ivl_lpm_trigger",
-    "ivl_lpm_type",
-    "ivl_lpm_width",
-    "ivl_lval_idx",
-    "ivl_lval_mux",
-    "ivl_lval_part_off",
-    "ivl_lval_sig",
-    "ivl_lval_width",
-    "ivl_nature_name",
-    "ivl_nexus_get_private",
-    "ivl_nexus_name",
-    "ivl_nexus_ptrs",
-    "ivl_nexus_ptr",
-    "ivl_nexus_set_private",
-    "ivl_nexus_ptr_branch",
-    "ivl_nexus_ptr_con",
-    "ivl_nexus_ptr_drive0",
-    "ivl_nexus_ptr_drive1",
-    "ivl_nexus_ptr_pin",
-    "ivl_nexus_ptr_lpm",
-    "ivl_nexus_ptr_log",
-    "ivl_nexus_ptr_sig",
-    "ivl_nexus_ptr_switch",
-    "ivl_parameter_basename",
-    "ivl_parameter_expr",
-    "ivl_parameter_file",
-    "ivl_parameter_lineno",
-    "ivl_path_condit",
-    "ivl_path_delay",
-    "ivl_path_is_condit",
-    "ivl_path_scope",
-    "ivl_path_source",
-    "ivl_path_source_negedge",
-    "ivl_path_source_posedge",
-    "ivl_scope_attr_cnt",
-    "ivl_scope_attr_val",
-    "ivl_scope_basename",
-    "ivl_scope_children",
-    "ivl_scope_def",
-    "ivl_scope_def_file",
-    "ivl_scope_def_lineno",
-    "ivl_scope_event",
-    "ivl_scope_events",
-    "ivl_scope_file",
-    "ivl_scope_is_auto",
-    "ivl_scope_is_cell",
-    "ivl_scope_lineno",
-    "ivl_scope_logs",
-    "ivl_scope_log",
-    "ivl_scope_lpms",
-    "ivl_scope_lpm",
-    "ivl_scope_name",
-    "ivl_scope_param",
-    "ivl_scope_params",
-    "ivl_scope_parent",
-    "ivl_scope_port",
-    "ivl_scope_ports",
-    "ivl_scope_sigs",
-    "ivl_scope_sig",
-    "ivl_scope_switch",
-    "ivl_scope_switches",
-    "ivl_scope_time_precision",
-    "ivl_scope_time_units",
-    "ivl_scope_type",
-    "ivl_scope_tname",
-    "ivl_signal_array_addr_swapped",
-    "ivl_signal_array_base",
-    "ivl_signal_array_count",
-    "ivl_signal_attr",
-    "ivl_signal_attr_cnt",
-    "ivl_signal_attr_val",
-    "ivl_signal_basename",
-    "ivl_signal_data_type",
-    "ivl_signal_dimensions",
-    "ivl_signal_discipline",
-    "ivl_signal_file",
-    "ivl_signal_integer",
-    "ivl_signal_lineno",
-    "ivl_signal_local",
-    "ivl_signal_lsb",
-    "ivl_signal_msb",
-    "ivl_signal_name",
-    "ivl_signal_nex",
-    "ivl_signal_npath",
-    "ivl_signal_path",
-    "ivl_signal_port",
-    "ivl_signal_signed",
-    "ivl_signal_type",
-    "ivl_signal_width",
-    "ivl_path_delay",
-    "ivl_path_source",
-    "ivl_process_analog",
-    "ivl_process_attr_cnt",
-    "ivl_process_attr_val",
-    "ivl_process_file",
-    "ivl_process_lineno",
-    "ivl_process_scope",
-    "ivl_process_stmt",
-    "ivl_process_type",
-    "ivl_statement_type",
-    "ivl_stmt_block_count",
-    "ivl_stmt_block_scope",
-    "ivl_stmt_block_stmt",
-    "ivl_stmt_call",
-    "ivl_stmt_case_count",
-    "ivl_stmt_case_expr",
-    "ivl_stmt_case_stmt",
-    "ivl_stmt_cond_expr",
-    "ivl_stmt_cond_false",
-    "ivl_stmt_cond_true",
-    "ivl_stmt_delay_expr",
-    "ivl_stmt_delay_val",
-    "ivl_stmt_events",
-    "ivl_stmt_file",
-    "ivl_stmt_lineno",
-    "ivl_stmt_lexp",
-    "ivl_stmt_lval",
-    "ivl_stmt_lvals",
-    "ivl_stmt_lwidth",
-    "ivl_stmt_name",
-    "ivl_stmt_nevent",
-    "ivl_stmt_parm",
-    "ivl_stmt_parm_count",
-    "ivl_stmt_rval",
-    "ivl_stmt_sub_stmt",
-    "ivl_switch_a",
-    "ivl_switch_b",
-    "ivl_switch_basename",
-    "ivl_switch_enable",
-    "ivl_switch_file",
-    "ivl_switch_island",
-    "ivl_switch_lineno",
-    "ivl_switch_offset",
-    "ivl_switch_part",
-    "ivl_switch_scope",
-    "ivl_switch_type",
-    "ivl_switch_width",
-    "ivl_udp_init",
-    "ivl_udp_name",
-    "ivl_udp_nin",
-    "ivl_udp_row",
-    "ivl_udp_rows",
-    "ivl_udp_sequ",
-]
 
 cc_binary(
     name = "ivl",
     srcs = glob(
-        ["*.cc", "*.h"],
+        [
+            "*.cc",
+            "*.h",
+        ],
         exclude = ["elab_anet.cc"],
     ) + [
-        "syn-rules.cc",
-        "lexor.cc",
-        "lexor_keyword.cc",
-        "parse.cc",
-        "parse.h",
-        "config.h",
+        ":config_h",
+        "vvp/ivl_dlfcn.h",
+        ":lexor",
+        ":lexor_keyword_cc",
+        ":parse_y",
+        ":syn-rules_y",
+        ":version_tag_h",
     ],
-    copts = [
-        "-w",
-    ],
+    # Really poor code hygiene. Produces mounds of warnings.
+    copts = ["-w"],
     # Do not sort: dot last.
     includes = [
         "libmisc",
@@ -371,14 +129,12 @@ cc_binary(
     ],
     linkopts = [
         "-ldl",
-        "-Wl,-u," + ",-u,".join(ivl_def),
-    ] + select({
-        "@bazel_tools//src/conditions:darwin": ["-Wl,-export_dynamic", "-Wl,-no_pie"],
-        "//conditions:default": ["-Wl,--export-dynamic", "-Wl,-no-pie"],
-    }),
+        "-Wl,--export-dynamic",
+        "-Wl,-no-pie",
+    ],
     deps = [
-        "ivl-misc",
-        ":shared_headers",
+        ":ivl-misc",
+        ":vpi_user",
     ],
 )
 
@@ -404,40 +160,26 @@ genyacc(
     source_out = "syn-rules.cc",
 )
 
-cc_library(
-    name = "shared_headers",
-    hdrs = [
-        "ivl_alloc.h",
-        "ivl_target.h",
-        "ivl_target_priv.h",
-        "version_base.h",
-        "version_tag.h",
-        "sv_vpi_user.h",
-    ],
-    includes = [
-        ".",
-    ],
-    deps = [
-        ":vpi_user",
-    ],
-)
-
 cc_binary(
     name = "iverilog-bin",
-    srcs = [
-        "driver/cflexor.c",
-        "driver/cfparse.c",
-        "driver/cfparse.h",
-        "config.h",
-    ] + glob([
-        "driver/*.h",
+    srcs = glob([
         "driver/*.c",
-    ]),
+        "driver/*.h",
+    ]) + [
+        ":config_h",
+        "ivl_alloc.h",
+        "version_base.h",
+        ":version_tag_h",
+        ":cflexor",
+        ":cfparse_y",
+    ],
     copts = [
         "-D_GNU_SOURCE",
         "-std=c11",
         "-fcommon",
-        "-w",
+        "-DIVL_LIB='\"\"'",
+        "-DIVL_SUFFIX='\"\"'",
+        "-DIVL_INCLUDE_INSTALL_DIR='\"\"'",
     ],
     # Do not sort: dot last.
     includes = [
@@ -445,8 +187,6 @@ cc_binary(
         "libmisc",
         ".",
     ],
-    deps = [":shared_headers"],
-    visibility = ["//visibility:public"],
 )
 
 genlex(
@@ -463,63 +203,24 @@ genyacc(
     source_out = "driver/cfparse.c",
 )
 
-# A Bazel bug requires full enumeration of symbols to retain. The list comes
-# from vvp.def.
-vvp_def = [
-    "vpi_chk_error",
-    "vpi_control",
-    "vpi_flush",
-    "vpi_fopen",
-    "vpi_free_object",
-    "vpi_get",
-    "vpi_get_delays",
-    "vpi_get_file",
-    "vpi_get_str",
-    "vpi_get_time",
-    "vpi_get_userdata",
-    "vpi_get_value",
-    "vpi_get_vlog_info",
-    "vpi_handle",
-    "vpi_handle_by_index",
-    "vpi_handle_by_name",
-    "vpi_iterate",
-    "vpi_mcd_close",
-    "vpi_mcd_flush",
-    "vpi_mcd_name",
-    "vpi_mcd_open",
-    "vpi_mcd_printf",
-    "vpi_mcd_vprintf",
-    "vpi_printf",
-    "vpi_put_delays",
-    "vpi_put_userdata",
-    "vpi_put_value",
-    "vpi_register_cb",
-    "vpi_register_systf",
-    "vpi_remove_cb",
-    "vpi_scan",
-    "vpi_sim_control",
-    "vpi_sim_vcontrol",
-    "vpi_vprintf",
-    "vpip_format_strength",
-    "vpip_set_return_value",
-    "vpip_calc_clog2",
-]
-
 cc_binary(
     name = "vvp-bin",
     srcs = glob([
         "vvp/*.cc",
         "vvp/*.h",
     ]) + [
-        "vvp_gen/config.h",
-        "vvp_gen/lexor.cc",
-        "vvp_gen/parse.h",
-        "vvp_gen/parse.cc",
-        "vvp_gen/tables.cc",
+        "ivl_alloc.h",
+        "sv_vpi_user.h",
+        "version_base.h",
+        ":version_tag_h",
+        ":gen_tables",
+        ":vvp_flexor",
+        ":vvp_parse_y",
+        ":vvp_gen__vvp_config_h",
     ],
     copts = [
         "-O2",  # Optimized binary regardless of configuration.
-        "-w",
+        "-Wno-implicit-fallthrough",
     ],
     # Do not sort: dot last.
     includes = [
@@ -529,18 +230,12 @@ cc_binary(
     ],
     linkopts = [
         "-ldl",
-        "-Wl,-u," + ",-u,".join(vvp_def),
-    ] + select({
-        "@bazel_tools//src/conditions:darwin": ["-Wl,-export_dynamic"],
-        "//conditions:default": ["-Wl,--export-dynamic"],
-    }),
+        "-Wl,--export-dynamic",
+    ],
     deps = [
-        ":shared_headers",
         ":vpi_user",
         "@org_gnu_readline//:readline",
-        "@net_invisible_island_ncurses//:ncurses",
     ],
-    visibility = ["//visibility:public"],
 )
 
 genyacc(
@@ -564,17 +259,21 @@ cc_binary(
 genrule(
     name = "gen_tables",
     outs = ["vvp_gen/tables.cc"],
-    cmd = "$(location draw_tt) > $@",
-    tools = ["draw_tt"],
+    cmd = "$(location :draw_tt) > $@",
+    tools = [":draw_tt"],
 )
 
 cc_binary(
     name = "ivlpp",
-    srcs = [
-        "config.h",
-        "ivlpp_lex/lexor.c",
-        "ivlpp/globals.h",
-        "ivlpp/main.c",
+    srcs = glob([
+        "ivlpp/*.c",
+        "ivlpp/*.h",
+    ]) + [
+        ":config_h",
+        "ivl_alloc.h",
+        "version_base.h",
+        ":version_tag_h",
+        ":ivlpp_lexor",
     ],
     copts = ["-Wno-unused-variable"],
     # Do not sort: dot last.
@@ -582,31 +281,36 @@ cc_binary(
         "ivlpp",
         ".",
     ],
-    deps = [
-        ":shared_headers",
-    ],
 )
 
 genlex(
     name = "ivlpp_lexor",
     src = "ivlpp/lexor.lex",
-    out = "ivlpp_lex/lexor.c",
+    out = "ivlpp_gen/lexor.c",
 )
 
 vpi_binary(
-    name = "system.vpi",
-    srcs = glob(["vpi/*.h"]) + [
-        "config.h",
+    name = "system_vpi",
+    srcs = [
+        ":config_h",
+        "ivl_alloc.h",
+        "sv_vpi_user.h",
+        "version_base.h",
         "vpi/fastlz.c",
+        "vpi/fastlz.h",
         "vpi/fstapi.c",
-        "vpi/lxt2_write.c",
+        "vpi/fstapi.h",
         "vpi/lxt_write.c",
+        "vpi/lxt_write.h",
+        "vpi/lxt2_write.c",
+        "vpi/lxt2_write.h",
         "vpi/lz4.c",
+        "vpi/lz4.h",
         "vpi/mt19937int.c",
-        "vpi/sdf_lexor.c",
-        "vpi/sdf_parse.c",
-        "vpi/sdf_parse.h",
+        "vpi/sdf_parse_priv.h",
+        "vpi/sdf_priv.h",
         "vpi/stringheap.c",
+        "vpi/stringheap.h",
         "vpi/sys_convert.c",
         "vpi/sys_countdrivers.c",
         "vpi/sys_darray.c",
@@ -620,11 +324,13 @@ vpi_binary(
         "vpi/sys_lxt2.c",
         "vpi/sys_plusargs.c",
         "vpi/sys_priv.c",
+        "vpi/sys_priv.h",
         "vpi/sys_queue.c",
         "vpi/sys_random.c",
+        "vpi/sys_random.h",
         "vpi/sys_random_mti.c",
         "vpi/sys_readmem.c",
-        "vpi/sys_readmem_lex.c",
+        "vpi/sys_readmem_lex.h",
         "vpi/sys_scanf.c",
         "vpi/sys_sdf.c",
         "vpi/sys_table.c",
@@ -632,28 +338,33 @@ vpi_binary(
         "vpi/sys_vcd.c",
         "vpi/sys_vcdoff.c",
         "vpi/table_mod.c",
-        "vpi/table_mod_lexor.c",
-        "vpi/table_mod_parse.c",
-        "vpi/table_mod_parse.h",
+        "vpi/table_mod.h",
         "vpi/vams_simparam.c",
         "vpi/vcd_priv.c",
+        "vpi/vcd_priv.h",
         "vpi/vcd_priv2.cc",
         "vpi/vpi_config.h",
+        "vpi/wavealloca.h",
+        ":table_mod_lexor_lex",
+        ":table_mod_parse_y",
+        ":vpi_sdf_lexor",
+        ":vpi_sdfparse_y",
+        ":vpi_sys_readmem_lex",
     ],
+    out = "system.vpi",
     # Optimized binary regardless of configuration.
     copts = [
         "$(STACK_FRAME_UNLIMITED)",
         "-O2",
-    ],
-    linkopts = [
-        "-lpthread",
+        # "-std=c11",
+        # was for for-loop-indices, removed to allow vcd_priv2.cc to compile
     ],
     includes = [
         ".",
         "vpi",
     ],
+    # The code has atrocious const hygiene. Produces mounds of warnings.
     deps = [
-        ":shared_headers",
         ":vpi_user",
         "@org_sourceware_bzip2//:bzip2",
         "@net_zlib//:zlib",
@@ -695,111 +406,151 @@ genlex(
 )
 
 vpi_binary(
-    name = "va_math.vpi",
+    name = "vhdl_sys_vpi",
     srcs = [
-        "vpi/va_math.c",
+        "ivl_alloc.h",
+        "sv_vpi_user.h",
+        "vpi/sys_priv.c",
+        "vpi/sys_priv.h",
+        "vpi/vhdl_table.c",
         "vpi/vpi_config.h",
     ],
-    copts = ["-O2"],  # Optimized binary regardless of configuration.
+    out = "vhdl_sys.vpi",
+    copts = ["-O2"],
     includes = [
         ".",
         "vpi",
     ],
     deps = [
-        ":shared_headers",
         ":vpi_user",
     ],
 )
 
 vpi_binary(
-    name = "v2005_math.vpi",
+    name = "vhdl_textio_vpi",
     srcs = [
+        "ivl_alloc.h",
+        "sv_vpi_user.h",
+        "vpi/sys_priv.c",
+        "vpi/sys_priv.h",
+        "vpi/vhdl_textio.c",
+        "vpi/vpi_config.h",
+    ],
+    out = "vhdl_textio.vpi",
+    copts = ["-O2"],
+    includes = [
+        ".",
+        "vpi",
+    ],
+    deps = [
+        ":vpi_user",
+    ],
+)
+
+vpi_binary(
+    name = "va_math_vpi",
+    srcs = [
+        "ivl_alloc.h",
+        "vpi/va_math.c",
+        "vpi/vpi_config.h",
+    ],
+    out = "va_math.vpi",
+    copts = ["-O2"],  # Optimized binary regardless of configuration.
+    includes = [
+        ".",
+        "vpi",
+    ],
+    # The code has atrocious const hygiene. Produces mounds of warnings.
+    deps = [
+        ":vpi_user",
+    ],
+)
+
+vpi_binary(
+    name = "v2005_math_vpi",
+    srcs = [
+        "ivl_alloc.h",
+        "sv_vpi_user.h",
         "vpi/sys_clog2.c",
         "vpi/v2005_math.c",
         "vpi/vpi_config.h",
     ],
+    out = "v2005_math.vpi",
     copts = ["-O2"],  # Optimized binary regardless of configuration.
     includes = [
         ".",
         "vpi",
     ],
+    # The code has atrocious const hygiene. Produces mounds of warnings.
     deps = [
         ":vpi_user",
-        ":shared_headers",
     ],
 )
 
 vpi_binary(
-    name = "vhdl_table.vpi",
+    name = "vpi_debug_vpi",
+    srcs = ["vpi/vpi_debug.c"],
+    out = "vpi_debug.vpi",
+    copts = ["-O2"],
+    includes = [
+        ".",
+        "vpi",
+    ],
+    deps = [
+        ":vpi_user",
+    ],
+)
+
+vpi_binary(
+    name = "v2009_vpi",
     srcs = [
-        "vpi/vhdl_table.c",
+        "ivl_alloc.h",
+        "sv_vpi_user.h",
+        "vpi/sys_priv.c",
+        "vpi/sys_priv.h",
+        "vpi/v2009_array.c",
+        "vpi/v2009_bitvec.c",
+        "vpi/v2009_enum.c",
+        "vpi/v2009_string.c",
+        "vpi/v2009_table.c",
         "vpi/vpi_config.h",
     ],
-    copts = ["-O2"],
-    includes = [
-        ".",
-        "vpi",
-    ],
-    deps = [
-        ":shared_headers",
-        ":vpi_user",
-    ],
-)
-
-vpi_binary(
-    name = "vpi_debug.vpi",
-    srcs = [
-        "vpi/vpi_debug.c",
-    ],
-    copts = ["-O2"],
-    includes = [
-        ".",
-        "vpi",
-    ],
-    deps = [
-        ":vpi_user",
-    ],
-)
-
-vpi_binary(
-    name = "vvp.tgt",
-    srcs = [
-        "tgt-vvp/draw_class.c",
-        "tgt-vvp/draw_delay.c",
-        "tgt-vvp/draw_enum.c",
-        "tgt-vvp/draw_mux.c",
-        "tgt-vvp/draw_net_input.c",
-        "tgt-vvp/draw_substitute.c",
-        "tgt-vvp/draw_switch.c",
-        "tgt-vvp/draw_ufunc.c",
-        "tgt-vvp/draw_vpi.c",
-        "tgt-vvp/eval_bool.c",
-        "tgt-vvp/eval_condit.c",
-        "tgt-vvp/eval_expr.c",
-        "tgt-vvp/eval_object.c",
-        "tgt-vvp/eval_real.c",
-        "tgt-vvp/eval_string.c",
-        "tgt-vvp/eval_vec4.c",
-        "tgt-vvp/modpath.c",
-        "tgt-vvp/stmt_assign.c",
-        "tgt-vvp/vector.c",
-        "tgt-vvp/vvp.c",
-        "tgt-vvp/vvp_config.h",
-        "tgt-vvp/vvp_priv.h",
-        "tgt-vvp/vvp_process.c",
-        "tgt-vvp/vvp_scope.c",
-    ],
+    out = "v2009.vpi",
     copts = [
-        "-w",
+        "-O2",  # Optimized binary regardless of configuration.
+    ],
+    includes = [
+        ".",
+        "vpi",
+    ],
+    deps = [
+        ":vpi_user",
+    ],
+)
+
+vpi_binary(
+    name = "vvp_tgt",
+    srcs = glob([
+        "tgt-vvp/*.c",
+        "tgt-vvp/*.h",
+    ]) + [
+        "ivl_alloc.h",
+        "ivl_target.h",
+        "version_base.h",
+        ":version_tag_h",
+        ":tgt_vvp__vvp_config_h",
+    ],
+    out = "vvp.tgt",
+    copts = [
         "-std=c11",
+        "-Wno-implicit-function-declaration",
+        "-Wno-int-conversion",
     ],
     includes = [
         ".",
         "tgt-vvp",
     ],
-    deps = [
-        ":shared_headers",
-    ],
+    # The code has atrocious const hygiene. Produces mounds of warnings.
 )
 
 genrule(
@@ -818,29 +569,20 @@ genrule(
     message = "Generating perfect hash function from $(SRCS)",
 )
 
-genrule(
-    name = "vhdlpp_lexor_keyword_cc",
-    srcs = ["vhdlpp/lexor_keyword.gperf"],
-    tools = ["@org_gnu_gperf//:gperf"],
-    outs = ["vhdlpp_lexor_keyword.cc"],
-    cmd = "$(location @org_gnu_gperf//:gperf) -o -i 7 --ignore-case -C -k 1-4,6,9,$$ -H keyword_hash -N check_identifier -t $(location :vhdlpp/lexor_keyword.gperf) > $@",
-    message = "Generating perfect hash function from $(SRCS)",
-)
-
 # In the following genrules we do an extremely crude approximation of a
 # configuration step -- workable now given the limited set of
 # platforms/environments we intend to target.
 
-HAVE_CONFIG_SUFFIXES = 'TIMES|IOSFWD|GETOPT_H|INTTYPES_H|DLFCN_H|LIBREADLINE|LIBZ|LIBBZ2|LROUND|SYS_WAIT_H|ALLOCA_H|FSEEKO|LIBPTHREAD|REALPATH'
+HAVE_CONFIG_SUFFIXES = "TIMES|IOSFWD|GETOPT_H|INTTYPES_H|DLFCN_H|LIBREADLINE|LIBZ|LIBBZ2|LROUND|SYS_WAIT_H|ALLOCA_H|FSEEKO|LIBPTHREAD|REALPATH"
 HAVE_CONFIG_RE = "HAVE_(%s)" % HAVE_CONFIG_SUFFIXES
 
-DEFS = ['HAVE_IOSFWD', 'HAVE_DLFCN_H', 'HAVE_GETOPT_H', 'HAVE_LIBREADLINE', 'HAVE_READLINE_READLINE_H', 'HAVE_LIBHISTORY', 'HAVE_READLINE_HISTORY_H', 'HAVE_INTTYPES_H', 'HAVE_LROUND', 'HAVE_LLROUND', 'HAVE_NAN', 'UINT64_T_AND_ULONG_SAME', 'HAVE_SYS_RESOURCE_H', 'LINUX']
+DEFS = ["HAVE_IOSFWD", "HAVE_DLFCN_H", "HAVE_GETOPT_H", "HAVE_LIBREADLINE", "HAVE_READLINE_READLINE_H", "HAVE_LIBHISTORY", "HAVE_READLINE_HISTORY_H", "HAVE_INTTYPES_H", "HAVE_LROUND", "HAVE_LLROUND", "HAVE_NAN", "UINT64_T_AND_ULONG_SAME", "HAVE_SYS_RESOURCE_H", "LINUX"]
 
 pseudo_configure(
     name = "tgt_vvp__vvp_config_h",
     src = "tgt-vvp/vvp_config.h.in",
     out = "tgt-vvp/vvp_config.h",
-    defs = ['HAVE_STDINT_H', 'HAVE_INTTYPES_H', '_LARGEFILE_SOURCE'],
+    defs = ["HAVE_STDINT_H", "HAVE_INTTYPES_H", "_LARGEFILE_SOURCE"],
     mappings = {},
 )
 
@@ -848,7 +590,7 @@ pseudo_configure(
     name = "config_h",
     src = "config.h.in",
     out = "config.h",
-    defs = ['HAVE_TIMES', 'HAVE_IOSFWD', 'HAVE_GETOPT_H', 'HAVE_INTTYPES_H', 'HAVE_DLFCN_H', 'HAVE_LIBREADLINE', 'HAVE_LIBZ', 'HAVE_LIBBZ2', 'HAVE_LROUND', 'HAVE_SYS_WAIT_H', 'HAVE_ALLOCA_H', 'HAVE_FSEEKO', 'HAVE_LIBPTHREAD', 'HAVE_REALPATH'],
+    defs = ["HAVE_TIMES", "HAVE_IOSFWD", "HAVE_GETOPT_H", "HAVE_INTTYPES_H", "HAVE_DLFCN_H", "HAVE_LIBREADLINE", "HAVE_LIBZ", "HAVE_LIBBZ2", "HAVE_LROUND", "HAVE_SYS_WAIT_H", "HAVE_ALLOCA_H", "HAVE_FSEEKO", "HAVE_LIBPTHREAD", "HAVE_REALPATH"],
     mappings = {},
 )
 
@@ -865,43 +607,50 @@ pseudo_configure(
     src = "vvp/config.h.in",
     out = "vvp_gen/config.h",
     defs = DEFS,
-    mappings = {'SIZEOF_UNSIGNED_LONG_LONG': '8', 'SIZEOF_UNSIGNED_LONG': '8', 'SIZEOF_UNSIGNED': '4', 'USE_READLINE': '', 'USE_HISTORY': '', 'MODULE_DIR': '"."', '__STDC_FORMAT_MACROS': '', 'TIME_FMT_O': '"lo"', 'TIME_FMT_U': '"lu"', 'TIME_FMT_X': '"lx"', 'UL_AND_TIME64_SAME': '', 'i64round': 'lround', 'nan(x)': '(NAN)', 'INFINITY': 'HUGE_VAL', 'LU': '""', 'TU': '""'},
+    mappings = {"SIZEOF_UNSIGNED_LONG_LONG": "8", "SIZEOF_UNSIGNED_LONG": "8", "SIZEOF_UNSIGNED": "4", "SIZEOF_VOID_P": "8", "USE_READLINE": "", "USE_HISTORY": "", "MODULE_DIR": '"."', "__STDC_FORMAT_MACROS": "", "TIME_FMT_O": '"lo"', "TIME_FMT_U": '"lu"', "TIME_FMT_X": '"lx"', "UL_AND_TIME64_SAME": "", "i64round": "lround", "nan(x)": "(NAN)", "INFINITY": "HUGE_VAL", "LU": '""', "TU": '""'},
 )
 
 touch(
     name = "version_tag_h",
     out = "version_tag.h",
-    contents = dict(VERSION_TAG = '"v10_3"'),
+    contents = dict(VERSION_TAG = '"v12_0"'),
 )
 
 # Trivial integration tests to confirm iverilog is minimally functional.
-copy(
-    name = "hello_v",
-    src = "@rules_hdl//dependency_support/com_icarus_iverilog:hello.v",
-    out = "hello.v",
-)
 
-iverilog_compile(
-    srcs = ["hello.v"],
+genrule(
+    name = "hello_vvp",
+    srcs = ["@rules_hdl//dependency_support/com_icarus_iverilog:hello.v"],
+    outs = ["hello.vvp"],
+    cmd = (
+        "$(location :iverilog) " +
+        "-o $@ " +
+        "$<"
+    ),
+    tools = [
+        ":iverilog",
+        ":vvp",  # to resolve module include
+    ],
 )
 
 vpi_binary(
-    name = "hello.vpi",
+    name = "hello_vpi",
     srcs = ["@rules_hdl//dependency_support/com_icarus_iverilog:hello_vpi.c"],
+    out = "hello.vpi",
     deps = [":vpi_user"],
 )
 
 genrule(
     name = "run_hello",
-    srcs = ["hello.vvp"],
+    srcs = [":hello_vvp"],
     outs = ["hello.out"],
     cmd = (
         "$(location :vvp) " +
-        "-M$$(dirname $(location :hello.vpi)) " +
+        "-M$$(dirname $(location :hello_vpi)) " +
         "-mhello $< > $@ "
     ),
     tools = [
-        ":hello.vpi",
+        ":hello_vpi",
         ":vvp",
     ],
 )
@@ -909,6 +658,6 @@ genrule(
 sh_test(
     name = "hello_verilog_test",
     srcs = ["@rules_hdl//dependency_support/com_icarus_iverilog:hello_verilog_test.sh"],
-    data = [":hello.out"],
-    args = ["$(location :hello.out)"],
+    args = ["$(location :run_hello)"],
+    data = [":run_hello"],
 )

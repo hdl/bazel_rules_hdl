@@ -18,16 +18,14 @@
 
 set -eu
 
-iverilog_path="$(find . -name iverilog-bin | head -n 1)"
-if [ "$iverilog_path" == "" ]; then
-  iverilog_path="$(command -v iverilog-bin)"
-fi
-
-dir=$(dirname "$iverilog_path")
+dir="$0.runfiles/com_icarus_iverilog"
+vvp_dir="${0/%iverilog/vvp}.runfiles/com_icarus_iverilog"
 
 if [[ ! -d "$dir" ]]; then
-  echo "Unable to find dependencies (looking under $dir)." 1>&2
-  exit 1
+  dir=$(dirname $0)  # use current directory it not launched directly from the :iverilog target.
+fi
+if [[ ! -d "$vvp_dir" ]]; then
+  vvp_dir=$(dirname $0)  # use current directory it not launched directly from the :iverilog target.
 fi
 
-exec "$dir/iverilog-bin" -B"$dir" -DIVERILOG "$@"
+exec "$dir/iverilog-bin" -B"$dir" -BM"$vvp_dir" -DIVERILOG "$@"

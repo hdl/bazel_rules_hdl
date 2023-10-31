@@ -15,51 +15,23 @@
 """BUILD helpers for using iverilog.
 """
 
-load("@rules_cc//cc:defs.bzl", "cc_binary")
-
-def iverilog_compile(srcs, flags = "", name = ""):
-    """Compiles the first .v files given in srcs into a .vvp file.
-
-    Passes the flags to iverilog.
-    """
-    vvp_file = srcs[0] + "vp"  # Changes .v to .vvp
-    native.genrule(
-        name = "gen_" + vvp_file,
-        srcs = srcs,
-        outs = [vvp_file],
-        cmd = (
-            "$(location @com_icarus_iverilog//:iverilog) " +
-            flags + " " +
-            "-o $@ " +
-            "$(location " + srcs[0] + ")"
-        ),
-        tools = ["@com_icarus_iverilog//:iverilog"],
-    )
-
-    # Creates a dummy test which will force the .vvp file production.
-    native.sh_test(
-        name = "dummy_iverilog_compile_test_" + name + "_" + vvp_file,
-        srcs = ["@rules_hdl//dependency_support/com_icarus_iverilog:dummy.sh"],
-        data = [vvp_file],
-    )
-
-def vpi_binary(name, srcs, **kwargs):
+def vpi_binary(name, out, srcs, **kwargs):
     """Creates a .vpi file with the given name from the given sources.
 
     All the extra arguments are passed directly to cc_binary.
     """
-    so_name = name + ".so"
-    cc_binary(
-        name = so_name,
+    cc_target = name + "_shared"
+    native.cc_binary(
+        name = cc_target,
         srcs = srcs,
         linkshared = 1,
         **kwargs
     )
 
     native.genrule(
-        name = "gen_" + name,
-        srcs = [so_name],
-        outs = [name],
+        name = name,
+        srcs = [":" + cc_target],
+        outs = [out],
         cmd = "cp $< $@",
         output_to_bindir = 1,
         executable = 1,
