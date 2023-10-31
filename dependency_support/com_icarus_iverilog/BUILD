@@ -15,7 +15,6 @@
 licenses(["restricted"])  # GPLv2
 
 exports_files([
-    "dummy.sh",
     "hello.v",
     "hello_verilog_test.sh",
     "hello_vpi.c",

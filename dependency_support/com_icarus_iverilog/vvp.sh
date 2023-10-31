@@ -18,12 +18,7 @@
 
 set -eu
 
-vvp_path="$(find . -name vvp-bin | head -n 1)"
-if [ "$vvp_path" == "" ]; then
-  vvp_path="$(command -v vvp-bin)"
-fi
-
-dir=$(dirname "$vvp_path")
+dir="$0.runfiles/com_icarus_iverilog"
 
 if [[ ! -d "$dir" ]]; then
   echo "Unable to find dependencies (looking under $dir)." 1>&2
