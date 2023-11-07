@@ -13,22 +13,22 @@
 # limitations under the License.
 
 ##########################################################################
-# ASAP7 "rev 27" 7.5 track standard cell library with SRAM blocks.
+""" ASAP7 "rev 26" 6 track standard cell library with SRAM blocks. """
 ##########################################################################
 
 asap7_srams_files(
-    name = "asap7-srams-sc7p5t_rev27",
-    rev = "27",
-    tracks = "7p5t",
+    name = "asap7-srams-sc6t_rev26",
+    rev = "26",
+    tracks = "6t",
 )
 
 filegroup(
-    name = "asap7-misc-sc7p5t_rev27-lef",
+    name = "asap7-misc-sc6t_rev26-lef",
     # FIXME: Where is the 1x techlef?
-    srcs = ["asap7sc7p5t_28/techlef_misc/asap7_tech_1x_201209.lef"],
+    srcs = ["techlef_misc/asap7sc6t_tech_4x_210831.lef"],
 )
 
 filegroup(
-    name = "asap7-misc-sc7p5t_rev27_4x-lef",
-    srcs = ["asap7sc7p5t_27/techlef_misc/asap7_tech_4x_201209.lef"],
+    name = "asap7-misc-sc6t_rev26_4x-lef",
+    srcs = ["techlef_misc/asap7sc6t_tech_4x_210831.lef"],
 )

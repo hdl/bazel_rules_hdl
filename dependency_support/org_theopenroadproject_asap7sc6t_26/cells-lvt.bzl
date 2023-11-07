@@ -12,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# ASAP7 "rev 27" 7.5 track standard cell library using Super-Low VT transistors
+""" ASAP7 "rev 26" 6 track standard cell library using low VT transistors """
+
 # ------------------------------------------------------------------------
 asap7_cells_files(
-    name = "asap7-cells-sc7p5t_rev27_slvt",
-    rev = "27",
-    tracks = "7p5t",
-    vt = "slvt",
-    has_gds = False,
+    name = "asap7-cells-sc6t_rev26_lvt",
+    rev = "26",
+    tracks = "6t",
+    vt = "lvt",
 )
 
 open_road_pdk_configuration(
-    name = "open_road-asap7-sc7p5t_rev27_slvt",
-    cell_site = "asap7sc7p5t",
-    cts_buffer_cell = "BUFx4_ASAP7_75t_SL",
+    name = "open_road-asap7-sc6t_rev26_lvt",
+    cell_site = "asap7sc6t",
+    cts_buffer_cell = "BUFx4_ASAP7_75t_L",
     do_not_use_cell_list = [
         "*x1_ASAP7*",
         "*x1p*_ASAP7*",
@@ -34,14 +34,14 @@ open_road_pdk_configuration(
         "ICG*",
         "DFFH*",
     ],
-    endcap_cell = "TAPCELL_ASAP7_75t_SL",
+    endcap_cell = "TAPCELL_ASAP7_75t_L",
     fill_cells = [
-        "FILLERxp5_ASAP7_75t_SL",
-        "DECAPx1_ASAP7_75t_SL",
-        "DECAPx2_ASAP7_75t_SL",
-        "DECAPx4_ASAP7_75t_SL",
-        "DECAPx6_ASAP7_75t_SL",
-        "DECAPx10_ASAP7_75t_SL",
+        "FILLERxp5_ASAP7_75t_L",
+        "DECAPx1_ASAP7_75t_L",
+        "DECAPx2_ASAP7_75t_L",
+        "DECAPx4_ASAP7_75t_L",
+        "DECAPx6_ASAP7_75t_L",
+        "DECAPx10_ASAP7_75t_L",
     ],
     global_placement_cell_pad = 2,
     global_routing_clock_layers = "M2-M7",
@@ -54,17 +54,17 @@ open_road_pdk_configuration(
         "M7": "0.5",
     },
     global_routing_signal_layers = "M2-M7",
-    klayout_tech_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7:asap7.lyt",
-    pdn_config = "@rules_hdl//dependency_support/org_theopenroadproject_asap7:pdn_config_1x.pdn",
+    klayout_tech_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:asap7.lyt",
+    pdn_config = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:pdn_config_1x.pdn",
     pin_horizontal_metal_layer = "M4",
     pin_vertical_metal_layer = "M5",
-    rc_script_configuration = "@rules_hdl//dependency_support/org_theopenroadproject_asap7:rc_script.tcl",
-    tap_cell = "TAPCELL_ASAP7_75t_SL",
+    rc_script_configuration = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:rc_script.tcl",
+    tap_cell = "TAPCELL_ASAP7_75t_L",
     tapcell_distance = 25,
-    tie_high_port = "TIEHIx1_ASAP7_75t_SL/H",
-    tie_low_port = "TIELOx1_ASAP7_75t_SL/L",
+    tie_high_port = "TIEHIx1_ASAP7_75t_L/H",
+    tie_low_port = "TIELOx1_ASAP7_75t_L/L",
     tie_separation = 0,
-    tracks_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7:tracks.tcl",
+    tracks_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:tracks.tcl",
     wire_rc_clock_metal_layer = "M5",
     wire_rc_signal_metal_layer = "M2",
 )

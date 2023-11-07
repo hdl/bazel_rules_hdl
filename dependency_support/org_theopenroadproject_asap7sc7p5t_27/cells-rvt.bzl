@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-<<<<<<<< HEAD:dependency_support/org_theopenroadproject_asap7_pdk_r1p7/asap7-sc7p5t_rev27_rvt-cells.bzl
-# ASAP7 "rev 27" 7.5 track standard cell library using regular VT transistors
+""" ASAP7 "rev 27" 7.5 track standard cell library using regular VT transistors """
+
 # ------------------------------------------------------------------------
 asap7_cells_files(
     name = "asap7-cells-sc7p5t_rev27_rvt",
@@ -21,26 +21,6 @@ asap7_cells_files(
     tracks = "7p5t",
     vt = "rvt",
     has_gds = True,
-========
-"""Arizona State University 7nm PDK"""
-
-load("@rules_hdl//pdk:open_road_configuration.bzl", "open_road_pdk_configuration")
-load("@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:asap7.bzl", "asap7_cell_library")
-
-asap7_cell_library(
-    name = "asap7_rvt_1x",
-    srcs = glob(["LIB/CCS/*.lib.7z"]),
-    cell_lef = "LEF/asap7sc7p5t_28_R_1x_220121a.lef",
-    cell_type = "RVT",
-    platform_gds = "GDS/asap7sc7p5t_28_R_220121a.gds",
-    default_corner_delay_model = "ccs",
-    default_corner_swing = "SS",
-    openroad_configuration = ":open_road_asap7_1x",
-    tech_lef = "techlef_misc/asap7_tech_1x_201209.lef",
-    visibility = [
-        "//visibility:public",
-    ]
->>>>>>>> temp-fix-asap7:dependency_support/org_theopenroadproject_asap7sc7p5t_28/bundled.BUILD.bazel
 )
 
 open_road_pdk_configuration(
@@ -75,13 +55,8 @@ open_road_pdk_configuration(
         "M7": "0.5",
     },
     global_routing_signal_layers = "M2-M7",
-<<<<<<<< HEAD:dependency_support/org_theopenroadproject_asap7_pdk_r1p7/asap7-sc7p5t_rev27_rvt-cells.bzl
-    klayout_tech_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7:asap7.lyt",
-    pdn_config = "@rules_hdl//dependency_support/org_theopenroadproject_asap7:pdn_config_1x.pdn",
-========
     klayout_tech_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:asap7.lyt",
-    pdn_config = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:pdn_config.pdn",
->>>>>>>> temp-fix-asap7:dependency_support/org_theopenroadproject_asap7sc7p5t_28/bundled.BUILD.bazel
+    pdn_config = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:pdn_config_1x.pdn",
     pin_horizontal_metal_layer = "M4",
     pin_vertical_metal_layer = "M5",
     rc_script_configuration = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:rc_script.tcl",

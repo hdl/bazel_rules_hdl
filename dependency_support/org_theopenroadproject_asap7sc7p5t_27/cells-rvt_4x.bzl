@@ -13,8 +13,10 @@
 # limitations under the License.
 
 ##########################################################################
-# Special 4x scaled version of the ASAP7 "rev 27" 7.5 track standard cell
-# library using regular VT transistors.
+"""
+Special 4x scaled version of the ASAP7 "rev 27" 7.5 track standard cell
+library using regular VT transistors.
+"""
 ##########################################################################
 
 # Layouts for GDS generation
@@ -25,8 +27,8 @@
 # timing analysis (STA).
 # ------------------------------------------------------------------------
 alias(
-    name = "asap7-cells-sc7p5t_rev27_rvt_4x-libgz",
-    actual = ":asap7-cells-sc7p5t_rev27_rvt-libgz",
+    name = "asap7-cells-sc7p5t_rev27_rvt_4x-lib7z",
+    actual = ":asap7-cells-sc7p5t_rev27_rvt-lib7z",
 )
 
 # Verilog models for digital simulation and logical equivalence
@@ -54,7 +56,7 @@ alias(
 # ------------------------------------------------------------------------
 filegroup(
     name = "asap7-cells-sc7p5t_rev27_rvt_4x-lef",
-    srcs = ["asap7sc7p5t_27/LEF/scaled/asap7sc7p5t_27_R_4x_201211.lef"],
+    srcs = ["LEF/scaled/asap7sc7p5t_27_R_4x_201211.lef"],
 )
 
 # Library configuration
@@ -62,18 +64,18 @@ filegroup(
 asap7_cell_library(
     name = "asap7-sc7p5t_rev27_rvt_4x",
     srcs = [
-	":asap7-cells-sc7p5t_rev27_rvt_4x-libgz",
-#	":asap7-srams-sc7p5t_rev27_4x-libgz",
+        ":asap7-cells-sc7p5t_rev27_rvt_4x-lib7z",
+        #	":asap7-srams-sc7p5t_rev27_4x-lib7z",
     ],
     cell_lef = ":asap7-cells-sc7p5t_rev27_rvt_4x-lef",
-#    platform_gds = ":asap7-cells-sc7p5t_rev27_rvt_4x-gds",
+    #    platform_gds = ":asap7-cells-sc7p5t_rev27_rvt_4x-gds",
     default_corner_delay_model = "ccs",
     default_corner_swing = "SS",
     openroad_configuration = ":open_road-asap7-sc7p5t_rev27_rvt_4x",
     tech_lef = ":asap7-misc-sc7p5t_rev27_4x-lef",
     visibility = [
         "//visibility:public",
-    ]
+    ],
 )
 
 # OpenROAD configuration
@@ -81,6 +83,7 @@ asap7_cell_library(
 open_road_pdk_configuration(
     name = "open_road-asap7-sc7p5t_rev27_rvt_4x",
     cell_site = "asap7sc7p5t",
+    check_placement = False,
     cts_buffer_cell = "BUFx4_ASAP7_75t_R",
     do_not_use_cell_list = [
         "*x1_ASAP7*",
@@ -110,17 +113,17 @@ open_road_pdk_configuration(
         "M7": "0.5",
     },
     global_routing_signal_layers = "M2-M7",
-    klayout_tech_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7:asap7.lyt",
-    pdn_config = "@rules_hdl//dependency_support/org_theopenroadproject_asap7:pdn_config_4x.pdn",
+    klayout_tech_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:asap7.lyt",
+    pdn_config = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:pdn_config_4x.pdn",
     pin_horizontal_metal_layer = "M4",
     pin_vertical_metal_layer = "M5",
-    rc_script_configuration = "@rules_hdl//dependency_support/org_theopenroadproject_asap7:rc_script.tcl",
+    rc_script_configuration = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:rc_script.tcl",
     tap_cell = "TAPCELL_ASAP7_75t_R",
     tapcell_distance = 25,
     tie_high_port = "TIEHIx1_ASAP7_75t_R/H",
     tie_low_port = "TIELOx1_ASAP7_75t_R/L",
     tie_separation = 0,
-    tracks_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7:tracks.tcl",
+    tracks_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:tracks.tcl",
     wire_rc_clock_metal_layer = "M5",
     wire_rc_signal_metal_layer = "M2",
 )

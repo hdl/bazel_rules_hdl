@@ -3,17 +3,24 @@
 load("@rules_hdl//pdk:build_defs.bzl", "CornerInfo", "StandardCellInfo")
 load("@rules_hdl//pdk:open_road_configuration.bzl", "OpenRoadPdkInfo")
 
-<<<<<<< HEAD
+def asap7_srams_files(name = None, rev = None, tracks = None, has_gds = True):
+    """Generate ASAP7 sram's filegroup targets (asap7-cells-XXX).
 
-def asap7_srams_files(name=None, rev=None, tracks=None, has_gds=True):
+    Args:
+      name: Macro instance name.
+      rev: ASAP7 revision ("26" / "27" / "28").
+      tracks: Number of tracks ("7p5t", "6t").
+      has_gds: SRAM have GDS layouts.
+    """
+
     if rev not in ["26", "27", "28"]:
         fail("Invalid rev {}".format(repr(rev)))
     if tracks not in ["7p5t", "6t"]:
         fail("Invalid rev {}".format(repr(tracks)))
 
     args = {
-        'rev': str(rev),
-        'tracks': str(tracks),
+        "rev": str(rev),
+        "tracks": str(tracks),
     }
 
     # Layouts for GDS generation
@@ -21,47 +28,56 @@ def asap7_srams_files(name=None, rev=None, tracks=None, has_gds=True):
     if has_gds:
         native.filegroup(
             name = "asap7-srams-sc{tracks}_rev{rev}-gds".format(**args),
-            srcs = native.glob(["asap7sc{tracks}_{rev}/GDS/asap7sc{tracks}_{rev}*_SRAM_*.gds".format(**args)]),
+            srcs = native.glob(["GDS/asap7sc{tracks}_{rev}*_SRAM_*.gds".format(**args)]),
         )
 
     # Timing information (in compressed Liberty format) for synthesis and static
     # timing analysis (STA).
     # ------------------------------------------------------------------------
     native.filegroup(
-        name = "asap7-srams-sc{tracks}_rev{rev}-libgz".format(**args),
-        srcs = native.glob(["asap7sc{tracks}_{rev}/LIB/CCS/*SRAM*.lib.gz".format(**args)]),
+        name = "asap7-srams-sc{tracks}_rev{rev}-lib7z".format(**args),
+        srcs = native.glob(["LIB/CCS/*SRAM*.lib.7z".format(**args)]),
     )
 
     # Verilog models for digital simulation and logical equivalence
     # ------------------------------------------------------------------------
     native.filegroup(
         name = "asap7-srams-sc{tracks}_rev{rev}-v".format(**args),
-        srcs = native.glob(["asap7sc{tracks}_{rev}/Verilog/asap7sc{tracks}_*_SRAM_*.v".format(**args)]),
+        srcs = native.glob(["Verilog/asap7sc{tracks}_*_SRAM_*.v".format(**args)]),
     )
 
     # CDL models for LVS checking
     # ------------------------------------------------------------------------
     native.filegroup(
         name = "asap7-srams-sc{tracks}_rev{rev}-lvs".format(**args),
-        srcs = ["asap7sc{tracks}_{rev}/CDL/LVS/asap7sc{tracks}_{rev}_*SRAM*.cdl".format(**args)],
+        srcs = ["CDL/LVS/asap7sc{tracks}_{rev}_*SRAM*.cdl".format(**args)],
     )
 
     # CDL models for Spice simulation
     # ------------------------------------------------------------------------
     native.filegroup(
         name = "asap7-srams-sc{tracks}_rev{rev}-spice".format(**args),
-        srcs = ["asap7sc{tracks}_{rev}/CDL/xAct3D_extracted/asap7sc{tracks}_{rev}_*SRAM*.sp".format(**args)],
+        srcs = ["CDL/xAct3D_extracted/asap7sc{tracks}_{rev}_*SRAM*.sp".format(**args)],
     )
 
     # Place and route
     # ------------------------------------------------------------------------
     native.filegroup(
         name = "asap7-srams-sc{tracks}_rev{rev}-lef".format(**args),
-        srcs = ["asap7sc{tracks}_{rev}/LEF/asap7sc{tracks}_{rev}*_SRAM_*.lef".format(**args)],
+        srcs = ["LEF/asap7sc{tracks}_{rev}*_SRAM_*.lef".format(**args)],
     )
 
+def asap7_cells_files(name = None, rev = None, tracks = None, vt = None, has_gds = True):
+    """Generate ASAP7 cell's filegroup targets (asap7-cells-XXX).
 
-def asap7_cells_files(name=None, rev=None, tracks=None, vt=None, has_gds=True):
+    Args:
+      name: Macro instance name.
+      rev: ASAP7 revision ("26" / "27" / "28").
+      tracks: Number of tracks ("7p5t", "6t").
+      vt: VT type ("rvt", "lvt", "slvt").
+      has_gds: Cells have GDS layouts.
+    """
+
     if rev not in ["26", "27", "28"]:
         fail("Invalid rev {}".format(repr(rev)))
     if tracks not in ["7p5t", "6t"]:
@@ -70,11 +86,11 @@ def asap7_cells_files(name=None, rev=None, tracks=None, vt=None, has_gds=True):
         fail("Invalid vt {}".format(repr(vt)))
 
     args = {
-        'rev': rev,
-        'tracks': tracks,
-        'vt_long': vt,
-        'vt_upper': vt.upper(),
-        'vt_short': {'rvt': 'R', 'lvt': 'L', 'slvt': 'SL'}[vt],
+        "rev": rev,
+        "tracks": tracks,
+        "vt_long": vt,
+        "vt_upper": vt.upper(),
+        "vt_short": {"rvt": "R", "lvt": "L", "slvt": "SL"}[vt],
     }
 
     # Layouts for GDS generation
@@ -82,43 +98,43 @@ def asap7_cells_files(name=None, rev=None, tracks=None, vt=None, has_gds=True):
     if has_gds:
         native.filegroup(
             name = "asap7-cells-sc{tracks}_rev{rev}_{vt_long}-gds".format(**args),
-            srcs = native.glob(["asap7sc{tracks}_{rev}/GDS/asap7sc{tracks}_{rev}_{vt_short}*.gds".format(**args)]),
+            srcs = native.glob(["GDS/asap7sc{tracks}_{rev}_{vt_short}*.gds".format(**args)]),
         )
 
     # Timing information (in compressed Liberty format) for synthesis and static
     # timing analysis (STA).
     # ------------------------------------------------------------------------
     native.filegroup(
-        name = "asap7-cells-sc{tracks}_rev{rev}_{vt_long}-libgz".format(**args),
-        srcs = native.glob(["asap7sc{tracks}_{rev}/LIB/CCS/*_{vt_upper}_*.lib.gz".format(**args)]),
+        name = "asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lib7z".format(**args),
+        srcs = native.glob(["LIB/CCS/*_{vt_upper}_*.lib.7z".format(**args)]),
     )
 
     # Verilog models for digital simulation and logical equivalence
     # ------------------------------------------------------------------------
     native.filegroup(
         name = "asap7-cells-sc{tracks}_rev{rev}_{vt_long}-v".format(**args),
-        srcs = native.glob(["asap7sc{tracks}_{rev}/Verilog/asap7sc{tracks}_*_{vt_upper}_*.v".format(**args)]),
+        srcs = native.glob(["Verilog/asap7sc{tracks}_*_{vt_upper}_*.v".format(**args)]),
     )
 
     # CDL models for LVS checking
     # ------------------------------------------------------------------------
     native.filegroup(
         name = "asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lvs".format(**args),
-        srcs = native.glob(["asap7sc{tracks}_{rev}/CDL/LVS/asap7sc{tracks}_{rev}_{vt_short}.cdl".format(**args)]),
+        srcs = native.glob(["CDL/LVS/asap7sc{tracks}_{rev}_{vt_short}.cdl".format(**args)]),
     )
 
     # CDL models for Spice simulation
     # ------------------------------------------------------------------------
     native.filegroup(
         name = "asap7-cells-sc{tracks}_rev{rev}_{vt_long}-spice".format(**args),
-        srcs = native.glob(["asap7sc{tracks}_{rev}/CDL/xAct3D_extracted/asap7sc{tracks}_{rev}_{vt_short}.sp".format(**args)]),
+        srcs = native.glob(["CDL/xAct3D_extracted/asap7sc{tracks}_{rev}_{vt_short}.sp".format(**args)]),
     )
 
     # Place and route
     # ------------------------------------------------------------------------
     native.filegroup(
         name = "asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lef".format(**args),
-        srcs = native.glob(["asap7sc{tracks}_{rev}/LEF/asap7sc{tracks}_{rev}_{vt_short}_1x*.lef".format(**args)]),
+        srcs = native.glob(["LEF/asap7sc{tracks}_{rev}_{vt_short}_1x*.lef".format(**args)]),
     )
 
     # Library configuration
@@ -126,8 +142,8 @@ def asap7_cells_files(name=None, rev=None, tracks=None, vt=None, has_gds=True):
     asap7_cell_library(
         name = "asap7-sc{tracks}_rev{rev}_{vt_long}".format(**args),
         srcs = [
-            ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-libgz".format(**args),
-            #":asap7-srams-sc{tracks}_rev{rev}-libgz".format(**args),
+            ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lib7z".format(**args),
+            #":asap7-srams-sc{tracks}_rev{rev}-lib7z".format(**args),
         ],
         cell_lef = ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lef".format(**args),
         platform_gds = ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-gds".format(**args),
@@ -137,29 +153,17 @@ def asap7_cells_files(name=None, rev=None, tracks=None, vt=None, has_gds=True):
         tech_lef = ":asap7-misc-sc{tracks}_rev{rev}-lef".format(**args),
         visibility = [
             "//visibility:public",
-        ]
+        ],
     )
 
-
-def _asap7_cell_library_impl(ctx):
-    liberty_files = [file for file in ctx.files.srcs if file.extension == "gz"]
-    liberty_files = [file for file in liberty_files if "_{}_".format(ctx.attr.default_corner_delay_model) in file.basename]
-    liberty_files = [file for file in liberty_files if "SRAM" not in file.basename]
-
-    uncompressed_files = []
-    for file in liberty_files:
-        uncompressed_file = ctx.actions.declare_file(file.basename[:-len(".gz")])
-=======
 def _asap7_cell_library_impl(ctx):
     liberty_files = [file for file in ctx.files.srcs if file.extension == "7z"]
     liberty_files = [file for file in liberty_files if "_{}_".format(ctx.attr.default_corner_delay_model) in file.basename]
     liberty_files = [file for file in liberty_files if "SRAM" not in file.basename]
-    liberty_files = [file for file in liberty_files if ctx.attr.cell_type in file.basename]
 
     uncompressed_files = []
     for file in liberty_files:
         uncompressed_file = ctx.actions.declare_file(file.basename[:-len(".7z")])
->>>>>>> temp-fix-asap7
         ctx.actions.run_shell(
             outputs = [
                 uncompressed_file,
@@ -167,12 +171,6 @@ def _asap7_cell_library_impl(ctx):
             inputs = [
                 file,
             ],
-<<<<<<< HEAD
-            command = "gunzip --to-stdout {compressed_file} > {uncompressed_file}".format(
-                compressed_file = file.path,
-                uncompressed_file = uncompressed_file.path,
-            ),
-=======
             command = "{tool} x -so -- {compressed_file} > {uncompressed_file}".format(
                 tool = ctx.executable._uncompress.path,
                 compressed_file = file.path,
@@ -181,7 +179,6 @@ def _asap7_cell_library_impl(ctx):
             tools = [
                 ctx.executable._uncompress,
             ],
->>>>>>> temp-fix-asap7
         )
 
         uncompressed_files.append(uncompressed_file)
@@ -227,30 +224,19 @@ asap7_cell_library = rule(
         "tech_lef": attr.label(allow_single_file = True, mandatory = True, doc = "The tech lef file for these standard cells"),
         "default_corner_swing": attr.string(mandatory = True, values = ["SS", "FF", "TT"]),
         "default_corner_delay_model": attr.string(mandatory = True, values = ["ccs", "ccsn", "ccsa"]),
-<<<<<<< HEAD
         #TODO(b/212480812): Support multiple VTs in a single design.
         "openroad_configuration": attr.label(providers = [OpenRoadPdkInfo]),
         "cell_lef": attr.label(allow_single_file = True, mandatory = True, doc = "The lef file for the standard cells"),
         "platform_gds": attr.label(allow_single_file = True, mandatory = False, doc = "Platform GDS files"),
-=======
-        "cell_type": attr.string(mandatory = True, values = ["RVT", "LVT", "SLVT"]),
-        #TODO(b/212480812): Support multiple VTs in a single design.
-        "openroad_configuration": attr.label(providers = [OpenRoadPdkInfo]),
-        "cell_lef": attr.label(allow_single_file = True, mandatory = True, doc = "The lef file for the standard cells"),
-        "platform_gds": attr.label(allow_single_file = True, mandatory = True, doc = "Platform GDS files"),
->>>>>>> temp-fix-asap7
         "_combine_liberty": attr.label(
             default = Label("@rules_hdl//pdk/liberty:combine_liberty"),
             executable = True,
             cfg = "exec",
         ),
-<<<<<<< HEAD
-=======
         "_uncompress": attr.label(
             default = Label("@7zip//:7za"),
             executable = True,
             cfg = "exec",
         ),
->>>>>>> temp-fix-asap7
     },
 )

@@ -46,20 +46,20 @@ load("@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:asap7
 load("@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:asap7.bzl", "asap7_srams_files")
 
 
-# From org_theopenroadproject_asap7sc7p5t_28/cells-lvt.bzl
-""" ASAP7 "rev 28" 7.5 track standard cell library using Low VT transistors """
+# From org_theopenroadproject_asap7sc6t_26/cells-lvt.bzl
+""" ASAP7 "rev 26" 6 track standard cell library using low VT transistors """
 
 # ------------------------------------------------------------------------
 asap7_cells_files(
-    name = "asap7-cells-sc7p5t_rev28_lvt",
-    rev = "28",
-    tracks = "7p5t",
+    name = "asap7-cells-sc6t_rev26_lvt",
+    rev = "26",
+    tracks = "6t",
     vt = "lvt",
 )
 
 open_road_pdk_configuration(
-    name = "open_road-asap7-sc7p5t_rev28_lvt",
-    cell_site = "asap7sc7p5t",
+    name = "open_road-asap7-sc6t_rev26_lvt",
+    cell_site = "asap7sc6t",
     cts_buffer_cell = "BUFx4_ASAP7_75t_L",
     do_not_use_cell_list = [
         "*x1_ASAP7*",
@@ -104,20 +104,20 @@ open_road_pdk_configuration(
     wire_rc_signal_metal_layer = "M2",
 )
 
-# From org_theopenroadproject_asap7sc7p5t_28/cells-rvt.bzl
-""" ASAP7 "rev 28" 7.5 track standard cell library using regular VT transistors """
+# From org_theopenroadproject_asap7sc6t_26/cells-rvt.bzl
+""" ASAP7 "rev 26" 6 track standard cell library using regular VT transistors """
 
 # ------------------------------------------------------------------------
 asap7_cells_files(
-    name = "asap7-cells-sc7p5t_rev28_rvt",
-    rev = "28",
-    tracks = "7p5t",
+    name = "asap7-cells-sc6t_rev26_rvt",
+    rev = "26",
+    tracks = "6t",
     vt = "rvt",
 )
 
 open_road_pdk_configuration(
-    name = "open_road-asap7-sc7p5t_rev28_rvt",
-    cell_site = "asap7sc7p5t",
+    name = "open_road-asap7-sc6t_rev26_rvt",
+    cell_site = "asap7sc6t",
     cts_buffer_cell = "BUFx4_ASAP7_75t_R",
     do_not_use_cell_list = [
         "*x1_ASAP7*",
@@ -162,20 +162,20 @@ open_road_pdk_configuration(
     wire_rc_signal_metal_layer = "M2",
 )
 
-# From org_theopenroadproject_asap7sc7p5t_28/cells-slvt.bzl
-""" ASAP7 "rev 28" 7.5 track standard cell library using Super-Low VT transistors """
+# From org_theopenroadproject_asap7sc6t_26/cells-slvt.bzl
+""" ASAP7 "rev 26" 6 track standard cell library using super-low VT transistors """
 
 # ------------------------------------------------------------------------
 asap7_cells_files(
-    name = "asap7-cells-sc7p5t_rev28_slvt",
-    rev = "28",
-    tracks = "7p5t",
+    name = "asap7-cells-sc6t_rev26_slvt",
+    rev = "26",
+    tracks = "6t",
     vt = "slvt",
 )
 
 open_road_pdk_configuration(
-    name = "open_road-asap7-sc7p5t_rev28_slvt",
-    cell_site = "asap7sc7p5t",
+    name = "open_road-asap7-sc6t_rev26_slvt",
+    cell_site = "asap7sc6t",
     cts_buffer_cell = "BUFx4_ASAP7_75t_SL",
     do_not_use_cell_list = [
         "*x1_ASAP7*",
@@ -220,24 +220,24 @@ open_road_pdk_configuration(
     wire_rc_signal_metal_layer = "M2",
 )
 
-# From org_theopenroadproject_asap7sc7p5t_28/common.bzl
+# From org_theopenroadproject_asap7sc6t_26/common.bzl
 ##########################################################################
-""" ASAP7 "rev 28" 7.5 track standard cell library with SRAM blocks. """
+""" ASAP7 "rev 26" 6 track standard cell library with SRAM blocks. """
 ##########################################################################
 
 asap7_srams_files(
-    name = "asap7-srams-sc7p5t_rev28",
-    rev = "28",
-    tracks = "7p5t",
+    name = "asap7-srams-sc6t_rev26",
+    rev = "26",
+    tracks = "6t",
 )
 
 filegroup(
-    name = "asap7-misc-sc7p5t_rev28-lef",
-    srcs = ["techlef_misc/asap7_tech_1x_201209.lef"],
-    visibility = ["//visibility:public"],
+    name = "asap7-misc-sc6t_rev26-lef",
+    # FIXME: Where is the 1x techlef?
+    srcs = ["techlef_misc/asap7sc6t_tech_4x_210831.lef"],
 )
 
 filegroup(
-    name = "asap7-misc-sc7p5t_rev28_4x-lef",
-    srcs = ["techlef_misc/asap7_tech_4x_201209.lef"],
+    name = "asap7-misc-sc6t_rev26_4x-lef",
+    srcs = ["techlef_misc/asap7sc6t_tech_4x_210831.lef"],
 )
