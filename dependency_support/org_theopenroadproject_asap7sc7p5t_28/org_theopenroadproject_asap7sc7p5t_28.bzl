@@ -17,14 +17,14 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-def org_theopenroadproject_asap7():
+def org_theopenroadproject_asap7sc7p5t_28():
     maybe(
         http_archive,
-        name = "org_theopenroadproject_asap7",
+        name = "org_theopenroadproject_asap7sc7p5t_28",
         urls = [
-            "https://github.com/The-OpenROAD-Project/asap7/archive/cd13de4e603913291ec6b8401ab63ec481178a5a.tar.gz",
+            "https://github.com/The-OpenROAD-Project/asap7sc7p5t_28/archive/d88477438935a5a388bd6294f682dc405c93c5d2.tar.gz",
         ],
-        strip_prefix = "asap7-cd13de4e603913291ec6b8401ab63ec481178a5a",
-        sha256 = "1820b732362852ec9658695c7509dd81eda571bb6b64def48ff92e2fab78fbe8",
-        build_file = Label("@rules_hdl//dependency_support/org_theopenroadproject_asap7:bundled.BUILD.bazel"),
+        strip_prefix = "asap7sc7p5t_28-d88477438935a5a388bd6294f682dc405c93c5d2",
+        sha256 = "7f028a41425b8d736958cae994b3c1722d4bef2c0d28f6bf507b9ac8138ecc41",
+        build_file = Label("@rules_hdl//dependency_support/org_theopenroadproject_asap7sc7p5t_28:bundled.BUILD.bazel"),
     )
