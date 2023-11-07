@@ -83,7 +83,7 @@ place_and_route(
 
 synthesize_rtl(
     name = "verilog_counter_asap7_synth",
-    standard_cells = "@org_theopenroadproject_asap7//:asap7_rvt_1x",
+    standard_cells = "@org_theopenroadproject_asap7sc7p5t_28//:asap7_rvt_1x",
     target_clock_period_pico_seconds = 10000,
     top_module = "counter",
     deps = [
