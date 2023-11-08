@@ -22,10 +22,14 @@ asap7_srams_files(
     tracks = "6t",
 )
 
-filegroup(
+# FIXME: Where is the 1x techlef?
+#filegroup(
+#    name = "asap7-misc-sc6t_rev26-lef",
+#    srcs = ["techlef_misc/asap7sc6t_tech_4x_210831.lef"],
+#)
+alias(
     name = "asap7-misc-sc6t_rev26-lef",
-    # FIXME: Where is the 1x techlef?
-    srcs = ["techlef_misc/asap7sc6t_tech_4x_210831.lef"],
+    actual = "@org_theopenroadproject_asap7sc7p5t_28//:asap7-misc-sc7p5t_rev28-lef",
 )
 
 filegroup(
