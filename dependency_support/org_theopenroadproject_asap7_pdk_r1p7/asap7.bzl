@@ -50,21 +50,21 @@ def asap7_srams_files(name = None, rev = None, tracks = None, has_gds = True):
     # ------------------------------------------------------------------------
     native.filegroup(
         name = "asap7-srams-sc{tracks}_rev{rev}-lvs".format(**args),
-        srcs = ["CDL/LVS/asap7sc{tracks}_{rev}_*SRAM*.cdl".format(**args)],
+        srcs = native.glob(["CDL/LVS/asap7sc{tracks}_{rev}_*SRAM*.cdl".format(**args)]),
     )
 
     # CDL models for Spice simulation
     # ------------------------------------------------------------------------
     native.filegroup(
         name = "asap7-srams-sc{tracks}_rev{rev}-spice".format(**args),
-        srcs = ["CDL/xAct3D_extracted/asap7sc{tracks}_{rev}_*SRAM*.sp".format(**args)],
+        srcs = native.glob(["CDL/xAct3D_extracted/asap7sc{tracks}_{rev}_*SRAM*.sp".format(**args)]),
     )
 
     # Place and route
     # ------------------------------------------------------------------------
     native.filegroup(
         name = "asap7-srams-sc{tracks}_rev{rev}-lef".format(**args),
-        srcs = ["LEF/asap7sc{tracks}_{rev}*_SRAM_*.lef".format(**args)],
+        srcs = native.glob(["LEF/asap7sc{tracks}_{rev}*_SRAM_*.lef".format(**args)]),
     )
 
 def asap7_cells_files(name = None, rev = None, tracks = None, vt = None, has_gds = True):
