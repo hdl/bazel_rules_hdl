@@ -199,7 +199,7 @@ def _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict):
 
     constants_env = {}
     for c in step[FlowStepInfo].constants:
-        s = ctx.attr.constants.get(c)
+        s = ctx.attr.constants[DefaultInfo].get(c)
         if s == None:
             fail("Required constant", c, "not found in constants dictionary", ctx.attr.constants)
         constants_env["CONSTANT_" + c.upper()] = s
