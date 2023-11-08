@@ -150,29 +150,27 @@ asap7_targets(
 )
 
 # ASAP7 6 track rev 26
-asap7_targets(
-    name = "verilog_counter-asap7-6t_rev26_rvt",
-    has_gds = False,  # FIXME: These cells do actually have GDS
-    rev = 26,
-    target = "verilog_counter",
-    tracks = "6t",
-    vt = "rvt",
-)
-
-asap7_targets(
-    name = "verilog_counter-asap7-6t_rev26_lvt",
-    has_gds = False,  # FIXME: These cells do actually have GDS
-    rev = 26,
-    target = "verilog_counter",
-    tracks = "6t",
-    vt = "lvt",
-)
-
-asap7_targets(
-    name = "verilog_counter-asap7-6t_rev26_slvt",
-    has_gds = False,  # FIXME: These cells do actually have GDS
-    rev = 26,
-    target = "verilog_counter",
-    tracks = "6t",
-    vt = "slvt",
-)
+# FIXME: Enable the 6 track config.
+#asap7_targets(
+#    name = "verilog_counter-asap7-6t_rev26_rvt",
+#    rev = 26,
+#    target = "verilog_counter",
+#    tracks = "6t",
+#    vt = "rvt",
+#)
+#
+#asap7_targets(
+#    name = "verilog_counter-asap7-6t_rev26_lvt",
+#    rev = 26,
+#    target = "verilog_counter",
+#    tracks = "6t",
+#    vt = "lvt",
+#)
+#
+#asap7_targets(
+#    name = "verilog_counter-asap7-6t_rev26_slvt",
+#    rev = 26,
+#    target = "verilog_counter",
+#    tracks = "6t",
+#    vt = "slvt",
+#)
