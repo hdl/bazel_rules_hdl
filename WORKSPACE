@@ -93,12 +93,13 @@ llvm_toolchain(
 maybe(
     http_archive,
     name = "rules_7zip",
+    sha256 = "fd9e99f6ccb9e946755f9bc444abefbdd1eedb32c372c56dcacc7eb486aed178",
     strip_prefix = "rules_7zip-e00b15d3cb76b78ddc1c15e7426eb1d1b7ddaa3e",
     urls = ["https://github.com/zaucy/rules_7zip/archive/e00b15d3cb76b78ddc1c15e7426eb1d1b7ddaa3e.zip"],
-    sha256 = "fd9e99f6ccb9e946755f9bc444abefbdd1eedb32c372c56dcacc7eb486aed178",
 )
 
 load("@rules_7zip//:setup.bzl", "setup_7zip")
+
 setup_7zip()
 
 maybe(

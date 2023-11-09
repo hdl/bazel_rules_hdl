@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-def org_theopenroadproject_asap7_pdk_r1p7():
+def org_theopenroadproject_asap7sc7p5t_27():
     maybe(
         http_archive,
-        name = "org_theopenroadproject_asap7_pdk_r1p7",
+        name = "org_theopenroadproject_asap7sc7p5t_27",
         urls = [
-            "https://github.com/The-OpenROAD-Project/asap7_pdk_r1p7/archive/1ff7649bbf423207f6f70293dc1cf630cd477365.tar.gz",
+            "https://github.com/The-OpenROAD-Project/asap7sc7p5t_27/archive/900f55ed8bef025f39edcc8b8be5e04a2c55c15a.tar.gz",
         ],
-        strip_prefix = "asap7_pdk_r1p7-1ff7649bbf423207f6f70293dc1cf630cd477365",
-        sha256 = "b5847f93e55debb49d03ec581e22eb301109ff90c9ad19d35ae1223c70250391",
-        build_file = Label("@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:bundled.BUILD.bazel"),
+        strip_prefix = "asap7sc7p5t_27-900f55ed8bef025f39edcc8b8be5e04a2c55c15a",
+        sha256 = "db5531736a34f34e919488468e8ee09ae87495ff8a6188fad375d68c19e10e20",
+        build_file = Label("@rules_hdl//dependency_support/org_theopenroadproject_asap7sc7p5t_27:bundled.BUILD.bazel"),
     )
