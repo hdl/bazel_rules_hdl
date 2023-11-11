@@ -25,16 +25,18 @@ py_binary(
     srcs_version = "PY3",
     visibility = ["//visibility:public"],
     deps = [
-        ":cell_parser",
+        ":liberty_utility",
         requirement("absl-py"),
     ],
 )
 
 py_library(
-    name = "cell_parser",
+    name = "liberty_utility",
     srcs = [
-        "cell_parser.py",
         "liberty_utility.py",
+    ],
+    deps = [
+        ":cell_parser",
     ],
 )
 
@@ -45,7 +47,14 @@ py_test(
     ],
     python_version = "PY3",
     deps = [
-        ":cell_parser",
+        ":liberty_utility",
+    ],
+)
+
+py_library(
+    name = "cell_parser",
+    srcs = [
+        "cell_parser.py",
     ],
 )
 
