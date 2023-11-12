@@ -1,3 +1,4 @@
+load("@rules_python//python:defs.bzl", "py_binary")
 load("//verilator:defs.bzl", "verilator_cc_library")
 load("//verilog:providers.bzl", "verilog_library")
 load(
