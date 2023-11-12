@@ -54,6 +54,7 @@ def _run_opensta_impl(ctx):
         input_manifests = input_manifests,
         env = env,
         mnemonic = "RunningSTA",
+	toolchain = None,
     )
 
     return [
