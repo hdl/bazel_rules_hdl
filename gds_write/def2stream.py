@@ -38,7 +38,7 @@ The import took place:
     * from https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/blob/99e8d3e9b399c7703fab26bef2b5770d39a2f724/flow/util/def2stream.py
 """
 
-import klayout.db as db
+from klayout import db
 import re
 import argparse
 
