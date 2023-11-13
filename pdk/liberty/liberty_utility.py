@@ -15,13 +15,14 @@
 """Utility functions to prepare the comibined liberty file."""
 
 import itertools
-from typing import List
+import mmap
+from typing import List, Union
 
 from pdk.liberty import cell_parser
 
 
 def generate_merged_liberty_io_vector(
-    liberty_files: List[bytes]) -> List[bytes]:
+    liberty_files: List[Union[bytes, mmap.mmap]]) -> List[bytes]:
   """Generates a merged io vector representing a combined liberty file.
 
   Args:
