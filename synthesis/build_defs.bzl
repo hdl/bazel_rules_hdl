@@ -150,6 +150,7 @@ def _synthesize_design_impl(ctx):
         input_manifests = input_manifests,
         env = env,
         mnemonic = "SynthesizingRTL",
+	toolchain = None,
     )
 
     return [

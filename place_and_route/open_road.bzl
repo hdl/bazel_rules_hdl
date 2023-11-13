@@ -259,6 +259,7 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
         },
         execution_requirements = execution_requirements,
         mnemonic = "OpenROAD",
+	toolchain = None,
     )
 
     return struct(db = output_db, log_file = log_file)
