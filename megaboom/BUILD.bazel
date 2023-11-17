@@ -488,11 +488,11 @@ build_openroad(
         macros=boom_tile_rams + boom_regfile_rams,
         synth_sources=["constraints-top.sdc"],
         stage_args={
-                'synth': ['SDC_FILE=constraints-top.sdc'],
+                'synth': ['SDC_FILE=constraints-top.sdc',
+                'SYNTH_HIERARCHICAL=1'],
                 'floorplan': [
                         'CORE_UTILIZATION=10',
                         'MACRO_PLACE_HALO="50 50"',
-                        'SYNTH_HIERARCHICAL=1',
                         'RTLMP_FLOW=True'
                         ],
                 'place': ['PLACE_DENSITY=0.20', 'PLACE_PINS_ARGS=-annealing'],
