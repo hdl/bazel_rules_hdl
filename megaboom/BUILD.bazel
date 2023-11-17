@@ -346,7 +346,9 @@ boom_tile_rams = ["table_256x12",
         stage_args={
                 'synth': ['SDC_FILE=constraints-sram.sdc'],
                 'floorplan': ['BLAH=1'],
-        'place': ['PLACE_DENSITY=0.65']}
+        'place': ['PLACE_DENSITY=0.65']},
+        mock_abstract=True,
+        mock_stage=2
         )
  for ram in boom_tile_rams]
 
