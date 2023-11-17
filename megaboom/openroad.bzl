@@ -112,7 +112,8 @@ def build_openroad(
         (['GDS_ALLOW_EMPTY="(' + '|'.join(macros) + ')"'] if stage in ("final") and len(macros) > 0 else []) +
         ([] if len(macros) == 0 else ['MIN_ROUTING_LAYER=M2',
         'MAX_ROUTING_LAYER=M9',
-        'PDN_TCL=$$(PLATFORM_DIR)/openRoad/pdn/BLOCKS_grid_strategy.tcl']) +       
+        '"PDN_TCL=\\$$(PLATFORM_DIR)/openRoad/pdn/BLOCKS_grid_strategy.tcl"']
+        ) +
         ([] if any(map(lambda a: a.startswith('SDC_FILE'), stage_args.get('synth', [])))
           else ['SDC_FILE=constraints.sdc']),
         outs = ([
