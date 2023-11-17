@@ -13,12 +13,18 @@ def set(iterable):
             result = result + [item.strip()]
     return result
 
+def filter(iterable, func):
+    result = []
+    for item in iterable:
+        if func(item):
+            result = result + [item]
+    return result
+
 def build_openroad(
     name,
     verilog_files = [],
     synth_sources = [],
     macros = [],
-    synth_args = [],
     io_constraints = "io.tcl",
     stage_args={},
     mock_abstract=False,
@@ -53,7 +59,8 @@ def build_openroad(
         tool = ":orfs",
         srcs = macro_targets + synth_sources + all_sources + set(verilog_files),
         args = ["make"] + base_args + [
-            "'VERILOG_FILES=" + ' '.join(set(verilog_files)) + "'"] + synth_args +
+            "SDC_FILE=" + list(filter(synth_sources, lambda s: s.endswith(".sdc")))[0],
+            "'VERILOG_FILES=" + ' '.join(set(verilog_files)) + "'"] + stage_args.get('synth', []) +
             ["bazel-synth"] + macro_config,
         outs = [
             "build/results/asap7/%s/base/1_synth.v" %(output_folder_name),

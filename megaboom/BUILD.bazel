@@ -320,7 +320,6 @@ build_openroad(
         execunits,
         synth_sources=["constraints-top.sdc"],
         stage_args={
-                'synth': ['SDC_FILE=constraints-top.sdc'],
                 'floorplan': ['CORE_UTILIZATION=10','MACRO_PLACE_HALO="50 50"'],
                 'place': ['PLACE_DENSITY=0.20']},
         io_constraints=None
@@ -343,9 +342,10 @@ boom_tile_rams = ["table_256x12",
         name = ram,
         verilog_files=["rtl/" + ram + ".sv"],
         synth_sources=["constraints-sram.sdc"],
-        synth_args=['SDC_FILE=constraints-sram.sdc'],
         io_constraints=None,
-        stage_args={'floorplan': ['BLAH=1'],
+        stage_args={
+                'synth': ['SDC_FILE=constraints-sram.sdc'],
+                'floorplan': ['BLAH=1'],
         'place': ['PLACE_DENSITY=0.65']}
         )
  for ram in boom_tile_rams]
@@ -359,9 +359,10 @@ boom_regfile_rams = [
         name = ram,
         verilog_files=["rtl/" + ram + ".sv"],
         synth_sources=["constraints-sram.sdc"],
-        synth_args=['SDC_FILE=constraints-sram.sdc'],
         io_constraints=None,
-        stage_args={'floorplan': ['CORE_UTILIZATION=7'],
+        stage_args={
+                'synth': ['SDC_FILE=constraints-sram.sdc'],
+                'floorplan': ['CORE_UTILIZATION=7'],
         'place': ['PLACE_DENSITY=0.10'],
         },
         mock_abstract=True,
@@ -488,8 +489,7 @@ build_openroad(
         macros=boom_tile_rams + boom_regfile_rams,
         synth_sources=["constraints-top.sdc"],
         stage_args={
-                'synth': ['SDC_FILE=constraints-top.sdc',
-                'SYNTH_HIERARCHICAL=1'],
+                'synth': ['SYNTH_HIERARCHICAL=1'],
                 'floorplan': [
                         'CORE_UTILIZATION=10',
                         'MACRO_PLACE_HALO="50 50"',
