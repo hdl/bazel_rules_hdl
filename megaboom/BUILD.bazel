@@ -1,0 +1,501 @@
+load("//:openroad.bzl", "build_openroad")
+
+nonrams = [
+"ram_corrupt_combMem_0",
+"ram_corrupt_combMem_1",
+"ram_corrupt_combMem",
+"ram_2x1",
+"ram_2x3",
+"ram_2x4",
+"ram_2x5",
+"ram_2x8",
+"ram_2x40",
+"ram_2x64",
+"ram_3x1",
+"ram_5x1",
+"ram_7x1",
+"ram_8x8",
+"ram_12x3"
+]
+
+rams = [
+"ram_256x8",
+"ram_addr_16x40",
+"ram_addr_combMem_0",
+"ram_addr_combMem",
+"ram_address_2x14",
+"ram_address_2x21",
+"ram_address_2x29",
+"ram_address_2x32",
+"ram_address_12x32",
+"ram_address_combMem_0",
+"ram_address_combMem_1",
+"ram_address_combMem_2",
+"ram_address_combMem_3",
+"ram_address_combMem_4",
+"ram_address_combMem",
+"ram_combMem_0",
+"ram_combMem",
+"ram_corrupt_12x1",
+"ram_data_2x128",
+"ram_data_3x65",
+"ram_data_3x128",
+"ram_data_4x64",
+"ram_data_5x65",
+"ram_data_7x65",
+"ram_data_12x64",
+"ram_data_combMem_0",
+"ram_data_combMem_1",
+"ram_data_combMem_2",
+"ram_data_combMem_3",
+"ram_data_combMem_4",
+"ram_data_combMem_5",
+"ram_data_combMem_6",
+"ram_data_combMem_7",
+"ram_data_combMem_8",
+"ram_data_combMem",
+"ram_data_tag_combMem",
+"ram_fflags_bits_flags_3x5",
+"ram_fflags_bits_flags_5x5",
+"ram_fflags_bits_flags_7x5",
+"ram_fflags_bits_flags_combMem_0",
+"ram_fflags_bits_flags_combMem_1",
+"ram_fflags_bits_flags_combMem",
+"ram_fflags_bits_uop_rob_idx_3x7",
+"ram_fflags_bits_uop_rob_idx_5x7",
+"ram_fflags_bits_uop_rob_idx_7x7",
+"ram_fflags_bits_uop_rob_idx_combMem_0",
+"ram_fflags_bits_uop_rob_idx_combMem_1",
+"ram_fflags_bits_uop_rob_idx_combMem",
+"ram_index_combMem_0",
+"ram_index_combMem",
+"ram_is_hella_4x1",
+"ram_is_hella_16x1",
+"ram_is_hella_combMem_0",
+"ram_is_hella_combMem",
+"ram_mask_2x16",
+"ram_mask_combMem_0",
+"ram_mask_combMem_1",
+"ram_mask_combMem_2",
+"ram_mask_combMem",
+"ram_meta_0_combMem_0",
+"ram_meta_0_combMem",
+"ram_meta_2x120",
+"ram_opcode_combMem_0",
+"ram_opcode_combMem_1",
+"ram_opcode_combMem",
+"ram_param_2x2",
+"ram_param_combMem",
+"ram_pc_combMem_0",
+"ram_pc_combMem",
+"ram_predicated_combMem_0",
+"ram_predicated_combMem_1",
+"ram_predicated_combMem",
+"ram_sdq_id_16x5",
+"ram_sdq_id_combMem",
+"ram_set_combMem",
+"ram_size_combMem_0",
+"ram_size_combMem_1",
+"ram_size_combMem",
+"ram_source_2x6",
+"ram_source_2x7",
+"ram_source_12x4",
+"ram_source_combMem_0",
+"ram_source_combMem_1",
+"ram_source_combMem_2",
+"ram_source_combMem_3",
+"ram_source_combMem_4",
+"ram_source_combMem",
+"ram_tl_state_source_combMem_0",
+"ram_tl_state_source_combMem"]
+
+execunits = ['ALUExeUnit_2', 'ALUExeUnit_3', 'ALUExeUnit_4', 'ALUExeUnit_5', 'ALUExeUnit']
+
+exeunitsrc =  [ "rtl/ALU.sv",
+        "rtl/AMOALU.sv",
+        "rtl/PipelinedMulUnit.sv",
+        "rtl/ALUUnit_1.sv",
+        "rtl/ALUUnit_2.sv",
+        "rtl/ALUUnit.sv",
+        "rtl/DivUnit.sv",
+        "rtl/MemAddrCalcUnit.sv",
+        "rtl/BranchKillableQueue_8.sv",
+        "rtl/BranchKillableQueue_9.sv",
+        "rtl/BranchKillableQueue_10.sv",
+        "rtl/BranchKillableQueue_11.sv",
+        "rtl/BranchKillableQueue.sv",
+        "rtl/IntToFPUnit.sv",
+        "rtl/MulDiv.sv",
+        "rtl/PipelinedMultiplier.sv",
+        "rtl/IntToFP.sv",
+        "rtl/UOPCodeFPUDecoder.sv",
+        "rtl/ram_fflags_bits_flags_5x5.sv",
+        "rtl/ram_fflags_bits_uop_rob_idx_5x7.sv",
+        "rtl/ram_5x1.sv",
+        "rtl/ram_data_5x65.sv",
+        "rtl/INToRecFN_1.sv",
+        "rtl/INToRecFN.sv",
+        "rtl/RoundAnyRawFNToRecFN.sv",
+        "rtl/RoundAnyRawFNToRecFN_1.sv"]
+
+[build_openroad(
+        name = exe,
+        verilog_files=["rtl/" + exe + ".sv"] + exeunitsrc,
+        synth_sources=["constraints.sdc"],
+        stage_args={
+                'floorplan': ['CORE_UTILIZATION=5',
+                'CORE_ASPECT_RATIO=8',
+                "RTLMP_FLOW=True"],
+                'place': ['PLACE_DENSITY=0.2000'],
+                'route': ['BLAH=6']
+                }
+        )
+ for exe in execunits]
+
+[build_openroad(
+        name = exe,
+        verilog_files=["rtl/" + exe + ".sv",
+        "rtl/regfile_128x65.sv",
+        "rtl/regfile_128x64.sv"],
+        synth_sources=["constraints.sdc"],
+        stage_args={
+                'floorplan': ['CORE_UTILIZATION=10'],
+                'place': ['PLACE_DENSITY=0.20'],
+                'route': ['BLAH=6']
+                }
+        )
+ for exe in ['RegisterFileSynthesizable_1']]
+
+ #'RegisterFileSynthesizable',
+
+renamefiles = ["rtl/RenameBusyTable.sv",
+        "rtl/RenameBusyTable_1.sv",
+        "rtl/RenameFreeList.sv",
+        "rtl/RenameFreeList_1.sv",
+        "rtl/RenameMapTable.sv",
+        "rtl/RenameMapTable_1.sv"]
+
+
+[build_openroad(
+        name = exe,
+        verilog_files=["rtl/" + exe + ".sv"] + renamefiles,
+        synth_sources=["constraints.sdc"],
+        stage_args={'floorplan':['CORE_UTILIZATION=10'],
+        'place': ['PLACE_DENSITY=0.20']}
+        )
+ for exe in ['RenameStage', 'RenameStage_1']]
+
+fpfiles = ["rtl/FpPipeline.sv",
+        "rtl/Arbiter_16.sv",
+        "rtl/RegisterRead.sv",
+        "rtl/RegisterFileSynthesizable.sv",
+        "rtl/IssueUnitCollapsing.sv",
+        "rtl/FPUExeUnit_1.sv",
+        "rtl/FPUExeUnit.sv",
+        "rtl/BranchKillableQueue_10.sv",
+        "rtl/BranchKillableQueue_11.sv",
+        "rtl/FDivSqrtUnit.sv",
+        "rtl/FPUUnit.sv",
+        "rtl/IssueSlot.sv",
+        "rtl/regfile_128x65.sv",
+        "rtl/RegisterReadDecode_1.sv",
+        "rtl/RegisterReadDecode.sv",
+        "rtl/FPU.sv",
+        "rtl/RecFNToRecFN.sv",
+        "rtl/RecFNToRecFN_1.sv",
+        "rtl/DivSqrtRecF64.sv",
+        "rtl/UOPCodeFDivDecoder.sv",
+        "rtl/ram_fflags_bits_flags_7x5.sv",
+        "rtl/ram_fflags_bits_uop_rob_idx_7x7.sv",
+        "rtl/ram_7x1.sv",
+        "rtl/ram_data_7x65.sv",
+        "rtl/ram_fflags_bits_flags_3x5.sv",
+        "rtl/ram_fflags_bits_uop_rob_idx_3x7.sv",
+        "rtl/ram_3x1.sv",
+        "rtl/ram_data_3x65.sv",
+        "rtl/RoundAnyRawFNToRecFN_5.sv",
+        "rtl/Mul54.sv",
+        "rtl/DivSqrtRecF64_mulAddZ31.sv",
+        "rtl/RoundAnyRawFNToRecFN_4.sv",
+        "rtl/FPToFP.sv",
+        "rtl/FPToInt.sv",
+        "rtl/FMADecoder.sv",
+        "rtl/FPUFMAPipe_1.sv",
+        "rtl/FPUFMAPipe.sv",
+        "rtl/UOPCodeFPUDecoder.sv",
+        "rtl/MulAddRecFNPipe.sv",
+        "rtl/MulAddRecFNPipe_1.sv",
+        "rtl/RecFNToIN_1.sv",
+        "rtl/RecFNToIN.sv",
+        "rtl/CompareRecFN.sv",
+        "rtl/RoundRawFNToRecFN_2.sv",
+        "rtl/DivSqrtRecF64ToRaw_mulAddZ31.sv",
+        "rtl/RoundAnyRawFNToRecFN_7.sv",
+        "rtl/RoundRawFNToRecFN_1.sv",
+        "rtl/MulAddRecFNToRaw_postMul_1.sv",
+        "rtl/MulAddRecFNToRaw_preMul_1.sv",
+        "rtl/RoundRawFNToRecFN.sv",
+        "rtl/MulAddRecFNToRaw_postMul.sv",
+        "rtl/MulAddRecFNToRaw_preMul.sv",
+        "rtl/RoundAnyRawFNToRecFN_2.sv",
+        "rtl/RoundAnyRawFNToRecFN_3.sv"]
+
+build_openroad(
+        name = "FpPipeline",
+        verilog_files=fpfiles,
+        synth_sources=["constraints.sdc"],
+        stage_args={'floorplan':['CORE_UTILIZATION=20'],
+        'place': ['PLACE_DENSITY=0.40']}
+        )
+
+registerreadsrc = ["rtl/RegisterRead_1.sv",
+        "rtl/RegisterReadDecode_6.sv",
+        "rtl/RegisterReadDecode_5.sv",
+        "rtl/RegisterReadDecode_2.sv",
+        "rtl/RegisterReadDecode_4.sv"
+        ]
+
+build_openroad(
+        name = "RegisterRead_1",
+        verilog_files=registerreadsrc,
+        synth_sources=["constraints.sdc"],
+        stage_args={'floorplan':['CORE_UTILIZATION=5',
+        'CORE_ASPECT_RATIO=4'],
+        'place': ['PLACE_DENSITY=0.20']}
+        )
+
+issueslotfiles = ["rtl/IssueUnitCollapsing_1.sv", "rtl/IssueUnitCollapsing_2.sv",
+        "rtl/IssueSlot_32.sv"]
+
+[build_openroad(
+        name = exe,
+        verilog_files=issueslotfiles,
+        synth_sources=["constraints.sdc"],
+        stage_args={'floorplan':['CORE_UTILIZATION=10'],
+        'place': ['PLACE_DENSITY=0.20']}
+        )
+ for exe in ['IssueUnitCollapsing_1', 'IssueUnitCollapsing_2']]
+
+
+build_openroad(
+        name = "Rob",
+        verilog_files=["rtl/Rob.sv"],
+        synth_sources=["constraints.sdc"],
+        stage_args={'floorplan':['CORE_UTILIZATION=3'],
+        'place': ['PLACE_DENSITY=0.05']}
+        )
+
+build_openroad(
+        name = "DecodeUnit",
+        verilog_files=["rtl/DecodeUnit.sv"],
+        synth_sources=["constraints.sdc"],
+        stage_args={'floorplan':['CORE_UTILIZATION=20',
+        'CORE_ASPECT_RATIO=4'],
+        'place': ['PLACE_DENSITY=0.40']}
+        )
+
+build_openroad(
+        name = "BoomCore",
+        verilog_files=["rtl/BoomCore.sv",
+        "rtl/Arbiter_18.sv",
+        "rtl/CSRFile.sv",
+        "rtl/Arbiter_19.sv",
+        "rtl/BasicDispatcher.sv",
+        "rtl/BranchMaskGenerationLogic.sv",
+        "rtl/DecodeUnit.sv",
+        "rtl/ALUExeUnit.sv",
+        "rtl/ALUExeUnit_2.sv",
+        "rtl/ALUExeUnit_3.sv",
+        "rtl/ALUExeUnit_4.sv",
+        "rtl/ALUExeUnit_5.sv"
+        ] + exeunitsrc + registerreadsrc,
+        macros=["FpPipeline",
+        "IssueUnitCollapsing_1",
+        "IssueUnitCollapsing_2",
+        "Rob",
+        "RenameStage",
+        "RenameStage_1",
+        "RegisterRead_1",
+        "RegisterFileSynthesizable_1"] +
+        execunits,
+        synth_sources=["constraints-top.sdc"],
+        stage_args={
+                'synth': ['SDC_FILE=constraints-top.sdc'],
+                'floorplan': ['CORE_UTILIZATION=10','MACRO_PLACE_HALO="50 50"'],
+                'place': ['PLACE_DENSITY=0.20']},
+        io_constraints=None
+        )
+
+boom_tile_rams = ["table_256x12",
+        "table_128x13",
+        "table_128x11",
+        "ebtb_128x40",
+        "btb_128x14",
+        "data_2048x2",
+        "array_256x64",
+        "tag_array_64x22",
+        "meta_128x30",
+        "dataArrayB_256x64",
+        "tag_array_64x20",
+        "l2_tlb_ram_0_512x45"]
+
+[build_openroad(
+        name = ram,
+        verilog_files=["rtl/" + ram + ".sv"],
+        synth_sources=["constraints-sram.sdc"],
+        synth_args=['SDC_FILE=constraints-sram.sdc'],
+        io_constraints=None,
+        stage_args={'floorplan': ['BLAH=1'],
+        'place': ['PLACE_DENSITY=0.65']}
+        )
+ for ram in boom_tile_rams]
+
+
+boom_regfile_rams = [
+        "regfile_128x64",
+        "regfile_128x65"]
+
+[build_openroad(
+        name = ram,
+        verilog_files=["rtl/" + ram + ".sv"],
+        synth_sources=["constraints-sram.sdc"],
+        synth_args=['SDC_FILE=constraints-sram.sdc'],
+        io_constraints=None,
+        stage_args={'floorplan': ['CORE_UTILIZATION=7'],
+        'place': ['PLACE_DENSITY=0.10'],
+        },
+        mock_abstract=True,
+        mock_stage=2
+        )
+ for ram in boom_regfile_rams]
+
+
+boomtilefiles = ["rtl/" + f + ".sv" for f in ['TLXbar_8',
+        'IntXbar_1',
+        'IntXbar',
+        'TLWidthWidget_8',
+        'BoomNonBlockingDCache',
+        'BoomFrontend',
+        'TLWidthWidget_9',
+        'TLBuffer_13',
+        'LSU',
+        'PTW',
+        'HellaCacheArbiter',
+        'Arbiter_14',
+        'AMOALU',
+        'BoomWritebackUnit',
+        'BoomProbeUnit',
+        'BoomMSHRFile',
+        'L1MetadataArray',
+        'L1MetadataArray',
+        'Arbiter_9',
+        'Arbiter_10',
+        'BoomDuplicatedDataArray',
+        'Arbiter_11',
+        'Arbiter_12',
+        'MaxPeriodFibonacciLFSR',
+        'Arbiter_13',
+        'Arbiter_14',
+        'ICache',
+        'BranchPredictor',
+        'BoomRAS',
+        'TLB',
+        'Queue_66',
+        'Queue_67',
+        'RVCExpander',
+        'RVCExpander',
+        'BranchDecode',
+        'Queue_68',
+        'Queue_69',
+        'FetchBuffer',
+        'FetchTargetQueue',
+        'Arbiter_15',
+        'TLWidthWidget_9',
+        'TLBuffer_13',
+        'LSU',
+        'PTW',
+        'HellaCacheArbiter',
+        'ForwardingAgeLogic',
+        'NBDTLB',
+        'OptimizationBarrier_93',
+        'OptimizationBarrier_92',
+        'Arbiter_20',
+        'OptimizationBarrier_14',
+        'PMPChecker_1',
+        'ComposedBranchPredictorBank',
+        'OptimizationBarrier',
+        'PMPChecker',
+        'ram_meta_2x120',
+        'ghist_40x5',
+        'ghist_40x1',
+        'ghist_40x64',
+        'meta_40x120',
+        'BoomIOMSHR',
+        'Arbiter_8',
+        'BoomMSHR',
+        'Arbiter_7',
+        'Arbiter_6',
+        'Arbiter_5',
+        'Arbiter_4',
+        'Arbiter_3',
+        'Arbiter_2',
+        'Arbiter_1',
+        'Arbiter',
+        'lb_32x128',
+        'sdq_17x64',
+        'NLPrefetcher',
+        'FAMicroBTBBranchPredictorBank',
+        'BIMBranchPredictorBank',
+        'BTBBranchPredictorBank',
+        'TageBranchPredictorBank',
+        'LoopBranchPredictorBank',
+        'LoopBranchPredictorColumn',
+        'MaxPeriodFibonacciLFSR_3',
+        'TageTable_5',
+        'TageTable_4',
+        'TageTable_3',
+        'TageTable_2',
+        'TageTable_1',
+        'TageTable',
+        'mem_128x1',
+        'table_128x11',
+        'mem_256x1',
+        'table_256x12'
+        ] + rams + nonrams]
+
+build_openroad(
+        name = "BoomTile",
+        verilog_files=["rtl/BoomTile.sv",
+        "rtl/Rob.sv",
+        "rtl/DecodeUnit.sv",
+        "rtl/BoomCore.sv",
+        "rtl/Arbiter_18.sv",
+        "rtl/CSRFile.sv",
+        "rtl/Arbiter_19.sv",
+        "rtl/BasicDispatcher.sv",
+        "rtl/BranchMaskGenerationLogic.sv",
+        "rtl/ALUExeUnit.sv",
+        "rtl/ALUExeUnit_2.sv",
+        "rtl/ALUExeUnit_3.sv",
+        "rtl/ALUExeUnit_4.sv",
+        "rtl/ALUExeUnit_5.sv",
+        "rtl/RegisterFileSynthesizable_1.sv",
+        "rtl/RenameStage_1.sv",
+        "rtl/RenameStage.sv",
+        "rtl/RegisterFileSynthesizable.sv"
+        ] + exeunitsrc + registerreadsrc + renamefiles + fpfiles +issueslotfiles +
+        boomtilefiles,
+        macros=boom_tile_rams + boom_regfile_rams,
+        synth_sources=["constraints-top.sdc"],
+        stage_args={
+                'synth': ['SDC_FILE=constraints-top.sdc'],
+                'floorplan': [
+                        'CORE_UTILIZATION=10',
+                        'MACRO_PLACE_HALO="50 50"',
+                        'SYNTH_HIERARCHICAL=1',
+                        'RTLMP_FLOW=True'
+                        ],
+                'place': ['PLACE_DENSITY=0.20', 'PLACE_PINS_ARGS=-annealing'],
+                },
+        io_constraints=None
+        )

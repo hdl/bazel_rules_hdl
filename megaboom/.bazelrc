@@ -1,0 +1,1 @@
+build --remote_cache=https://storage.googleapis.com/orfs-megaboom --google_default_credentials --experimental_remote_cache_compression=true

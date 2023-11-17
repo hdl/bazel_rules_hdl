@@ -1,0 +1,13 @@
+aes
+bazel-*
+build/
+vars-*
+run-*
+*.tar.gz
+versions.txt
+output_files/
+qdb/
+megaboom.qpf
+megaboom.qsf
+megaboom.qws
+tmp-clearbox/
