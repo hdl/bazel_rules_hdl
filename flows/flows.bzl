@@ -213,6 +213,7 @@ def _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict):
         mnemonic = step[FlowStepInfo].executable_type,
         env = dicts.add(constants_env, inputs_env, outputs_env),
         input_manifests = input_manifests,
+        toolchain = None,
     )
 
     return dicts.add(inputs_dict, outputs_dict)
