@@ -816,7 +816,7 @@ def generate_encrypt_tcl(ctx, all_files, keyfile_path, ip_dir_src):
       ip_dir_src: The location of ip source directory.
 
     Returns:
-      encrypt_content: A string to encypt all sources.
+      encrypt_content: A string to encrypt all sources.
       encrypted_files: The output files to be encrypted.
       post_processing_command: A command to fix up the ip sources.
     """
