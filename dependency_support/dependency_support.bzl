@@ -62,6 +62,7 @@ load("@rules_hdl//dependency_support/org_theopenroadproject_asap7sc6t_26:org_the
 load("@rules_hdl//dependency_support/org_theopenroadproject_asap7sc7p5t_27:org_theopenroadproject_asap7sc7p5t_27.bzl", "org_theopenroadproject_asap7sc7p5t_27")
 load("@rules_hdl//dependency_support/org_theopenroadproject_asap7sc7p5t_28:org_theopenroadproject_asap7sc7p5t_28.bzl", "org_theopenroadproject_asap7sc7p5t_28")
 load("@rules_hdl//dependency_support/pybind11:pybind11.bzl", "pybind11")
+load("@rules_hdl//dependency_support/rules_license:rules_license.bzl", "rules_license")
 load("@rules_hdl//dependency_support/tk_tcl:tk_tcl.bzl", "tk_tcl")
 load("@rules_hdl//dependency_support/verilator:verilator.bzl", "verilator")
 
@@ -111,5 +112,6 @@ def dependency_support():
     org_theopenroadproject_asap7sc7p5t_27()
     org_theopenroadproject_asap7sc7p5t_28()
     pybind11()
+    rules_license()
     tk_tcl()
     verilator()

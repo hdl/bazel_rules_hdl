@@ -16,6 +16,11 @@ load("@rules_hdl_pip_deps//:requirements.bzl", "requirement")
 load("//cocotb:cocotb.bzl", "cocotb_test")
 load("//verilog:providers.bzl", "verilog_library")
 
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
+
 verilog_library(
     name = "counter",
     srcs = ["counter.v"],

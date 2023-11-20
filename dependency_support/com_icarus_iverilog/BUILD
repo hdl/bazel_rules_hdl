@@ -12,7 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-licenses(["restricted"])  # GPLv2
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
+
+licenses(["restricted"])
 
 exports_files([
     "hello.v",

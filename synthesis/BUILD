@@ -16,6 +16,11 @@
 
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
+
 exports_files(["synth.tcl"])
 
 pkg_tar(

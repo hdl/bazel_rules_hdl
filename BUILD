@@ -12,4 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Empty BUILD file, just to make this directory a Bazel package.
+load("@rules_license//rules:license.bzl", "license")
+
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
+
+license(
+  name = "package_license",
+  package_name = "bazel_rules_hdl",
+)
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])

@@ -15,6 +15,11 @@
 load("@bazel_tools//tools/python:toolchain.bzl", "py_runtime_pair")
 load("@rules_python//python:defs.bzl", "py_runtime")
 
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
+
 py_runtime(
     name = "cpython_runtime",
     files = ["@rules_hdl_cpython//:all"],

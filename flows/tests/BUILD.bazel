@@ -19,6 +19,11 @@ load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//flows:flows.bzl", "flow_binary", "run_flow")
 load("//flows/openroad:build_defs.bzl", "openroad_step")
 
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
+
 openroad_step(
     name = "hello_openroad",
     constants = ["name"],

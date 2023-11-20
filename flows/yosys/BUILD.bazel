@@ -18,7 +18,10 @@ load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("//flows:flows.bzl", "flow_binary")
 load("//flows/yosys:build_defs.bzl", "yosys_synth_file_step")
 
-package(default_visibility = ["//flows:__subpackages__"])
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//flows:__subpackages__"],
+)
 
 exports_files(["synth.tcl"])
 

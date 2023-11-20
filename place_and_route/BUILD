@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Place and Route tool package.
-
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
+
+# Place and Route tool package.
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
 
 pkg_tar(
     name = "openroad",
