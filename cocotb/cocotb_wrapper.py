@@ -66,7 +66,7 @@ def cocotb_argument_parser():
 
     parser = argparse.ArgumentParser(description="Runs the Cocotb framework from Bazel")
 
-    parser.add_argument("--sim", default="icarus", help="Dafault simulator")
+    parser.add_argument("--sim", default="icarus", help="Default simulator")
     parser.add_argument(
         "--hdl_library", default="top", help="The library name to compile into"
     )
