@@ -33,7 +33,7 @@ CornerInfo = provider(
     fields = {
         "liberty": "A file that points to the liberty file for this corner",
         "with_ccsnoise": "boolean Indicates that this is a ccsnoise model.",
-        "with_leakage": "boolean Indicates wheter leakage is included in model",
+        "with_leakage": "boolean Indicates whether leakage is included in model",
         "corner_name": "Name of the process corner",
     },
 )
