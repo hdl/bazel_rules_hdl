@@ -1,21 +1,21 @@
 """Describe Vivado providers."""
 
 VivadoSynthCheckpointInfo = provider(
-    doc = "Contains infomation at output of synthesis.",
+    doc = "Contains information at output of synthesis.",
     fields = {
         "checkpoint": "A vivado checkpoint.",
     },
 )
 
 VivadoPlacementCheckpointInfo = provider(
-    doc = "Contains infomation at output of placement.",
+    doc = "Contains information at output of placement.",
     fields = {
         "checkpoint": "A vivado checkpoint.",
     },
 )
 
 VivadoRoutingCheckpointInfo = provider(
-    doc = "Contains infomation at output of routing.",
+    doc = "Contains information at output of routing.",
     fields = {
         "checkpoint": "A vivado checkpoint.",
     },

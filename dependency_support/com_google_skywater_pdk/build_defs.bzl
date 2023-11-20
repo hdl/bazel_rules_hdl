@@ -131,7 +131,7 @@ skywater_corner = rule(
         ),
         "with_ccsnoise": attr.bool(
             default = False,
-            doc = "Wheter to generate ccsnoise.",
+            doc = "Whether to generate ccsnoise.",
         ),
         "standard_cell_name": attr.string(
             mandatory = True,
@@ -139,7 +139,7 @@ skywater_corner = rule(
         ),
         "with_leakage": attr.bool(
             default = False,
-            doc = "Wheter to generate leakage",
+            doc = "Whether to generate leakage",
         ),
         "_liberty_tool": attr.label(
             default = Label("@com_google_skywater_pdk//:liberty"),
