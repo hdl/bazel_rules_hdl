@@ -1,5 +1,10 @@
 load("//pdk:open_road_configuration.bzl", "open_road_pdk_configuration")
 
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
+
 exports_files([
     "pdk.patch",
     "fill.json",  # Imported from OpenROAD-flow-scripts on 24.07.2023 at 6ec980e1d49a1a8dcdd1e25ed81255b4bb8285c8 from: https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/blob/6ec980e1d49a1a8dcdd1e25ed81255b4bb8285c8/flow/platforms/sky130hd/fill.json

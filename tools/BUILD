@@ -15,6 +15,11 @@
 load("@rules_hdl_pip_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
 
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
+
 py_binary(
     name = "report_status_to_github",
     srcs = ["report_status_to_github.py"],

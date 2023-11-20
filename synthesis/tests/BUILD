@@ -20,6 +20,11 @@ load("//static_timing:build_defs.bzl", "run_opensta")
 load("//synthesis:build_defs.bzl", "synthesize_rtl")
 load("//verilog:providers.bzl", "verilog_library")
 
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
+
 synthesize_rtl(
     name = "verilog_adder_synthesized",
     top_module = "adder",

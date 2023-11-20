@@ -12,4 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Empty BUILD file, just to make this directory a Bazel package.
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)

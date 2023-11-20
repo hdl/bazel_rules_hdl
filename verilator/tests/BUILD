@@ -15,6 +15,11 @@
 load("//verilator:defs.bzl", "verilator_cc_library")
 load("//verilog:providers.bzl", "verilog_library")
 
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
+
 verilog_library(
     name = "adder",
     srcs = [

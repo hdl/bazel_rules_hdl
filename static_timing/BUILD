@@ -13,5 +13,9 @@
 # limitations under the License.
 
 # Static timing tool package.
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
 
 exports_files(["sta.tcl"])

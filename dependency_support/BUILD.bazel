@@ -16,6 +16,11 @@ load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
+
 compile_pip_requirements(name = "pip_requirements")
 
 genrule(

@@ -23,6 +23,11 @@ load(
     "xsim_test",
 )
 
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
+
 verilog_library(
     name = "johnson_counter",
     srcs = [

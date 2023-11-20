@@ -14,6 +14,11 @@
 
 load("//flows/analysis:build_defs.bzl", "analyze_rtl_binary")
 
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
+
 analyze_rtl_binary(
     name = "critical_path_sky130",
     analysis_script = "critical_path.tcl",
