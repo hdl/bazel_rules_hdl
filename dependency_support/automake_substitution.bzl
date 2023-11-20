@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides helper that replaces @VARIABLE_NAME@ occurences with values, as
+"""Provides helper that replaces @VARIABLE_NAME@ occurrences with values, as
 specified by a provided map."""
 
 def automake_substitution(name, src, out, substitutions = {}):
-    """Replaces @VARIABLE_NAME@ occurences with values.
+    """Replaces @VARIABLE_NAME@ occurrences with values.
 
     Note: The current implementation does not allow slashes in variable
     values."""
