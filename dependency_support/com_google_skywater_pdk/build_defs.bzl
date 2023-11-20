@@ -86,7 +86,10 @@ def _skywater_cell_library_impl(ctx):
         default_lib_depset = [default_corner.liberty]
 
     return [
-        DefaultInfo(files = depset(default_lib_depset)),
+        DefaultInfo(
+            files = depset(default_lib_depset),
+            runfiles = ctx.runfiles(default_lib_depset),
+        ),
         StandardCellInfo(
             corners = corners,
             default_corner = default_corner,
