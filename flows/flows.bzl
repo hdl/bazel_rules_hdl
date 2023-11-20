@@ -204,10 +204,10 @@ def _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict):
             fail("Required constant", c, "not found in constants dictionary", ctx.attr.constants)
         constants_env["CONSTANT_" + c.upper()] = s
 
-    ctx.actions.run(
+    ctx.actions.run_shell(
         outputs = outputs,
         inputs = inputs,
-        executable = step[DefaultInfo].files_to_run.executable,
+        command = step[DefaultInfo].files_to_run.executable.path,
         tools = tool_inputs,
         arguments = step[FlowStepInfo].arguments,
         mnemonic = step[FlowStepInfo].executable_type,
