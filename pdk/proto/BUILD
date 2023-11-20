@@ -12,12 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_python//python:proto.bzl", "py_proto_library")
+
 package(
     default_applicable_licenses = ["//:package_license"],
-    default_visibility = ["//visibility:private"],
+    default_visibility = ["//visibility:public"],
 )
 
 exports_files([
     "build_defs.bzl",
     "pdk_info.proto",
 ])
+
+proto_library(
+    name = "pdk_info_proto",
+    srcs = ["pdk_info.proto"],
+)
+
+cc_proto_library(
+    name = "pdk_info_cc_proto",
+    deps = [":pdk_info_proto"],
+)
+
+py_proto_library(
+    name = "pdk_info_py_proto",
+    deps = [":pdk_info_proto"],
+)
