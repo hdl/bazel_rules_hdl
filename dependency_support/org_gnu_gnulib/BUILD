@@ -6,4 +6,4 @@ package(
     default_visibility = ["//visibility:private"],
 )
 
-licenses(["restricted"])  # GPL-2.0-or-later
+licenses(["restricted"])

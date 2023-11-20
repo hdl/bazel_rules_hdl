@@ -17,7 +17,7 @@ package(
     default_visibility = ["//visibility:private"],
 )
 
-licenses(["restricted"])  # GPLv2
+licenses(["restricted"])
 
 exports_files([
     "hello.v",

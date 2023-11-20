@@ -17,7 +17,7 @@ package(
     default_visibility = ["//visibility:private"],
 )
 
-licenses(["notice"])  # BSD
+licenses(["notice"])
 
 exports_files([
     "wc_test.sh",

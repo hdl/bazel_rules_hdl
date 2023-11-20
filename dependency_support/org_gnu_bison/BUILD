@@ -17,7 +17,7 @@ package(
     default_visibility = ["//visibility:private"],
 )
 
-licenses(["restricted"])  # GPLv3
+licenses(["restricted"])
 
 exports_files([
     "calc_test.sh",
