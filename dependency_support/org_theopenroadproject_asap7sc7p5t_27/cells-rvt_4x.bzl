@@ -117,13 +117,13 @@ open_road_pdk_configuration(
     pdn_config = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:pdn_config_4x.pdn",
     pin_horizontal_metal_layer = "M4",
     pin_vertical_metal_layer = "M5",
-    rc_script_configuration = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:rc_script.tcl",
+    rc_script_configuration = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:rc_script_4x.tcl",
     tap_cell = "TAPCELL_ASAP7_75t_R",
     tapcell_distance = 25 * 4,  # We are using the by 4 variants of these cells.
     tie_high_port = "TIEHIx1_ASAP7_75t_R/H",
     tie_low_port = "TIELOx1_ASAP7_75t_R/L",
     tie_separation = 0,
-    tracks_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:tracks.tcl",
+    tracks_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:tracks_4x.tcl",
     wire_rc_clock_metal_layer = "M5",
     wire_rc_signal_metal_layer = "M2",
 )

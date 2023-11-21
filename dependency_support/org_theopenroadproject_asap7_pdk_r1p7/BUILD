@@ -18,8 +18,10 @@ package(
 )
 
 exports_files([
-    "tracks.tcl",
-    "rc_script.tcl",
+    "tracks_1x.tcl",
+    "tracks_4x.tcl",
+    "rc_script_1x.tcl",
+    "rc_script_4x.tcl",
     "pdn_config_1x.pdn",  # FIXME: Where did this come from?
     "pdn_config_4x.pdn",  # FIXME: Where did this come from?
     "asap7.lyt",  # Imported from OpenROAD-flow-scripts on 24.07.2023 at 6ec980e1d49a1a8dcdd1e25ed81255b4bb8285c8 from: https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/blob/6ec980e1d49a1a8dcdd1e25ed81255b4bb8285c8/flow/platforms/asap7/KLayout/asap7.lyt
