@@ -54,25 +54,6 @@ def build_openroad(
     base_args = ["DESIGN_NAME=" + name,
     "WORK_HOME=$(RULEDIR)/build", "PRIVATE_DIR=."]
 
-    run_binary(
-        name = "%s_synth" %(name),
-        tool = ":orfs",
-        srcs = macro_targets + synth_sources + all_sources + set(verilog_files),
-        args = ["make"] + base_args + [
-            "SDC_FILE=" + list(filter(synth_sources, lambda s: s.endswith(".sdc")))[0],
-            "'VERILOG_FILES=" + ' '.join(set(verilog_files)) + "'"] + stage_args.get('synth', []) +
-            ["bazel-synth"] + macro_config,
-        outs = [
-            "build/results/asap7/%s/base/1_synth.v" %(output_folder_name),
-            "build/results/asap7/%s/base/1_synth.sdc" %(output_folder_name)
-        ]
-    )
-
-    all_stages = ([(1, 'synth'), (2, 'floorplan'), (3, 'place'),
-    (4, 'cts'), (5, 'route'), (6, 'final'), (7, 'generate_abstract')])
-    stages = [stage for stage in all_stages if not mock_abstract or (stage[0] <= mock_stage or stage[0] >= 7)]
-    abstract_source = str(mock_stage) + "_" + all_stages[mock_stage - 1][1]
-
     reports ={'synth': ['1_1_yosys'],
     'floorplan': ['2_1_floorplan',
         '2_2_floorplan_io',
@@ -93,6 +74,25 @@ def build_openroad(
      '6_report'],
     'generate_abstract': ['generate_abstract']
     }
+
+    run_binary(
+        name = "%s_synth" %(name),
+        tool = ":orfs",
+        srcs = macro_targets + synth_sources + all_sources + set(verilog_files),
+        args = ["make"] + base_args + [
+            "SDC_FILE=" + list(filter(synth_sources, lambda s: s.endswith(".sdc")))[0],
+            "'VERILOG_FILES=" + ' '.join(set(verilog_files)) + "'"] + stage_args.get('synth', []) +
+            ["bazel-synth", "elapsed"] + macro_config,
+        outs = [
+            "build/results/asap7/%s/base/1_synth.v" %(output_folder_name),
+            "build/results/asap7/%s/base/1_synth.sdc" %(output_folder_name)
+        ] + list(map(lambda log: "build/logs/asap7/%s/base/%s.log" %(output_folder_name, log), reports['synth']))
+    )
+
+    all_stages = ([(1, 'synth'), (2, 'floorplan'), (3, 'place'),
+    (4, 'cts'), (5, 'route'), (6, 'final'), (7, 'generate_abstract')])
+    stages = [stage for stage in all_stages if not mock_abstract or (stage[0] <= mock_stage or stage[0] >= 7)]
+    abstract_source = str(mock_stage) + "_" + all_stages[mock_stage - 1][1]
 
     [run_binary(
         name = name + "_" + stage,
