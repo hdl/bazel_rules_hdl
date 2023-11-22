@@ -12,7 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_hdl//pdk/proto:build_defs.bzl", "extract_lef_and_liberty")
+
 package(
     default_applicable_licenses = ["//:package_license"],
     default_visibility = ["//visibility:private"],
+)
+
+extract_lef_and_liberty(
+    name = "asap7-sc7p5t_rev28_lvt_data",
+    standard_cell = "@org_theopenroadproject_asap7sc6t_26//:asap7-sc7p5t_rev28_lvt",
+)
+
+extract_lef_and_liberty(
+    name = "asap7-sc7p5t_rev28_rvt_data",
+    standard_cell = "@org_theopenroadproject_asap7sc6t_26//:asap7-sc7p5t_rev28_rvt",
+)
+
+extract_lef_and_liberty(
+    name = "asap7-sc7p5t_rev28_slvt_data",
+    standard_cell = "@org_theopenroadproject_asap7sc6t_26//:asap7-sc7p5t_rev28_slvt",
 )
