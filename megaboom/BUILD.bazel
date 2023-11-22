@@ -348,7 +348,7 @@ boom_tile_rams = ["table_256x12",
                 'floorplan': ['BLAH=1'],
         'place': ['PLACE_DENSITY=0.65']},
         mock_abstract=True,
-        mock_stage=2
+        mock_stage=3
         )
  for ram in boom_tile_rams]
 
@@ -368,7 +368,7 @@ boom_regfile_rams = [
         'place': ['PLACE_DENSITY=0.10'],
         },
         mock_abstract=True,
-        mock_stage=2
+        mock_stage=3
         )
  for ram in boom_regfile_rams]
 
