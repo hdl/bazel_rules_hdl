@@ -141,7 +141,7 @@ exeunitsrc =  [ "rtl/ALU.sv",
 [build_openroad(
         name = exe,
         verilog_files=["rtl/" + exe + ".sv"] + exeunitsrc,
-        synth_sources=["constraints.sdc"],
+        stage_sources={'synth': ["constraints.sdc"]},
         stage_args={
                 'floorplan': ['CORE_UTILIZATION=5',
                 'CORE_ASPECT_RATIO=8',
@@ -157,7 +157,7 @@ exeunitsrc =  [ "rtl/ALU.sv",
         verilog_files=["rtl/" + exe + ".sv",
         "rtl/regfile_128x65.sv",
         "rtl/regfile_128x64.sv"],
-        synth_sources=["constraints.sdc"],
+        stage_sources={'synth': ["constraints.sdc"]},
         stage_args={
                 'floorplan': ['CORE_UTILIZATION=10'],
                 'place': ['PLACE_DENSITY=0.20'],
@@ -179,7 +179,7 @@ renamefiles = ["rtl/RenameBusyTable.sv",
 [build_openroad(
         name = exe,
         verilog_files=["rtl/" + exe + ".sv"] + renamefiles,
-        synth_sources=["constraints.sdc"],
+        stage_sources={'synth': ["constraints.sdc"]},
         stage_args={'floorplan':['CORE_UTILIZATION=10'],
         'place': ['PLACE_DENSITY=0.20']}
         )
@@ -243,7 +243,7 @@ fpfiles = ["rtl/FpPipeline.sv",
 build_openroad(
         name = "FpPipeline",
         verilog_files=fpfiles,
-        synth_sources=["constraints.sdc"],
+        stage_sources={'synth': ["constraints.sdc"]},
         stage_args={'floorplan':['CORE_UTILIZATION=20'],
         'place': ['PLACE_DENSITY=0.40']}
         )
@@ -258,7 +258,7 @@ registerreadsrc = ["rtl/RegisterRead_1.sv",
 build_openroad(
         name = "RegisterRead_1",
         verilog_files=registerreadsrc,
-        synth_sources=["constraints.sdc"],
+        stage_sources={'synth': ["constraints.sdc"]},
         stage_args={'floorplan':['CORE_UTILIZATION=5',
         'CORE_ASPECT_RATIO=4'],
         'place': ['PLACE_DENSITY=0.20']}
@@ -270,7 +270,7 @@ issueslotfiles = ["rtl/IssueUnitCollapsing_1.sv", "rtl/IssueUnitCollapsing_2.sv"
 [build_openroad(
         name = exe,
         verilog_files=issueslotfiles,
-        synth_sources=["constraints.sdc"],
+        stage_sources={'synth': ["constraints.sdc"]},
         stage_args={'floorplan':['CORE_UTILIZATION=10'],
         'place': ['PLACE_DENSITY=0.20']}
         )
@@ -280,7 +280,7 @@ issueslotfiles = ["rtl/IssueUnitCollapsing_1.sv", "rtl/IssueUnitCollapsing_2.sv"
 build_openroad(
         name = "Rob",
         verilog_files=["rtl/Rob.sv"],
-        synth_sources=["constraints.sdc"],
+        stage_sources={'synth': ["constraints.sdc"]},
         stage_args={'floorplan':['CORE_UTILIZATION=3'],
         'place': ['PLACE_DENSITY=0.05']}
         )
@@ -288,7 +288,7 @@ build_openroad(
 build_openroad(
         name = "DecodeUnit",
         verilog_files=["rtl/DecodeUnit.sv"],
-        synth_sources=["constraints.sdc"],
+        stage_sources={'synth': ["constraints.sdc"]},
         stage_args={'floorplan':['CORE_UTILIZATION=20',
         'CORE_ASPECT_RATIO=4'],
         'place': ['PLACE_DENSITY=0.40']}
@@ -318,7 +318,7 @@ build_openroad(
         "RegisterRead_1",
         "RegisterFileSynthesizable_1"] +
         execunits,
-        synth_sources=["constraints-top.sdc"],
+        stage_sources={'synth': ["constraints-top.sdc"]},
         stage_args={
                 'floorplan': ['CORE_UTILIZATION=10','MACRO_PLACE_HALO="50 50"'],
                 'place': ['PLACE_DENSITY=0.20']},
@@ -336,12 +336,14 @@ boom_tile_rams = ["table_256x12",
         "meta_128x30",
         "dataArrayB_256x64",
         "tag_array_64x20",
-        "l2_tlb_ram_0_512x45"]
+        "l2_tlb_ram_0_512x45",
+        "tail_2x3"]
 
 [build_openroad(
         name = ram,
         verilog_files=["rtl/" + ram + ".sv"],
-        synth_sources=["constraints-sram.sdc"],
+        stage_sources={'synth': ["constraints-sram.sdc"],
+        'floorplan': ['util.tcl']},
         io_constraints=None,
         stage_args={
                 'synth': ['SDC_FILE=constraints-sram.sdc'],
@@ -360,7 +362,8 @@ boom_regfile_rams = [
 [build_openroad(
         name = ram,
         verilog_files=["rtl/" + ram + ".sv"],
-        synth_sources=["constraints-sram.sdc"],
+        stage_sources={'synth': ["constraints-sram.sdc", "util.tcl"],
+        'floorplan': ['util.tcl']},
         io_constraints=None,
         stage_args={
                 'synth': ['SDC_FILE=constraints-sram.sdc'],
@@ -489,7 +492,7 @@ build_openroad(
         ] + exeunitsrc + registerreadsrc + renamefiles + fpfiles +issueslotfiles +
         boomtilefiles,
         macros=boom_tile_rams + boom_regfile_rams,
-        synth_sources=["constraints-top.sdc"],
+        stage_sources={'synth': ["constraints-top.sdc"]},
         stage_args={
                 'synth': ['SYNTH_HIERARCHICAL=1'],
                 'floorplan': [

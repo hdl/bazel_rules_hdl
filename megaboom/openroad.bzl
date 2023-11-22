@@ -23,7 +23,7 @@ def filter(iterable, func):
 def build_openroad(
     name,
     verilog_files = [],
-    synth_sources = [],
+    stage_sources = {},
     macros = [],
     io_constraints = "io.tcl",
     stage_args={},
@@ -78,9 +78,9 @@ def build_openroad(
     run_binary(
         name = "%s_synth" %(name),
         tool = ":orfs",
-        srcs = macro_targets + synth_sources + all_sources + set(verilog_files),
+        srcs = macro_targets + stage_sources.get('synth', []) + all_sources + set(verilog_files),
         args = ["make"] + base_args + [
-            "SDC_FILE=" + list(filter(synth_sources, lambda s: s.endswith(".sdc")))[0],
+            "SDC_FILE=" + list(filter(stage_sources.get('synth', []), lambda s: s.endswith(".sdc")))[0],
             "'VERILOG_FILES=" + ' '.join(set(verilog_files)) + "'"] + stage_args.get('synth', []) +
             ["bazel-synth", "elapsed"] + macro_config,
         outs = [
@@ -98,7 +98,8 @@ def build_openroad(
         name = name + "_" + stage,
         tool = ":orfs",
         srcs = macro_targets + all_sources + [name + "_" + previous] +
-        (['util.tcl', io_constraints] if io_constraints != None else []),
+        (['util.tcl', io_constraints] if io_constraints != None else []) +
+        stage_sources.get(stage, []),
         args = ["make"] +
         base_args +
              ["bazel-" + stage, "elapsed"] +
