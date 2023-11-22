@@ -336,8 +336,7 @@ boom_tile_rams = ["table_256x12",
         "meta_128x30",
         "dataArrayB_256x64",
         "tag_array_64x20",
-        "l2_tlb_ram_0_512x45",
-        "tail_2x3"]
+        "l2_tlb_ram_0_512x45"]
 
 [build_openroad(
         name = ram,
