@@ -60,7 +60,8 @@ def build_openroad(
 
     stage_args['final'] = stage_args.get('final', []) + ([
         "'ADDITIONAL_GDS_FILES=" + ADDITIONAL_GDS_FILES + "'",
-        "'ADDITIONAL_LEFS=" + ADDITIONAL_LEFS + "'"] if len(macros) > 0 else [])
+        "'ADDITIONAL_LEFS=" + ADDITIONAL_LEFS + "'"] if len(macros) > 0 else []) + (
+        ["GND_NETS_VOLTAGES=\"\"","PWR_NETS_VOLTAGES=\"\""])
 
     base_args = ["DESIGN_NAME=" + name,
     "WORK_HOME=$(RULEDIR)/build", "PRIVATE_DIR=.",
@@ -113,9 +114,6 @@ def build_openroad(
         args = ["make"] +
         base_args +
              ["bazel-" + stage, "elapsed"] +
-         (["GND_NETS_VOLTAGES=\"\"",
-                            "PWR_NETS_VOLTAGES=\"\""] if stage == "generate_abstract"
-                            else []) +
                             (["IO_CONSTRAINTS=" + io_constraints] if io_constraints != None else []) +
         (['ABSTRACT_SOURCE=' + abstract_source] if mock_abstract and i == 7 else []) +
         (['WRITE_ON_FAIL=1'] if stage in ("place", "route") else []) +
