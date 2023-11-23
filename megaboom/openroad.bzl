@@ -41,6 +41,8 @@ def build_openroad(
         "settings.mk"
     ]
 
+    orfs_version = 1
+
     macro_targets = map(lambda m: ":" + m + "_generate_abstract", macros)
 
     ADDITIONAL_LEFS = ' '.join(map(lambda m: '$(RULEDIR)/build/results/asap7/%s/base/%s.lef' % (m, m), macros))
@@ -52,7 +54,8 @@ def build_openroad(
         "'ADDITIONAL_GDS_FILES=" + ADDITIONAL_GDS_FILES + "'"] if len(macros) > 0 else []
 
     base_args = ["DESIGN_NAME=" + name,
-    "WORK_HOME=$(RULEDIR)/build", "PRIVATE_DIR=."]
+    "WORK_HOME=$(RULEDIR)/build", "PRIVATE_DIR=.",
+    "ORFS_VERSION=" + str(orfs_version)]
 
     reports ={'synth': ['1_1_yosys'],
     'floorplan': ['2_1_floorplan',
