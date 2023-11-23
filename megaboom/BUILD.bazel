@@ -503,3 +503,19 @@ build_openroad(
                 },
         io_constraints=None
         )
+
+build_openroad(
+        name = "L1MetadataArray",
+        verilog_files=["rtl/L1MetadataArray.sv"],
+        macros=["tag_array_64x22"],
+        stage_sources={'synth': ["constraints-top.sdc"]},
+        stage_args={
+                'synth': ['SYNTH_HIERARCHICAL=1'],
+                'floorplan': [
+                        'CORE_UTILIZATION=10',
+                        'RTLMP_FLOW=True'
+                        ],
+                'place': ['PLACE_DENSITY=0.20', 'PLACE_PINS_ARGS=-annealing'],
+                },
+        io_constraints=None
+        )

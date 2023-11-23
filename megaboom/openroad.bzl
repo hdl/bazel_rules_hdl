@@ -41,7 +41,7 @@ def build_openroad(
         "settings.mk"
     ]
 
-    orfs_version = 1
+    orfs_version = 2
 
     macro_targets = map(lambda m: ":" + m + "_generate_abstract", macros)
 
@@ -49,14 +49,18 @@ def build_openroad(
     ADDITIONAL_LEFS = ' '.join(map(lambda m: '$(RULEDIR)/build/results/asap7/%s/base/%s.lef' % (m, m), macros))
     ADDITIONAL_LIBS = ' '.join(map(lambda m: '$(RULEDIR)/build/results/asap7/%s/base/%s.lib' % (m, m), macros))
     ADDITIONAL_GDS_FILES = ' '.join(map(lambda m: '$(RULEDIR)/build/results/asap7/%s/base/6_final.gds' % (m), macros))
-    stage_args['synth'] = stage_args.get('synth', []) + [
-        "'ADDITIONAL_LIBS=" + ADDITIONAL_LIBS + "'",
+    stage_args['synth'] = stage_args.get('synth', []) + (
+        ["'ADDITIONAL_LIBS=" + ADDITIONAL_LIBS + "'"] if len(macros) > 0 else []) + [
         "'VERILOG_FILES=" + ' '.join(set(verilog_files)) + "'",
         "SDC_FILE=" + list(filter(stage_sources.get('synth', []), lambda s: s.endswith(".sdc")))[0]
         ]
-    stage_args['final'] = stage_args.get('final', []) + [
+    stage_args['floorplan'] = stage_args.get('floorplan', []) + ([
+        "'ADDITIONAL_LIBS=" + ADDITIONAL_LIBS + "'",
+        "'ADDITIONAL_LEFS=" + ADDITIONAL_LEFS + "'"] if len(macros) > 0 else [])
+
+    stage_args['final'] = stage_args.get('final', []) + ([
         "'ADDITIONAL_GDS_FILES=" + ADDITIONAL_GDS_FILES + "'",
-        "'ADDITIONAL_LEFS=" + ADDITIONAL_LEFS + "'"]
+        "'ADDITIONAL_LEFS=" + ADDITIONAL_LEFS + "'"] if len(macros) > 0 else [])
 
     base_args = ["DESIGN_NAME=" + name,
     "WORK_HOME=$(RULEDIR)/build", "PRIVATE_DIR=.",
