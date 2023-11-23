@@ -1,11 +1,11 @@
 source util.tcl
 
 # Set the clock name and period
-set clk_name  R0_clk
 set clk_period 400 
 
 # Get the list of clock ports
 set clk_ports [match_pins .*_clk]
+set clk_name [lindex $clk_ports 0]
 
 # Create the clock for each clock port
 foreach clk_port_name $clk_ports {

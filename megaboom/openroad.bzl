@@ -45,13 +45,18 @@ def build_openroad(
 
     macro_targets = map(lambda m: ":" + m + "_generate_abstract", macros)
 
+    stage_args = dict(stage_args)
     ADDITIONAL_LEFS = ' '.join(map(lambda m: '$(RULEDIR)/build/results/asap7/%s/base/%s.lef' % (m, m), macros))
     ADDITIONAL_LIBS = ' '.join(map(lambda m: '$(RULEDIR)/build/results/asap7/%s/base/%s.lib' % (m, m), macros))
     ADDITIONAL_GDS_FILES = ' '.join(map(lambda m: '$(RULEDIR)/build/results/asap7/%s/base/6_final.gds' % (m), macros))
-    macro_config = [
-        "'ADDITIONAL_LEFS=" + ADDITIONAL_LEFS + "'",
+    stage_args['synth'] = stage_args.get('synth', []) + [
         "'ADDITIONAL_LIBS=" + ADDITIONAL_LIBS + "'",
-        "'ADDITIONAL_GDS_FILES=" + ADDITIONAL_GDS_FILES + "'"] if len(macros) > 0 else []
+        "'VERILOG_FILES=" + ' '.join(set(verilog_files)) + "'",
+        "SDC_FILE=" + list(filter(stage_sources.get('synth', []), lambda s: s.endswith(".sdc")))[0]
+        ]
+    stage_args['final'] = stage_args.get('final', []) + [
+        "'ADDITIONAL_GDS_FILES=" + ADDITIONAL_GDS_FILES + "'",
+        "'ADDITIONAL_LEFS=" + ADDITIONAL_LEFS + "'"]
 
     base_args = ["DESIGN_NAME=" + name,
     "WORK_HOME=$(RULEDIR)/build", "PRIVATE_DIR=.",
@@ -82,10 +87,8 @@ def build_openroad(
         name = "%s_synth" %(name),
         tool = ":orfs",
         srcs = macro_targets + stage_sources.get('synth', []) + all_sources + set(verilog_files),
-        args = ["make"] + base_args + [
-            "SDC_FILE=" + list(filter(stage_sources.get('synth', []), lambda s: s.endswith(".sdc")))[0],
-            "'VERILOG_FILES=" + ' '.join(set(verilog_files)) + "'"] + stage_args.get('synth', []) +
-            ["bazel-synth", "elapsed"] + macro_config,
+        args = ["make"] + base_args + stage_args.get('synth', []) +
+            ["bazel-synth", "elapsed"],
         outs = [
             "build/results/asap7/%s/base/1_synth.v" %(output_folder_name),
             "build/results/asap7/%s/base/1_synth.sdc" %(output_folder_name)
@@ -106,7 +109,7 @@ def build_openroad(
         args = ["make"] +
         base_args +
              ["bazel-" + stage, "elapsed"] +
-         macro_config + (["GND_NETS_VOLTAGES=\"\"",
+         (["GND_NETS_VOLTAGES=\"\"",
                             "PWR_NETS_VOLTAGES=\"\""] if stage == "generate_abstract"
                             else []) +
                             (["IO_CONSTRAINTS=" + io_constraints] if io_constraints != None else []) +
