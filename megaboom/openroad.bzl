@@ -41,7 +41,7 @@ def build_openroad(
         "settings.mk"
     ]
 
-    orfs_version = 2
+    orfs_version = 3
 
     macro_targets = map(lambda m: ":" + m + "_generate_abstract", macros)
 

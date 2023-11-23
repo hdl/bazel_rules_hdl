@@ -1,12 +1,17 @@
+# Yikes! $(UNSET_AND_MAKE) doesn't work recursively as the variables
+# set on the command line becomes environment variables upon the
+# first invocation.
+
 .PHONY: bazel-synth
 bazel-synth:
 	$(UNSET_AND_MAKE) synth
 
 .PHONY: bazel-floorplan
 bazel-floorplan:
-	mkdir -p $(LOG_DIR)
+	mkdir -p $(LOG_DIR) $(REPORTS_DIR)
 	touch $(LOG_DIR)/2_3_floorplan_tdms.log
-	$(UNSET_AND_MAKE) do-floorplan
+	$(UNSET_VARS); echo hello
+	$(UNSET_AND_MAKE) do-2_1_floorplan do-2_2_floorplan_io do-2_3_floorplan_tdms do-2_4_floorplan_macro do-2_5_floorplan_tapcell do-2_6_floorplan_pdn do-2_floorplan
 
 # This target does not produce a non-zero exit code if detailed or global
 # placement fails. In this case $(RESULTS_DIR)/3_place.odb and $(RESULTS_DIR)/3_place.sdc
@@ -52,13 +57,13 @@ check-place:
 
 .PHONY: bazel-cts
 bazel-cts:
-	$(UNSET_AND_MAKE) check-place do-cts
+	mkdir -p $(LOG_DIR) $(REPORTS_DIR)
+	$(UNSET_AND_MAKE) check-place do-4_1_cts do-4_cts
 
 # Same as do-place, support for build systems that require a non-zero exit code
 # and the same artifacts to be produced every time or no artifacts are published
 .PHONY: bazel-route
 bazel-route:
-	mkdir -p $(RESULTS_DIR) $(LOG_DIR) $(REPORTS_DIR)
 	mkdir -p $(RESULTS_DIR) $(LOG_DIR) $(REPORTS_DIR)
 	echo >$(RESULTS_DIR)/route.ok 0
 	touch $(REPORTS_DIR)/congestion.rpt
@@ -82,9 +87,11 @@ check-route:
 
 .PHONY: bazel-final
 bazel-final:
-	$(UNSET_AND_MAKE) check-route do-final
+	mkdir -p $(RESULTS_DIR) $(LOG_DIR) $(REPORTS_DIR)
+	$(UNSET_AND_MAKE) check-route do-6_1_fill do-6_1_fill.sdc do-6_final.sdc do-6_report do-gds
 
 .PHONY: bazel-generate_abstract
 bazel-generate_abstract:
+	mkdir -p $(RESULTS_DIR) $(LOG_DIR) $(REPORTS_DIR)
 	$(UNSET_AND_MAKE) do-generate_abstract
 
