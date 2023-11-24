@@ -47,6 +47,10 @@ def build_openroad(
 
     macro_targets = map(lambda m: ":" + m + "_generate_abstract", macros)
 
+    stage_sources = dict(stage_sources)
+
+    stage_sources['synth'] = stage_sources.get('synth', []) + set(verilog_files)
+
     stage_args = dict(stage_args)
     ADDITIONAL_LEFS = ' '.join(map(lambda m: '$(RULEDIR)/build/results/asap7/%s/base/%s.lef' % (m, m), macros))
     ADDITIONAL_LIBS = ' '.join(map(lambda m: '$(RULEDIR)/build/results/asap7/%s/base/%s.lib' % (m, m), macros))
@@ -111,7 +115,7 @@ def build_openroad(
     run_binary(
         name = "%s_synth" %(name),
         tool = ":orfs",
-        srcs = macro_targets + stage_sources.get('synth', []) + all_sources + set(verilog_files),
+        srcs = macro_targets + stage_sources.get('synth', []) + all_sources,
         args = ["make"] + base_args + stage_args.get('synth', []) +
             ["bazel-synth", "elapsed"],
         outs = [
