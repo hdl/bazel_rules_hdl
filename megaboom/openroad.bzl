@@ -39,9 +39,8 @@ def build_openroad(
 
     all_sources = [
         "orfs",
-        "private.mk",
-        "config.mk",
-        "settings.mk"
+        "bazel.mk",
+        "config.mk"
     ]
 
     orfs_version = 3
@@ -84,7 +83,8 @@ def build_openroad(
 
 
     base_args = ["DESIGN_NAME=" + name,
-    "WORK_HOME=$(RULEDIR)/build", "PRIVATE_DIR=.",
+    "DESIGN_CONFIG=config.mk",
+    "WORK_HOME=$(RULEDIR)/build",
     "ORFS_VERSION=" + str(orfs_version)]
 
     reports ={'synth': ['1_1_yosys'],
@@ -126,7 +126,6 @@ def build_openroad(
         name = name + "_" + stage,
         tool = ":orfs",
         srcs = macro_targets + all_sources + [name + "_" + previous] +
-        (['util.tcl', io_constraints] if io_constraints != None else []) +
         stage_sources.get(stage, []),
         args = ["make"] +
         base_args +

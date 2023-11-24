@@ -135,12 +135,12 @@ ORFS on the command line.
 
 Search in the output for the line for the floorplan stage:
 
-    ++ make DESIGN_NAME=ALUExeUnit WORK_HOME=bazel-out/k8-fastbuild/bin/build PRIVATE_DIR=. bazel-floorplan elapsed IO_CONSTRAINTS=io.tcl CORE_UTILIZATION=5 CORE_ASPECT_RATIO=6 RTLMP_FLOW=True
+    ++ make DESIGN_NAME=ALUExeUnit WORK_HOME=bazel-out/k8-fastbuild/bin/build bazel-floorplan elapsed IO_CONSTRAINTS=io.tcl CORE_UTILIZATION=5 CORE_ASPECT_RATIO=6 RTLMP_FLOW=True
 
 Here we want to copy the variables passed on the command line to the `./orfs` script,
-but deleted the `WORK_HOME` assignment as we want to artifacts in default build folder (see settings.mk, `export WORK_HOME?=bazel-bin/build`).
+but deleted the `WORK_HOME` assignment as we want to artifacts in default build folder (see config.mk, `export WORK_HOME?=bazel-bin/build`).
 
-    ./orfs make DESIGN_NAME=ALUExeUnit PRIVATE_DIR=. IO_CONSTRAINTS=io.tcl CORE_UTILIZATION=5 CORE_ASPECT_RATIO=6 RTLMP_FLOW=True floorplan_issue
+    ./orfs make DESIGN_NAME=ALUExeUnit IO_CONSTRAINTS=io.tcl CORE_UTILIZATION=5 CORE_ASPECT_RATIO=6 RTLMP_FLOW=True floorplan_issue
 
 Run all synth targets
 ---------------------
