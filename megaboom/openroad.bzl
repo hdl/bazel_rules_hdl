@@ -112,43 +112,38 @@ def build_openroad(
     'generate_abstract': ['generate_abstract']
     }
 
-    run_binary(
-        name = "%s_synth" %(name),
-        tool = ":orfs",
-        srcs = macro_targets + stage_sources.get('synth', []) + all_sources,
-        args = ["make"] + base_args + stage_args.get('synth', []) +
-            ["bazel-synth", "elapsed"],
-        outs = [
+    outs = {
+        'synth':[
             "build/results/asap7/%s/base/1_synth.v" %(output_folder_name),
             "build/results/asap7/%s/base/1_synth.sdc" %(output_folder_name)
-        ] + list(map(lambda log: "build/logs/asap7/%s/base/%s.log" %(output_folder_name, log), reports['synth']))
-    )
+        ],
+        "generate_abstract": [
+            "build/results/asap7/%s/base/%s.lib" %(output_folder_name, name),
+            "build/results/asap7/%s/base/%s.lef" %(output_folder_name, name),
+        ],
+        'final': [
+            "build/results/asap7/%s/base/6_final.spef" %(output_folder_name),
+            "build/results/asap7/%s/base/6_final.gds" %(output_folder_name)
+        ],
+        'route': ["build/reports/asap7/%s/base/congestion.rpt" %(output_folder_name),
+            "build/reports/asap7/%s/base/5_route_drc.rpt" %(output_folder_name)]
+    }
 
     stages = [stage for stage in all_stages if not mock_abstract or (stage[0] <= mock_stage or stage[0] >= 7)]
 
     [run_binary(
         name = name + "_" + stage,
         tool = ":orfs",
-        srcs = macro_targets + all_sources + [name + "_" + previous] +
+        srcs = macro_targets + all_sources + ([name + "_" + previous] if i > 1 else [])+
         stage_sources.get(stage, []),
         args = ["make"] +
         base_args +
              ["bazel-" + stage, "elapsed"] +
         stage_args.get(stage, []),
-        outs = ([
-            "build/results/asap7/%s/base/%s.lib" %(output_folder_name, name),
-            "build/results/asap7/%s/base/%s.lef" %(output_folder_name, name),
-        ] if stage == "generate_abstract" else [
+        outs = outs.get(stage, []) + ([
             "build/results/asap7/%s/base/%s.sdc" %(output_folder_name, str(i) + "_" + stage),
-            "build/results/asap7/%s/base/%s.odb" %(output_folder_name, str(i) + "_" + stage),
-        ]) + ([
-            "build/results/asap7/%s/base/6_final.spef" %(output_folder_name),
-            "build/results/asap7/%s/base/6_final.gds" %(output_folder_name)
-        ] if stage == "final" else []) + (
-            ["build/results/asap7/%s/base/%s.ok" %(output_folder_name, stage)] if stage in ("place", "route") else []) +
-        ([
-            "build/reports/asap7/%s/base/congestion.rpt" %(output_folder_name),
-            "build/reports/asap7/%s/base/5_route_drc.rpt" %(output_folder_name)
-        ] if stage == "route" else []) +
+            "build/results/asap7/%s/base/%s.odb" %(output_folder_name, str(i) + "_" + stage)
+        ] if stage in ["floorplan", "place", "cts", "route"] else []) +
+        (["build/results/asap7/%s/base/%s.ok" %(output_folder_name, stage)] if stage in ["place", "route"] else []) +
         list(map(lambda log: "build/logs/asap7/%s/base/%s.log" %(output_folder_name, log), reports[stage]))
-    ) for ((j, previous), (i, stage)) in zip(stages, stages[1:])]
+    ) for ((j, previous), (i, stage)) in zip([(0, 'n/a')] + stages, stages)]
