@@ -142,7 +142,7 @@ def build_openroad(
         outs = outs.get(stage, []) + ([
             "build/results/asap7/%s/base/%s.sdc" %(output_folder_name, str(i) + "_" + stage),
             "build/results/asap7/%s/base/%s.odb" %(output_folder_name, str(i) + "_" + stage)
-        ] if stage in ["floorplan", "place", "cts", "route"] else []) +
+        ] if stage in ["floorplan", "place", "cts", "route", "final"] else []) +
         (["build/results/asap7/%s/base/%s.ok" %(output_folder_name, stage)] if stage in ["place", "route"] else []) +
         list(map(lambda log: "build/logs/asap7/%s/base/%s.log" %(output_folder_name, log), reports[stage]))
     ) for ((j, previous), (i, stage)) in zip([(0, 'n/a')] + stages, stages)]
