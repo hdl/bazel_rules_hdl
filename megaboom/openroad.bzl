@@ -58,22 +58,21 @@ def build_openroad(
 
     io_constraints_args = ["IO_CONSTRAINTS=" + io_constraints] if io_constraints != None else []
 
-    stage_args['synth'] = stage_args.get('synth', []) + (
-        ["'ADDITIONAL_LIBS=" + ADDITIONAL_LIBS + "'"] if len(macros) > 0 else []) + [
+    lefs_args = (["'ADDITIONAL_LEFS=" + ADDITIONAL_LEFS + "'"] if len(macros) > 0 else [])
+    libs_args = (["'ADDITIONAL_LIBS=" + ADDITIONAL_LIBS + "'"] if len(macros) > 0 else [])
+    gds_args = (["'ADDITIONAL_GDS_FILES=" + ADDITIONAL_GDS_FILES + "'"] if len(macros) > 0 else [])
+
+    stage_args['synth'] = stage_args.get('synth', []) + libs_args + lefs_args + [
         "'VERILOG_FILES=" + ' '.join(set(verilog_files)) + "'",
         "SDC_FILE=" + list(filter(stage_sources.get('synth', []), lambda s: s.endswith(".sdc")))[0]
         ] + io_constraints_args
-    stage_args['floorplan'] = stage_args.get('floorplan', []) + ([
-        "'ADDITIONAL_LIBS=" + ADDITIONAL_LIBS + "'",
-        "'ADDITIONAL_LEFS=" + ADDITIONAL_LEFS + "'"] if len(macros) > 0 else []) + (
+    stage_args['floorplan'] = stage_args.get('floorplan', []) + lefs_args + libs_args + (
             [] if len(macros) == 0 else [
         '"PDN_TCL=\\$$(PLATFORM_DIR)/openRoad/pdn/BLOCKS_grid_strategy.tcl"']
         )
-    stage_args['place'] = stage_args.get('place', []) + io_constraints_args
+    stage_args['place'] = stage_args.get('place', []) + libs_args + io_constraints_args
 
-    stage_args['final'] = stage_args.get('final', []) + ([
-        "'ADDITIONAL_GDS_FILES=" + ADDITIONAL_GDS_FILES + "'",
-        "'ADDITIONAL_LEFS=" + ADDITIONAL_LEFS + "'"] if len(macros) > 0 else []) + (
+    stage_args['final'] = stage_args.get('final', []) + gds_args + lefs_args + (
         ["GND_NETS_VOLTAGES=\"\"","PWR_NETS_VOLTAGES=\"\""])
 
     stage_args['route'] = stage_args.get('route', []) + (
@@ -81,7 +80,7 @@ def build_openroad(
         'MAX_ROUTING_LAYER=M9'])
 
     abstract_source = str(mock_stage) + "_" + all_stages[mock_stage - 1][1]
-    stage_args['generate_abstract'] = stage_args.get('generate_abstract', []) + (
+    stage_args['generate_abstract'] = stage_args.get('generate_abstract', []) + gds_args + lefs_args + (
         ['ABSTRACT_SOURCE=' + abstract_source] if mock_abstract else []) + (
             ['GDS_ALLOW_EMPTY="(' + '|'.join(macros) + ')"'] if len(macros) > 0 else [])
 
