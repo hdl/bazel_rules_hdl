@@ -30,6 +30,9 @@ def build_openroad(
     mock_abstract=False,
     mock_stage=3
 ):
+    all_stages = ([(1, 'synth'), (2, 'floorplan'), (3, 'place'),
+    (4, 'cts'), (5, 'route'), (6, 'final'), (7, 'generate_abstract')])
+
     source_folder_name = name
 
     output_folder_name = source_folder_name
@@ -49,19 +52,36 @@ def build_openroad(
     ADDITIONAL_LEFS = ' '.join(map(lambda m: '$(RULEDIR)/build/results/asap7/%s/base/%s.lef' % (m, m), macros))
     ADDITIONAL_LIBS = ' '.join(map(lambda m: '$(RULEDIR)/build/results/asap7/%s/base/%s.lib' % (m, m), macros))
     ADDITIONAL_GDS_FILES = ' '.join(map(lambda m: '$(RULEDIR)/build/results/asap7/%s/base/6_final.gds' % (m), macros))
+
+    io_constraints_args = ["IO_CONSTRAINTS=" + io_constraints] if io_constraints != None else []
+
     stage_args['synth'] = stage_args.get('synth', []) + (
         ["'ADDITIONAL_LIBS=" + ADDITIONAL_LIBS + "'"] if len(macros) > 0 else []) + [
         "'VERILOG_FILES=" + ' '.join(set(verilog_files)) + "'",
         "SDC_FILE=" + list(filter(stage_sources.get('synth', []), lambda s: s.endswith(".sdc")))[0]
-        ]
+        ] + io_constraints_args
     stage_args['floorplan'] = stage_args.get('floorplan', []) + ([
         "'ADDITIONAL_LIBS=" + ADDITIONAL_LIBS + "'",
-        "'ADDITIONAL_LEFS=" + ADDITIONAL_LEFS + "'"] if len(macros) > 0 else [])
+        "'ADDITIONAL_LEFS=" + ADDITIONAL_LEFS + "'"] if len(macros) > 0 else []) + (
+            [] if len(macros) == 0 else [
+        '"PDN_TCL=\\$$(PLATFORM_DIR)/openRoad/pdn/BLOCKS_grid_strategy.tcl"']
+        )
+    stage_args['place'] = stage_args.get('place', []) + io_constraints_args
 
     stage_args['final'] = stage_args.get('final', []) + ([
         "'ADDITIONAL_GDS_FILES=" + ADDITIONAL_GDS_FILES + "'",
         "'ADDITIONAL_LEFS=" + ADDITIONAL_LEFS + "'"] if len(macros) > 0 else []) + (
         ["GND_NETS_VOLTAGES=\"\"","PWR_NETS_VOLTAGES=\"\""])
+
+    stage_args['route'] = stage_args.get('route', []) + (
+        [] if len(macros) == 0 else ['MIN_ROUTING_LAYER=M2',
+        'MAX_ROUTING_LAYER=M9'])
+
+    abstract_source = str(mock_stage) + "_" + all_stages[mock_stage - 1][1]
+    stage_args['generate_abstract'] = stage_args.get('generate_abstract', []) + (
+        ['ABSTRACT_SOURCE=' + abstract_source] if mock_abstract else []) + (
+            ['GDS_ALLOW_EMPTY="(' + '|'.join(macros) + ')"'] if len(macros) > 0 else [])
+
 
     base_args = ["DESIGN_NAME=" + name,
     "WORK_HOME=$(RULEDIR)/build", "PRIVATE_DIR=.",
@@ -100,10 +120,7 @@ def build_openroad(
         ] + list(map(lambda log: "build/logs/asap7/%s/base/%s.log" %(output_folder_name, log), reports['synth']))
     )
 
-    all_stages = ([(1, 'synth'), (2, 'floorplan'), (3, 'place'),
-    (4, 'cts'), (5, 'route'), (6, 'final'), (7, 'generate_abstract')])
     stages = [stage for stage in all_stages if not mock_abstract or (stage[0] <= mock_stage or stage[0] >= 7)]
-    abstract_source = str(mock_stage) + "_" + all_stages[mock_stage - 1][1]
 
     [run_binary(
         name = name + "_" + stage,
@@ -114,17 +131,7 @@ def build_openroad(
         args = ["make"] +
         base_args +
              ["bazel-" + stage, "elapsed"] +
-                            (["IO_CONSTRAINTS=" + io_constraints] if io_constraints != None else []) +
-        (['ABSTRACT_SOURCE=' + abstract_source] if mock_abstract and i == 7 else []) +
-        (['WRITE_ON_FAIL=1'] if stage in ("place", "route") else []) +
-        stage_args.get(stage, []) +
-        (['GDS_ALLOW_EMPTY="(' + '|'.join(macros) + ')"'] if stage in ("final") and len(macros) > 0 else []) +
-        ([] if len(macros) == 0 else ['MIN_ROUTING_LAYER=M2',
-        'MAX_ROUTING_LAYER=M9',
-        '"PDN_TCL=\\$$(PLATFORM_DIR)/openRoad/pdn/BLOCKS_grid_strategy.tcl"']
-        ) +
-        ([] if any(map(lambda a: a.startswith('SDC_FILE'), stage_args.get('synth', [])))
-          else ['SDC_FILE=constraints.sdc']),
+        stage_args.get(stage, []),
         outs = ([
             "build/results/asap7/%s/base/%s.lib" %(output_folder_name, name),
             "build/results/asap7/%s/base/%s.lef" %(output_folder_name, name),
@@ -134,8 +141,8 @@ def build_openroad(
         ]) + ([
             "build/results/asap7/%s/base/6_final.spef" %(output_folder_name),
             "build/results/asap7/%s/base/6_final.gds" %(output_folder_name)
-        ] if stage == "final" else []) +
-        (["build/results/asap7/%s/base/%s.ok" %(output_folder_name, stage)] if stage in ("place", "route") else []) +
+        ] if stage == "final" else []) + (
+            ["build/results/asap7/%s/base/%s.ok" %(output_folder_name, stage)] if stage in ("place", "route") else []) +
         ([
             "build/reports/asap7/%s/base/congestion.rpt" %(output_folder_name),
             "build/reports/asap7/%s/base/5_route_drc.rpt" %(output_folder_name)
