@@ -325,17 +325,20 @@ build_openroad(
         io_constraints=None
         )
 
-boom_tile_rams = ["table_256x12",
+boom_tile_small_srams = [
+        "tag_array_64x22",
+        "tag_array_64x20",
+        "data_2048x2",
+        "table_256x12",
         "table_128x13",
         "table_128x11",
-        "ebtb_128x40",
         "btb_128x14",
-        "data_2048x2",
+        "meta_128x30"]
+
+boom_tile_rams = [
+        "ebtb_128x40",
         "array_256x64",
-        "tag_array_64x22",
-        "meta_128x30",
         "dataArrayB_256x64",
-        "tag_array_64x20",
         "l2_tlb_ram_0_512x45"]
 
 [build_openroad(
@@ -463,7 +466,7 @@ boomtilefiles = ["rtl/" + f + ".sv" for f in ['TLXbar_8',
         'table_128x11',
         'mem_256x1',
         'table_256x12'
-        ] + rams + nonrams]
+        ] + rams + nonrams + boom_tile_small_srams]
 
 build_openroad(
         name = "BoomTile",
