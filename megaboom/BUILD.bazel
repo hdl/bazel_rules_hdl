@@ -495,8 +495,8 @@ build_openroad(
         stage_args={
                 'synth': ['SYNTH_HIERARCHICAL=1'],
                 'floorplan': [
-                        'CORE_UTILIZATION=10',
-                        'MACRO_PLACE_HALO="50 50"'
+                        'CORE_UTILIZATION=30',
+                        'MACRO_PLACE_HALO="20 20"'
                         # Too slow for now...
                         #,'RTLMP_FLOW=True'
                         ],
