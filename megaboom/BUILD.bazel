@@ -333,7 +333,9 @@ boom_tile_small_srams = [
         "table_128x13",
         "table_128x11",
         "btb_128x14",
-        "meta_128x30"]
+        "meta_128x30",
+        "lb_32x128",
+        "sdq_17x64"]
 
 boom_tile_rams = [
         "ebtb_128x40",
@@ -352,7 +354,7 @@ boom_tile_rams = [
         mock_abstract=(ram != "data_2048x2"),
         mock_stage=3
         )
- for ram in boom_tile_rams]
+ for ram in boom_tile_rams + boom_tile_small_srams]
 
 
 boom_regfile_rams = [
@@ -490,7 +492,8 @@ build_openroad(
         "rtl/RegisterFileSynthesizable.sv"
         ] + exeunitsrc + registerreadsrc + renamefiles + fpfiles +issueslotfiles +
         boomtilefiles,
-        macros=boom_tile_rams + boom_regfile_rams,
+        macros=boom_tile_rams + boom_regfile_rams +
+        ["ICache", "BoomNonBlockingDCache"],
         stage_sources={'synth': ["constraints-top.sdc"]},
         stage_args={
                 'synth': ['SYNTH_HIERARCHICAL=1'],
@@ -517,6 +520,75 @@ build_openroad(
                         'RTLMP_FLOW=True'
                         ],
                 'place': ['PLACE_DENSITY=0.20', 'PLACE_PINS_ARGS=-annealing'],
+                },
+        io_constraints=None
+        )
+
+build_openroad(
+        name = "ICache",
+        verilog_files=["rtl/ICache.sv",
+        "rtl/MaxPeriodFibonacciLFSR.sv"],
+        macros=["dataArrayB_256x64",
+        "tag_array_64x20"],
+        stage_sources={'synth': ["constraints.sdc"]},
+        stage_args={
+                'synth': ['SYNTH_HIERARCHICAL=1'],
+                'floorplan': [
+                        'RTLMP_FLOW=True'
+                        ],
+                'place': ['PLACE_DENSITY=0.20'],
+                },
+        io_constraints=None
+        )
+
+build_openroad(
+        name = "BoomNonBlockingDCache",
+        verilog_files=["rtl/BoomNonBlockingDCache.sv",
+        "rtl/BoomWritebackUnit.sv",
+        "rtl/BoomProbeUnit.sv",
+        "rtl/BoomMSHRFile.sv",
+        "rtl/L1MetadataArray.sv",
+        "rtl/BoomProbeUnit.sv",
+        "rtl/Arbiter.sv",
+        "rtl/Arbiter_1.sv",
+        "rtl/Arbiter_2.sv",
+        "rtl/Arbiter_3.sv",
+        "rtl/Arbiter_4.sv",
+        "rtl/Arbiter_5.sv",
+        "rtl/Arbiter_6.sv",
+        "rtl/Arbiter_7.sv",
+        "rtl/Arbiter_8.sv",
+        "rtl/Arbiter_9.sv",
+        "rtl/Arbiter_10.sv",
+        "rtl/BoomDuplicatedDataArray.sv",
+        "rtl/Arbiter_11.sv",
+        "rtl/Arbiter_12.sv",
+        "rtl/Arbiter_13.sv",
+        "rtl/MaxPeriodFibonacciLFSR.sv",
+        "rtl/Arbiter_14.sv",
+        "rtl/AMOALU.sv",
+        "rtl/BranchKillableQueue.sv",
+        "rtl/BranchKillableQueue_8.sv",
+        "rtl/BoomIOMSHR.sv",
+        "rtl/BoomMSHR.sv",
+        "rtl/NLPrefetcher.sv",
+        "rtl/ram_is_hella_4x1.sv",
+        "rtl/ram_is_hella_16x1.sv",
+        "rtl/ram_data_4x64.sv",
+        "rtl/ram_sdq_id_16x5.sv",
+        "rtl/ram_addr_16x40.sv"],
+        macros=["tag_array_64x22",
+        "tag_array_64x20",
+        "array_256x64",
+        "lb_32x128",
+        "sdq_17x64"],
+        stage_sources={'synth': ["constraints.sdc"]},
+        stage_args={
+                'synth': ['SYNTH_HIERARCHICAL=1'],
+                'floorplan': [
+                        'RTLMP_FLOW=True'
+                        ],
+                'place': ['PLACE_DENSITY=0.20'],
                 },
         io_constraints=None
         )
