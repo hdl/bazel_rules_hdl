@@ -3,3 +3,4 @@
 
 export DESIGN_CONFIG?=config.mk
 export DESIGN_NAME?=BoomTile
+export WORK_HOME?=bazel-bin/build/
