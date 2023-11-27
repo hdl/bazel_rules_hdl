@@ -576,19 +576,19 @@ build_openroad(
         "rtl/ram_is_hella_16x1.sv",
         "rtl/ram_data_4x64.sv",
         "rtl/ram_sdq_id_16x5.sv",
-        "rtl/ram_addr_16x40.sv"],
-        macros=["tag_array_64x22",
-        "tag_array_64x20",
-        "array_256x64",
-        "lb_32x128",
-        "sdq_17x64"],
-        stage_sources={'synth': ["constraints.sdc"]},
+        "rtl/ram_addr_16x40.sv",
+        "rtl/tag_array_64x22.sv",
+        "rtl/tag_array_64x20.sv",
+        "rtl/lb_32x128.sv",
+        "rtl/sdq_17x64.sv"],
+        macros=["array_256x64"],
+        stage_sources={'synth': ["constraints-dcache.sdc"]},
         stage_args={
                 'synth': ['SYNTH_HIERARCHICAL=1'],
                 'floorplan': [
                         'RTLMP_FLOW=True'
                         ],
-                'place': ['PLACE_DENSITY=0.20'],
+                'place': ['PLACE_DENSITY=0.10'],
                 },
         io_constraints=None
         )
