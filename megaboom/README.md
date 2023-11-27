@@ -216,7 +216,7 @@ Staring at logs
 
 If you want to "stare at logs" while Bazel is running, open the logs folder in vscode by:
 
-    code $(readlink -f /proc/$(pgrep openroad)/cwd)/bazel-bin/build/logs/
+  code $(readlink -f /proc/$(pgrep openroad)/cwd)/bazel-out/k8-fastbuild/bin/build/logs/asap7/
 
 MegaBoom RTL code
 =================
