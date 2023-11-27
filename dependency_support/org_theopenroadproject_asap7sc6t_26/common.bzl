@@ -36,3 +36,11 @@ filegroup(
     name = "asap7-misc-sc6t_rev26_4x-lef",
     srcs = ["techlef_misc/asap7sc6t_tech_4x_210831.lef"],
 )
+
+# Default rev26 cell library is the RVT library using slow-slow corner with CCS
+# modeling.
+alias(
+    name = "asap7-sc6t_rev26",
+    actual = ":asap7-sc6t_rev26_rvt-ccs_ss",
+    visibility = ["//visibility:public"],
+)

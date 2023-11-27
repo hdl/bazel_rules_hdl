@@ -62,7 +62,7 @@ filegroup(
 # Library configuration
 # ------------------------------------------------------------------------
 asap7_cell_library(
-    name = "asap7-sc7p5t_rev27_rvt_4x",
+    name = "asap7-sc7p5t_rev27_rvt_4x-ccs_ss",
     srcs = [
         ":asap7-cells-sc7p5t_rev27_rvt_4x-lib7z",
         #	":asap7-srams-sc7p5t_rev27_4x-lib7z",
@@ -73,6 +73,14 @@ asap7_cell_library(
     default_corner_swing = "SS",
     openroad_configuration = ":open_road-asap7-sc7p5t_rev27_rvt_4x",
     tech_lef = ":asap7-misc-sc7p5t_rev27_4x-lef",
+    visibility = [
+        "//visibility:public",
+    ],
+)
+
+alias(
+    name = "asap7-sc7p5t_rev27_rvt_4x",
+    actual = ":asap7-sc7p5t_rev27_rvt_4x-ccs_ss",
     visibility = [
         "//visibility:public",
     ],
