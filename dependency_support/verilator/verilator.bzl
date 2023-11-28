@@ -30,7 +30,7 @@ def _verilator_repository_impl(ctx):
     replace = {
         "#define PACKAGE_STRING \"\"": "#define PACKAGE_STRING \"Verilator v{}\"".format(ctx.attr.version),
     }
-    ctx.template("src/config_build.h", "src/config_build.h.in", replace, executable = False)
+    ctx.template("src/config_package.h", "src/config_package.h.in", replace, executable = False)
 
     ctx.file(
         "src/config_rev.h",
@@ -56,11 +56,11 @@ verilator_repository = repository_rule(
         ),
         "version": attr.string(
             doc = "The version of verilator to use.",
-            default = "4.224",
+            default = "5.018",
         ),
         "sha256": attr.string(
             doc = "The sha256 hash for this version of verilator",
-            default = "010ff2b5c76d4dbc2ed4a3278a5599ba35c8ed4c05690e57296d6b281591367b",
+            default = "8b544273eedee379e3c1a3bb849e14c754c9b5035d61ad03acdf3963092ba6c0",
         ),
     },
 )

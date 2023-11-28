@@ -39,28 +39,53 @@ genrule(
     name = "verilator_astgen",
     srcs = [
         "src/V3Ast.h",
-        "src/V3AstNodes.h",
+        "src/V3AstNodeDType.h",
+        "src/V3AstNodeExpr.h",
+        "src/V3AstNodeOther.h",
+        "src/V3DfgVertices.h",
         "src/Verilator.cpp",
         "src/astgen",
     ],
     outs = [
-        "V3Ast__gen_classes.h",
-        "V3Ast__gen_impl.h",
+        "V3Ast__gen_forward_class_decls.h",
         "V3Ast__gen_report.txt",
-        "V3Ast__gen_types.h",
-        "V3Ast__gen_visitor.h",
+        "V3Ast__gen_type_enum.h",
+        "V3Ast__gen_type_info.h",
+        "V3Ast__gen_type_tests.h",
+        "V3Ast__gen_visitor_decls.h",
+        "V3Ast__gen_visitor_defns.h",
         "V3Ast__gen_yystype.h",
-        "V3AstNodes__gen_macros.h",
+        "V3Ast__gen_macros.h",
+        "V3Dfg__gen_forward_class_decls.h",
+        "V3Dfg__gen_type_enum.h",
+        "V3Dfg__gen_type_tests.h",
+        "V3Dfg__gen_visitor_decls.h",
+        "V3Dfg__gen_visitor_defns.h",
+        "V3Dfg__gen_macros.h",
+        "V3Dfg__gen_auto_classes.h",
+        "V3Dfg__gen_ast_to_dfg.h",
+        "V3Dfg__gen_dfg_to_ast.h",
     ],
     cmd = """
-    python3 $(location src/astgen) -I $$(dirname $(location src/V3Ast.h)) --classes
-    cp V3Ast__gen_classes.h $(@D)
-    cp V3Ast__gen_impl.h $(@D)
+    python3 $(location src/astgen) -I $$(dirname $(location src/astgen)) --astdef V3AstNodeDType.h --astdef V3AstNodeExpr.h --astdef V3AstNodeOther.h --dfgdef V3DfgVertices.h --classes
+    cp V3Ast__gen_forward_class_decls.h $(@D)
     cp V3Ast__gen_report.txt $(@D)
-    cp V3Ast__gen_types.h $(@D)
-    cp V3Ast__gen_visitor.h $(@D)
+    cp V3Ast__gen_type_enum.h $(@D)
+    cp V3Ast__gen_type_info.h $(@D)
+    cp V3Ast__gen_type_tests.h $(@D)
+    cp V3Ast__gen_visitor_decls.h $(@D)
+    cp V3Ast__gen_visitor_defns.h $(@D)
     cp V3Ast__gen_yystype.h $(@D)
-    cp V3AstNodes__gen_macros.h $(@D)
+    cp V3Ast__gen_macros.h $(@D)
+    cp V3Dfg__gen_forward_class_decls.h $(@D)
+    cp V3Dfg__gen_type_enum.h $(@D)
+    cp V3Dfg__gen_type_tests.h $(@D)
+    cp V3Dfg__gen_visitor_decls.h $(@D)
+    cp V3Dfg__gen_visitor_defns.h $(@D)
+    cp V3Dfg__gen_macros.h $(@D)
+    cp V3Dfg__gen_auto_classes.h $(@D)
+    cp V3Dfg__gen_ast_to_dfg.h $(@D)
+    cp V3Dfg__gen_dfg_to_ast.h $(@D)
     """,
 )
 
@@ -68,14 +93,17 @@ genrule(
     name = "verilator_astgen_const",
     srcs = [
         "src/V3Ast.h",
-        "src/V3AstNodes.h",
+        "src/V3AstNodeDType.h",
+        "src/V3AstNodeExpr.h",
+        "src/V3AstNodeOther.h",
+        "src/V3DfgVertices.h",
         "src/V3Const.cpp",
         "src/Verilator.cpp",
         "src/astgen",
     ],
     outs = ["V3Const__gen.cpp"],
     cmd = """
-    python3 $(location src/astgen) -I $$(dirname $(location src/V3Const.cpp)) V3Const.cpp
+    python3 $(location src/astgen) -I $$(dirname $(location src/V3Const.cpp)) --astdef V3AstNodeDType.h --astdef V3AstNodeExpr.h --astdef V3AstNodeOther.h --dfgdef V3DfgVertices.h V3Const.cpp
     cp V3Const__gen.cpp $(@D)
     """,
 )
@@ -133,13 +161,6 @@ cc_library(
     strip_include_prefix = "include/",
 )
 
-# Helper lib to break dependency between V3 and libverilated
-cc_library(
-    name = "verilated_trace_defs",
-    hdrs = ["include/verilated_trace_defs.h"],
-    strip_include_prefix = "include/",
-)
-
 # TODO(kkiningh): Verilator also supports multithreading, should we enable it?
 cc_library(
     name = "verilator_libV3",
@@ -150,17 +171,29 @@ cc_library(
             "src/V3Const.cpp",
         ],
     ) + [
-        ":V3Ast__gen_classes.h",
-        ":V3Ast__gen_impl.h",
-        ":V3Ast__gen_types.h",
-        ":V3Ast__gen_visitor.h",
-        ":V3AstNodes__gen_macros.h",
+        ":V3Ast__gen_forward_class_decls.h",
+        ":V3Ast__gen_type_enum.h",
+        ":V3Ast__gen_type_info.h",
+        ":V3Ast__gen_type_tests.h",
+        ":V3Ast__gen_visitor_decls.h",
+        ":V3Ast__gen_visitor_defns.h",
+        ":V3Ast__gen_macros.h",
         ":V3Ast__gen_yystype.h",
         ":V3Const__gen.cpp",
+        ":V3Dfg__gen_forward_class_decls.h",
+        ":V3Dfg__gen_type_enum.h",
+        ":V3Dfg__gen_type_tests.h",
+        ":V3Dfg__gen_visitor_decls.h",
+        ":V3Dfg__gen_visitor_defns.h",
+        ":V3Dfg__gen_macros.h",
+        ":V3Dfg__gen_auto_classes.h",
+        ":V3Dfg__gen_ast_to_dfg.h",
+        ":V3Dfg__gen_dfg_to_ast.h",
         ":V3ParseBison.h",
     ],
     hdrs = glob(["src/V3*.h"]) + [
         "src/config_build.h",
+        "src/config_package.h",
         "src/config_rev.h",
     ],
     copts = [
@@ -181,7 +214,6 @@ cc_library(
         ":V3ParseBison.c",
     ],
     deps = [
-        ":verilated_trace_defs",  # Needed for V3TraceDecl.cpp
         ":verilatedos",
         "@com_github_westes_flex//:FlexLexer",
     ],
@@ -199,6 +231,7 @@ cc_library(
         "include/verilated_fst_c.cpp",
         "include/verilated_imp.h",
         "include/verilated_syms.h",
+        "include/verilated_threads.cpp",
         "include/verilated_vcd_c.cpp",
     ],
     hdrs = [
@@ -206,12 +239,11 @@ cc_library(
         "include/verilated_config.h",
         "include/verilated_dpi.h",
         "include/verilated_fst_c.h",
-        "include/verilated_heavy.h",
         "include/verilated_intrinsics.h",
         "include/verilated_sc.h",
         "include/verilated_sym_props.h",
+        "include/verilated_threads.h",
         "include/verilated_trace.h",
-        "include/verilated_trace_defs.h",
         # Needed for verilated_vcd_c.cpp and verilated_fst_c.cpp
         "include/verilated_trace_imp.h",
         "include/verilated_vcd_c.h",

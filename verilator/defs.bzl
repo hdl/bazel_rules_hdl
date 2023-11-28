@@ -136,6 +136,7 @@ def _verilator_cc_library(ctx):
     prefix = "V" + ctx.attr.module_top
 
     args = ctx.actions.args()
+    args.add("--no-std")
     args.add("--cc")
     args.add("--Mdir", verilator_output.path)
     args.add("--top-module", ctx.attr.module_top)
