@@ -20,8 +20,8 @@ package(
 )
 
 license(
-  name = "package_license",
-  package_name = "bazel_rules_hdl",
+    name = "package_license",
+    package_name = "bazel_rules_hdl",
 )
 
 licenses(["notice"])
