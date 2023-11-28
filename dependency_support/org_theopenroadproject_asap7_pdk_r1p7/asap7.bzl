@@ -139,8 +139,18 @@ def asap7_cells_files(name = None, rev = None, tracks = None, vt = None, has_gds
 
     # Library configuration
     # ------------------------------------------------------------------------
-    asap7_cell_library(
+    # Default library is slow-slow corner using CCS
+    native.alias(
         name = "asap7-sc{tracks}_rev{rev}_{vt_long}".format(**args),
+        actual = ":asap7-sc{tracks}_rev{rev}_{vt_long}-ccs_ss".format(**args),
+        visibility = [
+            "//visibility:public",
+        ],
+    )
+
+    # CCS delay model
+    asap7_cell_library(
+        name = "asap7-sc{tracks}_rev{rev}_{vt_long}-ccs_ss".format(**args),
         srcs = [
             ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lib7z".format(**args),
             #":asap7-srams-sc{tracks}_rev{rev}-lib7z".format(**args),
@@ -149,6 +159,38 @@ def asap7_cells_files(name = None, rev = None, tracks = None, vt = None, has_gds
         platform_gds = ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-gds".format(**args),
         default_corner_delay_model = "ccs",
         default_corner_swing = "SS",
+        openroad_configuration = ":open_road-asap7-sc{tracks}_rev{rev}_{vt_long}".format(**args),
+        tech_lef = ":asap7-misc-sc{tracks}_rev{rev}-lef".format(**args),
+        visibility = [
+            "//visibility:public",
+        ],
+    )
+    asap7_cell_library(
+        name = "asap7-sc{tracks}_rev{rev}_{vt_long}-ccs_tt".format(**args),
+        srcs = [
+            ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lib7z".format(**args),
+            #":asap7-srams-sc{tracks}_rev{rev}-lib7z".format(**args),
+        ],
+        cell_lef = ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lef".format(**args),
+        platform_gds = ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-gds".format(**args),
+        default_corner_delay_model = "ccs",
+        default_corner_swing = "TT",
+        openroad_configuration = ":open_road-asap7-sc{tracks}_rev{rev}_{vt_long}".format(**args),
+        tech_lef = ":asap7-misc-sc{tracks}_rev{rev}-lef".format(**args),
+        visibility = [
+            "//visibility:public",
+        ],
+    )
+    asap7_cell_library(
+        name = "asap7-sc{tracks}_rev{rev}_{vt_long}-ccs_ff".format(**args),
+        srcs = [
+            ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lib7z".format(**args),
+            #":asap7-srams-sc{tracks}_rev{rev}-lib7z".format(**args),
+        ],
+        cell_lef = ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lef".format(**args),
+        platform_gds = ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-gds".format(**args),
+        default_corner_delay_model = "ccs",
+        default_corner_swing = "FF",
         openroad_configuration = ":open_road-asap7-sc{tracks}_rev{rev}_{vt_long}".format(**args),
         tech_lef = ":asap7-misc-sc{tracks}_rev{rev}-lef".format(**args),
         visibility = [

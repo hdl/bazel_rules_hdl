@@ -148,6 +148,7 @@ asap7_targets(
 asap7_targets(
     name = "verilog_counter-asap7-sc7p5t_rev27_rvt_4x",
     size = 2000,
+    corners = ["ccs_ss"],
     has_gds = False,  # No GDS for the 4x cells
     rev = 27,
     target = "verilog_counter",
