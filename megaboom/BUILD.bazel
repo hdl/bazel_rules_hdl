@@ -321,8 +321,7 @@ build_openroad(
         stage_sources={'synth': ["constraints-top.sdc"]},
         stage_args={
                 'floorplan': ['CORE_UTILIZATION=10','MACRO_PLACE_HALO="50 50"'],
-                'place': ['PLACE_DENSITY=0.20']},
-        io_constraints=None
+                'place': ['PLACE_DENSITY=0.20']}
         )
 
 boom_tile_small_srams = [
@@ -348,7 +347,6 @@ boom_tile_rams = [
         verilog_files=["rtl/" + ram + ".sv"],
         stage_sources={'synth': ["constraints-sram.sdc", "util.tcl"],
         'floorplan': ["util.tcl"]},
-        io_constraints=None,
         stage_args={
         'place': ['PLACE_DENSITY=0.65']},
         mock_abstract=(ram != "data_2048x2"),
@@ -366,7 +364,6 @@ boom_regfile_rams = [
         verilog_files=["rtl/" + ram + ".sv"],
         stage_sources={'synth': ["constraints-sram.sdc", "util.tcl"],
         'floorplan': ['util.tcl']},
-        io_constraints=None,
         stage_args={
                 'floorplan': ['CORE_UTILIZATION=7'],
         'place': ['PLACE_DENSITY=0.10'],
@@ -504,15 +501,17 @@ build_openroad(
                         ,'RTLMP_FLOW=True'
                         ],
                 'place': ['PLACE_DENSITY=0.20', 'PLACE_PINS_ARGS=-annealing'],
-                },
-        io_constraints=None
+                }
         )
 
 build_openroad(
         name = "L1MetadataArray",
         verilog_files=["rtl/L1MetadataArray.sv"],
         macros=["tag_array_64x22"],
-        stage_sources={'synth': ["constraints-top.sdc"]},
+        stage_sources={'synth': ["constraints-top.sdc"],
+        'floorplan': ["util.tcl"],
+        'place': ["util.tcl"]},
+        io_constraints="io.tcl",
         stage_args={
                 'synth': ['SYNTH_HIERARCHICAL=1'],
                 'floorplan': [
@@ -520,8 +519,7 @@ build_openroad(
                         'RTLMP_FLOW=True'
                         ],
                 'place': ['PLACE_DENSITY=0.20', 'PLACE_PINS_ARGS=-annealing'],
-                },
-        io_constraints=None
+                }
         )
 
 build_openroad(
@@ -530,7 +528,10 @@ build_openroad(
         "rtl/MaxPeriodFibonacciLFSR.sv"],
         macros=["dataArrayB_256x64",
         "tag_array_64x20"],
-        stage_sources={'synth': ["constraints.sdc"]},
+        io_constraints="io.tcl",
+        stage_sources={'synth': ["constraints.sdc"],
+        'floorplan': ["util.tcl"],
+        'place': ["util.tcl"]},
         stage_args={
                 'synth': ['SYNTH_HIERARCHICAL=1'],
                 'floorplan': [
@@ -538,7 +539,8 @@ build_openroad(
                         ],
                 'place': ['PLACE_DENSITY=0.20'],
                 },
-        io_constraints=None
+        mock_abstract=True,
+        mock_stage=2
         )
 
 build_openroad(
@@ -582,7 +584,10 @@ build_openroad(
         "rtl/lb_32x128.sv",
         "rtl/sdq_17x64.sv"],
         macros=["array_256x64"],
-        stage_sources={'synth': ["constraints-dcache.sdc"]},
+        io_constraints="io.tcl",
+        stage_sources={'synth': ["constraints-dcache.sdc"],
+        'floorplan': ["util.tcl"],
+        'place': ["util.tcl"]},
         stage_args={
                 'synth': ['SYNTH_HIERARCHICAL=1'],
                 'floorplan': [
@@ -590,5 +595,6 @@ build_openroad(
                         ],
                 'place': ['PLACE_DENSITY=0.07'],
                 },
-        io_constraints=None
+        mock_abstract=True,
+        mock_stage=2
         )

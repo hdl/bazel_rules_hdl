@@ -25,7 +25,7 @@ def build_openroad(
     verilog_files = [],
     stage_sources = {},
     macros = [],
-    io_constraints = "io.tcl",
+    io_constraints=None,
     stage_args={},
     mock_abstract=False,
     mock_stage=3
@@ -50,6 +50,9 @@ def build_openroad(
     stage_sources = dict(stage_sources)
 
     stage_sources['synth'] = stage_sources.get('synth', []) + set(verilog_files)
+    io_constraints_source = ([io_constraints] if io_constraints != None else [])
+    stage_sources['floorplan'] = stage_sources.get('floorplan', []) + io_constraints_source
+    stage_sources['place'] = stage_sources.get('place', []) + io_constraints_source
 
     stage_args = dict(stage_args)
     ADDITIONAL_LEFS = ' '.join(map(lambda m: '$(RULEDIR)/build/results/asap7/%s/base/%s.lef' % (m, m), macros))
@@ -65,11 +68,11 @@ def build_openroad(
     stage_args['synth'] = stage_args.get('synth', []) + libs_args + lefs_args + [
         "'VERILOG_FILES=" + ' '.join(set(verilog_files)) + "'",
         "SDC_FILE=" + list(filter(stage_sources.get('synth', []), lambda s: s.endswith(".sdc")))[0]
-        ] + io_constraints_args
+        ]
     stage_args['floorplan'] = stage_args.get('floorplan', []) + lefs_args + libs_args + (
             [] if len(macros) == 0 else [
         '"PDN_TCL=\\$$(PLATFORM_DIR)/openRoad/pdn/BLOCKS_grid_strategy.tcl"']
-        )
+        ) + io_constraints_args
     stage_args['place'] = stage_args.get('place', []) + libs_args + io_constraints_args
 
     stage_args['final'] = stage_args.get('final', []) + gds_args + lefs_args + (
