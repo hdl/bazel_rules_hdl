@@ -498,10 +498,10 @@ build_openroad(
         stage_args={
                 'synth': ['SYNTH_HIERARCHICAL=1'],
                 'floorplan': [
-                        'CORE_UTILIZATION=30',
+                        'CORE_UTILIZATION=20',
                         'MACRO_PLACE_HALO="20 20"'
                         # Too slow for now...
-                        #,'RTLMP_FLOW=True'
+                        ,'RTLMP_FLOW=True'
                         ],
                 'place': ['PLACE_DENSITY=0.20', 'PLACE_PINS_ARGS=-annealing'],
                 },
@@ -588,7 +588,7 @@ build_openroad(
                 'floorplan': [
                         'RTLMP_FLOW=True'
                         ],
-                'place': ['PLACE_DENSITY=0.10'],
+                'place': ['PLACE_DENSITY=0.07'],
                 },
         io_constraints=None
         )
