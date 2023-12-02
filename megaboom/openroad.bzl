@@ -133,19 +133,26 @@ def build_openroad(
 
     stages = [stage for stage in all_stages if not mock_abstract or (stage[0] <= mock_stage or stage[0] >= 7)]
 
+    stage_num = dict(map(lambda s: (s[1], s[0]), all_stages))
+
+    for stage, i in map(lambda stage: (stage, stage_num[stage]), ["floorplan", "place", "cts", "route", "final"]):
+        outs[stage] = outs.get(stage, []) + [
+            "build/results/asap7/%s/base/%s.sdc" %(output_folder_name, str(i) + "_" + stage),
+            "build/results/asap7/%s/base/%s.odb" %(output_folder_name, str(i) + "_" + stage)]
+
+    for stage in ["place", "route"]:
+        outs[stage] = outs.get(stage, []) + [
+            "build/results/asap7/%s/base/%s.ok" %(output_folder_name, stage)]
+
+    outs[stage] = outs.get(stage, []) + list(
+        map(lambda log: "build/logs/asap7/%s/base/%s.log" %(output_folder_name, log), reports[stage])) 
+
     [run_binary(
         name = name + "_" + stage,
         tool = ":orfs",
         srcs = macro_targets + all_sources + ([name + "_" + previous] if i > 1 else [])+
         stage_sources.get(stage, []),
-        args = ["make"] +
-        base_args +
-             ["bazel-" + stage, "elapsed"] +
+        args = ["make"] + base_args + ["bazel-" + stage, "elapsed"] +
         stage_args.get(stage, []),
-        outs = outs.get(stage, []) + ([
-            "build/results/asap7/%s/base/%s.sdc" %(output_folder_name, str(i) + "_" + stage),
-            "build/results/asap7/%s/base/%s.odb" %(output_folder_name, str(i) + "_" + stage)
-        ] if stage in ["floorplan", "place", "cts", "route", "final"] else []) +
-        (["build/results/asap7/%s/base/%s.ok" %(output_folder_name, stage)] if stage in ["place", "route"] else []) +
-        list(map(lambda log: "build/logs/asap7/%s/base/%s.log" %(output_folder_name, log), reports[stage]))
+        outs = outs.get(stage, [])
     ) for ((j, previous), (i, stage)) in zip([(0, 'n/a')] + stages, stages)]
