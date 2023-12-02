@@ -344,9 +344,11 @@ boom_tile_rams = [
 
 [build_openroad(
         name = ram,
+        io_constraints="io-sram.tcl",
         verilog_files=["rtl/" + ram + ".sv"],
         stage_sources={'synth': ["constraints-sram.sdc", "util.tcl"],
-        'floorplan': ["util.tcl"]},
+        'floorplan': ["util.tcl"],
+        'place': ["util.tcl"]},
         stage_args={
         'place': ['PLACE_DENSITY=0.65']},
         mock_abstract=(ram != "data_2048x2"),
@@ -361,9 +363,11 @@ boom_regfile_rams = [
 
 [build_openroad(
         name = ram,
+        io_constraints="io-sram.tcl",
         verilog_files=["rtl/" + ram + ".sv"],
         stage_sources={'synth': ["constraints-sram.sdc", "util.tcl"],
-        'floorplan': ['util.tcl']},
+        'floorplan': ['util.tcl'],
+        'place': ["util.tcl"]},
         stage_args={
                 'floorplan': ['CORE_UTILIZATION=7'],
         'place': ['PLACE_DENSITY=0.10'],
