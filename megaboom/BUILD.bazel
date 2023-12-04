@@ -350,9 +350,10 @@ boom_tile_rams = [
         'floorplan': ["util.tcl"],
         'place': ["util.tcl"]},
         stage_args={
-        'place': ['PLACE_DENSITY=0.65']},
-        mock_abstract=(ram != "data_2048x2"),
-        mock_stage=3
+                'floorplan': ['CORE_UTILIZATION=100'],
+                'place': ['PLACE_DENSITY=0.65']},
+        mock_abstract=True,
+        mock_stage=2
         )
  for ram in boom_tile_rams + boom_tile_small_srams]
 
@@ -539,7 +540,8 @@ build_openroad(
         stage_args={
                 'synth': ['SYNTH_HIERARCHICAL=1'],
                 'floorplan': [
-                        'RTLMP_FLOW=True'
+                        'RTLMP_FLOW=True',
+                        'CORE_UTILIZATION=60',
                         ],
                 'place': ['PLACE_DENSITY=0.20'],
                 },
@@ -595,7 +597,8 @@ build_openroad(
         stage_args={
                 'synth': ['SYNTH_HIERARCHICAL=1'],
                 'floorplan': [
-                        'RTLMP_FLOW=True'
+                        'RTLMP_FLOW=True',
+                        'CORE_UTILIZATION=60'
                         ],
                 'place': ['PLACE_DENSITY=0.07'],
                 },
