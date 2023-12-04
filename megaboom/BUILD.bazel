@@ -598,7 +598,7 @@ build_openroad(
                 'synth': ['SYNTH_HIERARCHICAL=1'],
                 'floorplan': [
                         'RTLMP_FLOW=True',
-                        'CORE_UTILIZATION=60'
+                        'CORE_UTILIZATION=50'
                         ],
                 'place': ['PLACE_DENSITY=0.07'],
                 },
