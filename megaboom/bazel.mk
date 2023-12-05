@@ -4,11 +4,14 @@
 
 .PHONY: bazel-synth
 bazel-synth:
+	mkdir -p $(LOG_DIR)
+	$(UNSET_AND_MAKE) print-SUB_MAKE >$(LOG_DIR)/synth.txt
 	$(UNSET_AND_MAKE) synth
 
 .PHONY: bazel-floorplan
 bazel-floorplan:
 	mkdir -p $(LOG_DIR) $(REPORTS_DIR)
+	$(UNSET_AND_MAKE) print-SUB_MAKE >$(LOG_DIR)/floorplan.txt
 	touch $(LOG_DIR)/2_3_floorplan_tdms.log
 	$(UNSET_VARS); echo hello
 	$(UNSET_AND_MAKE) do-2_1_floorplan do-2_2_floorplan_io do-2_3_floorplan_tdms do-2_4_floorplan_macro do-2_5_floorplan_tapcell do-2_6_floorplan_pdn do-2_floorplan
@@ -27,6 +30,7 @@ bazel-floorplan:
 .PHONY: bazel-place
 bazel-place:
 	mkdir -p $(LOG_DIR) $(REPORTS_DIR)
+	$(UNSET_AND_MAKE) print-SUB_MAKE >$(LOG_DIR)/place.txt
 	touch $(LOG_DIR)/3_1_place_gp_skip_io.log
 	touch $(LOG_DIR)/3_2_place_iop.log
 	touch $(LOG_DIR)/3_3_place_gp.log
@@ -58,6 +62,7 @@ check-place:
 .PHONY: bazel-cts
 bazel-cts:
 	mkdir -p $(LOG_DIR) $(REPORTS_DIR)
+	$(UNSET_AND_MAKE) print-SUB_MAKE >$(LOG_DIR)/cts.txt
 	$(UNSET_AND_MAKE) check-place do-4_1_cts do-4_cts
 
 # Same as do-place, support for build systems that require a non-zero exit code
@@ -65,6 +70,7 @@ bazel-cts:
 .PHONY: bazel-route
 bazel-route:
 	mkdir -p $(RESULTS_DIR) $(LOG_DIR) $(REPORTS_DIR)
+	$(UNSET_AND_MAKE) print-SUB_MAKE >$(LOG_DIR)/route.txt
 	echo >$(RESULTS_DIR)/route.ok 0
 	touch $(REPORTS_DIR)/congestion.rpt
 	touch $(REPORTS_DIR)/5_route_drc.rpt
@@ -88,6 +94,7 @@ check-route:
 .PHONY: bazel-final
 bazel-final:
 	mkdir -p $(RESULTS_DIR) $(LOG_DIR) $(REPORTS_DIR)
+	$(UNSET_AND_MAKE) print-SUB_MAKE >$(LOG_DIR)/final.txt
 	$(UNSET_AND_MAKE) check-route do-6_1_fill do-6_1_fill.sdc do-6_final.sdc do-6_report
 	$(UNSET_AND_MAKE) do-klayout_tech do-klayout do-klayout_wrap do-gds-merged
 	cp $(GDS_MERGED_FILE) $(GDS_FINAL_FILE)
@@ -95,5 +102,6 @@ bazel-final:
 .PHONY: bazel-generate_abstract
 bazel-generate_abstract:
 	mkdir -p $(RESULTS_DIR) $(LOG_DIR) $(REPORTS_DIR)
+	$(UNSET_AND_MAKE) print-SUB_MAKE >$(LOG_DIR)/generate_abstract.txt
 	$(UNSET_AND_MAKE) do-generate_abstract
 

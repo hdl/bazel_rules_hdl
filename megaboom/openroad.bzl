@@ -88,10 +88,10 @@ def build_openroad(
             ['GDS_ALLOW_EMPTY="(' + '|'.join(macros) + ')"'] if len(macros) > 0 else [])
 
 
-    base_args = ["DESIGN_NAME=" + name,
-    "DESIGN_CONFIG=config.mk",
-    "WORK_HOME=$(RULEDIR)/build",
-    "ORFS_VERSION=" + str(orfs_version)]
+    base_args = ["WORK_HOME=$(RULEDIR)/build",
+    "ORFS_VERSION=" + str(orfs_version),
+    "DESIGN_NAME=" + name,
+    "DESIGN_CONFIG=config.mk"]
 
     reports ={'synth': ['1_1_yosys'],
     'floorplan': ['2_1_floorplan',
@@ -154,5 +154,5 @@ def build_openroad(
         stage_sources.get(stage, []),
         args = ["make"] + base_args + ["bazel-" + stage, "elapsed"] +
         stage_args.get(stage, []),
-        outs = outs.get(stage, [])
+        outs = outs.get(stage, []) + ["build/logs/asap7/%s/base/%s.txt" %(output_folder_name, stage)],
     ) for ((j, previous), (i, stage)) in zip([(0, 'n/a')] + stages, stages)]
