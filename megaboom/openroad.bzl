@@ -85,7 +85,7 @@ def build_openroad(
     abstract_source = str(mock_stage) + "_" + all_stages[mock_stage - 1][1]
     stage_args['generate_abstract'] = stage_args.get('generate_abstract', []) + gds_args + lefs_args + (
         ['ABSTRACT_SOURCE=' + abstract_source] if mock_abstract else []) + (
-            ['GDS_ALLOW_EMPTY="(' + '|'.join(macros) + ')"'] if len(macros) > 0 else [])
+            ['"GDS_ALLOW_EMPTY=(' + '|'.join(macros) + ')"'] if len(macros) > 0 else [])
 
 
     base_args = ["WORK_HOME=$(RULEDIR)/build",
