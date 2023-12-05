@@ -22,6 +22,7 @@ def org_sourceware_bzip2():
         http_archive,
         name = "org_sourceware_bzip2",
         urls = [
+            "https://mirrors.kernel.org/sourceware/bzip2/bzip2-1.0.8.tar.gz",
             "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz",
         ],
         strip_prefix = "bzip2-1.0.8",
