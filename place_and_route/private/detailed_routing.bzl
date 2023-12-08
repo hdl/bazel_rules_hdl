@@ -55,8 +55,10 @@ def detailed_routing(ctx, open_road_info):
         if detailed_routing_configs.enable_via_gen:
             detailed_routing_args += " -disable_via_gen "
 
-    open_road_commands = timing_setup_command_struct.commands
-    open_road_commands.append("detailed_route -output_drc {} {}".format(output_drc.path, detailed_routing_args))
+    open_road_commands = timing_setup_command_struct.commands + [
+        "set_propagated_clock [all_clocks]",
+        "detailed_route -output_drc {} {}".format(output_drc.path, detailed_routing_args)
+    ]
     density_fill_config = None
     if open_road_configuration.density_fill_config:
         density_fill_config = open_road_configuration.density_fill_config.files.to_list()[0]

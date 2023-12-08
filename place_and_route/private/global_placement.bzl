@@ -40,7 +40,7 @@ def global_placement(ctx, open_road_info):
             pad_left = open_road_configuration.global_placement_cell_pad,
             pad_right = open_road_configuration.global_placement_cell_pad,
         ),
-        "remove_buffers",
+        "estimate_parasitics -placement",
     ]
 
     command_output = openroad_command(

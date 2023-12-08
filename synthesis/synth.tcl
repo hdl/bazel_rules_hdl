@@ -72,14 +72,45 @@ yosys synth -top $top
 yosys opt_clean -purge
 yosys autoname
 
+# Technology mapping of adders
+if {[info exists ::env(ADDER_MAPPING)] && [file isfile $::env(ADDER_MAPPING)]} {
+  # extract the full adders
+  extract_fa
+  # map full adders
+  techmap -map $::env(ADDER_MAPPING)
+  techmap
+  # Quick optimization
+  opt -fast -purge
+}
+
 # mapping to liberty
 set liberty $::env(LIBERTY)
 dfflibmap -liberty $liberty
+
+opt
 
 if { [info exists ::env(CLOCK_PERIOD) ] } {
   abc -liberty $liberty -dff -g aig -D $::env(CLOCK_PERIOD) {*}$::env(DONT_USE_ARGS)
 } else {
   abc -liberty $liberty -dff -g aig {*}$::env(DONT_USE_ARGS)
+}
+
+setundef -zero
+
+splitnets
+
+opt_clean -purge
+
+if {[info exists ::env(TIEHI_CELL_AND_PORT)] && [info exists ::env(TIELO_CELL_AND_PORT)]} {
+  hilomap \
+        -hicell {*}[split $::env(TIEHI_CELL_AND_PORT) "/"] \
+        -locell {*}[split $::env(TIELO_CELL_AND_PORT) "/"]
+} elseif { [info exists ::env(TIEHI_CELL_AND_PORT)] } {
+  hilomap \
+        -hicell {*}$::env(TIEHI_CELL_AND_PORT)
+} elseif { [info exists ::env(TIELO_CELL_AND_PORT)] } {
+  hilomap \
+        -locell {*}$::env(TIELO_CELL_AND_PORT)
 }
 
 # Remove internal only aliases for public nets and then give created instances
@@ -101,7 +132,7 @@ if { [info exists ::env(STATS_JSON) ] } {
 read_liberty -lib -ignore_miss_func $liberty
 ltp -noff $top
 
-yosys log -n Flop count:\ 
+yosys log -n Flop count:\
 yosys select -count t:*__df* t:DFF* t:*_DFF* t:*_SDFF* t:*_ADFF* t:*dff
 
 set base_liberty [file tail $liberty]

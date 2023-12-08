@@ -210,9 +210,9 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
 
     output_db = None
     if step_name:
-        output_db = ctx.actions.declare_file("{}__{}.db".format(ctx.attr.name, step_name))
+        output_db = ctx.actions.declare_file("{}__{}.odb".format(ctx.attr.name, step_name))
     else:
-        output_db = ctx.actions.declare_file("{}{}.db".format(input_hash, command_hash))
+        output_db = ctx.actions.declare_file("{}{}.odb".format(input_hash, command_hash))
 
     real_commands = []
     if input_db:
