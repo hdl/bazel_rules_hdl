@@ -72,7 +72,8 @@ def _gds_write_impl(ctx):
                 tech_lef,
             ],
         ),
-        command = "python {}".format(ctx.executable._gds_write.path) +
+        command = "$(PYTHON3)" +
+                  " {}".format(ctx.executable._gds_write.path) +
                   " --design-name {}".format(ctx.attr.implemented_rtl[SynthesisInfo].top_module) +
                   " --input-def {}".format(ctx.attr.implemented_rtl[OpenRoadInfo].routed_def.path) +
                   lef_args +
@@ -81,6 +82,7 @@ def _gds_write_impl(ctx):
                   gds_allow_empty_args +
                   " --out {}".format(final_gds.path),
         tools = depset([ctx.executable._gds_write]),
+        toolchain = "//python:current_py_toolchain",
     )
 
     return [DefaultInfo(files = depset([final_gds]))]
