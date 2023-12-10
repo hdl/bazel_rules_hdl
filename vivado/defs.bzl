@@ -118,9 +118,10 @@ def generate_ip_block_tcl(ip_blocks):
     Returns:
         The tcl to include the paths to the ip blocks.
     """
-    ip_tcl = ""
+    ip_tcl = "set_property ip_repo_paths [list "
     for ip_block in ip_blocks:
-        ip_tcl += "set_property ip_repo_paths {}/ [current_project]\n".format(ip_block[VivadoIPBlockInfo].repo.path)
+        ip_tcl += "{} ".format(ip_block[VivadoIPBlockInfo].repo.path)
+    ip_tcl += "] [current_project]\n"
     ip_tcl += "update_ip_catalog\n"
     return ip_tcl
 
