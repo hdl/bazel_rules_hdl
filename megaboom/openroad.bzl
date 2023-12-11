@@ -144,8 +144,9 @@ def build_openroad(
         outs[stage] = outs.get(stage, []) + [
             "build/results/asap7/%s/base/%s.ok" %(output_folder_name, stage)]
 
-    outs[stage] = outs.get(stage, []) + list(
-        map(lambda log: "build/logs/asap7/%s/base/%s.log" %(output_folder_name, log), reports[stage])) 
+    for stage in reports:
+        outs[stage] = outs.get(stage, []) + list(
+            map(lambda log: "build/logs/asap7/%s/base/%s.log" %(output_folder_name, log), reports[stage]))
 
     [run_binary(
         name = name + "_" + stage,
