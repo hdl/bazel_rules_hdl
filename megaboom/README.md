@@ -218,6 +218,11 @@ If you want to "stare at logs" while Bazel is running, open the logs folder in v
 
   code $(readlink -f /proc/$(pgrep openroad)/cwd)/bazel-out/k8-fastbuild/bin/build/logs/asap7/
 
+Downloading the immediate dependencies of a target
+--------------------------------------------------
+
+  bazel build $(bazel query 'deps(BoomTile_floorplan, 1)' --noimplicit_deps)
+
 MegaBoom RTL code
 =================
 
