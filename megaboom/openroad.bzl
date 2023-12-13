@@ -28,7 +28,8 @@ def build_openroad(
     io_constraints=None,
     stage_args={},
     mock_abstract=False,
-    mock_stage=3
+    mock_stage=3,
+    orfs_version=4
 ):
     all_stages = ([(1, 'synth'), (2, 'floorplan'), (3, 'place'),
     (4, 'cts'), (5, 'route'), (6, 'final'), (7, 'generate_abstract')])
@@ -42,8 +43,6 @@ def build_openroad(
         "bazel.mk",
         "config.mk"
     ]
-
-    orfs_version = 3
 
     macro_targets = map(lambda m: ":" + m + "_generate_abstract", macros)
 
