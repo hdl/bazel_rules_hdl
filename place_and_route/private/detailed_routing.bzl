@@ -76,6 +76,24 @@ def detailed_routing(ctx, open_road_info):
                                   "\n}")
         open_road_commands.append("density_fill -rules {}".format(density_fill_config.path))
         inputs.append(density_fill_config)
+
+    open_road_commands.append("puts \"report_checks -path_delay min_max -format full_clock_expanded -fields {input_pin slew capacitance} -digits 3\"")
+    open_road_commands.append("report_checks -path_delay min_max -format full_clock_expanded -fields {input_pin slew capacitance} -digits 3")
+
+    open_road_commands.append("puts \"report_wns\"")
+    open_road_commands.append("report_wns")
+
+    open_road_commands.append("puts \"report_tns\"")
+    open_road_commands.append("report_tns")
+
+    open_road_commands.append("puts \"report_check_types -max_slew -max_capacitance -max_fanout -violators\"")
+    open_road_commands.append("report_check_types -max_slew -max_capacitance -max_fanout -violators")
+
+    open_road_commands.append("puts \"report_floating_nets -verbose\"")
+    open_road_commands.append("report_floating_nets -verbose")
+
+    open_road_commands.append("puts \"report_units\"")
+    open_road_commands.append("report_units")
     open_road_commands.append("write_def {}".format(routed_def.path))
 
     execution_requirements = {}
