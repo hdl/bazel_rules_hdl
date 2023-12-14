@@ -63,11 +63,11 @@ def init(python_interpreter = None, python_interpreter_target = None):
         python_interpreter = python_interpreter,
         python_interpreter_target = python_interpreter_target,
     )
-    if (not python_interpreter) or (python_interpreter_target != "@rules_hdl_cpython//:install/bin/python3"):
+    if (not python_interpreter) or (python_interpreter_target != "@python39//:install/bin/python3"):
         install_pip_deps()
 
     init_boost()
-    init_pybind11()
+    init_pybind11(python_interpreter_target = python_interpreter_target)
 
     protobuf_deps()
 

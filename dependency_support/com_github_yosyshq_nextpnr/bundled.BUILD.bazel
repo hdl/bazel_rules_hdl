@@ -129,7 +129,7 @@ cc_binary(
     linkopts = ["-lpthread"],
     visibility = ["//visibility:public"],
     deps = DEPS + [
-        "@rules_hdl//dependency_support/embedded_python_interpreter",
+        "@python39//:libpython",
         ":common",
         ":%s_chipdb" % family,
     ],
@@ -158,7 +158,7 @@ cc_binary(
         ":common",
         ":%s_chipdb" % family,
         "@com_google_googletest//:gtest_main",
-        "@rules_hdl//dependency_support/embedded_python_interpreter",
+        "@python39//:libpython",
     ],
 ) for family in [
     # There are no unit tests for ECP5 under tests/ecp5.
