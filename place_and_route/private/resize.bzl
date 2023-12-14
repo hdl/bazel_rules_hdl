@@ -51,7 +51,7 @@ def resize(ctx, open_road_info):
         ),
     ] + placement_padding_struct.commands + [
         "detailed_placement",
-        "improve_placement",
+        "improve_placement" if ctx.attr.enable_improve_placement else "",
         "optimize_mirroring",
         "check_placement -verbose",
         "report_checks -path_delay min_max -format full_clock_expanded -fields {input_pin slew capacitance} -digits 3",
