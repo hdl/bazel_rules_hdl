@@ -47,6 +47,7 @@ def cc_compile_and_link_static_library(ctx, srcs, hdrs, deps, runfiles, includes
         actions = ctx.actions,
         feature_configuration = feature_configuration,
         cc_toolchain = cc_toolchain,
+        user_compile_flags = ctx.attr.copts,
         srcs = srcs,
         includes = includes,
         defines = defines,
@@ -201,6 +202,10 @@ verilator_cc_library = rule(
         "vopts": attr.string_list(
             doc = "Additional command line options to pass to Verilator",
             default = ["-Wall"],
+        ),
+        "copts": attr.string_list(
+            doc = "List of additional compilation flags",
+            default = [],
         ),
         "_cc_toolchain": attr.label(
             doc = "CC compiler.",
