@@ -47,6 +47,7 @@ def clock_tree_synthesis(ctx, open_road_info):
             sink_clustering_max_diameter = "-sink_clustering_max_diameter {}".format(ctx.attr.sink_clustering_max_diameter) if ctx.attr.sink_clustering_max_diameter else "",
         ),
         "set_propagated_clock [all_clocks]",
+        "estimate_parasitics -placement",
         "repair_clock_nets",
         "estimate_parasitics -placement",
     ] + placement_padding_struct.commands + [
