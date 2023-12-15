@@ -152,6 +152,7 @@ cc_library(
         ],
         exclude = [
             "kernel/driver.cc",
+            "backends/cxxrtl/runtime/**/*.cc",
             "backends/protobuf/*.cc",
             "frontends/verific/*.cc",
             "passes/techmap/filterlib.cc",
@@ -176,6 +177,7 @@ cc_library(
         ],
         exclude = [
             "backends/protobuf/*.h",
+            "backends/cxxrtl/runtime/**/*.h",
         ],
     ) + GENERATED_HEADERS,
     copts = YOSYS_COPTS,
