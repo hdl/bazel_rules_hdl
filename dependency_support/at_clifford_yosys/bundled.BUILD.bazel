@@ -123,6 +123,7 @@ GENERATED_HEADERS = [
     "passes/pmgen/xilinx_dsp_pm.h",
     "passes/pmgen/xilinx_dsp48a_pm.h",
     "passes/pmgen/xilinx_srl_pm.h",
+    "techlibs/quicklogic/ql_dsp_macc_pm.h",
 ]
 
 YOSYS_COPTS = [
@@ -196,6 +197,7 @@ cc_library(
         "frontends/rtlil",
         "passes/techmap",
         "techlibs/common",
+        "techlibs/quicklogic",
     ],
     deps = [
         ":bigint",
@@ -478,6 +480,18 @@ genrule(
     ],
     outs = ["passes/pmgen/peepopt_pm.h"],
     cmd = "$(location :pmgen) -o $(OUTS) -p peepopt $(SRCS)",
+    tools = [
+        ":pmgen",
+    ],
+)
+
+genrule(
+    name = "ql_dsp_mac_pm_h",
+    srcs = [
+        "techlibs/quicklogic/ql_dsp_macc.pmg",
+    ],
+    outs = ["techlibs/quicklogic/ql_dsp_macc_pm.h"],
+    cmd = "$(location :pmgen) -o $(OUTS) -p ql_dsp_macc $(SRCS)",
     tools = [
         ":pmgen",
     ],
