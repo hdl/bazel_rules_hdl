@@ -123,6 +123,7 @@ GENERATED_HEADERS = [
     "passes/pmgen/xilinx_dsp_pm.h",
     "passes/pmgen/xilinx_dsp48a_pm.h",
     "passes/pmgen/xilinx_srl_pm.h",
+    "techlibs/quicklogic/ql_dsp_macc_pm.h",
 ]
 
 YOSYS_COPTS = [
@@ -151,6 +152,7 @@ cc_library(
         ],
         exclude = [
             "kernel/driver.cc",
+            "backends/cxxrtl/runtime/**/*.cc",
             "backends/protobuf/*.cc",
             "frontends/verific/*.cc",
             "passes/techmap/filterlib.cc",
@@ -175,6 +177,7 @@ cc_library(
         ],
         exclude = [
             "backends/protobuf/*.h",
+            "backends/cxxrtl/runtime/**/*.h",
         ],
     ) + GENERATED_HEADERS,
     copts = YOSYS_COPTS,
@@ -196,6 +199,7 @@ cc_library(
         "frontends/rtlil",
         "passes/techmap",
         "techlibs/common",
+        "techlibs/quicklogic",
     ],
     deps = [
         ":bigint",
@@ -467,7 +471,9 @@ genrule(
         "passes/pmgen/ice40_dsp.pmg",
         "passes/pmgen/ice40_wrapcarry.pmg",
         "passes/pmgen/peepopt_muldiv.pmg",
-        "passes/pmgen/peepopt_shiftmul.pmg",
+        "passes/pmgen/peepopt_shiftadd.pmg",
+        "passes/pmgen/peepopt_shiftmul_right.pmg",
+        "passes/pmgen/peepopt_shiftmul_left.pmg",
         "passes/pmgen/xilinx_dsp48a.pmg",
         "passes/pmgen/xilinx_dsp_cascade.pmg",
         "passes/pmgen/xilinx_dsp_CREG.pmg",
@@ -476,6 +482,18 @@ genrule(
     ],
     outs = ["passes/pmgen/peepopt_pm.h"],
     cmd = "$(location :pmgen) -o $(OUTS) -p peepopt $(SRCS)",
+    tools = [
+        ":pmgen",
+    ],
+)
+
+genrule(
+    name = "ql_dsp_mac_pm_h",
+    srcs = [
+        "techlibs/quicklogic/ql_dsp_macc.pmg",
+    ],
+    outs = ["techlibs/quicklogic/ql_dsp_macc_pm.h"],
+    cmd = "$(location :pmgen) -o $(OUTS) -p ql_dsp_macc $(SRCS)",
     tools = [
         ":pmgen",
     ],
