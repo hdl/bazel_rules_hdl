@@ -130,6 +130,12 @@ def _synthesize_design_impl(ctx):
     if ctx.attr.target_clock_period_pico_seconds:
         script_env_files["CLOCK_PERIOD"] = str(ctx.attr.target_clock_period_pico_seconds)
 
+    if or_config.tie_low_port:
+        script_env_files["TIELO_CELL_AND_PORT"] = str(or_config.tie_low_port)
+
+    if or_config.tie_high_port:
+        script_env_files["TIEHI_CELL_AND_PORT"] = str(or_config.tie_high_port)
+
     env = {
         "YOSYS_DATDIR": yosys_runfiles_dir + "/at_clifford_yosys/techlibs/",
         "ABC": yosys_runfiles_dir + "/edu_berkeley_abc/abc",
