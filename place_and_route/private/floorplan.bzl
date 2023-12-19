@@ -91,6 +91,7 @@ def init_floor_plan(ctx):
         "source {tracks_file}".format(
             tracks_file = open_road_configuration.tracks_file.path,
         ),
+        "remove_buffers",
         "insert_tiecells {port} -prefix \"TIE_ONE_\"".format(
             port = tieoneport,
         ),
