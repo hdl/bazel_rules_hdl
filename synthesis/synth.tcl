@@ -72,9 +72,22 @@ yosys synth -top $top
 yosys opt_clean -purge
 yosys autoname
 
+# Technology mapping of adders
+if {[info exists ::env(ADDER_MAPPING)] && [file isfile $::env(ADDER_MAPPING)]} {
+  # extract the full adders
+  extract_fa
+  # map full adders
+  techmap -map $::env(ADDER_MAPPING)
+  techmap
+  # Quick optimization
+  opt -fast -purge
+}
+
 # mapping to liberty
 set liberty $::env(LIBERTY)
 dfflibmap -liberty $liberty
+
+opt
 
 if { [info exists ::env(CLOCK_PERIOD) ] } {
   abc -liberty $liberty -dff -script $::env(ABC_SCRIPT) -g aig -D $::env(CLOCK_PERIOD) {*}$::env(DONT_USE_ARGS)

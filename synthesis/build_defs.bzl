@@ -100,6 +100,8 @@ def _synthesize_design_impl(ctx):
     inputs.append(synth_tcl)
     inputs.append(abc_script)
     inputs.append(default_liberty_file)
+    if ctx.attr.adder_mapping:
+        inputs.append(ctx.file.adder_mapping)
 
     (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr.yosys_tool])
 
@@ -138,6 +140,9 @@ def _synthesize_design_impl(ctx):
 
     if or_config.tie_high_port:
         script_env_files["TIEHI_CELL_AND_PORT"] = str(or_config.tie_high_port)
+
+    if ctx.attr.adder_mapping:
+        script_env_files["ADDER_MAPPING"] = str(ctx.file.adder_mapping.path)
 
     env = {
         "YOSYS_DATDIR": yosys_runfiles_dir + "/at_clifford_yosys/techlibs/",
@@ -266,6 +271,10 @@ synthesize_rtl = rule(
             default = Label("//synthesis:abc.script"),
             allow_single_file = True,
             doc = "ABC script",
+        ),
+        "adder_mapping": attr.label(
+            allow_single_file = True,
+            doc = "Verilog file that maps yosys adder to PDK adders."
         ),
         "target_clock_period_pico_seconds": attr.int(doc = "target clock period in picoseconds"),
         "output_file_name": attr.string(doc = "The output file name."),
