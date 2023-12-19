@@ -77,9 +77,9 @@ set liberty $::env(LIBERTY)
 dfflibmap -liberty $liberty
 
 if { [info exists ::env(CLOCK_PERIOD) ] } {
-  abc -liberty $liberty -dff -g aig -D $::env(CLOCK_PERIOD) {*}$::env(DONT_USE_ARGS)
+  abc -liberty $liberty -dff -script $::env(ABC_SCRIPT) -g aig -D $::env(CLOCK_PERIOD) {*}$::env(DONT_USE_ARGS)
 } else {
-  abc -liberty $liberty -dff -g aig {*}$::env(DONT_USE_ARGS)
+  abc -liberty $liberty -dff -script $::env(ABC_SCRIPT) -g aig {*}$::env(DONT_USE_ARGS)
 }
 
 setundef -zero
