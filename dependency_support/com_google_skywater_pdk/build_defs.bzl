@@ -74,13 +74,19 @@ def _skywater_cell_library_impl(ctx):
         open_road_configuration = ctx.attr.openroad_configuration[OpenRoadPdkInfo]
 
     cell_lef_files = [lef_file for lef_file in ctx.files.srcs if lef_file.extension == "lef"]
+    if not cell_lef_files:
+        fail("No cell lef files found in " + str(ctx.files.srcs))
     platform_gds_files = [gds_file for gds_file in ctx.files.srcs if gds_file.extension == "gds"]
+    if not platform_gds_files:
+        fail("No gds files found in " + str(ctx.files.srcs))
 
     tech_lef = None
     if ctx.attr.tech_lef:
         tech_lef = ctx.file.tech_lef
 
-    default_corner = corners.get(ctx.attr.default_corner, None)
+    default_corner = corners.get(ctx.attr.default_corner)
+    if not default_corner:
+        fail("Did not find the default corner provided:" + str(ctx.attr.default_corner))
     default_lib_depset = []
     if default_corner:
         default_lib_depset = [default_corner.liberty]
