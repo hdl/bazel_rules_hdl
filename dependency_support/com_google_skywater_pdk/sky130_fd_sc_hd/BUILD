@@ -49,4 +49,5 @@ open_road_pdk_configuration(
     ],
     wire_rc_clock_metal_layer = "met5",
     wire_rc_signal_metal_layer = "met2",
+    ha_fa_mapping = "cell_adders.v"
 )
