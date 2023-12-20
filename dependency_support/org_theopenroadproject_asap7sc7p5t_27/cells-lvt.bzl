@@ -68,4 +68,5 @@ open_road_pdk_configuration(
     tracks_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:tracks_1x.tcl",
     wire_rc_clock_metal_layer = "M5",
     wire_rc_signal_metal_layer = "M2",
+    ha_fa_mapping = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:cell_adders_L.v",
 )
