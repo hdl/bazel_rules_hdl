@@ -23,6 +23,7 @@ StandardCellInfo = provider(
         "tech_lef": "Tech LEF file for the PDK",
         "cell_lef_definitions": "list of Abstract LEFs files for each standard cell.",
         "platform_gds": "list of Platform GDS files.",
+        "ha_fa_mapping": "HA/FA techmapping file",
         "parasitic_extraction_benchmark": "Optional calibration file for OpenRCX.",
         "open_road_configuration": "OpenROAD PDK configuration.",
     },

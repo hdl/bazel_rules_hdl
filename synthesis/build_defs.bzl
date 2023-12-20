@@ -98,8 +98,6 @@ def _synthesize_design_impl(ctx):
     inputs.extend(uhdm_files)
     inputs.append(synth_tcl)
     inputs.append(default_liberty_file)
-    if ctx.attr.adder_mapping:
-        inputs.append(ctx.file.adder_mapping)
 
     (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr.yosys_tool])
 
@@ -138,8 +136,11 @@ def _synthesize_design_impl(ctx):
     if or_config.tie_high_port:
         script_env_files["TIEHI_CELL_AND_PORT"] = str(or_config.tie_high_port)
 
-    if ctx.attr.adder_mapping:
-        script_env_files["ADDER_MAPPING"] = str(ctx.file.adder_mapping.path)
+    ha_fa_mapping = or_config.ha_fa_mapping
+    if ha_fa_mapping:
+        ha_fa_mapping_path = ha_fa_mapping.files.to_list()[0].path
+        script_env_files["ADDER_MAPPING"] = str(ha_fa_mapping_path)
+        inputs.append(ha_fa_mapping.files.to_list()[0])
 
     env = {
         "YOSYS_DATDIR": yosys_runfiles_dir + "/at_clifford_yosys/techlibs/",
