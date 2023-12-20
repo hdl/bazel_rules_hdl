@@ -1,25 +1,15 @@
-
-module weights_replay #(
+module weights_ram #(
+    parameter int RAM_DEPTH = 8,
     parameter int COUNTER_BITS = 3
 ) (
     input logic clk,
     input logic rst,
-    output logic [7:0] shift_reg
+    input logic [7:0] shift_reg
 );
 
   logic [COUNTER_BITS - 1:0] counter;
   logic [2:0] weights_address;
-  logic [7:0] weights [1][8];
-
-`ifdef __VERILATOR__
-  initial begin
-    $readmemh("./vivado/tests/test.mem", weights);
-  end
-`else
-  initial begin
-    $readmemh("./test.mem", weights);
-  end
-`endif
+  logic [7:0] weights[1][RAM_DEPTH];
 
   always @(posedge clk) begin
     if (rst) begin
@@ -34,7 +24,6 @@ module weights_replay #(
         counter <= counter + 1;
       end
     end
-    shift_reg <= weights[0][weights_address];
+    weights[0][weights_address] <= shift_reg;
   end
-
 endmodule

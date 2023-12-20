@@ -2,6 +2,8 @@ create_project project_1 {{PROJECT_DIR}} -part {{PART_NUMBER}}
 
 {{HDL_SOURCE_CONTENT}}
 
+{{IP_BLOCK_TCL}}
+
 {{TCL_CONTENT}}
 
 {{CONSTRAINTS_CONTENT}}

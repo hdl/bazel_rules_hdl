@@ -111,6 +111,7 @@ verilator_cc_library(
     name = "weights_replay_verilator",
     module = ":weights_replay",
     module_top = "weights_replay",
+    vopts = ["-D__VERILATOR__"],
 )
 
 cc_test(
@@ -165,6 +166,87 @@ vivado_create_project(
     ],
     module = ":weights_replay_top",
     module_top = "weights_replay_top",
+    part_number = "xczu28dr-ffvg1517-2-e",
+    tags = ["manual"],
+    xilinx_env = ":xilinx_env.sh",
+)
+
+verilog_library(
+    name = "weights_ram",
+    srcs = [
+        "weights_ram.sv",
+    ],
+)
+
+vivado_create_ip(
+    name = "weights_ram_ip",
+    encrypt = False,
+    ip_library = "test",
+    ip_vendor = "test_vendor",
+    ip_version = "0.1",
+    module = ":weights_ram",
+    module_top = "weights_ram",
+    part_number = "xczu28dr-ffvg1517-2-e",
+    tags = ["manual"],
+    xilinx_env = ":xilinx_env.sh",
+)
+
+verilog_library(
+    name = "weights_replay_and_save_bd",
+    srcs = [
+        "weights_replay_and_save_bd.tcl",
+    ],
+)
+
+vivado_create_ip(
+    name = "weights_replay_and_save_ip",
+    ip_blocks = [
+        ":weights_replay_ip",
+        ":weights_ram_ip",
+    ],
+    ip_library = "test",
+    ip_vendor = "test_vendor",
+    ip_version = "0.1",
+    module = ":weights_replay_and_save_bd",
+    module_top = "weights_replay_and_save",
+    part_number = "xczu28dr-ffvg1517-2-e",
+    tags = ["manual"],
+    xilinx_env = ":xilinx_env.sh",
+)
+
+verilog_library(
+    name = "weights_replay_and_save_tb",
+    srcs = [
+        "weights_replay_and_save_tb.sv",
+    ],
+)
+
+xsim_test(
+    name = "weights_replay_and_save_xsim",
+    ip_blocks = [
+        ":weights_replay_and_save_ip",
+    ],
+    module = ":weights_replay_and_save_tb",
+    module_top = "weights_replay_and_save_tb",
+    part_number = "xczu28dr-ffvg1517-2-e",
+    tags = ["manual"],
+    xilinx_env = ":xilinx_env.sh",
+)
+
+verilog_library(
+    name = "weights_replay_and_save_wrapper",
+    srcs = [
+        "weights_replay_and_save_wrapper.sv",
+    ],
+)
+
+vivado_create_project(
+    name = "weights_replay_and_save_project",
+    ip_blocks = [
+        ":weights_replay_and_save_ip",
+    ],
+    module = ":weights_replay_and_save_wrapper",
+    module_top = "weights_replay_and_save_wrapper",
     part_number = "xczu28dr-ffvg1517-2-e",
     tags = ["manual"],
     xilinx_env = ":xilinx_env.sh",
