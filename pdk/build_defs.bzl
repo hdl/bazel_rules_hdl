@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Providers for PDKs to be used by downstream synthesis.
-"""
+"""Providers for PDKs to be used by downstream synthesis."""
 
 StandardCellInfo = provider(
     "Contains information about the standard cells used for synthesis",
@@ -53,6 +52,12 @@ StandardCellOptionsInfo = provider(
 def temp_format(i):
     """Format an integer representing degrees celsius.
 
+    Args:
+        i: Temperature as integer in degrees celsius.
+
+    Returns:
+        A formated string version of input.
+
     The format is:
         * Always 4 characters long.
         * Always ends in lower case 'c'.
@@ -90,7 +95,13 @@ def temp_format(i):
     return s + "c"
 
 def temp_parse(s):
-    """Parse into an int a string representing temperature in degrees celsius.
+    """Parse a string representing temperature in degrees celsius into integer.
+
+    Args:
+        s: Temperature as string.
+
+    Returns:
+        An integer representing temperature in degrees celsius.
 
     >>> temp_parse("030c")
     30
@@ -116,7 +127,7 @@ def temp_parse(s):
 
     # Check string ends in `c` (for degree celsius)
     if s[-1] != "c":
-        fail("No `c` character found at end of value {}".format(s))
+        fail("No `c` character found at end of value {} (input {})".format(s, os))
     s = s[:-1]
 
     # Convert `m` into negative sign
@@ -137,6 +148,12 @@ def temp_parse(s):
 def temp_normalize(s):
     """Normalize an already existing temperature string into the format provided by `temp_format`.
 
+    Args:
+        s: Temperature as string.
+
+    Returns:
+        A normalize version of the input string.
+
     >>> temp_normalize("m2c")
     "m02c"
 
@@ -153,6 +170,12 @@ def temp_normalize(s):
 
 def voltage_format(f):
     """Format a decimal number representing a voltage.
+
+    Args:
+        f: Voltage as decimal number (float / int).
+
+    Returns:
+        A string version of the input.
 
     The format is:
         * Always 5 characters long.
@@ -189,6 +212,12 @@ def voltage_format(f):
 def voltage_normalize(s):
     """Normalize an existing voltage string into the format provided by `voltage_format`.
 
+    Args:
+        s: Voltage as string.
+
+    Returns:
+        A normalize version of the input string.
+
     >>> voltage_normalize("7p5v")
     "7v500"
 
@@ -197,12 +226,17 @@ def voltage_normalize(s):
 
     >>> voltage_normalize("7.5v")
     "7v500"
-
     """
     return voltage_format(voltage_parse(s))
 
 def voltage_parse(s):
     """Parse a voltage string like that produced by `voltage_format` function.
+
+    Args:
+        s: Voltage as string.
+
+    Returns:
+        A float version of the input string.
 
     >>> voltage_parse("7p5")
     7.5
