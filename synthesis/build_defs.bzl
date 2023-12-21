@@ -90,6 +90,7 @@ def _synthesize_design_impl(ctx):
     default_liberty_file = ctx.attr.standard_cells[StandardCellInfo].default_corner.liberty
 
     synth_tcl = ctx.file.synth_tcl
+    abc_script = ctx.file.abc_script
 
     inputs = []
     inputs.extend(verilog_files)
@@ -97,6 +98,7 @@ def _synthesize_design_impl(ctx):
     inputs.append(uhdm_flist)
     inputs.extend(uhdm_files)
     inputs.append(synth_tcl)
+    inputs.append(abc_script)
     inputs.append(default_liberty_file)
 
     (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr.yosys_tool])
@@ -125,6 +127,7 @@ def _synthesize_design_impl(ctx):
         "OUTPUT": output_file,
         "LIBERTY": default_liberty_file,
         "DONT_USE_ARGS": dont_use_args,
+        "ABC_SCRIPT": abc_script,
     }
 
     if ctx.attr.target_clock_period_pico_seconds:
@@ -264,6 +267,11 @@ synthesize_rtl = rule(
             default = Label("//synthesis:synth.tcl"),
             allow_single_file = True,
             doc = "Tcl synthesis script compatible with the environment-variable API of synth.tcl",
+        ),
+        "abc_script": attr.label(
+            default = Label("//synthesis:abc.script"),
+            allow_single_file = True,
+            doc = "ABC script",
         ),
         "adder_mapping": attr.label(
             allow_single_file = True,

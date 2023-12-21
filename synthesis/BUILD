@@ -22,6 +22,7 @@ package(
 )
 
 exports_files(["synth.tcl"])
+exports_files(["abc.script"])
 
 pkg_tar(
     name = "yosys",
