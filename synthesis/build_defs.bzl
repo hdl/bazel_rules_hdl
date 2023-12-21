@@ -136,6 +136,12 @@ def _synthesize_design_impl(ctx):
     if or_config.tie_high_port:
         script_env_files["TIEHI_CELL_AND_PORT"] = str(or_config.tie_high_port)
 
+    ha_fa_mapping = or_config.ha_fa_mapping
+    if ha_fa_mapping:
+        ha_fa_mapping_path = ha_fa_mapping.files.to_list()[0].path
+        script_env_files["ADDER_MAPPING"] = str(ha_fa_mapping_path)
+        inputs.append(ha_fa_mapping.files.to_list()[0])
+
     env = {
         "YOSYS_DATDIR": yosys_runfiles_dir + "/at_clifford_yosys/techlibs/",
         "ABC": yosys_runfiles_dir + "/edu_berkeley_abc/abc",
@@ -258,6 +264,10 @@ synthesize_rtl = rule(
             default = Label("//synthesis:synth.tcl"),
             allow_single_file = True,
             doc = "Tcl synthesis script compatible with the environment-variable API of synth.tcl",
+        ),
+        "adder_mapping": attr.label(
+            allow_single_file = True,
+            doc = "Verilog file that maps yosys adder to PDK adders."
         ),
         "target_clock_period_pico_seconds": attr.int(doc = "target clock period in picoseconds"),
         "output_file_name": attr.string(doc = "The output file name."),
