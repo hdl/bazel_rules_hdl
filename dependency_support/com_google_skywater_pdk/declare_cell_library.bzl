@@ -16,6 +16,7 @@
 cell library workspace to set things up."""
 
 load("@rules_hdl//dependency_support/com_google_skywater_pdk:build_defs.bzl", "skywater_cell_library", "skywater_corner")
+load("@rules_hdl//dependency_support/com_google_skywater_pdk:cells_info.bzl", "sky130_cell_normalize")
 load(":cell_libraries.bzl", "CELL_LIBRARIES")
 
 def declare_cell_library(workspace_name, name):
@@ -32,13 +33,21 @@ def declare_cell_library(workspace_name, name):
     )
     library = CELL_LIBRARIES[name]
     corners = library.get("corners", {})
+    all_corners = []
     for corner in corners:
+        target_name = sky130_cell_normalize(name, corner).replace("sky130_fd_", "")
+        corner_name = "corner-" + target_name
+        all_corners.append(corner_name)
+
         # boolean values indicating ccsnoise and leakage information in this
         # corner.
         ccsnoise = "ccsnoise" in corners[corner]
         leakage = "leakage" in corners[corner]
+
+        # Create the corner configuration
         skywater_corner(
-            name = "{}".format(corner),
+            name = corner_name,
+            corner = corner,
             visibility = ["//visibility:private"],
             srcs = native.glob([
                 "cells/**/*.lib.json",
@@ -49,6 +58,37 @@ def declare_cell_library(workspace_name, name):
             with_leakage = leakage,
             standard_cell_root = "external/{}".format(workspace_name),
         )
+
+        # Library with only just a single corner.
+        skywater_cell_library(
+            name = target_name,
+            srcs = native.glob(
+                include = [
+                    "cells/**/*.lef",
+                    "cells/**/*.gds",
+                ],
+                # There are two types of lefs in the PDK. One for magic a layout
+                # tool that requires some different properties set in the LEF that
+                # are not always suitable for the downstream tools like OpenROAD
+                # and yosys. We're basically just choosing that we want the normal
+                # lefs instead of the magic ones.
+                #
+                # Currently this repo doesn't integrate magic into the flow. At
+                # some point it will, and we'll need to somehow have both lefs, or
+                # fix the lefs upstream. Just know that you may at some point in the
+                # future need to modify this.
+                exclude = [
+                    "cells/**/*.magic.lef",
+                ],
+            ),
+            process_corners = [":" + corner_name],
+            default_corner = corner,
+            visibility = ["//visibility:public"],
+            openroad_configuration = library.get("open_road_configuration", None),
+            tech_lef = "tech/{}.tlef".format(name) if library.get("library_type", None) != "ip_library" else None,
+        )
+
+    # Multi-corner library
     skywater_cell_library(
         name = name,
         srcs = native.glob(
@@ -70,7 +110,7 @@ def declare_cell_library(workspace_name, name):
                 "cells/**/*.magic.lef",
             ],
         ),
-        process_corners = [":{}".format(corner) for corner in corners],
+        process_corners = [":{}".format(corner) for corner in all_corners],
         default_corner = library.get("default_corner", ""),
         visibility = ["//visibility:public"],
         openroad_configuration = library.get("open_road_configuration", None),

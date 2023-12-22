@@ -13,12 +13,20 @@
 //limitations under the License.
 
 
-module adder(
-  input [7:0] x,
-  input [7:0] y,
-  input carry_in,
-  output carry_output_bit,
-  output [7:0] sum,
+module verilog_counter(
+  input wire clk,
+  input wire reset,
+  output [128:0] out,
 );
-  assign {carry_output_bit, sum} = x + y + carry_in;
+  reg [128:0] counter_tmp;
+  always @ (posedge clk or posedge reset) begin
+    if (reset) begin
+      counter_tmp <= 0;
+    end else begin
+      counter_tmp <= counter_tmp + 1;
+    end
+  end
+
+  assign out = counter_tmp;
+
 endmodule

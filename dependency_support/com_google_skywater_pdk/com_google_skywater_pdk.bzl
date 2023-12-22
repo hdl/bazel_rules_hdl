@@ -41,6 +41,8 @@ def com_google_skywater_pdk():
 
     for library_name in CELL_LIBRARIES:
         library = CELL_LIBRARIES[library_name]
+        if library.get('library_type', None) == 'ip_library':
+            continue
         workspace_name = "com_google_skywater_pdk_" + library_name
         maybe(
             new_git_repository,

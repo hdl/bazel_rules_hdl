@@ -19,6 +19,9 @@ def _extract_lef_and_liberty_impl(ctx):
         content.append("tech_lef_path: \"{}\"".format(standard_cell.tech_lef.short_path))
         out_files.append(standard_cell.tech_lef)
 
+        if not standard_cell.default_corner:
+            fail("No default corner found on " + str(ctx.attr.standard_cell))
+
         content.append("liberty_path: \"{}\"".format(standard_cell.default_corner.liberty.short_path))
         out_files.append(standard_cell.default_corner.liberty)
     else:

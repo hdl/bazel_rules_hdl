@@ -1,4 +1,4 @@
-current_design counter
+current_design verilog_counter
 
 set clk_name  core_clock
 set clk_port_name clk
