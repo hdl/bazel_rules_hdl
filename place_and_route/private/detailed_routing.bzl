@@ -57,7 +57,7 @@ def detailed_routing(ctx, open_road_info):
 
     open_road_commands = timing_setup_command_struct.commands + [
         "set_propagated_clock [all_clocks]",
-        "detailed_route -output_drc {} {}".format(output_drc.path, detailed_routing_args)
+        "detailed_route -output_drc {} {}".format(output_drc.path, detailed_routing_args),
     ]
     density_fill_config = None
     if open_road_configuration.density_fill_config:

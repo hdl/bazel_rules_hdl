@@ -105,6 +105,6 @@ place_and_route = rule(
         "sink_clustering_size": attr.int(doc = "Clock tree synthesis sink group size"),
         "sink_clustering_max_diameter": attr.int(doc = "Clock tree synthesis sink group desired diamater in microns"),
         "min_pin_distance": attr.string(doc = "The minimum distance in microns between pins around the outside of the block."),
-        "enable_improve_placement": attr.bool(default=True, doc = "Enable/Disable improve_placement pass.")
+        "enable_improve_placement": attr.bool(default = True, doc = "Enable/Disable improve_placement pass."),
     },
 )
