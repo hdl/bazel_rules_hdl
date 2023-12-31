@@ -29,35 +29,44 @@ def place_pins(ctx, open_road_info):
        open_road_info: OpenRoadInfo provider from a previous step.
 
     """
-
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
+
+    inputs = []
+    open_road_commands = []
+
+    # Timing setup
     timing_setup_command_struct = timing_setup_commands(ctx)
-    inputs = timing_setup_command_struct.inputs
+    inputs.append(timing_setup_command_struct.inputs)
+    open_road_commands += timing_setup_command_struct.commands
 
-    tapcell_command = "tapcell -distance {tapcell_distance} -tapcell_master {tapcell}".format(
-        tapcell = open_road_configuration.tap_cell,
-        tapcell_distance = open_road_configuration.tapcell_distance,
-        endcap = open_road_configuration.endcap_cell,
-    )
+    # Pin placement
+    if ctx.file.pin_placement_script:
+        inputs.append(ctx.file.pin_placement_script)
+        open_road_commands.append(
+            "source {}".format(ctx.file.pin_placement_script.path),
+        )
 
-    if open_road_configuration.tapcell_tcl:
-        inputs = inputs + [
-            open_road_configuration.tapcell_tcl,
-        ]
-        tapcell_command = "source {}".format(open_road_configuration.tapcell_tcl.path)
-
-        if ctx.file.pin_placement_script:
-            inputs.append(ctx.file.pin_placement_script)
-
-    open_road_commands = timing_setup_command_struct.commands + [
-        "source {}".format(ctx.file.pin_placement_script.path) if ctx.file.pin_placement_script else "",
+    # FIXME: Should this be else the pin_placement_script?
+    open_road_commands.append(
         "place_pins -hor_layers {hor_layers} -ver_layers {ver_layers} {min_pin_distance}".format(
             hor_layers = open_road_configuration.pin_horizontal_metal_layer,
             ver_layers = open_road_configuration.pin_vertical_metal_layer,
             min_pin_distance = "-min_distance {}".format(ctx.attr.min_pin_distance) if ctx.attr.min_pin_distance else "",
         ),
-        tapcell_command,
-    ]
+    )
+
+	# Tap cell configuration
+    if open_road_configuration.tapcell_tcl:
+        inputs.append(open_road_configuration.tapcell_tcl)
+        open_road_commands.append(
+            "source {}".format(open_road_configuration.tapcell_tcl.path),
+        )
+    else:
+        tapcell_command = "tapcell -distance {tapcell_distance} -tapcell_master {tapcell}".format(
+            tapcell = open_road_configuration.tap_cell,
+            tapcell_distance = open_road_configuration.tapcell_distance,
+            endcap = open_road_configuration.endcap_cell,
+        )
 
     command_output = openroad_command(
         ctx,

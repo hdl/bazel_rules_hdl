@@ -30,17 +30,23 @@ def global_placement(ctx, open_road_info):
 
     """
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
+
+    inputs = []
+    open_road_commands = []
+
+    # Timing setup
     timing_setup_command_struct = timing_setup_commands(ctx)
+    inputs.append(timing_setup_command_struct.inputs)
+    open_road_commands += timing_setup_command_struct.commands
 
-    inputs = timing_setup_command_struct.inputs
-
-    open_road_commands = timing_setup_command_struct.commands + [
+    # Global placement
+    open_road_commands.append(
         "global_placement -timing_driven -routability_driven -density {density} -pad_left {pad_left} -pad_right {pad_right}".format(
             density = ctx.attr.placement_density,  #TODO(bazel): When bazel 4.0.0 is avaliable use float command
             pad_left = open_road_configuration.global_placement_cell_pad,
             pad_right = open_road_configuration.global_placement_cell_pad,
         ),
-    ]
+    )
 
     command_output = openroad_command(
         ctx,
