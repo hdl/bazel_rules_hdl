@@ -1,0 +1,1 @@
+set clk_port_name "clk"
