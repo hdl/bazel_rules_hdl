@@ -29,5 +29,6 @@ def at_clifford_yosys():
         build_file = Label("@rules_hdl//dependency_support:at_clifford_yosys/bundled.BUILD.bazel"),
         patches = [
             Label("@rules_hdl//dependency_support:at_clifford_yosys/yosys.patch"),
+            Label("@rules_hdl//dependency_support:at_clifford_yosys/autoname.patch"),
         ],
     )
