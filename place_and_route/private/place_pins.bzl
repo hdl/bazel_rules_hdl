@@ -54,17 +54,19 @@ def place_pins(ctx, open_road_info):
         ),
     )
 
-	# Tap cell configuration
+    # Tap cell configuration
     if open_road_configuration.tapcell_tcl:
         inputs.append(open_road_configuration.tapcell_tcl)
         open_road_commands.append(
             "source {}".format(open_road_configuration.tapcell_tcl.path),
         )
     else:
-        tapcell_command = "tapcell -distance {tapcell_distance} -tapcell_master {tapcell}".format(
-            tapcell = open_road_configuration.tap_cell,
-            tapcell_distance = open_road_configuration.tapcell_distance,
-            endcap = open_road_configuration.endcap_cell,
+        open_road_commands.append(
+            "tapcell -distance {tapcell_distance} -tapcell_master {tapcell}".format(
+                tapcell = open_road_configuration.tap_cell,
+                tapcell_distance = open_road_configuration.tapcell_distance,
+                endcap = open_road_configuration.endcap_cell,
+	    ),
         )
 
     command_output = openroad_command(

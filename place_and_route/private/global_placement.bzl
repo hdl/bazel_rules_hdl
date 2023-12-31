@@ -47,6 +47,13 @@ def global_placement(ctx, open_road_info):
         ),
     )
 
+    # Manual placement
+    if ctx.file.manual_placement_script:
+        inputs.append(ctx.file.manual_placement_script)
+        open_road_commands.append(
+            "source {}".format(ctx.file.manual_placement_script.path),
+	)
+
     command_output = openroad_command(
         ctx,
         commands = open_road_commands,

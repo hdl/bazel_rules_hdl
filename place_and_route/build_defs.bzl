@@ -95,7 +95,7 @@ place_and_route = rule(
         ),
         "sdc": attr.label(allow_single_file = True),
         "pin_placement_script": attr.label(allow_single_file = [".tcl"], doc = "See https://openroad.readthedocs.io/en/latest/main/src/ppl/README.html for syntax"),
-	"manual_placement_script": attr.label(allow_single_file = [".tcl"], doc = "TCL script which performs placement of certain cells."),
+        "manual_placement_script": attr.label(allow_single_file = [".tcl"], doc = "TCL script which performs placement of certain cells."),
         "clocks": attr.string_dict(),
         "die_width_microns": attr.int(),
         "die_height_microns": attr.int(),
