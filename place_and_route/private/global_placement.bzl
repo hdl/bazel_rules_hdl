@@ -31,12 +31,11 @@ def global_placement(ctx, open_road_info):
     """
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
 
-    inputs = []
     open_road_commands = []
 
     # Timing setup
     timing_setup_command_struct = timing_setup_commands(ctx)
-    inputs.append(timing_setup_command_struct.inputs)
+    inputs = timing_setup_command_struct.inputs
     open_road_commands += timing_setup_command_struct.commands
 
     # Global placement
