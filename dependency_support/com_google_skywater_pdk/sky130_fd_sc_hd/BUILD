@@ -1,4 +1,5 @@
-load("//pdk:open_road_configuration.bzl", "open_road_pdk_configuration")
+load("//pdk:build_defs.bzl", "ADDER_MAPPINGS")
+load("//pdk:open_road_configuration.bzl", "make_open_road_pdk_configuration")
 
 package(
     default_applicable_licenses = ["//:package_license"],
@@ -11,8 +12,7 @@ exports_files([
     "sky130hd.lyt",  # Imported from OpenROAD-flow-scripts on 24.07.2023 at 6ec980e1d49a1a8dcdd1e25ed81255b4bb8285c8 from: https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/blob/6ec980e1d49a1a8dcdd1e25ed81255b4bb8285c8/flow/platforms/sky130hd/sky130hd.lyt
 ])
 
-open_road_pdk_configuration(
-    name = "open_road_sky130_fd_sc_hd",
+_open_road_pdk_configuration_common = dict(
     cell_site = "unithd",
     cts_buffer_cell = "sky130_fd_sc_hd__clkbuf_1",
     density_fill_config = "fill.json",
@@ -34,7 +34,6 @@ open_road_pdk_configuration(
         "met5": "0.5",
     },
     global_routing_signal_layers = "met1-met5",
-    ha_fa_mapping = "cell_adders.v",
     klayout_tech_file = "sky130hd.lyt",
     pdn_config = "pdn_config.pdn",
     pin_horizontal_metal_layer = "met3",
@@ -45,9 +44,35 @@ open_road_pdk_configuration(
     tie_low_port = "sky130_fd_sc_hd__conb_1/LO",
     tie_separation = 5,
     tracks_file = "tracks.tcl",
-    visibility = [
-        "//visibility:public",
-    ],
+    visibility = ["//visibility:public"],
     wire_rc_clock_metal_layer = "met5",
     wire_rc_signal_metal_layer = "met2",
+)
+
+make_open_road_pdk_configuration(
+    name = "open_road_sky130_fd_sc_hd-nofa",
+    common = _open_road_pdk_configuration_common,
+)
+
+make_open_road_pdk_configuration(
+    name = "open_road_sky130_fd_sc_hd-fa",
+    common = _open_road_pdk_configuration_common,
+    ha_fa_mapping = "cell_adders.v",
+)
+
+# FIXME: Add in the adder mappers
+[
+    alias(
+        name = "open_road_sky130_fd_sc_hd-" + add,
+        actual = ":open_road_sky130_fd_sc_hd-fa",
+        visibility = ["//visibility:public"],
+    )
+    for add in ADDER_MAPPINGS
+]
+
+# Map the "optimal" configuration to the full adder
+alias(
+    name = "open_road_sky130_fd_sc_hd-opt",
+    actual = ":open_road_sky130_fd_sc_hd-fa",
+    visibility = ["//visibility:public"],
 )

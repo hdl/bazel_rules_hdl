@@ -40,7 +40,7 @@ ASAP7_OPTIONS = StandardCellOptionsInfo(
     ],
 )
 
-def for_each_asap7_cells(libname, include_vts = None, include_corners = None, include_volts = None, include_temps = None):
+def for_each_asap7_cells(libname, include_vts = None, include_corners = None, include_volts = None, include_temps = None, include_adders = None):
     """Generate a list of each standard cell library name.
 
     Args:
@@ -49,6 +49,7 @@ def for_each_asap7_cells(libname, include_vts = None, include_corners = None, in
         include_corners: 'all' or list of corners ('ff', 'tt', 'ss') to include in the output.
         include_volts: 'all' or list of voltages (in '0p55v' form) to include in the output.
         include_temps: 'all' or list of temperatures (in 'm40c' or '125c' form) to include in the output.
+        include_adders: 'all' or list of adder styles to include in the output.
 
     Returns:
         A list of tuples containing a unique name for the cell library
@@ -81,6 +82,7 @@ def for_each_asap7_cells(libname, include_vts = None, include_corners = None, in
         "include_corners": include_corners,
         "include_volts": include_volts,
         "include_temps": include_temps,
+        "include_adders": include_adders,
     }
     check_for_each_cells_args(kwargs, ASAP7_OPTIONS)
 
@@ -106,6 +108,9 @@ def for_each_asap7_cells(libname, include_vts = None, include_corners = None, in
             libname_short = libname.replace("rev", "")
 
             # "@org_theopenroadproject_asap7sc7p5t_27//:asap7-sc7p5t_rev27_rvt-ccs_ss
-            cell_target = "@org_theopenroadproject_asap7{}//:{}".format(libname_short, cell_name)
-            output.append((cell_name, cell_target))
+            for add in kwargs["include_adders"]:
+                if add:
+                    add = "-" + add
+                cell_target = "@org_theopenroadproject_asap7{}//:{}{}".format(libname_short, cell_name, add)
+                output.append((cell_name + add, cell_target))
     return output

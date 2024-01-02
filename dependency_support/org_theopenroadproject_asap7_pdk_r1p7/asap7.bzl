@@ -1,6 +1,6 @@
 """ASAP7 PDK rules."""
 
-load("@rules_hdl//pdk:build_defs.bzl", "CornerInfo", "StandardCellInfo")
+load("@rules_hdl//pdk:build_defs.bzl", "ADDER_TYPES", "CornerInfo", "StandardCellInfo")
 load("@rules_hdl//pdk:open_road_configuration.bzl", "OpenRoadPdkInfo")
 
 def asap7_srams_files(name = None, rev = None, tracks = None, has_gds = True):
@@ -149,54 +149,40 @@ def asap7_cells_files(name = None, rev = None, tracks = None, vt = None, has_gds
     )
 
     # CCS delay model
-    asap7_cell_library(
-        name = "asap7-sc{tracks}_rev{rev}_{vt_long}-ccs_ss".format(**args),
+    asap7_cell_library_common = dict(
         srcs = [
             ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lib7z".format(**args),
             #":asap7-srams-sc{tracks}_rev{rev}-lib7z".format(**args),
         ],
         cell_lef = ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lef".format(**args),
-        platform_gds = ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-gds".format(**args),
         default_corner_delay_model = "ccs",
-        default_corner_swing = "SS",
-        openroad_configuration = ":open_road-asap7-sc{tracks}_rev{rev}_{vt_long}".format(**args),
+        platform_gds = ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-gds".format(**args),
         tech_lef = ":asap7-misc-sc{tracks}_rev{rev}-lef".format(**args),
         visibility = [
             "//visibility:public",
         ],
     )
-    asap7_cell_library(
-        name = "asap7-sc{tracks}_rev{rev}_{vt_long}-ccs_tt".format(**args),
-        srcs = [
-            ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lib7z".format(**args),
-            #":asap7-srams-sc{tracks}_rev{rev}-lib7z".format(**args),
-        ],
-        cell_lef = ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lef".format(**args),
-        platform_gds = ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-gds".format(**args),
-        default_corner_delay_model = "ccs",
-        default_corner_swing = "TT",
-        openroad_configuration = ":open_road-asap7-sc{tracks}_rev{rev}_{vt_long}".format(**args),
-        tech_lef = ":asap7-misc-sc{tracks}_rev{rev}-lef".format(**args),
-        visibility = [
-            "//visibility:public",
-        ],
-    )
-    asap7_cell_library(
-        name = "asap7-sc{tracks}_rev{rev}_{vt_long}-ccs_ff".format(**args),
-        srcs = [
-            ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lib7z".format(**args),
-            #":asap7-srams-sc{tracks}_rev{rev}-lib7z".format(**args),
-        ],
-        cell_lef = ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-lef".format(**args),
-        platform_gds = ":asap7-cells-sc{tracks}_rev{rev}_{vt_long}-gds".format(**args),
-        default_corner_delay_model = "ccs",
-        default_corner_swing = "FF",
-        openroad_configuration = ":open_road-asap7-sc{tracks}_rev{rev}_{vt_long}".format(**args),
-        tech_lef = ":asap7-misc-sc{tracks}_rev{rev}-lef".format(**args),
-        visibility = [
-            "//visibility:public",
-        ],
-    )
+
+    for add in ADDER_TYPES:
+        args["add"] = add
+        asap7_cell_library(
+            name = "asap7-sc{tracks}_rev{rev}_{vt_long}-ccs_ss-{add}".format(**args),
+            default_corner_swing = "SS",
+            openroad_configuration = ":open_road-asap7-sc{tracks}_rev{rev}_{vt_long}-{add}".format(**args),
+            **asap7_cell_library_common
+        )
+        asap7_cell_library(
+            name = "asap7-sc{tracks}_rev{rev}_{vt_long}-ccs_tt-{add}".format(**args),
+            default_corner_swing = "TT",
+            openroad_configuration = ":open_road-asap7-sc{tracks}_rev{rev}_{vt_long}-{add}".format(**args),
+            **asap7_cell_library_common
+        )
+        asap7_cell_library(
+            name = "asap7-sc{tracks}_rev{rev}_{vt_long}-ccs_ff-{add}".format(**args),
+            default_corner_swing = "FF",
+            openroad_configuration = ":open_road-asap7-sc{tracks}_rev{rev}_{vt_long}-{add}".format(**args),
+            **asap7_cell_library_common
+        )
 
 def _asap7_cell_library_impl(ctx):
     liberty_files = [file for file in ctx.files.srcs if file.extension == "7z"]

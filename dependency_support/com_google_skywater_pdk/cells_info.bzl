@@ -17,6 +17,8 @@
 load("@rules_hdl//dependency_support/com_google_skywater_pdk:cell_libraries.bzl", "CELL_LIBRARIES")
 load("@rules_hdl//pdk:build_defs.bzl", "StandardCellOptionsInfo", "check_for_each_cells_args", "temp_normalize", "voltage_normalize")
 
+_SKY130_CORNER_BITS = [cname.split("_") for libname in CELL_LIBRARIES for cname in CELL_LIBRARIES[libname]["corners"]]
+
 SKY130_OPTIONS = StandardCellOptionsInfo(
     libraries = [
         "sc_hd",
@@ -28,21 +30,9 @@ SKY130_OPTIONS = StandardCellOptionsInfo(
         #"sc_hvl",
     ],
     vts = [],
-    corners = list(sorted({
-        cname.split("_")[0]: None
-        for libname in CELL_LIBRARIES
-        for cname in CELL_LIBRARIES[libname]["corners"]
-    }.keys())),
-    volts = list(sorted({
-        voltage_normalize(cname.split("_")[2]): None
-        for libname in CELL_LIBRARIES
-        for cname in CELL_LIBRARIES[libname]["corners"]
-    }.keys())),
-    temps = list(sorted({
-        temp_normalize(cname.split("_")[1]): None
-        for libname in CELL_LIBRARIES
-        for cname in CELL_LIBRARIES[libname]["corners"]
-    }.keys())),
+    corners = [b[0] for b in _SKY130_CORNER_BITS],
+    volts = [b[2] for b in _SKY130_CORNER_BITS],
+    temps = [b[1] for b in _SKY130_CORNER_BITS],
 )
 
 def sky130_cell_normalize(libname, corner_def):
@@ -78,7 +68,7 @@ def sky130_cell_normalize(libname, corner_def):
         t = temp,
     )
 
-def for_each_sky130_cells(libname, include_vts = None, include_corners = None, include_volts = None, include_temps = None):
+def for_each_sky130_cells(libname, include_vts = None, include_corners = None, include_volts = None, include_temps = None, include_adders = None):
     """Generate a list of each standard cell library name.
 
     Args:
@@ -87,6 +77,7 @@ def for_each_sky130_cells(libname, include_vts = None, include_corners = None, i
         include_corners: 'all' or list of corners ('ff', 'tt', 'ss') to include in the output.
         include_volts: 'all' or list of voltages (in '0p55v' form) to include in the output.
         include_temps: 'all' or list of temperatures (in 'm40c' or '125c' form) to include in the output.
+        include_adders: 'all' or list of adder styles to include in the output.
 
     Returns:
         A list of tuples containing a unique name for the cell library
@@ -120,6 +111,7 @@ def for_each_sky130_cells(libname, include_vts = None, include_corners = None, i
         "include_corners": include_corners,
         "include_volts": include_volts,
         "include_temps": include_temps,
+        "include_adders": include_adders,
     }
     check_for_each_cells_args(kwargs, SKY130_OPTIONS)
 
@@ -143,8 +135,11 @@ def for_each_sky130_cells(libname, include_vts = None, include_corners = None, i
         if temp not in kwargs["include_temps"]:
             continue
 
-        cell_name = sky130_cell_normalize(libname, corner_def)
-        cell_target = "@com_google_skywater_pdk_sky130_fd_{l}//:{c}".format(l = libname, c = cell_name)
-        corners[cell_name] = cell_target
+        for add in kwargs["include_adders"]:
+            if add:
+                add = "-" + add
+            cell_name = sky130_cell_normalize(libname, corner_def) + add
+            cell_target = "@com_google_skywater_pdk_sky130_fd_{l}//:{c}".format(l = libname, c = cell_name)
+            corners[cell_name] = cell_target
 
     return list(sorted(corners.items()))

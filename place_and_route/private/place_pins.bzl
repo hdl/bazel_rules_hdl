@@ -66,7 +66,7 @@ def place_pins(ctx, open_road_info):
                 tapcell = open_road_configuration.tap_cell,
                 tapcell_distance = open_road_configuration.tapcell_distance,
                 endcap = open_road_configuration.endcap_cell,
-	    ),
+            ),
         )
 
     command_output = openroad_command(

@@ -56,7 +56,8 @@ By default if not otherwise explicitly specified the default selection will be
 the 7.5 track library using RVT transistors and slow corner.
 """
 
-load("@rules_hdl//pdk:open_road_configuration.bzl", "open_road_pdk_configuration")
+load("@rules_hdl//pdk:build_defs.bzl", "ADDER_MAPPINGS")
+load("@rules_hdl//pdk:open_road_configuration.bzl", "make_open_road_pdk_configuration", "open_road_pdk_configuration")
 load("@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:asap7.bzl", "asap7_cell_library")
 load("@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:asap7.bzl", "asap7_cells_files")
 load("@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:asap7.bzl", "asap7_srams_files")

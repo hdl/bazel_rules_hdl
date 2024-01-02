@@ -17,6 +17,7 @@ cell library workspace to set things up."""
 
 load("@rules_hdl//dependency_support/com_google_skywater_pdk:build_defs.bzl", "skywater_cell_library", "skywater_corner")
 load("@rules_hdl//dependency_support/com_google_skywater_pdk:cells_info.bzl", "sky130_cell_normalize")
+load("//pdk:build_defs.bzl", "ADDER_TYPES")
 load(":cell_libraries.bzl", "CELL_LIBRARIES")
 
 def declare_cell_library(workspace_name, name):
@@ -32,6 +33,31 @@ def declare_cell_library(workspace_name, name):
         visibility = ["//visibility:public"],
     )
     library = CELL_LIBRARIES[name]
+
+    common_args = dict(
+        srcs = native.glob(
+            include = [
+                "cells/**/*.lef",
+                "cells/**/*.gds",
+            ],
+            # There are two types of lefs in the PDK. One for magic a layout
+            # tool that requires some different properties set in the LEF that
+            # are not always suitable for the downstream tools like OpenROAD
+            # and yosys. We're basically just choosing that we want the normal
+            # lefs instead of the magic ones.
+            #
+            # Currently this repo doesn't integrate magic into the flow. At
+            # some point it will, and we'll need to somehow have both lefs, or
+            # fix the lefs upstream. Just know that you may at some point in the
+            # future need to modify this.
+            exclude = [
+                "cells/**/*.magic.lef",
+            ],
+        ),
+        visibility = ["//visibility:public"],
+        tech_lef = "tech/{}.tlef".format(name) if library.get("library_type", None) != "ip_library" else None,
+    )
+
     corners = library.get("corners", {})
     all_corners = []
     for corner in corners:
@@ -60,59 +86,48 @@ def declare_cell_library(workspace_name, name):
         )
 
         # Library with only just a single corner.
-        skywater_cell_library(
-            name = target_name,
-            srcs = native.glob(
-                include = [
-                    "cells/**/*.lef",
-                    "cells/**/*.gds",
-                ],
-                # There are two types of lefs in the PDK. One for magic a layout
-                # tool that requires some different properties set in the LEF that
-                # are not always suitable for the downstream tools like OpenROAD
-                # and yosys. We're basically just choosing that we want the normal
-                # lefs instead of the magic ones.
-                #
-                # Currently this repo doesn't integrate magic into the flow. At
-                # some point it will, and we'll need to somehow have both lefs, or
-                # fix the lefs upstream. Just know that you may at some point in the
-                # future need to modify this.
-                exclude = [
-                    "cells/**/*.magic.lef",
-                ],
-            ),
+        corner_args = dict(
             process_corners = [":" + corner_name],
             default_corner = corner,
+            **common_args
+        )
+        for add in ADDER_TYPES:
+            if add == "opt":
+                continue
+            skywater_cell_library(
+                name = target_name + "-" + add,
+                openroad_configuration = str(library.get("open_road_configuration", None)) + "-" + add,
+                **corner_args
+            )
+        native.alias(
+            name = target_name + "-opt",
+            actual = ":" + target_name + "-fa",
             visibility = ["//visibility:public"],
-            openroad_configuration = library.get("open_road_configuration", None),
-            tech_lef = "tech/{}.tlef".format(name) if library.get("library_type", None) != "ip_library" else None,
         )
 
     # Multi-corner library
-    skywater_cell_library(
-        name = name,
-        srcs = native.glob(
-            include = [
-                "cells/**/*.lef",
-                "cells/**/*.gds",
-            ],
-            # There are two types of lefs in the PDK. One for magic a layout
-            # tool that requires some different properties set in the LEF that
-            # are not always suitable for the downstream tools like OpenROAD
-            # and yosys. We're basically just choosing that we want the normal
-            # lefs instead of the magic ones.
-            #
-            # Currently this repo doesn't integrate magic into the flow. At
-            # some point it will, and we'll need to somehow have both lefs, or
-            # fix the lefs upstream. Just know that you may at some point in the
-            # future need to modify this.
-            exclude = [
-                "cells/**/*.magic.lef",
-            ],
-        ),
+    common_args = dict(
         process_corners = [":{}".format(corner) for corner in all_corners],
         default_corner = library.get("default_corner", ""),
+        **common_args
+    )
+    for add in ADDER_TYPES:
+        if add == "opt":
+            continue
+        skywater_cell_library(
+            name = name + "-" + add,
+            openroad_configuration = str(library.get("open_road_configuration", None)) + "-" + add,
+            **common_args
+        )
+
+    # Map the "optimal" configuration to the full adder.
+    native.alias(
+        name = name + "-opt",
+        actual = ":" + name + "-fa",
         visibility = ["//visibility:public"],
-        openroad_configuration = library.get("open_road_configuration", None),
-        tech_lef = "tech/{}.tlef".format(name) if library.get("library_type", None) != "ip_library" else None,
+    )
+    native.alias(
+        name = name,
+        actual = ":" + name + "-fa",
+        visibility = ["//visibility:public"],
     )

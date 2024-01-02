@@ -87,6 +87,11 @@ def _open_road_pdk_configuration_impl(ctx):
         ),
     ]
 
+def make_open_road_pdk_configuration(common = {}, **kwargs):
+    for k, v in kwargs.items():
+        common[k] = v
+    return open_road_pdk_configuration(**common)
+
 open_road_pdk_configuration = rule(
     implementation = _open_road_pdk_configuration_impl,
     attrs = {

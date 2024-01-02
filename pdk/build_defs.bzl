@@ -38,7 +38,64 @@ CornerInfo = provider(
     },
 )
 
-StandardCellOptionsInfo = provider(
+ADDER_TYPES = {
+    "opt": "Default configuration, should be 'optimal'.",
+    "fa": "Enable Full Adder and Half Adder cell mapping.",
+    "nofa": "Disable Full Adder and Half Adder cell mapping.",
+    "ripple": "Ripple carry Adder -- Extremely slowest but very area efficient.",
+    "brentkung": "Brent Kung Adder -- <Put description here>.",
+    "hancarlson": "Han Carlson Adder -- <Put description here>.",
+    "koggestone": "Kogge Stone Adder -- <Put description here>.",
+}
+
+ADDER_MAPPINGS = [
+    "ripple",
+    "brentkung",
+    "hancarlson",
+    "koggestone",
+]
+
+def _init_standard_cell_options_info(*, libraries, vts, corners, volts, temps, adders = tuple(ADDER_TYPES.keys())):
+    normalized_libraries = {}
+    for lib in libraries:
+        normalized_libraries[lib.lower()] = None
+
+    if not normalized_libraries:
+        fail("No library names provided.")
+
+    normalized_vts = {}
+    for vt in vts:
+        normalized_vts[vt.lower()] = None
+
+    normalized_corners = {}
+    for corner in corners:
+        normalized_corners[corner.lower()] = None
+
+    normalized_volts = {}
+    for volt in volts:
+        normalized_volts[voltage_normalize(volt)] = None
+
+    normalized_temps = {}
+    for temp in temps:
+        normalized_temps[temp_normalize(temp)] = None
+
+    for add in adders:
+        invalid = []
+        if add not in ADDER_TYPES:
+            invalid.append(add)
+        if invalid:
+            fail("Invalid adder mapping option provided: {} (valid: {})".format(", ".join(invalid), ADDER_TYPES.keys()))
+
+    return {
+        "libraries": list(sorted(normalized_libraries.keys())),
+        "vts": list(sorted(normalized_vts.keys())),
+        "corners": list(sorted(normalized_corners.keys())),
+        "volts": list(sorted(normalized_volts.keys())),
+        "temps": list(sorted(normalized_temps.keys())),
+        "adders": list(sorted(adders)),
+    }
+
+StandardCellOptionsInfo, _new_standard_cell_options_info = provider(
     "Provides information about what standard cell options are available",
     fields = {
         "libraries": "A list of available standard cell library names.",
@@ -46,7 +103,9 @@ StandardCellOptionsInfo = provider(
         "corners": "A list of valid corners names.",
         "volts": "A list of (normalize) voltage levels names used in timing characterization.",
         "temps": "A list of (normalize) temperature values names used in timing characterization.",
+        "adders": "A list of adder types and styles supported.",
     },
+    init = _init_standard_cell_options_info,
 )
 
 def temp_format(i):
@@ -275,7 +334,7 @@ def check_for_each_cells_args(kwargs, options):
     #    fail("options should be a `StandardCellOptionsInfo` object.")
 
     if kwargs["libname"] not in options.libraries:
-        fail("Invalid library name: " + kwargs["libname"])
+        fail("Invalid library name: {} (valid: {})".format(kwargs["libname"], options.libraries))
 
     # Validate the provided voltage threadholds
     if kwargs["include_vts"] in ("all", None):
@@ -283,7 +342,7 @@ def check_for_each_cells_args(kwargs, options):
 
     for vt in kwargs["include_vts"]:
         if vt not in options.vts:
-            fail("Invalid vt: {} (from {})".format(vt, kwargs["include_vts"]))
+            fail("Invalid vt value in `include_vts`: {} (from {})".format(vt, kwargs["include_vts"]))
 
     # Valid the provided corners
     if kwargs["include_corners"] in ("all", None):
@@ -291,7 +350,7 @@ def check_for_each_cells_args(kwargs, options):
 
     for corner in kwargs["include_corners"]:
         if corner not in options.corners:
-            fail("Invalid corner: {} (from {})".format(corner, kwargs["include_corners"]))
+            fail("Invalid corner value in `include_corners`: {} (from {})".format(corner, kwargs["include_corners"]))
 
     # Validate and normalize the provided volts values
     if kwargs["include_volts"] in ("all", None):
@@ -302,7 +361,7 @@ def check_for_each_cells_args(kwargs, options):
 
     for voltage in kwargs["include_volts"]:
         if voltage not in options.volts:
-            fail("Invalid volts: {} (from {})".format(voltage, kwargs["include_volts"]))
+            fail("Invalid volts value in `include_volts`: {} (from {})".format(voltage, kwargs["include_volts"]))
 
     # Validate and normalize the provided temperature values
     if kwargs["include_temps"] in ("all", None):
@@ -313,4 +372,12 @@ def check_for_each_cells_args(kwargs, options):
 
     for temp in kwargs["include_temps"]:
         if temp not in options.temps:
-            fail("Invalid temp: {} (from {})".format(temp, kwargs["include_temps"]))
+            fail("Invalid temp value in `include_temps`: {} (from {})".format(temp, kwargs["include_temps"]))
+
+    # Validate the adder mapping requested
+    if kwargs["include_adders"] in ("all", None):
+        kwargs["include_adders"] = list(options.adders)
+
+    for add in kwargs["include_adders"]:
+        if add not in options.adders:
+            fail("Invalid adder mapping value in `include_adders`: {} (from {})".format(temp, kwargs["include_adders"]))

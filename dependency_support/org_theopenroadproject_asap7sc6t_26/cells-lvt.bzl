@@ -22,8 +22,7 @@ asap7_cells_files(
     vt = "lvt",
 )
 
-open_road_pdk_configuration(
-    name = "open_road-asap7-sc6t_rev26_lvt",
+_sc6t_rev26_lvt_open_road_pdk_configuration_common = dict(
     cell_site = "asap7sc6t",
     cts_buffer_cell = "BUFx4_ASAP7_6t_L",
     do_not_use_cell_list = [
@@ -65,6 +64,35 @@ open_road_pdk_configuration(
     tie_low_port = "TIELOxp5_ASAP7_6t_L/L",
     tie_separation = 0,
     tracks_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:tracks_1x.tcl",
+    visibility = ["//visibility:public"],
     wire_rc_clock_metal_layer = "M5",
     wire_rc_signal_metal_layer = "M2",
+)
+
+make_open_road_pdk_configuration(
+    name = "open_road-asap7-sc6t_rev26_lvt-nofa",
+    common = _sc6t_rev26_lvt_open_road_pdk_configuration_common,
+)
+
+make_open_road_pdk_configuration(
+    name = "open_road-asap7-sc6t_rev26_lvt-fa",
+    common = _sc6t_rev26_lvt_open_road_pdk_configuration_common,
+    ha_fa_mapping = "cell_adders.v",
+)
+
+# FIXME: Add in the adder mappers
+[
+    alias(
+        name = "open_road-asap7-sc6t_rev26_lvt-" + add,
+        actual = ":open_road-asap7-sc6t_rev26_lvt-fa",
+        visibility = ["//visibility:public"],
+    )
+    for add in ADDER_MAPPINGS
+]
+
+# Map the "optimal" configuration to the full adder
+alias(
+    name = "open_road-asap7-sc6t_rev26_lvt-opt",
+    actual = ":open_road-asap7-sc6t_rev26_lvt-fa",
+    visibility = ["//visibility:public"],
 )
