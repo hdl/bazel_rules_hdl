@@ -50,6 +50,9 @@ build_test(
                 core_padding_microns = 2,
                 die_height_microns = 400,
                 die_width_microns = 400,
+                exec_properties = dict(
+                    mem = "16g",
+                ),
                 sdc = "@rules_hdl//benchmarks/basic:common/asap7.sdc",
                 skip_detailed_routing = False,
             ),
@@ -70,6 +73,9 @@ build_test(
                 core_padding_microns = 2,
                 die_height_microns = 400,
                 die_width_microns = 400,
+                exec_properties = dict(
+                    mem = "16g",
+                ),
                 manual_placement_script = "@rules_hdl//benchmarks/basic:common/place.straight.tcl",
                 sdc = "@rules_hdl//benchmarks/basic:common/asap7.sdc",
                 skip_detailed_routing = False,
@@ -91,6 +97,9 @@ build_test(
                 core_padding_microns = 2,
                 die_height_microns = 400,
                 die_width_microns = 400,
+                exec_properties = dict(
+                    mem = "16g",
+                ),
                 manual_placement_script = "@rules_hdl//benchmarks/basic:common/place.loopback.tcl",
                 sdc = "@rules_hdl//benchmarks/basic:common/asap7.sdc",
                 skip_detailed_routing = False,
@@ -112,6 +121,9 @@ build_test(
                 core_padding_microns = 2,
                 die_height_microns = 400,
                 die_width_microns = 400,
+                exec_properties = dict(
+                    mem = "16g",
+                ),
                 manual_placement_script = "@rules_hdl//benchmarks/basic:common/place.diagonal.tcl",
                 sdc = "@rules_hdl//benchmarks/basic:common/asap7.sdc",
                 skip_detailed_routing = False,
@@ -133,6 +145,9 @@ build_test(
                 core_padding_microns = 2,
                 die_height_microns = 200,
                 die_width_microns = 100,
+                exec_properties = dict(
+                    mem = "16g",
+                ),
                 sdc = "@rules_hdl//benchmarks/basic:common/sky130.sdc",
                 skip_detailed_routing = False,
             ),
@@ -153,6 +168,9 @@ build_test(
                 core_padding_microns = 2,
                 die_height_microns = 200,
                 die_width_microns = 100,
+                exec_properties = dict(
+                    mem = "16g",
+                ),
                 manual_placement_script = "@rules_hdl//benchmarks/basic:common/place.straight.tcl",
                 sdc = "@rules_hdl//benchmarks/basic:common/sky130.sdc",
                 skip_detailed_routing = False,
@@ -174,6 +192,9 @@ build_test(
                 core_padding_microns = 2,
                 die_height_microns = 200,
                 die_width_microns = 100,
+                exec_properties = dict(
+                    mem = "16g",
+                ),
                 manual_placement_script = "@rules_hdl//benchmarks/basic:common/place.loopback.tcl",
                 sdc = "@rules_hdl//benchmarks/basic:common/sky130.sdc",
                 skip_detailed_routing = False,
@@ -195,6 +216,9 @@ build_test(
                 core_padding_microns = 2,
                 die_height_microns = 200,
                 die_width_microns = 100,
+                exec_properties = dict(
+                    mem = "16g",
+                ),
                 manual_placement_script = "@rules_hdl//benchmarks/basic:common/place.diagonal.tcl",
                 sdc = "@rules_hdl//benchmarks/basic:common/sky130.sdc",
                 skip_detailed_routing = False,

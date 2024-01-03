@@ -141,6 +141,9 @@ build_test(
                 die_width_microns = {PDK_CONFIG['pnr']['die_width_microns']},
                 sdc = "@rules_hdl//benchmarks/basic:common/{PDK_NAME}.sdc",
                 skip_detailed_routing = {PDK_CONFIG['pnr']['skip_detailed_routing']},
+                exec_properties = dict(
+                    mem = '16g',
+                ),
             ),
         ),
         target = ":rtl",
@@ -165,6 +168,9 @@ build_test(
                 core_padding_microns = {PDK_CONFIG['pnr']['core_padding_microns']},
                 die_height_microns = {PDK_CONFIG['pnr']['die_height_microns']},
                 die_width_microns = {PDK_CONFIG['pnr']['die_width_microns']},
+                exec_properties = dict(
+                    mem = '16g',
+                ),
             ),
         ),
         target = ":rtl",
