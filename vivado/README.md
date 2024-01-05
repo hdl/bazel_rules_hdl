@@ -192,6 +192,20 @@ current_fileset
 open_wave_database bazel-out/k8-fastbuild/bin/vivado/tests/xsim_smoke_test.wdb
 ```
 
+To test a module that depends on ip blocks, the ip vlocks need to be added in `ip_blocks` field.
+```
+xsim_test(
+    name = "weights_replay_and_save_xsim",
+    ip_blocks = [
+        ":weights_replay_and_save_ip",
+    ],
+    module = ":weights_replay_and_save_tb",
+    module_top = "weights_replay_and_save_tb",
+    part_number = "xczu28dr-ffvg1517-2-e",
+    tags = ["manual"],
+    xilinx_env = ":xilinx_env.sh",
+)
+```
 ## vivado_create_ip
 
 Creates and IP block from a module for vivado.
@@ -212,3 +226,22 @@ vivado_create_ip(
 ```
 
 This will generate an ip repository directory that can be included in vivado projects.
+
+If an ip block relies on other ip blocks, the `ip_blocks` field needs to be updated.
+```
+vivado_create_ip(
+    name = "weights_replay_and_save_ip",
+    ip_blocks = [
+        ":weights_replay_ip",
+        ":weights_ram_ip",
+    ],
+    ip_library = "test",
+    ip_vendor = "test_vendor",
+    ip_version = "0.1",
+    module = ":weights_replay_and_save_bd",
+    module_top = "weights_replay_and_save",
+    part_number = "xczu28dr-ffvg1517-2-e",
+    tags = ["manual"],
+    xilinx_env = ":xilinx_env.sh",
+)
+```

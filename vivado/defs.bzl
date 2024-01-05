@@ -76,8 +76,8 @@ def get_content_from_files(all_files):
         elif file.extension == "xdc":
             constraints_content += "read_xdc " + file.path + "\n"
         else:
-            # Try generic "add_files" for that type.
-            hdl_source_content += "add_files " + file.path + "\n"
+            # Use import files instead to make sure generic files like coef and txt are added to the project.
+            hdl_source_content += "import_files " + file.path + "\n"
 
     return hdl_source_content, constraints_content, tcl_content
 
@@ -120,8 +120,17 @@ def generate_ip_block_tcl(ip_blocks):
     """
     ip_tcl = "set_property ip_repo_paths [list "
     for ip_block in ip_blocks:
-        ip_tcl += "{} ".format(ip_block[VivadoIPBlockInfo].repo.path)
+        for repo in ip_block[VivadoIPBlockInfo].repo:
+            ip_tcl += "{} ".format(repo.path)
     ip_tcl += "] [current_project]\n"
+    for ip_block in ip_blocks:
+        ip_tcl += "create_ip -name {} -vendor {} -library {} -version {} -module_name {}\n".format(
+            ip_block[VivadoIPBlockInfo].module_top,
+            ip_block[VivadoIPBlockInfo].vendor,
+            ip_block[VivadoIPBlockInfo].library,
+            ip_block[VivadoIPBlockInfo].version,
+            ip_block[VivadoIPBlockInfo].module_top + "_ip",
+        )
     ip_tcl += "update_ip_catalog\n"
     return ip_tcl
 
@@ -185,7 +194,9 @@ def create_and_synth(
         "{{WITH_SYNTH}}": with_synth_str,
     }
 
-    ip_block_dirs = [ip_block[VivadoIPBlockInfo].repo for ip_block in ctx.attr.ip_blocks]
+    ip_block_dirs = []
+    for ip_block in ctx.attr.ip_blocks:
+        ip_block_dirs += ip_block[VivadoIPBlockInfo].repo
 
     return run_tcl_template(
         ctx,
@@ -716,6 +727,11 @@ def vivado_flow(name, module, module_top, part_number, xilinx_env, tags = [], ip
 def _xsim_test_impl(ctx):
     all_files, hdl_source_content, constraints_content, tcl_content = generate_file_load_tcl(ctx.attr.module)
 
+    ip_block_tcl = generate_ip_block_tcl(ctx.attr.ip_blocks)
+    ip_block_dirs = []
+    for ip_block in ctx.attr.ip_blocks:
+        ip_block_dirs += ip_block[VivadoIPBlockInfo].repo
+
     project_dir = ctx.actions.declare_directory("{}_prj".format(ctx.label.name))
     if (ctx.attr.with_waveform):
         with_waveform_str = "1"
@@ -730,6 +746,7 @@ def _xsim_test_impl(ctx):
     substitutions = {
         "{{PART_NUMBER}}": ctx.attr.part_number,
         "{{HDL_SOURCE_CONTENT}}": hdl_source_content,
+        "{{IP_BLOCK_TCL}}": ip_block_tcl,
         "{{TCL_CONTENT}}": tcl_content,
         "{{CONSTRAINTS_CONTENT}}": constraints_content,
         "{{MODULE_TOP}}": ctx.attr.module_top,
@@ -743,7 +760,7 @@ def _xsim_test_impl(ctx):
         ctx.file.xsim_test_template,
         substitutions,
         ctx.file.xilinx_env,
-        all_files,
+        all_files + ip_block_dirs,
         outputs,
     )
 
@@ -784,6 +801,11 @@ xsim_test = rule(
         "module_top": attr.string(
             doc = "The name of the top level verilog module.",
             mandatory = True,
+        ),
+        "ip_blocks": attr.label_list(
+            doc = "Ip blocks to include in this design.",
+            providers = [VivadoIPBlockInfo],
+            default = [],
         ),
         "part_number": attr.string(
             doc = "The targeted xilinx part.",
@@ -851,6 +873,7 @@ def _vivado_create_ip_impl(ctx):
 
     xci_name = ctx.label.name
     ip_dir = ctx.actions.declare_directory(ctx.label.name)
+    ip_block_tcl = generate_ip_block_tcl(ctx.attr.ip_blocks)
 
     outputs = [ip_dir]
 
@@ -875,6 +898,7 @@ def _vivado_create_ip_impl(ctx):
         "{{PROJECT_DIR}}": "./",
         "{{IP_OUTPUT_DIR}}": ip_dir.path,
         "{{IP_VERSION}}": ctx.attr.ip_version,
+        "{{IP_BLOCK_TCL}}": ip_block_tcl,
         "{{JOBS}}": "{}".format(ctx.attr.jobs),
         "{{ENCRYPT_CONTENT}}": encrypt_content,
         "{{IP_VENDOR}}": ctx.attr.ip_vendor,
@@ -882,19 +906,22 @@ def _vivado_create_ip_impl(ctx):
         "{{XCI_NAME}}": xci_name,
     }
 
+    ip_block_dirs = []
+    for ip_block in ctx.attr.ip_blocks:
+        ip_block_dirs += ip_block[VivadoIPBlockInfo].repo
     ip_block_outputs = run_tcl_template(
         ctx,
         ctx.file.create_ip_block_template,
         substitutions,
         ctx.file.xilinx_env,
-        all_files + [ctx.file.keyfile],
+        all_files + [ctx.file.keyfile] + ip_block_dirs,
         outputs,
         post_processing_command,
     )
 
     return [
         ip_block_outputs[0],
-        VivadoIPBlockInfo(repo = ip_dir),
+        VivadoIPBlockInfo(repo = [ip_dir] + ip_block_dirs, vendor = ctx.attr.ip_vendor, library = ctx.attr.ip_library, version = ctx.attr.ip_version, module_top = ctx.attr.module_top),
     ]
 
 vivado_create_ip = rule(
@@ -909,6 +936,11 @@ vivado_create_ip = rule(
         "module_top": attr.string(
             doc = "The name of the top level verilog module.",
             mandatory = True,
+        ),
+        "ip_blocks": attr.label_list(
+            doc = "Ip blocks to include in this design.",
+            providers = [VivadoIPBlockInfo],
+            default = [],
         ),
         "part_number": attr.string(
             doc = "The targeted xilinx part.",
