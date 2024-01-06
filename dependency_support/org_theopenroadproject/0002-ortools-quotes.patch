@@ -1,26 +1,20 @@
 diff --git a/src/gpl/src/mbff.cpp b/src/gpl/src/mbff.cpp
-index 795d9c453..0c3e2f5a1 100644
+index b5ff561b3..53265da28 100644
 --- a/src/gpl/src/mbff.cpp
 +++ b/src/gpl/src/mbff.cpp
-@@ -37,11 +37,11 @@
- #include <lemon/maps.h>
+@@ -36,8 +36,8 @@
+ #include <lemon/list_graph.h>
  #include <lemon/network_simplex.h>
  #include <omp.h>
--#include <ortools/base/logging.h>
 -#include <ortools/linear_solver/linear_solver.h>
 -#include <ortools/sat/cp_model.h>
--#include <ortools/sat/cp_model.pb.h>
--#include <ortools/sat/cp_model_solver.h>
-+#include "ortools/base/logging.h"
 +#include "ortools/linear_solver/linear_solver.h"
 +#include "ortools/sat/cp_model.h"
-+#include "ortools/sat/cp_model.pb.h"
-+#include "ortools/sat/cp_model_solver.h"
  
  #include <algorithm>
- #include <chrono>
+ #include <random>
 diff --git a/src/mpl2/src/bus_synthesis.cpp b/src/mpl2/src/bus_synthesis.cpp
-index cbb4d36d4..0e2c9f5f7 100644
+index 56a546b92..4abb381ce 100644
 --- a/src/mpl2/src/bus_synthesis.cpp
 +++ b/src/mpl2/src/bus_synthesis.cpp
 @@ -33,7 +33,7 @@
