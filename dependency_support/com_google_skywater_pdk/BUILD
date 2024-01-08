@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_hdl//pdk/proto:build_defs.bzl", "extract_lef_and_liberty")
+
 package(
     default_applicable_licenses = ["//:package_license"],
     default_visibility = ["//visibility:private"],
@@ -22,3 +24,8 @@ licenses(["notice"])
 exports_files([
     "liberty_wrapper.py",
 ])
+
+extract_lef_and_liberty(
+    name = "sky130-fd_sc_hd_data",
+    standard_cell = "@com_google_skywater_pdk_sky130_fd_sc_hd//:sky130_fd_sc_hd",
+)
