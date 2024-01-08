@@ -45,10 +45,11 @@ def com_google_ortools():
         #url = "http://www.tcs.hut.fi/Software/bliss/bliss-0.73.zip",
     )
     maybe(
-        new_git_repository,
+        http_archive,
         name = "eigen",
-        tag = "3.4.0",
-        remote = "https://gitlab.com/libeigen/eigen.git",
+        sha256 = "37f0a3859e42112b0b4ea4e7ba2e8167159cbb00dc6cf03cf46b877e360e6dfd",
+        strip_prefix = "eigen-454f89af9d6f3525b1df5f9ef9c86df58bf2d4d3",
+        url = "https://gitlab.com/libeigen/eigen/-/archive/454f89af9d6f3525b1df5f9ef9c86df58bf2d4d3/eigen-454f89af9d6f3525b1df5f9ef9c86df58bf2d4d3.tar.gz",
         build_file_content = """
 cc_library(
     name = 'eigen3',
