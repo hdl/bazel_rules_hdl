@@ -74,6 +74,9 @@ place_and_route(
     core_padding_microns = 20,
     die_height_microns = 200,
     die_width_microns = 200,
+    exec_properties = dict(
+        mem = "16g",
+    ),
     placement_density = "0.7",
     synthesized_rtl = ":verilog_adder-synth",
 )
@@ -84,6 +87,9 @@ place_and_route(
     core_padding_microns = 20,
     die_height_microns = 200,
     die_width_microns = 200,
+    exec_properties = dict(
+        mem = "16g",
+    ),
     placement_density = "0.7",
     sdc = "constraint.sdc",
     synthesized_rtl = ":verilog_counter-synth",
@@ -120,12 +126,18 @@ place_and_route(
 EXTRA_ARGS = {
     "verilog_counter": {
         "place_and_route": dict(
+            exec_properties = dict(
+                mem = "16g",
+            ),
             sdc = "constraint.sdc",
         ),
     },
     "verilog_adder": {
         "place_and_route": dict(
             clock_period = None,  # Combinational only design
+            exec_properties = dict(
+                mem = "16g",
+            ),
         ),
     },
 }
