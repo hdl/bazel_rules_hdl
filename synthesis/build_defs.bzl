@@ -275,7 +275,7 @@ synthesize_rtl = rule(
         ),
         "adder_mapping": attr.label(
             allow_single_file = True,
-            doc = "Verilog file that maps yosys adder to PDK adders."
+            doc = "Verilog file that maps yosys adder to PDK adders.",
         ),
         "target_clock_period_pico_seconds": attr.int(doc = "target clock period in picoseconds"),
         "output_file_name": attr.string(doc = "The output file name."),
