@@ -34,6 +34,7 @@ open_road_pdk_configuration(
         "met5": "0.5",
     },
     global_routing_signal_layers = "met1-met5",
+    ha_fa_mapping = "cell_adders.v",
     klayout_tech_file = "sky130hd.lyt",
     pdn_config = "pdn_config.pdn",
     pin_horizontal_metal_layer = "met3",
@@ -49,5 +50,4 @@ open_road_pdk_configuration(
     ],
     wire_rc_clock_metal_layer = "met5",
     wire_rc_signal_metal_layer = "met2",
-    ha_fa_mapping = "cell_adders.v"
 )

@@ -58,13 +58,13 @@ def sky130_cell_normalize(libname, corner_def):
     """
     bits = corner_def.split("_")
     corner, temp, voltage = bits[:3]
-    v_extra = ''
+    v_extra = ""
     if len(bits) > 3:
-        v_extra += '_'
-        if bits[3].startswith('lowhv'):
-            v_extra += voltage_normalize(bits.pop(3)[6:])+'t'
-        if len(bits) > 3 and bits[3].startswith('lv'):
-            v_extra += 't'+voltage_normalize(bits.pop(3)[3:])
+        v_extra += "_"
+        if bits[3].startswith("lowhv"):
+            v_extra += voltage_normalize(bits.pop(3)[6:]) + "t"
+        if len(bits) > 3 and bits[3].startswith("lv"):
+            v_extra += "t" + voltage_normalize(bits.pop(3)[3:])
     if len(bits) > 3:
         fail("Found extra bits in corner definition {} (from '{}')".format(bits[3:], corner_def))
 
@@ -74,7 +74,7 @@ def sky130_cell_normalize(libname, corner_def):
     return "sky130-{n}-{c}-{v}_{t}".format(
         n = libname,
         c = corner,
-        v = voltage+v_extra,
+        v = voltage + v_extra,
         t = temp,
     )
 
