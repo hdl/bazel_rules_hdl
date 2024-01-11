@@ -92,6 +92,7 @@ OPENROAD_BINARY_SRCS = OPENROAD_BINARY_SRCS_WITHOUT_MAIN + [
 
 OPENROAD_COPTS = [
     "-fexceptions",
+    "-ffp-contract=off", # Needed for floating point stability.
     "-Wno-error",
     "-Wall",
     "-Wextra",
