@@ -132,8 +132,8 @@ def _verilator_cc_library(ctx):
             verilog_files.append(file)
 
     verilator_output = ctx.actions.declare_directory(ctx.label.name + "-gen")
-    verilator_output_cpp = ctx.actions.declare_directory(ctx.label.name + ".cpp")
-    verilator_output_hpp = ctx.actions.declare_directory(ctx.label.name + ".h")
+    verilator_output_cpp = ctx.actions.declare_directory(ctx.label.name + "-cpp")
+    verilator_output_hpp = ctx.actions.declare_directory(ctx.attr.out_include_dir)
 
     prefix = "V" + ctx.attr.module_top
 
@@ -175,7 +175,7 @@ def _verilator_cc_library(ctx):
     defines = ["VM_TRACE"] if ctx.attr.trace else []
     deps = [ctx.attr._verilator_lib, ctx.attr._zlib, ctx.attr._verilator_svdpi]
 
-    return cc_compile_and_link_static_library(
+    [default, cc] = cc_compile_and_link_static_library(
         ctx,
         srcs = [verilator_output_cpp],
         hdrs = [verilator_output_hpp],
@@ -184,6 +184,10 @@ def _verilator_cc_library(ctx):
         includes = [verilator_output_hpp.path],
         deps = deps,
     )
+    return [
+        DefaultInfo(files = depset([verilator_output_hpp], transitive = [default.files])),
+        cc,
+    ]
 
 verilator_cc_library = rule(
     _verilator_cc_library,
@@ -208,6 +212,10 @@ verilator_cc_library = rule(
         "copts": attr.string_list(
             doc = "List of additional compilation flags",
             default = [],
+        ),
+        "out_include_dir": attr.string(
+            doc = "Name of the output subdirectory with the header files.",
+            default = "include",
         ),
         "_cc_toolchain": attr.label(
             doc = "CC compiler.",
