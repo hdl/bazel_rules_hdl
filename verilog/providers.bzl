@@ -38,6 +38,7 @@ def make_dag_entry(srcs, hdrs, deps, label):
 
     Args:
       srcs: A list of File that are 'srcs'.
+      hdrs: A list of File that are 'hdrs'.
       deps: A list of Label that are deps of this entry.
       label: A Label to use as the name for this entry.
     Returns:
