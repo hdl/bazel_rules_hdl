@@ -65,6 +65,8 @@ def _synthesize_design_impl(ctx):
     transitive_srcs = _transitive_srcs([dep for dep in ctx.attr.deps if VerilogInfo in dep])
     verilog_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs.to_list()]
     verilog_files = [src for sub_tuple in verilog_srcs for src in sub_tuple]
+    verilog_hdrs = [verilog_info_struct.hdrs for verilog_info_struct in transitive_srcs.to_list()]
+    verilog_hdr_files = [hdr for sub_tuple in verilog_hdrs for hdr in sub_tuple]
 
     verilog_flist = _create_flist(
         ctx,
@@ -94,6 +96,7 @@ def _synthesize_design_impl(ctx):
 
     inputs = []
     inputs.extend(verilog_files)
+    inputs.extend(verilog_hdr_files)
     inputs.append(verilog_flist)
     inputs.append(uhdm_flist)
     inputs.extend(uhdm_files)
