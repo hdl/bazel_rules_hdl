@@ -19,7 +19,6 @@ load("@rules_hdl//pdk:build_defs.bzl", "StandardCellOptionsInfo", "check_for_eac
 ASAP7_OPTIONS = StandardCellOptionsInfo(
     libraries = [
         "sc6t_rev26",
-        "sc7p5t_rev27",
         "sc7p5t_rev28",
     ],
     vts = [
