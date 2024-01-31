@@ -22,7 +22,7 @@ exports_files(["LICENSE"])
 
 # The following settings are taken from the command line build when executing
 # configure :
-TCL_COPTS = [
+TCL_BASE_COPTS = [
     "-DHAVE_ZLIB=",  # Enables ZLIB
     "-DTCL_DBGX=",
     "-DHAVE_LIMITS_H=1",
@@ -37,10 +37,6 @@ TCL_COPTS = [
     "-DPEEK_XCLOSEIM=1",
     "-D_LARGEFILE64_SOURCE=1",
     "-DTCL_WIDE_INT_TYPE=long\\ long",
-    "-DHAVE_STRUCT_STAT64=1",
-    "-DHAVE_OPEN64=1",
-    "-DHAVE_LSEEK64=1",
-    "-DHAVE_TYPE_OFF64_T=1",
     "-DHAVE_GETCWD=1",
     "-DHAVE_OPENDIR=1",
     "-DHAVE_STRSTR=1",
@@ -57,10 +53,6 @@ TCL_COPTS = [
     "-DHAVE_GETGRGID_R=1",
     "-DHAVE_GETGRNAM_R_5=1",
     "-DHAVE_GETGRNAM_R=1",
-    "-DHAVE_GETHOSTBYNAME_R_6=1",
-    "-DHAVE_GETHOSTBYNAME_R=1",
-    "-DHAVE_GETHOSTBYADDR_R_8=1",
-    "-DHAVE_GETHOSTBYADDR_R=1",
     "-DUSE_TERMIOS=1",
     "-DTIME_WITH_SYS_TIME=1",
     "-DHAVE_TM_ZONE=1",
@@ -79,6 +71,27 @@ TCL_COPTS = [
     "-fno-strict-aliasing",
     "-fPIC",
 ]
+
+TCL_OSX_COPTS = [
+    "-Dftruncate64=ftruncate",
+    "-DNO_FSTATFS=1",
+]
+
+TCL_LINUX_COPTS = [
+    "-DHAVE_STRUCT_STAT64=1",
+    "-DHAVE_OPEN64=1",
+    "-DHAVE_LSEEK64=1",
+    "-DHAVE_TYPE_OFF64_T=1",
+    "-DHAVE_GETHOSTBYNAME_R_6=1",
+    "-DHAVE_GETHOSTBYNAME_R=1",
+    "-DHAVE_GETHOSTBYADDR_R_8=1",
+    "-DHAVE_GETHOSTBYADDR_R=1",
+]
+
+TCL_COPTS = TCL_BASE_COPTS + select({
+        "@platforms//os:osx": TCL_OSX_COPTS,
+        "//conditions:default": TCL_LINUX_COPTS,
+    })
 
 # tclAlloc uses additional define
 cc_library(
