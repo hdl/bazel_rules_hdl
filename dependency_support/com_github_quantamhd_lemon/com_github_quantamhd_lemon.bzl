@@ -29,6 +29,7 @@ def com_github_quantamhd_lemon():
         build_file = Label("@rules_hdl//dependency_support/com_github_quantamhd_lemon:bundled.BUILD.bazel"),
         patches = [
             Label("@rules_hdl//dependency_support/com_github_quantamhd_lemon:lemon.patch"),
+            Label("@rules_hdl//dependency_support/com_github_quantamhd_lemon:allocator-patch.patch"),
         ],
         patch_args = [
             "-p1",
