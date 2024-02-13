@@ -19,8 +19,8 @@ load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 http_archive(
     name = "com_grail_bazel_toolchain",
-    sha256 = "77c368349e1a90e6e133c7a16743c622856a0e6b4c9935d7d40ece53cf9d3576",
-    strip_prefix = "bazel-toolchain-7e7c7cf1f965f348861085183d79b6a241764390",
+    sha256 = "ddad1bde0eb9d470ea58500681a7deacdf55c714adf4b89271392c4687acb425",
+    strip_prefix = "toolchains_llvm-7e7c7cf1f965f348861085183d79b6a241764390",
     urls = ["https://github.com/grailbio/bazel-toolchain/archive/7e7c7cf1f965f348861085183d79b6a241764390.tar.gz"],
 )
 
