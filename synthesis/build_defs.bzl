@@ -110,6 +110,15 @@ def _synthesize_design_impl(ctx):
 
     log_file = ctx.actions.declare_file("{}_yosys_output.log".format(ctx.attr.name))
 
+    constr = ctx.actions.declare_file("{}_abc_constraints.constr".format(ctx.attr.name))
+    constr_contents = ""
+    default_driver_cell = getattr(ctx.attr.standard_cells[StandardCellInfo], "default_input_driver_cell", "")
+    if default_driver_cell:
+        constr_contents = "set_driving_cell {}\n".format(default_driver_cell)
+
+    ctx.actions.write(constr, constr_contents)
+    inputs.append(constr)
+
     args = ctx.actions.args()
     args.add("-q")  # quiet mode only errors printed to stderr
     args.add("-q")  # second q don't print warnings
@@ -131,6 +140,7 @@ def _synthesize_design_impl(ctx):
         "LIBERTY": default_liberty_file,
         "DONT_USE_ARGS": dont_use_args,
         "ABC_SCRIPT": abc_script,
+        "CONSTR": constr,
     }
 
     if ctx.attr.target_clock_period_pico_seconds:

@@ -25,6 +25,7 @@ StandardCellInfo = provider(
         "ha_fa_mapping": "HA/FA techmapping file",
         "parasitic_extraction_benchmark": "Optional calibration file for OpenRCX.",
         "open_road_configuration": "OpenROAD PDK configuration.",
+        "default_input_driver_cell": "The cell to assume is driving primary input nets (very useful for synthesis)",
     },
 )
 
