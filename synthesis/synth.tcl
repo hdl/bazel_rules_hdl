@@ -90,9 +90,9 @@ dfflibmap -liberty $liberty
 opt
 
 if { [info exists ::env(CLOCK_PERIOD) ] } {
-  abc -showtmp -nocleanup -liberty $liberty -dff -script $::env(ABC_SCRIPT) -constr $::env(CONSTR) -g aig -D $::env(CLOCK_PERIOD) {*}$::env(DONT_USE_ARGS)
+  abc -liberty $liberty -dff -script $::env(ABC_SCRIPT) -constr $::env(CONSTR) -g aig -D $::env(CLOCK_PERIOD) {*}$::env(DONT_USE_ARGS)
 } else {
-  abc -showtmp -nocleanup -liberty $liberty -dff -script $::env(ABC_SCRIPT) -constr $::env(CONSTR) -g aig {*}$::env(DONT_USE_ARGS)
+  abc -liberty $liberty -dff -script $::env(ABC_SCRIPT) -constr $::env(CONSTR) -g aig {*}$::env(DONT_USE_ARGS)
 }
 
 setundef -zero
