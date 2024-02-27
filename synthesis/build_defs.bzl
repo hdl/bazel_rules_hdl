@@ -112,7 +112,7 @@ def _synthesize_design_impl(ctx):
 
     constr = ctx.actions.declare_file("{}_abc_constraints.constr".format(ctx.attr.name))
     constr_contents = ""
-    default_driver_cell = ctx.attr.standard_cells[StandardCellInfo].default_input_driver_cell
+    default_driver_cell = getattr(ctx.attr.standard_cells[StandardCellInfo], "default_input_driver_cell", "")
     if default_driver_cell:
         constr_contents = "set_driving_cell {}\n".format(default_driver_cell)
 
