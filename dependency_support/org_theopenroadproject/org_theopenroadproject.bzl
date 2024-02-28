@@ -29,6 +29,7 @@ def org_theopenroadproject():
         patches = [
             Label("@rules_hdl//dependency_support/org_theopenroadproject:0001-logging-change-to-support-silence.patch"),
             Label("@rules_hdl//dependency_support/org_theopenroadproject:0002-ortools-quotes.patch"),
+            Label("@rules_hdl//dependency_support/org_theopenroadproject:0003-thread-safe-network.patch"),
         ],
         patch_args = ["-p1"],
     )

@@ -1,0 +1,241 @@
+Submodule src/sta 42b994d42..d932fd43a:
+diff --git a/src/sta/include/sta/ConcreteNetwork.hh b/src/sta/include/sta/ConcreteNetwork.hh
+index 1375c58..48c8c7b 100644
+--- a/src/sta/include/sta/ConcreteNetwork.hh
++++ b/src/sta/include/sta/ConcreteNetwork.hh
+@@ -17,6 +17,7 @@
+ #pragma once
+ 
+ #include <functional>
++#include <shared_mutex>
+ 
+ #include "Map.hh"
+ #include "Set.hh"
+@@ -47,6 +48,7 @@ typedef Vector<ConcreteNet*> ConcreteNetSeq;
+ typedef Vector<ConcretePin*> ConcretePinSeq;
+ typedef Map<Cell*, Instance*> CellNetworkViewMap;
+ typedef Set<const ConcreteNet*> ConcreteNetSet;
++typedef Map<const Net*, PinSet*> NetDrvrPinsMap;
+ 
+ // This adapter implements the network api for the concrete network.
+ // A superset of the Network api methods are implemented in the interface.
+@@ -188,6 +190,9 @@ public:
+                        PortSeq *members) override;
+   void setDirection(Port *port,
+                     PortDirection *dir) override;
++
++  PinSet *drivers(const Net *net) override;
++
+   // For NetworkEdit.
+   Instance *makeInstance(LibertyCell *cell,
+                          const char *name,
+@@ -210,6 +215,7 @@ public:
+   void deletePin(Pin *pin) override;
+   Net *makeNet(const char *name,
+                Instance *parent) override;
++  // This method should not be called in a multi-threaded context.
+   void deleteNet(Net *net) override;
+ 
+   // For NetworkReader API.
+@@ -233,6 +239,12 @@ public:
+   void setTopInstance(Instance *top_inst);
+   void deleteTopInstance();
+ 
++  // Connect/disconnect net/pins should clear the net->drvrs map.
++  // Incrementally maintaining the map is expensive because
++  // nets may be connected across hierarchy levels.
++  // This method must not be called in a multi-threaded context.
++  void clearNetDrvrPinMap();
++
+   using Network::netIterator;
+   using Network::findPin;
+   using Network::findNet;
+@@ -265,6 +277,8 @@ protected:
+   LinkNetworkFunc *link_func_;
+   CellNetworkViewMap cell_network_view_map_;
+   static ObjectId object_id_;
++  NetDrvrPinsMap net_drvr_pin_map_;
++  std::shared_mutex net_drvr_pin_map_mtx_;
+ 
+ private:
+   friend class ConcreteLibertyLibraryIterator;
+diff --git a/src/sta/include/sta/Network.hh b/src/sta/include/sta/Network.hh
+index 7a87d3e..f3f2c5d 100644
+--- a/src/sta/include/sta/Network.hh
++++ b/src/sta/include/sta/Network.hh
+@@ -38,7 +38,6 @@ typedef Instance *(LinkNetworkFunc)(const char *top_cell_name,
+ 				    bool make_black_boxes,
+ 				    Report *report,
+ 				    NetworkReader *network);
+-typedef Map<const Net*, PinSet*> NetDrvrPinsMap;
+ 
+ // The Network class defines the network API used by sta.
+ // The interface to a network implementation is constructed by
+@@ -86,7 +85,7 @@ class Network : public StaState
+ {
+ public:
+   Network();
+-  virtual ~Network();
++  virtual ~Network() {}
+   virtual void clear();
+ 
+   // Linking the hierarchy creates the instance/pin/net network hierarchy.
+@@ -474,15 +473,10 @@ protected:
+   // findNetsMatching using linear search.
+   NetSeq findNetsMatchingLinear(const Instance *instance,
+                                 const PatternMatch *pattern) const;
+-  // Connect/disconnect net/pins should clear the net->drvrs map.
+-  // Incrementally maintaining the map is expensive because 
+-  // nets may be connected across hierarchy levels.
+-  void clearNetDrvrPinMap();
+ 
+   LibertyLibrary *default_liberty_;
+   char divider_;
+   char escape_;
+-  NetDrvrPinsMap net_drvr_pin_map_;
+ };
+ 
+ // Network API to support network edits.
+diff --git a/src/sta/network/ConcreteNetwork.cc b/src/sta/network/ConcreteNetwork.cc
+index 8c14151..e92290d 100644
+--- a/src/sta/network/ConcreteNetwork.cc
++++ b/src/sta/network/ConcreteNetwork.cc
+@@ -259,6 +259,7 @@ ConcreteNetwork::ConcreteNetwork() :
+ ConcreteNetwork::~ConcreteNetwork()
+ {
+   clear();
++  net_drvr_pin_map_.deleteContents();
+ }
+ 
+ void
+@@ -268,6 +269,7 @@ ConcreteNetwork::clear()
+   deleteCellNetworkViews();
+   library_seq_.deleteContentsClear();
+   library_map_.clear();
++  clearNetDrvrPinMap();
+   Network::clear();
+ }
+ 
+@@ -280,6 +282,15 @@ ConcreteNetwork::deleteTopInstance()
+   }
+ }
+ 
++void
++ConcreteNetwork::clearNetDrvrPinMap()
++{
++  // No synchronization here, as you would have to lock the mutex for any usage of a Net* to protect from this delete.
++  // This method must not be called in a multi-threaded context.
++  std::unique_lock lock(net_drvr_pin_map_mtx_);
++  net_drvr_pin_map_.deleteContentsClear();
++}
++
+ void
+ ConcreteNetwork::deleteCellNetworkViews()
+ {
+@@ -1194,6 +1205,24 @@ ConcreteNetwork::makeInstance(LibertyCell *cell,
+   return makeConcreteInstance(cell, name, parent);
+ }
+ 
++PinSet *
++ConcreteNetwork::drivers(const Net *net)
++{
++  PinSet *drvrs = nullptr;
++  {
++    std::shared_lock lock(net_drvr_pin_map_mtx_);
++    drvrs = net_drvr_pin_map_.findKey(net);
++  }
++  if (!drvrs) {
++    drvrs = Network::drivers(net);
++    std::unique_lock lock(net_drvr_pin_map_mtx_);
++    auto*& entry = net_drvr_pin_map_[net];
++    // Do another check as could have been inserted by another thread.
++    if (!entry) entry = drvrs;
++  }
++  return drvrs;
++}
++
+ Instance *
+ ConcreteNetwork::makeConcreteInstance(ConcreteCell *cell,
+ 				      const char *name,
+@@ -1370,7 +1399,11 @@ ConcreteNetwork::connectNetPin(ConcreteNet *cnet,
+   if (isDriver(pin)) {
+     if (cnet->terms_ == nullptr) {
+       Net *net = reinterpret_cast<Net*>(cnet);
+-      PinSet *drvrs = net_drvr_pin_map_.findKey(net);
++      PinSet *drvrs = nullptr;
++      {
++        std::shared_lock lock(net_drvr_pin_map_mtx_);
++        drvrs = net_drvr_pin_map_.findKey(net);
++      }
+       if (drvrs)
+ 	drvrs->insert(pin);
+     }
+@@ -1416,7 +1449,11 @@ ConcreteNetwork::disconnectNetPin(ConcreteNet *cnet,
+     // and it is safe to incrementally update the drivers.
+     if (cnet->terms_ == nullptr) {
+       Net *net = reinterpret_cast<Net*>(cnet);
+-      PinSet *drvrs = net_drvr_pin_map_.findKey(net);
++      PinSet *drvrs = nullptr;
++      {
++        std::shared_lock lock(net_drvr_pin_map_mtx_);
++        drvrs = net_drvr_pin_map_.findKey(net);
++      }
+       if (drvrs)
+ 	drvrs->erase(pin);
+     }
+@@ -1463,6 +1500,8 @@ ConcreteNetwork::deleteNet(Net *net)
+ 
+   constant_nets_[int(LogicValue::zero)].erase(net);
+   constant_nets_[int(LogicValue::one)].erase(net);
++  // No synchronization here, as you would have to lock the mutex for any usage of a Net* to protect from this delete.
++  // This method must not be called in a multi-threaded context.
+   PinSet *drvrs = net_drvr_pin_map_.findKey(net);
+   if (drvrs) {
+     delete drvrs;
+diff --git a/src/sta/network/Network.cc b/src/sta/network/Network.cc
+index 4180072..031746d 100644
+--- a/src/sta/network/Network.cc
++++ b/src/sta/network/Network.cc
+@@ -33,16 +33,10 @@ Network::Network() :
+ {
+ }
+ 
+-Network::~Network()
+-{
+-  net_drvr_pin_map_.deleteContents();
+-}
+-
+ void
+ Network::clear()
+ {
+   default_liberty_ = nullptr;
+-  clearNetDrvrPinMap();
+ }
+ 
+ bool
+@@ -1591,22 +1585,12 @@ Network::drivers(const Pin *pin)
+     return nullptr;
+ }
+ 
+-void
+-Network::clearNetDrvrPinMap()
+-{
+-  net_drvr_pin_map_.deleteContentsClear();
+-}
+-
+ PinSet *
+ Network::drivers(const Net *net)
+ {
+-  PinSet *drvrs = net_drvr_pin_map_.findKey(net);
+-  if (drvrs == nullptr) {
+-    drvrs = new PinSet(this);
+-    FindDrvrPins visitor(drvrs, this);
+-    visitConnectedPins(net, visitor);
+-    net_drvr_pin_map_[net] = drvrs;
+-  }
++  PinSet *drvrs = new PinSet(this);
++  FindDrvrPins visitor(drvrs, this);
++  visitConnectedPins(net, visitor);
+   return drvrs;
+ }
+ 
