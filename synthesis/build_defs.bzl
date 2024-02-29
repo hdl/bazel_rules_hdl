@@ -121,7 +121,6 @@ def _synthesize_design_impl(ctx):
 
     args = ctx.actions.args()
     args.add("-q")  # quiet mode only errors printed to stderr
-    args.add("-q")  # second q don't print warnings
     args.add("-Q")  # Don't print header
     args.add_all("-l", [log_file])  # put output in log file
     args.add_all("-c", [synth_tcl])  # run synthesis tcl script
