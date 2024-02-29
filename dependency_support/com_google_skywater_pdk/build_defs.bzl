@@ -97,7 +97,7 @@ def _skywater_cell_library_impl(ctx):
             runfiles = ctx.runfiles(default_lib_depset),
         ),
         StandardCellInfo(
-            corners = corners,
+            corners = corners.values(),
             default_corner = default_corner,
             open_road_configuration = open_road_configuration,
             tech_lef = tech_lef,

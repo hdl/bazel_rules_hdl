@@ -14,7 +14,7 @@
 
 """Rules for running openSTA on synthesized Verilog."""
 
-load("//synthesis:build_defs.bzl", "SynthesisInfo")
+load("//third_party/bazel_rules_hdl/synthesis:build_defs.bzl", "SynthesisInfo")
 
 def _run_opensta_impl(ctx):
     """Implementation of the 'run_opensta' rule.
@@ -29,7 +29,8 @@ def _run_opensta_impl(ctx):
     synth_info = ctx.attr.synth_target[SynthesisInfo]
 
     netlist = synth_info.synthesized_netlist
-    liberty_file = synth_info.standard_cell_info.default_corner.liberty
+    default_liberty_file = synth_info.standard_cell_info.default_corner.liberty
+    additional_liberty_files = [corner.liberty for corner in synth_info.standard_cell_info.corners]
 
     (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr._opensta])
     opensta_runfiles_dir = ctx.executable._opensta.path + ".runfiles"
@@ -41,13 +42,14 @@ def _run_opensta_impl(ctx):
         "NETLIST": netlist.path,
         "TOP": synth_info.top_module,
         "LOGFILE": sta_log.path,
-        "LIBERTY": liberty_file.path,
-        "TCL_LIBRARY": opensta_runfiles_dir + "/tk_tcl/library",
+        "LIBERTY": default_liberty_file.path,
+        "ADDITIONAL_LIBERTIES": ",".join([f.path for f in additional_liberty_files]),
+        "TCL_LIBRARY": opensta_runfiles_dir + "/google3/third_party/tcl_tk/libs/library",
     }
 
     ctx.actions.run(
         outputs = [sta_log],
-        inputs = tool_inputs.to_list() + [liberty_file, sta_tcl, netlist],
+        inputs = tool_inputs.to_list() + [default_liberty_file, sta_tcl, netlist] + additional_liberty_files,
         arguments = ["-exit", sta_tcl.path],
         executable = ctx.executable._opensta,
         tools = tool_inputs,
