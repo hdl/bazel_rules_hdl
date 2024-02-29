@@ -31,7 +31,6 @@ def _run_opensta_impl(ctx):
     netlist = synth_info.synthesized_netlist
     liberty_file = synth_info.standard_cell_info.default_corner.liberty
 
-    (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr._opensta])
     opensta_runfiles_dir = ctx.executable._opensta.path + ".runfiles"
 
     sta_tcl = ctx.file.sta_tcl
@@ -47,11 +46,9 @@ def _run_opensta_impl(ctx):
 
     ctx.actions.run(
         outputs = [sta_log],
-        inputs = tool_inputs.to_list() + [liberty_file, sta_tcl, netlist],
+        inputs = [liberty_file, sta_tcl, netlist],
         arguments = ["-exit", sta_tcl.path],
         executable = ctx.executable._opensta,
-        tools = tool_inputs,
-        input_manifests = input_manifests,
         env = env,
         mnemonic = "RunningSTA",
         toolchain = None,
