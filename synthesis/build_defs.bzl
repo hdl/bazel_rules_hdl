@@ -104,8 +104,6 @@ def _synthesize_design_impl(ctx):
     inputs.append(abc_script)
     inputs.append(default_liberty_file)
 
-    (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr.yosys_tool])
-
     yosys_runfiles_dir = ctx.executable.yosys_tool.path + ".runfiles"
 
     log_file = ctx.actions.declare_file("{}_yosys_output.log".format(ctx.attr.name))
@@ -170,11 +168,9 @@ def _synthesize_design_impl(ctx):
 
     ctx.actions.run(
         outputs = [output_file, log_file],
-        inputs = inputs + tool_inputs.to_list(),
+        inputs = inputs,
         arguments = [args],
         executable = ctx.executable.yosys_tool,
-        tools = tool_inputs,
-        input_manifests = input_manifests,
         env = env,
         mnemonic = "SynthesizingRTL",
         toolchain = None,

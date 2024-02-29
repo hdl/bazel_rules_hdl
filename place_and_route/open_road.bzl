@@ -228,7 +228,6 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
     command_file = ctx.actions.declare_file(file_name)
     ctx.actions.write(command_file, content = "\n".join(real_commands))
 
-    (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr._openroad])
     openroad_runfiles_dir = ctx.executable._openroad.path + ".runfiles"
 
     log_file = ctx.actions.declare_file(
@@ -252,8 +251,6 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
             command_file.path,
         ],
         executable = ctx.executable._openroad,
-        tools = tool_inputs,
-        input_manifests = input_manifests,
         env = {
             "TCL_LIBRARY": openroad_runfiles_dir + "/tk_tcl/library",
         },

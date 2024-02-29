@@ -56,8 +56,6 @@ def _tcl_wrap_cc_impl(ctx):
     outfile_name = ctx.attr.out if ctx.attr.out else ctx.attr.name + ".cc"
     output_file = ctx.actions.declare_file(outfile_name)
 
-    (inputs, _) = ctx.resolve_tools(tools = [ctx.attr._swig])
-
     include_root_directory = root_label.workspace_root + "/" + root_label.package
 
     src_inputs = _get_transative_srcs(ctx.files.srcs + ctx.files.root_swig_src, ctx.attr.deps)
@@ -87,8 +85,7 @@ def _tcl_wrap_cc_impl(ctx):
         outputs = [output_file],
         inputs = src_inputs,
         arguments = [args],
-        tools = inputs,
-        executable = ([file for file in ctx.files._swig if file.basename == "swig"][0]),
+        executable = ctx.executable._swig,
     )
     return [
         DefaultInfo(files = depset([output_file])),
@@ -137,7 +134,7 @@ tcl_wrap_cc = rule(
         ),
         "_swig": attr.label(
             default = "@org_swig//:swig_stable",
-            allow_files = True,
+            executable = True,
             cfg = "exec",
         ),
     },

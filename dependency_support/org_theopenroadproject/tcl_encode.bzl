@@ -23,8 +23,6 @@ def _tcl_encode_impl(ctx):
     outfile_name = ctx.attr.out if ctx.attr.out else ctx.attr.name + ".cc"
     output_file = ctx.actions.declare_file(outfile_name)
 
-    (inputs, _) = ctx.resolve_tools(tools = [ctx.attr._tclsh, ctx.attr._encode_script])
-
     args = ctx.actions.args()
     args.add(ctx.file._encode_script)
     args.add(output_file)
@@ -35,7 +33,7 @@ def _tcl_encode_impl(ctx):
         outputs = [output_file],
         inputs = ctx.files.srcs,
         arguments = [args],
-        tools = inputs,
+        tools = [ctx.executable._tclsh, ctx.executable._encode_script],
         executable = ([file for file in ctx.files._tclsh if file.basename == "tclsh"][0]),
     )
     return [DefaultInfo(files = depset([output_file]))]
