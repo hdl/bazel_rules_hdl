@@ -14,7 +14,7 @@
 
 """Rules for running openSTA on synthesized Verilog."""
 
-load("//third_party/bazel_rules_hdl/synthesis:build_defs.bzl", "SynthesisInfo")
+load("//synthesis:build_defs.bzl", "SynthesisInfo")
 
 def _run_opensta_impl(ctx):
     """Implementation of the 'run_opensta' rule.
