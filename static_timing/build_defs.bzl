@@ -31,6 +31,8 @@ def _run_opensta_impl(ctx):
     netlist = synth_info.synthesized_netlist
     default_liberty_file = synth_info.standard_cell_info.default_corner.liberty
     additional_liberty_files = [corner.liberty for corner in synth_info.standard_cell_info.corners]
+    if default_liberty_file in additional_liberty_files:
+        additional_liberty_files.remove(default_liberty_file)
 
     (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr._opensta])
     opensta_runfiles_dir = ctx.executable._opensta.path + ".runfiles"
@@ -44,7 +46,7 @@ def _run_opensta_impl(ctx):
         "LOGFILE": sta_log.path,
         "LIBERTY": default_liberty_file.path,
         "ADDITIONAL_LIBERTIES": ",".join([f.path for f in additional_liberty_files]),
-        "TCL_LIBRARY": opensta_runfiles_dir + "/google3/third_party/tcl_tk/libs/library",
+        "TCL_LIBRARY": opensta_runfiles_dir + "/tk_tcl/library",
     }
 
     ctx.actions.run(

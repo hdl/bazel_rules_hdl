@@ -91,6 +91,8 @@ def _synthesize_design_impl(ctx):
     output_file = ctx.actions.declare_file(output_file_name)
     default_liberty_file = ctx.attr.standard_cells[StandardCellInfo].default_corner.liberty
     additional_liberty_files = [corner.liberty for corner in ctx.attr.standard_cells[StandardCellInfo].corners]
+    if default_liberty_file in additional_liberty_files:
+        additional_liberty_files.remove(default_liberty_file)
 
     synth_tcl = ctx.file.synth_tcl
     abc_script = ctx.file.abc_script
