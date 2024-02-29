@@ -21,7 +21,7 @@ def org_theopenroadproject():
     maybe(
         new_git_repository,
         name = "org_theopenroadproject",
-        commit = "68fc7ad38a68868aadc009e9773abf6b5e1ac8a3",
+        commit = "de92b19f3ed9ec26e35d52602df935280d2f6041",
         init_submodules = True,
         remote = "https://github.com/The-OpenROAD-Project/OpenROAD.git",
         build_file = Label("@rules_hdl//dependency_support/org_theopenroadproject:bundled.BUILD.bazel"),

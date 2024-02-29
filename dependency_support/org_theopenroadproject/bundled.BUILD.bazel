@@ -1300,6 +1300,7 @@ filegroup(
         "src/sta/tcl/Exception.i",
         "src/sta/tcl/NetworkEdit.i",
         "src/sta/tcl/StaTcl.i",
+        "src/sta/tcl/StaTclTypes.i",
         "src/sta/verilog/Verilog.i",
     ],
     visibility = ["@org_theopenroadproject//:__subpackages__"],
