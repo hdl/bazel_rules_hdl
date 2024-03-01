@@ -90,6 +90,9 @@ def _synthesize_design_impl(ctx):
         output_file_name = ctx.attr.output_file_name
     output_file = ctx.actions.declare_file(output_file_name)
     default_liberty_file = ctx.attr.standard_cells[StandardCellInfo].default_corner.liberty
+    additional_liberty_files = [corner.liberty for corner in ctx.attr.standard_cells[StandardCellInfo].corners]
+    if default_liberty_file in additional_liberty_files:
+        additional_liberty_files.remove(default_liberty_file)
 
     synth_tcl = ctx.file.synth_tcl
     abc_script = ctx.file.abc_script
@@ -103,6 +106,8 @@ def _synthesize_design_impl(ctx):
     inputs.append(synth_tcl)
     inputs.append(abc_script)
     inputs.append(default_liberty_file)
+    inputs.extend(additional_liberty_files)
+
 
     (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr.yosys_tool])
 
@@ -137,6 +142,7 @@ def _synthesize_design_impl(ctx):
         "TOP": ctx.attr.top_module,
         "OUTPUT": output_file,
         "LIBERTY": default_liberty_file,
+        "ADDITIONAL_LIBERTIES": additional_liberty_files,
         "DONT_USE_ARGS": dont_use_args,
         "ABC_SCRIPT": abc_script,
         "CONSTR": constr,
@@ -165,6 +171,8 @@ def _synthesize_design_impl(ctx):
     for k, v in script_env_files.items():
         if type(v) == "File":
             env[k] = v.path
+        elif type(v) == "list" and all([type(f) == "File" for f in v]):
+            env[k] = ",".join([f.path for f in v])  # List of File to comma-joined file paths.
         else:
             env[k] = v
 
