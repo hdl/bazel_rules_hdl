@@ -188,7 +188,7 @@ cc_library(
 )
 
 cc_library(
-    name = "libverilator",
+    name = "verilator",
     srcs = [
         "include/gtkwave/fastlz.h",
         "include/gtkwave/fst_config.h",
@@ -232,6 +232,15 @@ cc_library(
     deps = [
         "@net_zlib//:zlib",
     ],
+)
+
+# This alias is for supporting the legacy name but while allowing the
+# `cc_library` target to be renamed to avoid a `liblibverilator.a`
+# output name.
+alias(
+    name = "libverilator",
+    actual = "verilator",
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
