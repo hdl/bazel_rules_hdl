@@ -37,3 +37,14 @@ test:ciremotebuild --tls_client_certificate=/root/.ssh/buildbuddy-cert.pem
 test:ciremotebuild --tls_client_key=/root/.ssh/buildbuddy-key.pem
 test:ciremotebuild --build_metadata=VISIBILITY=PUBLIC
 test:ciremotebuild --remote_timeout=3600
+
+###############################################################################
+## User flags
+###############################################################################
+# Optionally allow users to define custom flags when developing new features.
+# https://bazel.build/configure/best-practices#bazelrc-file
+#
+# Note: This line should always be last in this file to ensure consistent behavior
+# with flags defined in this file.
+#
+try-import %workspace$/user.bazelrc

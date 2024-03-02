@@ -23,8 +23,8 @@ def _verilator_repository_impl(ctx):
         stripPrefix = "verilator-{}".format(ctx.attr.version),
     )
 
-    ctx.file("WORKSPACE", "workspace(name = {name})\n".format(name = repr(ctx.name)))
-    ctx.symlink(ctx.attr._buildfile, "BUILD")
+    ctx.file("WORKSPACE.bazel", "workspace(name = {name})\n".format(name = repr(ctx.name)))
+    ctx.symlink(ctx.attr._buildfile, "BUILD.bazel")
 
     # Generate files usually produced / modified by autotools.
     replace = {
@@ -51,16 +51,16 @@ def _verilator_repository_impl(ctx):
 verilator_repository = repository_rule(
     _verilator_repository_impl,
     attrs = {
-        "_buildfile": attr.label(
-            default = Label("@rules_hdl//dependency_support/verilator:verilator.BUILD"),
+        "sha256": attr.string(
+            doc = "The sha256 hash for this version of verilator",
+            default = "010ff2b5c76d4dbc2ed4a3278a5599ba35c8ed4c05690e57296d6b281591367b",
         ),
         "version": attr.string(
             doc = "The version of verilator to use.",
             default = "4.224",
         ),
-        "sha256": attr.string(
-            doc = "The sha256 hash for this version of verilator",
-            default = "010ff2b5c76d4dbc2ed4a3278a5599ba35c8ed4c05690e57296d6b281591367b",
+        "_buildfile": attr.label(
+            default = Label("@rules_hdl//dependency_support/verilator:verilator.BUILD.bazel"),
         ),
     },
 )
