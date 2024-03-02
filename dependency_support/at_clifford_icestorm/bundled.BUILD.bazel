@@ -57,7 +57,7 @@ py_binary(
     srcs = [],
     outs = ["chipdb-%s.txt" % device],
     cmd = "$(location :icebox_chipdb) %s > $@" % ICE40_DEVICES[device],
-    exec_tools = [":icebox_chipdb"],
+    tools = [":icebox_chipdb"],
     visibility = ["//visibility:public"],
 ) for device in ICE40_DEVICES.keys()]
 
@@ -143,5 +143,5 @@ py_binary(
     srcs = ["icefuzz/timings_%s.txt" % chip],
     outs = ["generated/timings_%s.cc" % chip],
     cmd = "(dir=$$(pwd) && cd $$(dirname $(location :icefuzz/timings_%s.txt)) && $$dir/$(location :timings) %s) > $@" % (chip, chip),
-    exec_tools = [":timings"],
+    tools = [":timings"],
 ) for chip in CHIPS]

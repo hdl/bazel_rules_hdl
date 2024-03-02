@@ -199,7 +199,7 @@ py_binary(
     ],
     outs = ["generated/ecp5_chipdb_%s.bba" % device],
     cmd = "PRJTRELLIS_DB=$$(dirname '$(location @com_github_yosyshq_prjtrellis_db//:devices.json)') $(location :trellis_import) -p $(location ecp5/constids.inc) -g $(location ecp5/gfx.h) %s > $@" % device,
-    exec_tools = [":trellis_import"],
+    tools = [":trellis_import"],
 ) for device in ECP5_DEVICES]
 
 [genrule(
@@ -207,7 +207,7 @@ py_binary(
     srcs = ["generated/ecp5_chipdb_%s.bba" % device],
     outs = ["generated/ecp5_chipdb_%s.cc" % device],
     cmd = "$(location :bbasm) --c %s $(SRCS) $@" % BBASM_ENDIAN_FLAG,
-    exec_tools = [":bbasm"],
+    tools = [":bbasm"],
 ) for device in ECP5_DEVICES]
 
 cc_library(
@@ -271,7 +271,7 @@ py_binary(
         ICE40_CHIPDB_OPTS[device],
         device,
     ),
-    exec_tools = [":ice40_chipdb_py"],
+    tools = [":ice40_chipdb_py"],
 ) for device in ICE40_DEVICES]
 
 [genrule(
@@ -279,7 +279,7 @@ py_binary(
     srcs = ["generated/ice40_chipdb_%s.bba" % device],
     outs = ["generated/ice40_chipdb_%s.cc" % device],
     cmd = "$(location :bbasm) --c %s $(SRCS) $@" % BBASM_ENDIAN_FLAG,
-    exec_tools = [":bbasm"],
+    tools = [":bbasm"],
 ) for device in ICE40_DEVICES]
 
 cc_library(
