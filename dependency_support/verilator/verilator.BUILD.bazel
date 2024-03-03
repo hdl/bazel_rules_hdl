@@ -13,7 +13,16 @@
 # Original implementation by Kevin Kiningham (@kkiningh) in kkiningh/rules_verilator.
 # Ported to bazel_rules_hdl by Stephen Tridgell (@stridge-cruxml)
 
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("@rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex")
+load(
+    "@rules_hdl//dependency_support/verilator/private:verilator_utils.bzl",
+    "verilator_astgen",
+    "verilator_bisonpre",
+    "verilator_flexfix",
+)
+load("@rules_python//python:defs.bzl", "py_binary")
 
 package(default_visibility = ["//visibility:private"])
 
@@ -25,59 +34,53 @@ exports_files([
     "COPYING.LESSER",
 ])
 
-sh_binary(
-    name = "flexfix",
-    srcs = ["src/flexfix"],
+# `py_binary` does not accept sources that do not end in `.py`. So to
+# successfully turn `bisonpre` into a binary, the source needs to be renamed.
+copy_file(
+    name = "bisonpre_src",
+    src = "src/bisonpre",
+    out = "src/bisonpre.py",
 )
 
-sh_binary(
+py_binary(
     name = "bisonpre",
-    srcs = ["src/bisonpre"],
+    srcs = ["src/bisonpre.py"],
+    main = "src/bisonpre.py",
 )
 
-genrule(
+verilator_astgen(
     name = "verilator_astgen",
     srcs = [
         "src/V3Ast.h",
         "src/V3AstNodes.h",
         "src/Verilator.cpp",
-        "src/astgen",
     ],
     outs = [
+        "V3AstNodes__gen_macros.h",
         "V3Ast__gen_classes.h",
         "V3Ast__gen_impl.h",
         "V3Ast__gen_report.txt",
         "V3Ast__gen_types.h",
         "V3Ast__gen_visitor.h",
         "V3Ast__gen_yystype.h",
-        "V3AstNodes__gen_macros.h",
     ],
-    cmd = """
-    python3 $(location src/astgen) -I $$(dirname $(location src/V3Ast.h)) --classes
-    cp V3Ast__gen_classes.h $(@D)
-    cp V3Ast__gen_impl.h $(@D)
-    cp V3Ast__gen_report.txt $(@D)
-    cp V3Ast__gen_types.h $(@D)
-    cp V3Ast__gen_visitor.h $(@D)
-    cp V3Ast__gen_yystype.h $(@D)
-    cp V3AstNodes__gen_macros.h $(@D)
-    """,
+    args = ["--classes"],
+    astgen = "src/astgen",
 )
 
-genrule(
+verilator_astgen(
     name = "verilator_astgen_const",
     srcs = [
         "src/V3Ast.h",
         "src/V3AstNodes.h",
         "src/V3Const.cpp",
         "src/Verilator.cpp",
-        "src/astgen",
     ],
-    outs = ["V3Const__gen.cpp"],
-    cmd = """
-    python3 $(location src/astgen) -I $$(dirname $(location src/V3Const.cpp)) V3Const.cpp
-    cp V3Const__gen.cpp $(@D)
-    """,
+    outs = [
+        "V3Const__gen.cpp",
+    ],
+    args = ["V3Const.cpp"],
+    astgen = "src/astgen",
 )
 
 genlex(
@@ -86,12 +89,12 @@ genlex(
     out = "V3Lexer_pregen.yy.cpp",
 )
 
-genrule(
+verilator_flexfix(
     name = "verilator_lex_flexfix",
-    srcs = [":V3Lexer_pregen.yy.cpp"],
-    outs = ["V3Lexer.yy.cpp"],
-    cmd = "./$(location :flexfix) V3Lexer < $(<) > $(@)",
-    tools = [":flexfix"],
+    src = ":V3Lexer_pregen.yy.cpp",
+    out = "V3Lexer.yy.cpp",
+    args = ["V3Lexer"],
+    flexfix = "src/flexfix",
 )
 
 genlex(
@@ -100,15 +103,15 @@ genlex(
     out = "V3PreLex_pregen.yy.cpp",
 )
 
-genrule(
+verilator_flexfix(
     name = "verilator_prelex_flexfix",
-    srcs = [":V3PreLex_pregen.yy.cpp"],
-    outs = ["V3PreLex.yy.cpp"],
-    cmd = "./$(location :flexfix) V3PreLex < $(<) > $(@)",
-    tools = [":flexfix"],
+    src = ":V3PreLex_pregen.yy.cpp",
+    out = "V3PreLex.yy.cpp",
+    args = ["V3PreLex"],
+    flexfix = "src/flexfix",
 )
 
-genrule(
+verilator_bisonpre(
     name = "verilator_bison",
     srcs = [
         "src/verilog.y",
@@ -118,10 +121,21 @@ genrule(
         "V3ParseBison.c",
         "V3ParseBison.h",
     ],
-    cmd = "M4=$(location @org_gnu_m4//:m4) BISON_PKGDATADIR=$(location @org_gnu_bison//:data) ./$(location :bisonpre)" +
-          " --yacc $(location @org_gnu_bison//:bison) -d -v -o $(location V3ParseBison.c) $(location src/verilog.y)",
+    args = [
+        "--yacc",
+        "$(execpath @org_gnu_bison//:bison)",
+        "-d",
+        "-v",
+        "-o",
+        "$(execpath V3ParseBison.c)",
+        "$(execpath src/verilog.y)",
+    ],
+    bisonpre = ":bisonpre",
+    env = {
+        "BISON_PKGDATADIR": "$(execpath @org_gnu_bison//:data)",
+        "M4": "$(execpath @org_gnu_m4//:m4)",
+    },
     tools = [
-        ":bisonpre",
         "@org_gnu_bison//:bison",
         "@org_gnu_m4//:m4",
     ],
@@ -150,11 +164,11 @@ cc_library(
             "src/V3Const.cpp",
         ],
     ) + [
+        ":V3AstNodes__gen_macros.h",
         ":V3Ast__gen_classes.h",
         ":V3Ast__gen_impl.h",
         ":V3Ast__gen_types.h",
         ":V3Ast__gen_visitor.h",
-        ":V3AstNodes__gen_macros.h",
         ":V3Ast__gen_yystype.h",
         ":V3Const__gen.cpp",
         ":V3ParseBison.h",
