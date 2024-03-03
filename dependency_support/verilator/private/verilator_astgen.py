@@ -59,6 +59,7 @@ def main() -> None:
     )
 
     if result.returncode:
+        print(result.args, file=sys.stderr)
         print(result.stdout, file=sys.stderr)
         sys.exit(result.returncode)
 

@@ -136,6 +136,7 @@ def _verilator_cc_library(ctx):
     prefix = "V" + ctx.attr.module_top
 
     args = ctx.actions.args()
+    args.add("--no-std")
     args.add("--cc")
     args.add("--Mdir", verilator_output.path)
     args.add("--top-module", ctx.attr.module_top)
@@ -148,6 +149,7 @@ def _verilator_cc_library(ctx):
 
     ctx.actions.run(
         arguments = [args],
+        mnemonic = "VerilatorCompile",
         executable = ctx.executable._verilator,
         inputs = verilog_files,
         outputs = [verilator_output],
@@ -184,8 +186,12 @@ def _verilator_cc_library(ctx):
     )
 
 verilator_cc_library = rule(
-    _verilator_cc_library,
+    implementation = _verilator_cc_library,
     attrs = {
+        "copts": attr.string_list(
+            doc = "List of additional compilation flags",
+            default = [],
+        ),
         "module": attr.label(
             doc = "The top level module target to verilate.",
             providers = [VerilogInfo],
@@ -202,10 +208,6 @@ verilator_cc_library = rule(
         "vopts": attr.string_list(
             doc = "Additional command line options to pass to Verilator",
             default = ["-Wall"],
-        ),
-        "copts": attr.string_list(
-            doc = "List of additional compilation flags",
-            default = [],
         ),
         "_cc_toolchain": attr.label(
             doc = "CC compiler.",
