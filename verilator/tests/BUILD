@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:defs.bzl", "cc_test")
 load("//verilator:defs.bzl", "verilator_cc_library")
 load("//verilog:providers.bzl", "verilog_library")
 
