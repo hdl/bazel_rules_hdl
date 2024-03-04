@@ -14,56 +14,15 @@
 # Ported to bazel_rules_hdl by Stephen Tridgell (@stridge-cruxml)
 """Download and build verilator"""
 
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-def _verilator_repository_impl(ctx):
-    ctx.download_and_extract(
-        url = ["https://github.com/verilator/verilator/archive/refs/tags/v{}.tar.gz".format(ctx.attr.version)],
-        sha256 = ctx.attr.sha256,
-        stripPrefix = "verilator-{}".format(ctx.attr.version),
-    )
-
-    ctx.file("WORKSPACE.bazel", "workspace(name = {name})\n".format(name = repr(ctx.name)))
-    ctx.symlink(ctx.attr._buildfile, "BUILD.bazel")
-
-    # Generate files usually produced / modified by autotools.
-    replace = {
-        "#define PACKAGE_STRING \"\"": "#define PACKAGE_STRING \"Verilator v{}\"".format(ctx.attr.version),
-    }
-    ctx.template("src/config_package.h", "src/config_package.h.in", replace, executable = False)
-
-    ctx.file(
-        "src/config_rev.h",
-        "static const char* const DTVERSION_rev = \"v{}\";\n".format(ctx.attr.version),
-    )
-
-    replace = {
-        "@PACKAGE_NAME@": "Verilator",
-        "@PACKAGE_VERSION@": ctx.attr.version,
-    }
-    ctx.template(
-        "include/verilated_config.h",
-        "include/verilated_config.h.in",
-        replace,
-        executable = False,
-    )
-
-verilator_repository = repository_rule(
-    _verilator_repository_impl,
-    attrs = {
-        "sha256": attr.string(
-            doc = "The sha256 hash for this version of verilator",
-            default = "3c2f5338f4b6ce7e2f47a142401acdd18cbf4c5da06092618d6d036c0afef12d",
-        ),
-        "version": attr.string(
-            doc = "The version of verilator to use.",
-            default = "5.022",
-        ),
-        "_buildfile": attr.label(
-            default = Label("@rules_hdl//dependency_support/verilator:verilator.BUILD.bazel"),
-        ),
-    },
-)
-
 def verilator():
-    maybe(verilator_repository, name = "verilator")
+    maybe(
+        http_archive,
+        name = "verilator",
+        build_file = Label("@rules_hdl//dependency_support/verilator:verilator.BUILD.bazel"),
+        urls = ["https://github.com/verilator/verilator/archive/refs/tags/v5.022.tar.gz"],
+        sha256 = "3c2f5338f4b6ce7e2f47a142401acdd18cbf4c5da06092618d6d036c0afef12d",
+        strip_prefix = "verilator-5.022",
+    )
