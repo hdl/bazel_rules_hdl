@@ -13,16 +13,17 @@
 # Original implementation by Kevin Kiningham (@kkiningh) in kkiningh/rules_verilator.
 # Ported to bazel_rules_hdl by Stephen Tridgell (@stridge-cruxml)
 
-load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("@rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex")
 load(
     "@rules_hdl//dependency_support/verilator/private:verilator_utils.bzl",
     "verilator_astgen",
     "verilator_bisonpre",
+    "verilator_build_template",
     "verilator_flexfix",
+    "verilator_version",
 )
-load("@rules_python//python:defs.bzl", "py_binary")
 
 package(default_visibility = ["//visibility:private"])
 
@@ -34,18 +35,50 @@ exports_files([
     "COPYING.LESSER",
 ])
 
-# `py_binary` does not accept sources that do not end in `.py`. So to
-# successfully turn `bisonpre` into a binary, the source needs to be renamed.
-copy_file(
-    name = "bisonpre_src",
-    src = "src/bisonpre",
-    out = "src/bisonpre.py",
+verilator_version(
+    name = "version",
+    changelog = "Changes",
 )
 
-py_binary(
-    name = "bisonpre",
-    srcs = ["src/bisonpre.py"],
-    main = "src/bisonpre.py",
+verilator_build_template(
+    name = "config_package",
+    out = "src/config_package.h",
+    substitutions = {
+        "#define PACKAGE_STRING \"\"": "#define PACKAGE_STRING \"Verilator v{VERILATOR_VERSION}\"",
+    },
+    template = "src/config_package.h.in",
+    version = ":version",
+)
+
+write_file(
+    name = "config_rev_template",
+    out = "src/config_rev.h.in",
+    content = """\
+static const char* const DTVERSION_rev = "";
+
+""".splitlines(),
+    newline = "unix",
+)
+
+verilator_build_template(
+    name = "config_rev",
+    out = "src/config_rev.h",
+    substitutions = {
+        "DTVERSION_rev = \"\"": "DTVERSION_rev = \"v{VERILATOR_VERSION}\"",
+    },
+    template = "src/config_rev.h.in",
+    version = ":version",
+)
+
+verilator_build_template(
+    name = "verilated_config",
+    out = "include/verilated_config.h",
+    substitutions = {
+        "@PACKAGE_NAME@": "Verilator",
+        "@PACKAGE_VERSION@": "{VERILATOR_VERSION}",
+    },
+    template = "include/verilated_config.h.in",
+    version = ":version",
 )
 
 verilator_astgen(
@@ -168,7 +201,7 @@ verilator_bisonpre(
         "$(execpath V3ParseBison.c)",
         "$(execpath src/verilog.y)",
     ],
-    bisonpre = ":bisonpre",
+    bisonpre = "src/bisonpre",
     env = {
         "BISON_PKGDATADIR": "$(execpath @org_gnu_bison//:data)",
         "M4": "$(execpath @org_gnu_m4//:m4)",
@@ -285,7 +318,6 @@ cc_library(
     includes = ["include"],
     linkopts = [
         "-lpthread",
-        "-latomic",
     ],
     strip_include_prefix = "include/",
     textual_hdrs = [

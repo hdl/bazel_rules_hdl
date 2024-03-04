@@ -59,10 +59,12 @@ def _is_expandable(value):
 
 def _verilator_bisonpre_impl(ctx):
     data = [ctx.attr.bisonpre] + ctx.attr.srcs + ctx.attr.tools
-    args = [
+    args = ctx.actions.args()
+    args.add(ctx.file.bisonpre)
+    args.add_all([
         ctx.expand_location(a, data) if _is_expandable(a) else a
         for a in ctx.attr.args
-    ]
+    ])
     envs = {
         # Expand $(location) / $(locations) in the values.
         k: ctx.expand_location(v, data) if _is_expandable(v) else v
@@ -71,9 +73,9 @@ def _verilator_bisonpre_impl(ctx):
     ctx.actions.run(
         outputs = ctx.outputs.outs,
         inputs = ctx.files.srcs,
-        tools = [ctx.executable.bisonpre] + ctx.files.tools,
-        executable = ctx.executable.bisonpre,
-        arguments = args,
+        tools = [ctx.file.bisonpre] + ctx.files.tools,
+        executable = ctx.executable._process_wrapper,
+        arguments = [args],
         mnemonic = "VerilatorBisonPre",
         use_default_shell_env = False,
         env = envs,
@@ -92,7 +94,7 @@ verilator_bisonpre = rule(
         ),
         "bisonpre": attr.label(
             doc = "The path to the `bisonpre` tool.",
-            executable = True,
+            allow_single_file = True,
             mandatory = True,
             cfg = "exec",
         ),
@@ -111,6 +113,11 @@ verilator_bisonpre = rule(
             allow_files = True,
             cfg = "exec",
             doc = "Additional tools of the action.",
+        ),
+        "_process_wrapper": attr.label(
+            executable = True,
+            cfg = "exec",
+            default = Label("//dependency_support/verilator/private:verilator_bisonpre"),
         ),
     },
 )
@@ -162,6 +169,97 @@ verilator_flexfix = rule(
             cfg = "exec",
             executable = True,
             default = Label("//dependency_support/verilator/private:verilator_flexfix"),
+        ),
+    },
+)
+
+def _verilator_version_impl(ctx):
+    output = ctx.actions.declare_file(ctx.label.name + ".txt")
+
+    args = ctx.actions.args()
+    args.add("--output", output)
+    args.add("--changelog", ctx.file.changelog)
+
+    ctx.actions.run(
+        executable = ctx.executable._parser,
+        mnemonic = "VerilatorVersion",
+        outputs = [output],
+        inputs = [ctx.file.changelog],
+        arguments = [args],
+    )
+
+    return [DefaultInfo(
+        files = depset([output]),
+    )]
+
+verilator_version = rule(
+    doc = "A rule for parsing the current verilator version from the change log.",
+    implementation = _verilator_version_impl,
+    attrs = {
+        "changelog": attr.label(
+            doc = "The Verilator change log.",
+            allow_single_file = True,
+            mandatory = True,
+        ),
+        "_parser": attr.label(
+            executable = True,
+            cfg = "exec",
+            default = Label("//dependency_support/verilator/private:verilator_version"),
+        ),
+    },
+)
+
+def _verilator_build_template_impl(ctx):
+    output = ctx.outputs.out
+
+    args = ctx.actions.args()
+    args.add("--output", output)
+    args.add("--version", ctx.file.version)
+    args.add("--substitutions", json.encode(ctx.attr.substitutions))
+    args.add("--template", ctx.file.template)
+
+    ctx.actions.run(
+        executable = ctx.executable._generator,
+        mnemonic = "VerilatorBuildTemplate",
+        outputs = [output],
+        inputs = [ctx.file.version, ctx.file.template],
+        arguments = [args],
+    )
+
+    return [DefaultInfo(
+        files = depset([output]),
+    )]
+
+verilator_build_template = rule(
+    doc = "A rule for expanding verilator template files required for compiling.",
+    implementation = _verilator_build_template_impl,
+    attrs = {
+        "out": attr.output(
+            doc = "The output file",
+            mandatory = True,
+        ),
+        "substitutions": attr.string_dict(
+            doc = "A mapping of substitutions to apply on the template file.",
+            mandatory = True,
+        ),
+        "template": attr.label(
+            doc = "The base template to apply substitutions to",
+            mandatory = True,
+            allow_single_file = True,
+        ),
+        "version": attr.label(
+            doc = (
+                "A file containing the current version of Verilator. In substitution " +
+                "values, the `{VERILATOR_VERSION}` string will be replaced by the version " +
+                "in this file."
+            ),
+            allow_single_file = True,
+            mandatory = True,
+        ),
+        "_generator": attr.label(
+            executable = True,
+            cfg = "exec",
+            default = Label("//dependency_support/verilator/private:verilator_build_template"),
         ),
     },
 )
