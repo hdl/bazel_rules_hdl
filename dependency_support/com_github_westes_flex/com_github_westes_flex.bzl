@@ -22,7 +22,7 @@ def com_github_westes_flex():
         http_archive,
         name = "com_github_westes_flex",
         urls = [
-            "https://github.com/westes/flex/files/981163/flex-2.6.4.tar.gz",
+            "https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz",
         ],
         strip_prefix = "flex-2.6.4",
         sha256 = "e87aae032bf07c26f85ac0ed3250998c37621d95f8bd748b31f15b33c45ee995",
