@@ -18,6 +18,7 @@ OpenRoadPdkInfo = provider(
     "provider for openROAD configuration for a pdk",
     fields = {
         "cell_site": "LEF standard cell site name to use for floorplanning",
+        "additional_cell_sites": "Any additional LEF sites to make rows for hybrid height technologies.",
         "tracks_file": "Track setup script",
         "endcap_cell": "The endcap cell to use in place and route",
         "tap_cell": "The tap cell to use in the place and route.",
@@ -57,6 +58,7 @@ def _open_road_pdk_configuration_impl(ctx):
     return [
         OpenRoadPdkInfo(
             cell_site = ctx.attr.cell_site,
+            additional_cell_sites = ctx.attr.additional_cell_sites,
             tracks_file = ctx.file.tracks_file,
             tap_cell = ctx.attr.tap_cell,
             pin_vertical_metal_layer = ctx.attr.pin_vertical_metal_layer,
@@ -91,6 +93,7 @@ open_road_pdk_configuration = rule(
     implementation = _open_road_pdk_configuration_impl,
     attrs = {
         "cell_site": attr.string(mandatory = True, doc = "LEF standard cell site name."),
+        "additional_cell_sites": attr.string_list(doc = "Any additional LEF sites to make rows for hybrid height technologies."),
         "tracks_file": attr.label(mandatory = True, allow_single_file = True, doc = "Track setup script."),
         "pdn_config": attr.label(mandatory = True, allow_single_file = True, doc = "PDN Config."),
         "tap_cell": attr.string(),
