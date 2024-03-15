@@ -47,10 +47,10 @@ def _place_and_route_impl(ctx):
         open_road_provider = impl(ctx) if step_name == "init_floor_plan" else impl(ctx, open_road_provider)
         if export_def_name != "":
             open_road_provider, output_def = export_def(ctx, open_road_provider, export_def_name)
+            output_files.append(output_def)
         if step_name == ctx.attr.stop_after_step:
             break
 
-    output_files.append(output_def)
     output_files.append(open_road_provider.output_db)
     output_files.extend(open_road_provider.logs.to_list())
 
