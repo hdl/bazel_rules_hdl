@@ -26,27 +26,30 @@ load("//place_and_route:private/place_pins.bzl", "place_pins")
 load("//place_and_route:private/resize.bzl", "resize")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
 
+PLACE_AND_ROUTE_STEPS = [
+    ("init_floor_plan", init_floor_plan, "pre_pnr"),
+    ("place_pins", place_pins, ""),
+    ("pdn_gen", pdn_gen, ""),
+    ("global_placement", global_placement, "global_placement"),
+    ("resize", resize, ""),
+    ("clock_tree_synthesis", clock_tree_synthesis, ""),
+    ("global_routing", global_routing, "post_pnr"),
+    ("detailed_routing", detailed_routing, "post_detailed_route"),
+]
+
 def _place_and_route_impl(ctx):
     # Throws an error if there is no OpenROAD configuration
     assert_has_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
 
     output_files = []
+    open_road_provider = None
+    for step_name, impl, export_def_name in PLACE_AND_ROUTE_STEPS:
+        open_road_provider = impl(ctx) if step_name == "init_floor_plan" else impl(ctx, open_road_provider)
+        if export_def_name != "":
+            open_road_provider, output_def = export_def(ctx, open_road_provider, export_def_name)
+        if step_name == ctx.attr.stop_after_step:
+            break
 
-    open_road_provider = init_floor_plan(ctx)
-    open_road_provider, output_def = export_def(ctx, open_road_provider, "pre_pnr")
-    output_files.append(output_def)
-    open_road_provider = place_pins(ctx, open_road_provider)
-    open_road_provider = pdn_gen(ctx, open_road_provider)
-    open_road_provider = global_placement(ctx, open_road_provider)
-    open_road_provider, output_def = export_def(ctx, open_road_provider, "global_placement")
-    output_files.append(output_def)
-    open_road_provider = resize(ctx, open_road_provider)
-    open_road_provider = clock_tree_synthesis(ctx, open_road_provider)
-    open_road_provider = global_routing(ctx, open_road_provider)
-    if not ctx.attr.skip_detailed_routing:
-        open_road_provider = detailed_routing(ctx, open_road_provider)
-        output_files.append(open_road_provider.routed_def)
-    open_road_provider, output_def = export_def(ctx, open_road_provider, "post_pnr")
     output_files.append(output_def)
     output_files.append(open_road_provider.output_db)
     output_files.extend(open_road_provider.logs.to_list())
@@ -79,9 +82,11 @@ place_and_route = rule(
             executable = True,
             cfg = "exec",
         ),
-        "skip_detailed_routing": attr.bool(
-            default = False,
-            doc = "Whether to skip detailed routing. This step is slow and is only required if requiring a fully manufacturable routed_def.",
+        "stop_after_step": attr.string(
+            doc = """
+            Stops the flow after the specified step. Leaving unspecified will run all pnr steps.
+            """,
+            values = [step[0] for step in PLACE_AND_ROUTE_STEPS],
         ),
         "local_detailed_routing_execution": attr.bool(
             default = False,

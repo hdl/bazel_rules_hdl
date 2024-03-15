@@ -46,14 +46,15 @@ def timing_setup_commands(ctx):
 
     netlist_target = ctx.attr.synthesized_rtl
     liberty = netlist_target[SynthesisInfo].standard_cell_info.default_corner.liberty
+    additional_liberties = [corner.liberty for corner in netlist_target[SynthesisInfo].standard_cell_info.corners]
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
     rc_script = open_road_configuration.rc_script_configuration
 
     # Liberty Setup
     inputs.append(liberty)
-    commands.append("read_liberty {liberty_file}".format(
-        liberty_file = liberty.path,
-    ))
+    inputs.extend(additional_liberties)
+    for file in [liberty] + additional_liberties:
+        commands.append("read_liberty {liberty}".format(liberty = file.path))
 
     # SDC/Clock Setup
     clock_commands_struct = clock_commands(ctx)

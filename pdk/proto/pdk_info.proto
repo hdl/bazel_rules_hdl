@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package bazel_rules_hdl.pdk;
+package third_party.bazel_rules_hdl.pdk;
 
 message PdkInfoProto {
   repeated string cell_lef_paths = 1;
@@ -27,6 +27,7 @@ message PdkInfoProto {
   optional string rc_script_configuration_path = 22;
   map<string, float> global_routing_layer_adjustments = 23;
   optional string cell_site = 24;
+  repeated string additional_cell_sites = 27;
   optional string tapcell_tcl_path = 25;
   optional string placement_padding_tcl_path = 26;
 }

@@ -24,7 +24,7 @@ def _initialize_floorplan_command(ctx):
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
 
     if ctx.attr.die_width_microns and ctx.attr.die_height_microns:
-        return "initialize_floorplan -site \"{site}\" -die_area {die_area} -core_area {core_area}".format(
+        return "initialize_floorplan -site \"{site}\" -additional_sites \"{additional_cell_sites}\" -die_area {die_area} -core_area {core_area}".format(
             die_area = "\"0 0 {width} {height}\"".format(
                 width = ctx.attr.die_width_microns,
                 height = ctx.attr.die_height_microns,
@@ -36,14 +36,16 @@ def _initialize_floorplan_command(ctx):
                 uy = ctx.attr.die_height_microns - ctx.attr.core_padding_microns,
             ),
             site = open_road_configuration.cell_site,
+            additional_cell_sites = " ".join(open_road_configuration.additional_cell_sites),
         )
 
     if ctx.attr.target_die_utilization_percentage:
         utilization = ctx.attr.target_die_utilization_percentage  #TODO(bazel): When bazel 4.0.0 is avaliable use float command
-        return "initialize_floorplan -site \"{site}\" -utilization {utilization} -core_space {core_space}".format(
+        return "initialize_floorplan -site \"{site}\" -additional_sites \"{additional_cell_sites}\" -utilization {utilization} -core_space {core_space}".format(
             utilization = utilization,
             core_space = ctx.attr.core_padding_microns,
             site = open_road_configuration.cell_site,
+            additional_cell_sites = " ".join(open_road_configuration.additional_cell_sites),
         )
 
     fail("either (die_width_microns and die_height_microns) or `utilization` must be set")
@@ -63,6 +65,7 @@ def init_floor_plan(ctx):
     netlist = netlist_target[SynthesisInfo].synthesized_netlist
     top_module = netlist_target[SynthesisInfo].top_module
     liberty = netlist_target[SynthesisInfo].standard_cell_info.default_corner.liberty
+    additional_liberties = [corner.liberty for corner in netlist_target[SynthesisInfo].standard_cell_info.corners]
     tech_lef = netlist_target[SynthesisInfo].standard_cell_info.tech_lef
     std_cell_lef = netlist_target[SynthesisInfo].standard_cell_info.cell_lef_definitions
     verilog_based_power_results = ctx.actions.declare_file("{}_verilog_based_power_results.textproto".format(ctx.attr.name))
@@ -77,10 +80,9 @@ def init_floor_plan(ctx):
     ]
     for file in std_cell_lef:
         open_road_commands.append("read_lef {}".format(file.path))
+    for file in [liberty] + additional_liberties:
+        open_road_commands.append("read_liberty {liberty}".format(liberty = file.path))
     open_road_commands.extend([
-        "read_liberty {liberty}".format(
-            liberty = liberty.path,
-        ),
         "read_verilog {verilog}".format(
             verilog = netlist.path,
         ),
@@ -107,7 +109,7 @@ def init_floor_plan(ctx):
         liberty,
         tech_lef,
         open_road_configuration.tracks_file,
-    ] + std_cell_lef
+    ] + std_cell_lef + additional_liberties
 
     command_output = openroad_command(
         ctx,
