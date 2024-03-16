@@ -96,25 +96,6 @@ def _only_hpp(f):
         return f.path
     return None
 
-_COPY_TREE_SH = """
-OUT=$1; shift && mkdir -p "$OUT" && cp $* "$OUT"
-"""
-
-def _copy_tree(ctx, idir, odir, map_each = None, progress_message = None):
-    """Copy files from a TreeArtifact to a new directory"""
-    args = ctx.actions.args()
-    args.add(odir.path)
-    args.add_all([idir], map_each = map_each)
-    ctx.actions.run_shell(
-        arguments = [args],
-        command = _COPY_TREE_SH,
-        inputs = [idir],
-        outputs = [odir],
-        progress_message = progress_message,
-    )
-
-    return odir
-
 def _verilator_cc_library(ctx):
     transitive_srcs = depset([], transitive = [ctx.attr.module[VerilogInfo].dag])
     all_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs.to_list()]
@@ -130,8 +111,6 @@ def _verilator_cc_library(ctx):
             verilog_files.append(file)
 
     verilator_output = ctx.actions.declare_directory(ctx.label.name + "-gen")
-    verilator_output_cpp = ctx.actions.declare_directory(ctx.label.name + ".cpp")
-    verilator_output_hpp = ctx.actions.declare_directory(ctx.label.name + ".h")
 
     prefix = "V" + ctx.attr.module_top
 
@@ -156,19 +135,21 @@ def _verilator_cc_library(ctx):
         progress_message = "[Verilator] Compiling {}".format(ctx.label),
     )
 
-    _copy_tree(
-        ctx,
-        verilator_output,
-        verilator_output_cpp,
-        map_each = _only_cpp,
-        progress_message = "[Verilator] Extracting C++ source files",
-    )
-    _copy_tree(
-        ctx,
-        verilator_output,
-        verilator_output_hpp,
-        map_each = _only_hpp,
-        progress_message = "[Verilator] Extracting C++ header files",
+    verilator_output_cpp = ctx.actions.declare_directory(ctx.label.name + "_cpp")
+    verilator_output_hpp = ctx.actions.declare_directory(ctx.label.name + "_h")
+
+    cp_args = ctx.actions.args()
+    cp_args.add("--src_output", verilator_output_cpp.path)
+    cp_args.add("--hdr_output", verilator_output_hpp.path)
+    cp_args.add_all([verilator_output], map_each = _only_cpp, format_each = "--src=%s")
+    cp_args.add_all([verilator_output], map_each = _only_hpp, format_each = "--hdr=%s")
+
+    ctx.actions.run(
+        mnemonic = "VerilatorCopyTree",
+        arguments = [cp_args],
+        inputs = [verilator_output],
+        outputs = [verilator_output_cpp, verilator_output_hpp],
+        executable = ctx.executable._copy_tree,
     )
 
     # Do actual compile
@@ -212,6 +193,12 @@ verilator_cc_library = rule(
         "_cc_toolchain": attr.label(
             doc = "CC compiler.",
             default = Label("@bazel_tools//tools/cpp:current_cc_toolchain"),
+        ),
+        "_copy_tree": attr.label(
+            doc = "A tool for copying a tree of files",
+            cfg = "exec",
+            executable = True,
+            default = Label("//verilator/private:verilator_copy_tree"),
         ),
         "_verilator": attr.label(
             doc = "Verilator binary.",
