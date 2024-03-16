@@ -76,11 +76,48 @@ def _place_and_route_impl(ctx):
 place_and_route = rule(
     implementation = _place_and_route_impl,
     attrs = {
-        "synthesized_rtl": attr.label(mandatory = True, providers = [SynthesisInfo]),
-        "_openroad": attr.label(
-            default = Label("@org_theopenroadproject//:openroad"),
-            executable = True,
-            cfg = "exec",
+        "clock_period": attr.string(
+            doc = """
+          The amount of time a single clock period lasts. Bazel doesn't support floats so enter the clock period as a decimal in string form.
+          The units currently depend on the PDK you're targeting. The default PDK is sky130 and it uses nano seconds for ASAP7 it is pico seconds.
+          """,
+        ),
+        "clocks": attr.string_dict(),
+        "core_padding_microns": attr.int(
+            mandatory = True,
+        ),
+        "density_fill_config": attr.label(
+            allow_single_file = True,
+        ),
+        "die_height_microns": attr.int(),
+        "die_width_microns": attr.int(),
+        "enable_improve_placement": attr.bool(
+            default = True,
+            doc = "Enable/Disable improve_placement pass.",
+        ),
+        "local_detailed_routing_execution": attr.bool(
+            default = False,
+            doc = "Whether to run detailed routing on a remote executor. If the detailed routing exceeds 15 minutes flip this setting.",
+        ),
+        "min_pin_distance": attr.string(
+            doc = "The minimum distance in microns between pins around the outside of the block.",
+        ),
+        "pin_placement_script": attr.label(
+            allow_single_file = [".tcl"],
+            doc = "See https://openroad.readthedocs.io/en/latest/main/src/ppl/README.html for syntax",
+        ),
+        "placement_density": attr.string(
+            default = "0.69",
+            doc = "When performing global placement this is how densely our cells should be packaged on the die parameter is (0-1]",
+        ),
+        "sdc": attr.label(
+            allow_single_file = True,
+        ),
+        "sink_clustering_max_diameter": attr.int(
+            doc = "Clock tree synthesis sink group desired diamater in microns",
+        ),
+        "sink_clustering_size": attr.int(
+            doc = "Clock tree synthesis sink group size",
         ),
         "stop_after_step": attr.string(
             doc = """
@@ -88,28 +125,17 @@ place_and_route = rule(
             """,
             values = [step[0] for step in PLACE_AND_ROUTE_STEPS],
         ),
-        "local_detailed_routing_execution": attr.bool(
-            default = False,
-            doc = "Whether to run detailed routing on a remote executor. If the detailed routing exceeds 15 minutes flip this setting.",
+        "synthesized_rtl": attr.label(
+            mandatory = True,
+            providers = [SynthesisInfo],
         ),
-        "clock_period": attr.string(
-            doc = """
-          The amount of time a single clock period lasts. Bazel doesn't support floats so enter the clock period as a decimal in string form.
-          The units currently depend on the PDK you're targeting. The default PDK is sky130 and it uses nano seconds for ASAP7 it is pico seconds.
-          """,
+        "target_die_utilization_percentage": attr.string(
+            doc = "string float value from 0-100 which sets the die area based on an estimated die area target utilization",
         ),
-        "sdc": attr.label(allow_single_file = True),
-        "pin_placement_script": attr.label(allow_single_file = [".tcl"], doc = "See https://openroad.readthedocs.io/en/latest/main/src/ppl/README.html for syntax"),
-        "clocks": attr.string_dict(),
-        "die_width_microns": attr.int(),
-        "die_height_microns": attr.int(),
-        "core_padding_microns": attr.int(mandatory = True),
-        "target_die_utilization_percentage": attr.string(doc = "string float value from 0-100 which sets the die area based on an estimated die area target utilization"),
-        "placement_density": attr.string(default = "0.69", doc = "When performing global placement this is how densely our cells should be packaged on the die parameter is (0-1]"),
-        "density_fill_config": attr.label(allow_single_file = True),
-        "sink_clustering_size": attr.int(doc = "Clock tree synthesis sink group size"),
-        "sink_clustering_max_diameter": attr.int(doc = "Clock tree synthesis sink group desired diamater in microns"),
-        "min_pin_distance": attr.string(doc = "The minimum distance in microns between pins around the outside of the block."),
-        "enable_improve_placement": attr.bool(default = True, doc = "Enable/Disable improve_placement pass."),
+        "_openroad": attr.label(
+            default = Label("@org_theopenroadproject//:openroad"),
+            executable = True,
+            cfg = "exec",
+        ),
     },
 )

@@ -179,18 +179,18 @@ def create_and_synth(
         outputs = [project_dir]
 
     substitutions = {
-        "{{PART_NUMBER}}": ctx.attr.part_number,
-        "{{HDL_SOURCE_CONTENT}}": hdl_source_content,
-        "{{TCL_CONTENT}}": tcl_content,
         "{{CONSTRAINTS_CONTENT}}": constraints_content,
-        "{{MODULE_TOP}}": ctx.attr.module_top,
-        "{{PROJECT_DIR}}": project_dir.path,
-        "{{SYNTH_STRATEGY}}": synth_strategy_str,
-        "{{SYNTH_CHECKPOINT}}": synth_path,
-        "{{TIMING_SUMMARY_REPORT}}": timing_path,
-        "{{UTILIZATION_REPORT}}": util_path,
+        "{{HDL_SOURCE_CONTENT}}": hdl_source_content,
         "{{IP_BLOCK_TCL}}": ip_block_tcl,
         "{{JOBS}}": "{}".format(ctx.attr.jobs),
+        "{{MODULE_TOP}}": ctx.attr.module_top,
+        "{{PART_NUMBER}}": ctx.attr.part_number,
+        "{{PROJECT_DIR}}": project_dir.path,
+        "{{SYNTH_CHECKPOINT}}": synth_path,
+        "{{SYNTH_STRATEGY}}": synth_strategy_str,
+        "{{TCL_CONTENT}}": tcl_content,
+        "{{TIMING_SUMMARY_REPORT}}": timing_path,
+        "{{UTILIZATION_REPORT}}": util_path,
         "{{WITH_SYNTH}}": with_synth_str,
     }
 
@@ -214,6 +214,20 @@ def _vivado_create_project_impl(ctx):
 vivado_create_project = rule(
     implementation = _vivado_create_project_impl,
     attrs = {
+        "create_project_tcl_template": attr.label(
+            doc = "The create project tcl template",
+            default = "@rules_hdl//vivado:create_project.tcl.template",
+            allow_single_file = [".template"],
+        ),
+        "ip_blocks": attr.label_list(
+            doc = "Ip blocks to include in this design.",
+            providers = [VivadoIPBlockInfo],
+            default = [],
+        ),
+        "jobs": attr.int(
+            doc = "Jobs to pass to vivado which defines the amount of parallelism.",
+            default = 4,
+        ),
         "module": attr.label(
             doc = "The top level build.",
             providers = [VerilogInfo],
@@ -227,25 +241,11 @@ vivado_create_project = rule(
             doc = "The targeted xilinx part.",
             mandatory = True,
         ),
-        "ip_blocks": attr.label_list(
-            doc = "Ip blocks to include in this design.",
-            providers = [VivadoIPBlockInfo],
-            default = [],
-        ),
         "xilinx_env": attr.label(
             doc = "A shell script to source the vivado environment and " +
                   "point to license server",
             mandatory = True,
             allow_single_file = [".sh"],
-        ),
-        "jobs": attr.int(
-            doc = "Jobs to pass to vivado which defines the amount of parallelism.",
-            default = 4,
-        ),
-        "create_project_tcl_template": attr.label(
-            doc = "The create project tcl template",
-            default = "@rules_hdl//vivado:create_project.tcl.template",
-            allow_single_file = [".template"],
         ),
     },
 )
@@ -272,6 +272,20 @@ def _vivado_synthesize_impl(ctx):
 vivado_synthesize = rule(
     implementation = _vivado_synthesize_impl,
     attrs = {
+        "create_project_tcl_template": attr.label(
+            doc = "The create project tcl template",
+            default = "@rules_hdl//vivado:create_project.tcl.template",
+            allow_single_file = [".template"],
+        ),
+        "ip_blocks": attr.label_list(
+            doc = "Ip blocks to include in this design.",
+            providers = [VivadoIPBlockInfo],
+            default = [],
+        ),
+        "jobs": attr.int(
+            doc = "Jobs to pass to vivado which defines the amount of parallelism.",
+            default = 4,
+        ),
         "module": attr.label(
             doc = "The top level build.",
             providers = [VerilogInfo],
@@ -289,25 +303,11 @@ vivado_synthesize = rule(
             doc = "The synthesis strategy to use.",
             default = "Vivado Synthesis Defaults",
         ),
-        "ip_blocks": attr.label_list(
-            doc = "Ip blocks to include in this design.",
-            providers = [VivadoIPBlockInfo],
-            default = [],
-        ),
         "xilinx_env": attr.label(
             doc = "A shell script to source the vivado environment and " +
                   "point to license server",
             mandatory = True,
             allow_single_file = [".sh"],
-        ),
-        "jobs": attr.int(
-            doc = "Jobs to pass to vivado which defines the amount of parallelism.",
-            default = 4,
-        ),
-        "create_project_tcl_template": attr.label(
-            doc = "The create project tcl template",
-            default = "@rules_hdl//vivado:create_project.tcl.template",
-            allow_single_file = [".template"],
         ),
     },
     provides = [
@@ -325,13 +325,13 @@ def _vivado_synthesis_optimize_impl(ctx):
     checkpoint_in = ctx.attr.checkpoint[VivadoSynthCheckpointInfo].checkpoint
 
     substitutions = {
-        "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{CHECKPOINT_IN}}": checkpoint_in.path,
+        "{{CHECKPOINT_OUT}}": synth_checkpoint.path,
+        "{{DRC_REPORT}}": drc_report.path,
         "{{OPT_DIRECTIVE}}": ctx.attr.opt_directive,
+        "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{TIMING_REPORT}}": timing_summary_report.path,
         "{{UTIL_REPORT}}": util_report.path,
-        "{{DRC_REPORT}}": drc_report.path,
-        "{{CHECKPOINT_OUT}}": synth_checkpoint.path,
     }
 
     outputs = [synth_checkpoint, timing_summary_report, util_report, drc_report]
@@ -358,24 +358,24 @@ vivado_synthesis_optimize = rule(
             providers = [VivadoSynthCheckpointInfo],
             mandatory = True,
         ),
-        "xilinx_env": attr.label(
-            doc = "A shell script to source the vivado environment and " +
-                  "point to license server",
-            mandatory = True,
-            allow_single_file = [".sh"],
-        ),
         "opt_directive": attr.string(
             doc = "The optimization directive.",
             default = "Explore",
-        ),
-        "threads": attr.int(
-            doc = "Threads to pass to vivado which defines the amount of parallelism.",
-            default = 8,
         ),
         "synthesis_optimize_template": attr.label(
             doc = "The synthesis optimzation tcl template",
             default = "@rules_hdl//vivado:synth_optimize.tcl.template",
             allow_single_file = [".template"],
+        ),
+        "threads": attr.int(
+            doc = "Threads to pass to vivado which defines the amount of parallelism.",
+            default = 8,
+        ),
+        "xilinx_env": attr.label(
+            doc = "A shell script to source the vivado environment and " +
+                  "point to license server",
+            mandatory = True,
+            allow_single_file = [".sh"],
         ),
     },
     provides = [
@@ -392,12 +392,12 @@ def _vivado_placement_impl(ctx):
     checkpoint_in = ctx.attr.checkpoint[VivadoSynthCheckpointInfo].checkpoint
 
     substitutions = {
-        "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{CHECKPOINT_IN}}": checkpoint_in.path,
+        "{{CHECKPOINT_OUT}}": placement_checkpoint.path,
         "{{PLACEMENT_DIRECTIVE}}": ctx.attr.placement_directive,
+        "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{TIMING_REPORT}}": timing_summary_report.path,
         "{{UTIL_REPORT}}": util_report.path,
-        "{{CHECKPOINT_OUT}}": placement_checkpoint.path,
     }
 
     outputs = [placement_checkpoint, timing_summary_report, util_report]
@@ -424,24 +424,24 @@ vivado_placement = rule(
             providers = [VivadoSynthCheckpointInfo],
             mandatory = True,
         ),
-        "xilinx_env": attr.label(
-            doc = "A shell script to source the vivado environment and " +
-                  "point to license server",
-            mandatory = True,
-            allow_single_file = [".sh"],
-        ),
         "placement_directive": attr.string(
             doc = "The optimization directive.",
             default = "Explore",
-        ),
-        "threads": attr.int(
-            doc = "Threads to pass to vivado which defines the amount of parallelism.",
-            default = 8,
         ),
         "placement_template": attr.label(
             doc = "The placement tcl template",
             default = "@rules_hdl//vivado:placement.tcl.template",
             allow_single_file = [".template"],
+        ),
+        "threads": attr.int(
+            doc = "Threads to pass to vivado which defines the amount of parallelism.",
+            default = 8,
+        ),
+        "xilinx_env": attr.label(
+            doc = "A shell script to source the vivado environment and " +
+                  "point to license server",
+            mandatory = True,
+            allow_single_file = [".sh"],
         ),
     },
     provides = [
@@ -458,12 +458,12 @@ def _vivado_place_optimize_impl(ctx):
     checkpoint_in = ctx.attr.checkpoint[VivadoPlacementCheckpointInfo].checkpoint
 
     substitutions = {
-        "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{CHECKPOINT_IN}}": checkpoint_in.path,
+        "{{CHECKPOINT_OUT}}": placement_checkpoint.path,
         "{{PHYS_OPT_DIRECTIVE}}": ctx.attr.phys_opt_directive,
+        "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{TIMING_REPORT}}": timing_summary_report.path,
         "{{UTIL_REPORT}}": util_report.path,
-        "{{CHECKPOINT_OUT}}": placement_checkpoint.path,
     }
 
     outputs = [placement_checkpoint, timing_summary_report, util_report]
@@ -490,24 +490,24 @@ vivado_place_optimize = rule(
             providers = [VivadoPlacementCheckpointInfo],
             mandatory = True,
         ),
-        "xilinx_env": attr.label(
-            doc = "A shell script to source the vivado environment and " +
-                  "point to license server",
-            mandatory = True,
-            allow_single_file = [".sh"],
-        ),
         "phys_opt_directive": attr.string(
             doc = "The optimization directive.",
             default = "AggressiveExplore",
-        ),
-        "threads": attr.int(
-            doc = "Threads to pass to vivado which defines the amount of parallelism.",
-            default = 8,
         ),
         "place_optimize_template": attr.label(
             doc = "The placement tcl template",
             default = "@rules_hdl//vivado:place_optimize.tcl.template",
             allow_single_file = [".template"],
+        ),
+        "threads": attr.int(
+            doc = "Threads to pass to vivado which defines the amount of parallelism.",
+            default = 8,
+        ),
+        "xilinx_env": attr.label(
+            doc = "A shell script to source the vivado environment and " +
+                  "point to license server",
+            mandatory = True,
+            allow_single_file = [".sh"],
         ),
     },
     provides = [
@@ -528,16 +528,16 @@ def _vivado_routing_impl(ctx):
     checkpoint_in = ctx.attr.checkpoint[VivadoPlacementCheckpointInfo].checkpoint
 
     substitutions = {
-        "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{CHECKPOINT_IN}}": checkpoint_in.path,
-        "{{ROUTE_DIRECTIVE}}": ctx.attr.route_directive,
-        "{{TIMING_REPORT}}": timing_summary_report.path,
-        "{{UTIL_REPORT}}": util_report.path,
-        "{{STATUS_REPORT}}": status_report.path,
+        "{{CHECKPOINT_OUT}}": route_checkpoint.path,
+        "{{DESIGN_ANALYSIS_REPORT}}": design_analysis_report.path,
         "{{IO_REPORT}}": io_report.path,
         "{{POWER_REPORT}}": power_report.path,
-        "{{DESIGN_ANALYSIS_REPORT}}": design_analysis_report.path,
-        "{{CHECKPOINT_OUT}}": route_checkpoint.path,
+        "{{ROUTE_DIRECTIVE}}": ctx.attr.route_directive,
+        "{{STATUS_REPORT}}": status_report.path,
+        "{{THREADS}}": "{}".format(ctx.attr.threads),
+        "{{TIMING_REPORT}}": timing_summary_report.path,
+        "{{UTIL_REPORT}}": util_report.path,
     }
 
     outputs = [
@@ -572,24 +572,24 @@ vivado_routing = rule(
             providers = [VivadoPlacementCheckpointInfo],
             mandatory = True,
         ),
-        "xilinx_env": attr.label(
-            doc = "A shell script to source the vivado environment and " +
-                  "point to license server",
-            mandatory = True,
-            allow_single_file = [".sh"],
-        ),
         "route_directive": attr.string(
             doc = "The routing directive.",
             default = "Explore",
-        ),
-        "threads": attr.int(
-            doc = "Threads to pass to vivado which defines the amount of parallelism.",
-            default = 8,
         ),
         "route_template": attr.label(
             doc = "The placement tcl template",
             default = "@rules_hdl//vivado:route.tcl.template",
             allow_single_file = [".template"],
+        ),
+        "threads": attr.int(
+            doc = "Threads to pass to vivado which defines the amount of parallelism.",
+            default = 8,
+        ),
+        "xilinx_env": attr.label(
+            doc = "A shell script to source the vivado environment and " +
+                  "point to license server",
+            mandatory = True,
+            allow_single_file = [".sh"],
         ),
     },
     provides = [
@@ -615,9 +615,9 @@ def _vivado_write_bitstream_impl(ctx):
         xsa_path = "nothing.xsa"
 
     substitutions = {
-        "{{THREADS}}": "{}".format(ctx.attr.threads),
-        "{{CHECKPOINT_IN}}": checkpoint_in.path,
         "{{BITSTREAM}}": bitstream.path,
+        "{{CHECKPOINT_IN}}": checkpoint_in.path,
+        "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{WRITE_XSA}}": with_xsa_str,
         "{{XSA_PATH}}": xsa_path,
     }
@@ -640,12 +640,6 @@ vivado_write_bitstream = rule(
             providers = [VivadoRoutingCheckpointInfo],
             mandatory = True,
         ),
-        "xilinx_env": attr.label(
-            doc = "A shell script to source the vivado environment and " +
-                  "point to license server",
-            mandatory = True,
-            allow_single_file = [".sh"],
-        ),
         "threads": attr.int(
             doc = "Threads to pass to vivado which defines the amount of parallelism.",
             default = 8,
@@ -658,6 +652,12 @@ vivado_write_bitstream = rule(
             doc = "The write bitstream tcl template",
             default = "@rules_hdl//vivado:write_bitstream.tcl.template",
             allow_single_file = [".template"],
+        ),
+        "xilinx_env": attr.label(
+            doc = "A shell script to source the vivado environment and " +
+                  "point to license server",
+            mandatory = True,
+            allow_single_file = [".sh"],
         ),
     },
     provides = [
@@ -744,15 +744,15 @@ def _xsim_test_impl(ctx):
         outputs = [project_dir]
 
     substitutions = {
-        "{{PART_NUMBER}}": ctx.attr.part_number,
+        "{{CONSTRAINTS_CONTENT}}": constraints_content,
         "{{HDL_SOURCE_CONTENT}}": hdl_source_content,
         "{{IP_BLOCK_TCL}}": ip_block_tcl,
-        "{{TCL_CONTENT}}": tcl_content,
-        "{{CONSTRAINTS_CONTENT}}": constraints_content,
         "{{MODULE_TOP}}": ctx.attr.module_top,
+        "{{PART_NUMBER}}": ctx.attr.part_number,
         "{{PROJECT_DIR}}": project_dir.path,
-        "{{WITH_WAVEFORM}}": with_waveform_str,
+        "{{TCL_CONTENT}}": tcl_content,
         "{{WAVE_DB}}": wave_db_path,
+        "{{WITH_WAVEFORM}}": with_waveform_str,
     }
 
     _, vivado_log, vivado_journal = run_tcl_template(
@@ -793,6 +793,11 @@ xsim_test = rule(
     doc = "Use the vivado tool xsim to test.",
     test = True,
     attrs = {
+        "ip_blocks": attr.label_list(
+            doc = "Ip blocks to include in this design.",
+            providers = [VivadoIPBlockInfo],
+            default = [],
+        ),
         "module": attr.label(
             doc = "The top level build.",
             providers = [VerilogInfo],
@@ -801,11 +806,6 @@ xsim_test = rule(
         "module_top": attr.string(
             doc = "The name of the top level verilog module.",
             mandatory = True,
-        ),
-        "ip_blocks": attr.label_list(
-            doc = "Ip blocks to include in this design.",
-            providers = [VivadoIPBlockInfo],
-            default = [],
         ),
         "part_number": attr.string(
             doc = "The targeted xilinx part.",
@@ -890,19 +890,19 @@ def _vivado_create_ip_impl(ctx):
         outputs += encrypted_files
 
     substitutions = {
-        "{{PART_NUMBER}}": ctx.attr.part_number,
-        "{{HDL_SOURCE_CONTENT}}": hdl_source_content,
-        "{{TCL_CONTENT}}": tcl_content,
         "{{CONSTRAINTS_CONTENT}}": constraints_content,
-        "{{MODULE_TOP}}": ctx.attr.module_top,
-        "{{PROJECT_DIR}}": "./",
-        "{{IP_OUTPUT_DIR}}": ip_dir.path,
-        "{{IP_VERSION}}": ctx.attr.ip_version,
-        "{{IP_BLOCK_TCL}}": ip_block_tcl,
-        "{{JOBS}}": "{}".format(ctx.attr.jobs),
         "{{ENCRYPT_CONTENT}}": encrypt_content,
-        "{{IP_VENDOR}}": ctx.attr.ip_vendor,
+        "{{HDL_SOURCE_CONTENT}}": hdl_source_content,
+        "{{IP_BLOCK_TCL}}": ip_block_tcl,
         "{{IP_LIBRARY}}": ctx.attr.ip_library,
+        "{{IP_OUTPUT_DIR}}": ip_dir.path,
+        "{{IP_VENDOR}}": ctx.attr.ip_vendor,
+        "{{IP_VERSION}}": ctx.attr.ip_version,
+        "{{JOBS}}": "{}".format(ctx.attr.jobs),
+        "{{MODULE_TOP}}": ctx.attr.module_top,
+        "{{PART_NUMBER}}": ctx.attr.part_number,
+        "{{PROJECT_DIR}}": "./",
+        "{{TCL_CONTENT}}": tcl_content,
         "{{XCI_NAME}}": xci_name,
     }
 
@@ -928,27 +928,19 @@ vivado_create_ip = rule(
     implementation = _vivado_create_ip_impl,
     doc = "Use vivado to package a module into an IP core",
     attrs = {
-        "module": attr.label(
-            doc = "The top level build.",
-            providers = [VerilogInfo],
-            mandatory = True,
+        "create_ip_block_template": attr.label(
+            doc = "The create project tcl template",
+            default = "@rules_hdl//vivado:create_ip_block.tcl.template",
+            allow_single_file = [".template"],
         ),
-        "module_top": attr.string(
-            doc = "The name of the top level verilog module.",
-            mandatory = True,
+        "encrypt": attr.bool(
+            doc = "Encrypt the sources. Note: This requires a license. See: https://support.xilinx.com/s/article/68071?language=en_US",
+            default = False,
         ),
         "ip_blocks": attr.label_list(
             doc = "Ip blocks to include in this design.",
             providers = [VivadoIPBlockInfo],
             default = [],
-        ),
-        "part_number": attr.string(
-            doc = "The targeted xilinx part.",
-            mandatory = True,
-        ),
-        "ip_version": attr.string(
-            doc = "The version of this ip core.",
-            mandatory = True,
         ),
         "ip_library": attr.string(
             doc = "The version of this ip core.",
@@ -958,29 +950,37 @@ vivado_create_ip = rule(
             doc = "The version of this ip core.",
             mandatory = True,
         ),
-        "encrypt": attr.bool(
-            doc = "Encrypt the sources. Note: This requires a license. See: https://support.xilinx.com/s/article/68071?language=en_US",
-            default = False,
+        "ip_version": attr.string(
+            doc = "The version of this ip core.",
+            mandatory = True,
         ),
         "jobs": attr.int(
             doc = "Jobs to pass to vivado which defines the amount of parallelism.",
             default = 4,
+        ),
+        "keyfile": attr.label(
+            doc = "The keyfile to use when optionally encrypting",
+            default = "@rules_hdl//vivado:xilinx_keyfile.txt",
+            allow_single_file = [".txt"],
+        ),
+        "module": attr.label(
+            doc = "The top level build.",
+            providers = [VerilogInfo],
+            mandatory = True,
+        ),
+        "module_top": attr.string(
+            doc = "The name of the top level verilog module.",
+            mandatory = True,
+        ),
+        "part_number": attr.string(
+            doc = "The targeted xilinx part.",
+            mandatory = True,
         ),
         "xilinx_env": attr.label(
             doc = "A shell script to source the vivado environment and " +
                   "point to license server",
             mandatory = True,
             allow_single_file = [".sh"],
-        ),
-        "create_ip_block_template": attr.label(
-            doc = "The create project tcl template",
-            default = "@rules_hdl//vivado:create_ip_block.tcl.template",
-            allow_single_file = [".template"],
-        ),
-        "keyfile": attr.label(
-            doc = "The keyfile to use when optionally encrypting",
-            default = "@rules_hdl//vivado:xilinx_keyfile.txt",
-            allow_single_file = [".txt"],
         ),
     },
     provides = [

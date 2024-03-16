@@ -17,35 +17,35 @@
 OpenRoadPdkInfo = provider(
     "provider for openROAD configuration for a pdk",
     fields = {
-        "cell_site": "LEF standard cell site name to use for floorplanning",
         "additional_cell_sites": "Any additional LEF sites to make rows for hybrid height technologies.",
-        "tracks_file": "Track setup script",
+        "cell_site": "LEF standard cell site name to use for floorplanning",
+        "check_placement": "Check the placement in the placement script",
+        "cts_buffer_cell": "Clock Tree Buffer cell",
+        "density_fill_config": "optional path to file with metal fill configuration",
+        "detailed_routing_configuration": "optional detailed routing configuration",
+        "do_not_use_cell_list": "Do not use cells in timing repair. This supports wild card * cell names",
         "endcap_cell": "The endcap cell to use in place and route",
-        "tap_cell": "The tap cell to use in the place and route.",
+        "fill_cells": "Metal fill cells",
+        "global_placement_cell_pad": "Global placement cell padding to aide in routing",
+        "global_routing_clock_layers": "Clock routing layers",
+        "global_routing_layer_adjustments": "Global routing adjustment layers",
+        "global_routing_signal_layers": "Signal routing layers",
+        "ha_fa_mapping": "HA/FA techmapping file",
+        "klayout_tech_file": "KLayout technology file for GDS write",
+        "pdn_config": "PDN config",
         "pin_horizontal_metal_layer": "",
         "pin_vertical_metal_layer": "",
-        "tapcell_distance": "Number of sites ",
-        "wire_rc_signal_metal_layer": "The metal layer to pull RC information for signal nets",
-        "wire_rc_clock_metal_layer": "The metal layer to pull RC information for clock nets",
-        "pdn_config": "PDN config",
-        "global_placement_cell_pad": "Global placement cell padding to aide in routing",
-        "do_not_use_cell_list": "Do not use cells in timing repair. This supports wild card * cell names",
-        "cts_buffer_cell": "Clock Tree Buffer cell",
-        "fill_cells": "Metal fill cells",
-        "ha_fa_mapping": "HA/FA techmapping file",
-        "global_routing_layer_adjustments": "Global routing adjustment layers",
-        "global_routing_clock_layers": "Clock routing layers",
-        "global_routing_signal_layers": "Signal routing layers",
-        "tie_low_port": "Tie low port",
-        "tie_high_port": "Tie high port",
-        "tie_separation": "Tie sepearation value",
-        "rc_script_configuration": "RC script for the various metal layers",
-        "tapcell_tcl": "TCL file that sets tapcell options. This overrides other tapcell attributes in this rule.",
         "placement_padding_tcl": "TCL Script for handling the placement padding of cells",
-        "check_placement": "Check the placement in the placement script",
-        "detailed_routing_configuration": "optional detailed routing configuration",
-        "density_fill_config": "optional path to file with metal fill configuration",
-        "klayout_tech_file": "KLayout technology file for GDS write",
+        "rc_script_configuration": "RC script for the various metal layers",
+        "tap_cell": "The tap cell to use in the place and route.",
+        "tapcell_distance": "Number of sites ",
+        "tapcell_tcl": "TCL file that sets tapcell options. This overrides other tapcell attributes in this rule.",
+        "tie_high_port": "Tie high port",
+        "tie_low_port": "Tie low port",
+        "tie_separation": "Tie sepearation value",
+        "tracks_file": "Track setup script",
+        "wire_rc_clock_metal_layer": "The metal layer to pull RC information for clock nets",
+        "wire_rc_signal_metal_layer": "The metal layer to pull RC information for signal nets",
     },
 )
 
@@ -92,35 +92,102 @@ def _open_road_pdk_configuration_impl(ctx):
 open_road_pdk_configuration = rule(
     implementation = _open_road_pdk_configuration_impl,
     attrs = {
-        "cell_site": attr.string(mandatory = True, doc = "LEF standard cell site name."),
-        "additional_cell_sites": attr.string_list(doc = "Any additional LEF sites to make rows for hybrid height technologies."),
-        "tracks_file": attr.label(mandatory = True, allow_single_file = True, doc = "Track setup script."),
-        "pdn_config": attr.label(mandatory = True, allow_single_file = True, doc = "PDN Config."),
-        "tap_cell": attr.string(),
-        "pin_horizontal_metal_layer": attr.string(mandatory = True),
-        "pin_vertical_metal_layer": attr.string(mandatory = True),
-        "tapcell_distance": attr.int(),
-        "endcap_cell": attr.string(),
-        "wire_rc_signal_metal_layer": attr.string(mandatory = True),
-        "wire_rc_clock_metal_layer": attr.string(mandatory = True),
-        "global_placement_cell_pad": attr.int(mandatory = True),
-        "do_not_use_cell_list": attr.string_list(mandatory = True, doc = "This value can be an empty list if all cells should be used in P&R"),
-        "cts_buffer_cell": attr.string(mandatory = True, doc = "Clock Tree Buffer cell"),
-        "fill_cells": attr.string_list(mandatory = True),
-        "ha_fa_mapping": attr.label(allow_single_file = True, doc = "Yosys specific HA/FA techmapping file"),
-        "global_routing_layer_adjustments": attr.string_dict(mandatory = True),
-        "global_routing_clock_layers": attr.string(mandatory = True),
-        "global_routing_signal_layers": attr.string(mandatory = True),
-        "tie_low_port": attr.string(mandatory = True),
-        "tie_high_port": attr.string(mandatory = True),
-        "tie_separation": attr.int(mandatory = True),
-        "rc_script_configuration": attr.label(allow_single_file = True),
-        "tapcell_tcl": attr.label(allow_single_file = True, doc = "TCL file that sets tapcell options. This overrides other tapcell attributes in this rule."),
-        "placement_padding_tcl": attr.label(allow_single_file = True, doc = "TCL Script for handling the placement padding of cells"),
-        "check_placement": attr.bool(mandatory = False, default = True),
-        "detailed_routing_configuration": attr.label(providers = [DetailedRoutingInfo]),
-        "density_fill_config": attr.label(allow_single_file = True),
-        "klayout_tech_file": attr.label(mandatory = True, allow_single_file = True),
+        "additional_cell_sites": attr.string_list(
+            doc = "Any additional LEF sites to make rows for hybrid height technologies.",
+        ),
+        "cell_site": attr.string(
+            mandatory = True,
+            doc = "LEF standard cell site name.",
+        ),
+        "check_placement": attr.bool(
+            mandatory = False,
+            default = True,
+        ),
+        "cts_buffer_cell": attr.string(
+            mandatory = True,
+            doc = "Clock Tree Buffer cell",
+        ),
+        "density_fill_config": attr.label(
+            allow_single_file = True,
+        ),
+        "detailed_routing_configuration": attr.label(
+            providers = [DetailedRoutingInfo],
+        ),
+        "do_not_use_cell_list": attr.string_list(
+            mandatory = True,
+            doc = "This value can be an empty list if all cells should be used in P&R",
+        ),
+        "endcap_cell": attr.string(
+        ),
+        "fill_cells": attr.string_list(
+            mandatory = True,
+        ),
+        "global_placement_cell_pad": attr.int(
+            mandatory = True,
+        ),
+        "global_routing_clock_layers": attr.string(
+            mandatory = True,
+        ),
+        "global_routing_layer_adjustments": attr.string_dict(
+            mandatory = True,
+        ),
+        "global_routing_signal_layers": attr.string(
+            mandatory = True,
+        ),
+        "ha_fa_mapping": attr.label(
+            allow_single_file = True,
+            doc = "Yosys specific HA/FA techmapping file",
+        ),
+        "klayout_tech_file": attr.label(
+            mandatory = True,
+            allow_single_file = True,
+        ),
+        "pdn_config": attr.label(
+            mandatory = True,
+            allow_single_file = True,
+            doc = "PDN Config.",
+        ),
+        "pin_horizontal_metal_layer": attr.string(
+            mandatory = True,
+        ),
+        "pin_vertical_metal_layer": attr.string(
+            mandatory = True,
+        ),
+        "placement_padding_tcl": attr.label(
+            allow_single_file = True,
+            doc = "TCL Script for handling the placement padding of cells",
+        ),
+        "rc_script_configuration": attr.label(
+            allow_single_file = True,
+        ),
+        "tap_cell": attr.string(
+        ),
+        "tapcell_distance": attr.int(
+        ),
+        "tapcell_tcl": attr.label(
+            allow_single_file = True,
+            doc = "TCL file that sets tapcell options. This overrides other tapcell attributes in this rule.",
+        ),
+        "tie_high_port": attr.string(
+            mandatory = True,
+        ),
+        "tie_low_port": attr.string(
+            mandatory = True,
+        ),
+        "tie_separation": attr.int(
+            mandatory = True,
+        ),
+        "tracks_file": attr.label(
+            mandatory = True,
+            allow_single_file = True,
+            doc = "Track setup script.",
+        ),
+        "wire_rc_clock_metal_layer": attr.string(
+            mandatory = True,
+        ),
+        "wire_rc_signal_metal_layer": attr.string(
+            mandatory = True,
+        ),
     },
 )
 
@@ -136,11 +203,23 @@ def detailed_routing_configuration_impl(ctx):
 detailed_routing_configuration = rule(
     implementation = detailed_routing_configuration_impl,
     attrs = {
-        "bottom_routing_layer": attr.string(mandatory = True, doc = "Minimum routing layer name"),
-        "top_routing_layer": attr.string(mandatory = True, doc = "Maximum routing layer name"),
-        "via_in_pin_bottom_layer": attr.string(doc = "via in pin bottom layer"),
-        "via_in_pin_top_layer": attr.string(doc = "via in pin top layer"),
-        "enable_via_gen": attr.bool(default = True),
+        "bottom_routing_layer": attr.string(
+            mandatory = True,
+            doc = "Minimum routing layer name",
+        ),
+        "enable_via_gen": attr.bool(
+            default = True,
+        ),
+        "top_routing_layer": attr.string(
+            mandatory = True,
+            doc = "Maximum routing layer name",
+        ),
+        "via_in_pin_bottom_layer": attr.string(
+            doc = "via in pin bottom layer",
+        ),
+        "via_in_pin_top_layer": attr.string(
+            doc = "via in pin top layer",
+        ),
     },
     provides = [DetailedRoutingInfo],
 )

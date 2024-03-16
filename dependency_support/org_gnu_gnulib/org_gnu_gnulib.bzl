@@ -88,12 +88,12 @@ def __org_gnu_gnulib(ctx):
 
     ctx.template("lib/config.in.h", Label("@rules_hdl//dependency_support:org_gnu_gnulib/config.in.h"), executable = False)
     ctx.template("config-darwin/config.h", Label("@rules_hdl//dependency_support:org_gnu_gnulib/config-darwin.h"), substitutions = {
-        "{GNULIB_CONFIG_HEADER}": _CONFIG_HEADER,
         "{GNULIB_CONFIG_FOOTER}": _CONFIG_FOOTER,
+        "{GNULIB_CONFIG_HEADER}": _CONFIG_HEADER,
     }, executable = False)
     ctx.template("config-linux/config.h", Label("@rules_hdl//dependency_support:org_gnu_gnulib/config-linux.h"), substitutions = {
-        "{GNULIB_CONFIG_HEADER}": _CONFIG_HEADER,
         "{GNULIB_CONFIG_FOOTER}": _CONFIG_FOOTER,
+        "{GNULIB_CONFIG_HEADER}": _CONFIG_HEADER,
     }, executable = False)
 
     # gnulib inspects inner details of FILE* based on hard-coded structs defined

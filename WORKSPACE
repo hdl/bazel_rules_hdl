@@ -49,11 +49,11 @@ load("@rules_python//python:repositories.bzl", "python_register_toolchains")
 
 python_register_toolchains(
     name = "python39",
-    python_version = "3.9",
 
     # Required for our containerized CI environments; we do not recommend
     # building bazel_rules_hdl as root normally.
     ignore_root_user_error = True,
+    python_version = "3.9",
 )
 
 # This sysroot is used by github.com/vsco/bazel-toolchains.

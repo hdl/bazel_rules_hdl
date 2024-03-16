@@ -15,13 +15,15 @@
 """BUILD helpers for using iverilog.
 """
 
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
 def vpi_binary(name, out, srcs, **kwargs):
     """Creates a .vpi file with the given name from the given sources.
 
     All the extra arguments are passed directly to cc_binary.
     """
     cc_target = name + "_shared"
-    native.cc_binary(
+    cc_binary(
         name = cc_target,
         srcs = srcs,
         linkshared = 1,

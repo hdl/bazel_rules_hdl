@@ -79,11 +79,6 @@ def _yosys_synth_file_step_impl(ctx):
 yosys_synth_file_step = rule(
     implementation = _yosys_synth_file_step_impl,
     attrs = {
-        "_yosys": attr.label(
-            default = Label("@at_clifford_yosys//:yosys"),
-            executable = True,
-            cfg = "exec",
-        ),
         "standard_cells": attr.label(
             doc = "Standard cells to use in yosys synthesis step",
             providers = [StandardCellInfo],
@@ -92,6 +87,11 @@ yosys_synth_file_step = rule(
             default = Label("//flows/yosys:synth.tcl"),
             allow_single_file = True,
             doc = "Tcl script controlling Yosys synthesis, using the Flow Step API environment variables",
+        ),
+        "_yosys": attr.label(
+            default = Label("@at_clifford_yosys//:yosys"),
+            executable = True,
+            cfg = "exec",
         ),
     },
 )

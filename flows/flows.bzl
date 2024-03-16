@@ -31,11 +31,11 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 FlowStepInfo = provider(
     "Provider that captures metadata about an individual flow step",
     fields = {
-        "inputs": "Lowercase strings naming logical file inputs of a flow step.",
-        "outputs": "Lowercase strings naming logical file outputs of a flow step.",
+        "arguments": "Extra arguments to pass when running this step as part of a larger flow",
         "constants": "Lowercase strings naming string constants used by a flow step.",
         "executable_type": "Type of executable implementing this flow step (e.g. openroad, yosys, etc.).",
-        "arguments": "Extra arguments to pass when running this step as part of a larger flow",
+        "inputs": "Lowercase strings naming logical file inputs of a flow step.",
+        "outputs": "Lowercase strings naming logical file outputs of a flow step.",
     },
 )
 
@@ -96,19 +96,19 @@ def _bind_step_inputs_impl(ctx):
 bind_step_inputs = rule(
     implementation = _bind_step_inputs_impl,
     attrs = {
+        "input_files": attr.label_list(
+            allow_files = True,
+            doc = "Files to use with the bound inputs. Must have the same length as input_names",
+        ),
+        "input_names": attr.string_list(
+            doc = "Names of logical step inputs to bind. May include extra inputs",
+        ),
         "step": attr.label(
             doc = "Base step with inputs to bind",
             executable = True,
             providers = [DefaultInfo, FlowStepInfo],
             mandatory = True,
             cfg = "exec",
-        ),
-        "input_names": attr.string_list(
-            doc = "Names of logical step inputs to bind. May include extra inputs",
-        ),
-        "input_files": attr.label_list(
-            allow_files = True,
-            doc = "Files to use with the bound inputs. Must have the same length as input_names",
         ),
     },
 )
@@ -271,26 +271,26 @@ def _run_flow_impl(ctx):
 run_flow = rule(
     implementation = _run_flow_impl,
     attrs = {
+        "constants": attr.string_dict(
+            doc = "String constants to use when running the flow",
+        ),
         "flow": attr.label_list(
             doc = "List of steps in the flow",
             providers = [DefaultInfo, FlowStepInfo],
             mandatory = True,
         ),
-        "input_names": attr.string_list(
-            doc = "Names of initial flow inputs",
-        ),
         "input_files": attr.label_list(
             allow_files = True,
             doc = "Files to use with the named inputs. Must have the same length as input_names",
         ),
-        "output_names": attr.string_list(
-            doc = "Names of final flow outputs",
+        "input_names": attr.string_list(
+            doc = "Names of initial flow inputs",
         ),
         "output_files": attr.output_list(
             doc = "Files to store final output values",
         ),
-        "constants": attr.string_dict(
-            doc = "String constants to use when running the flow",
+        "output_names": attr.string_list(
+            doc = "Names of final flow outputs",
         ),
     },
 )

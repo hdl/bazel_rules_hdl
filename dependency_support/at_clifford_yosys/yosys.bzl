@@ -50,7 +50,12 @@ def _move_files_impl(ctx):
 move_files = rule(
     implementation = _move_files_impl,
     attrs = {
-        "srcs": attr.label_list(allow_files = True),
-        "destination": attr.string(default = "", doc = "directory prefix to place files under."),
+        "destination": attr.string(
+            default = "",
+            doc = "directory prefix to place files under.",
+        ),
+        "srcs": attr.label_list(
+            allow_files = True,
+        ),
     },
 )

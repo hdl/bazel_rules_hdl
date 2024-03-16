@@ -41,12 +41,12 @@ def _run_opensta_impl(ctx):
     sta_log = ctx.actions.declare_file("{}_sta.log".format(ctx.attr.name))
 
     env = {
-        "NETLIST": netlist.path,
-        "TOP": synth_info.top_module,
-        "LOGFILE": sta_log.path,
-        "LIBERTY": default_liberty_file.path,
         "ADDITIONAL_LIBERTIES": ",".join([f.path for f in additional_liberty_files]),
+        "LIBERTY": default_liberty_file.path,
+        "LOGFILE": sta_log.path,
+        "NETLIST": netlist.path,
         "TCL_LIBRARY": opensta_runfiles_dir + "/tk_tcl/library",
+        "TOP": synth_info.top_module,
     }
 
     ctx.actions.run(
@@ -71,14 +71,14 @@ def _run_opensta_impl(ctx):
     ]
 
 run_opensta_attrs = {
-    "synth_target": attr.label(
-        doc = "The synth target to benchmark.",
-        providers = [SynthesisInfo],
-    ),
     "sta_tcl": attr.label(
         default = Label("//static_timing:sta.tcl"),
         allow_single_file = True,
         doc = "Tcl opensta script compatible with the environment-variable API of sta.tcl",
+    ),
+    "synth_target": attr.label(
+        doc = "The synth target to benchmark.",
+        providers = [SynthesisInfo],
     ),
     "_opensta": attr.label(
         default = Label("@org_theopenroadproject//:opensta"),

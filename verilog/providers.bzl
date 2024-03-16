@@ -104,11 +104,11 @@ def _produce_dag_impl(ctx):
 
 verilog_library = rule(
     attrs = {
-        "srcs": attr.label_list(allow_files = True),
-        "hdrs": attr.label_list(allow_files = True),
         "deps": attr.label_list(providers = [
             VerilogInfo,
         ]),
+        "hdrs": attr.label_list(allow_files = True),
+        "srcs": attr.label_list(allow_files = True),
     },
     implementation = _produce_dag_impl,
 )

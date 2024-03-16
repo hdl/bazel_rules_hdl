@@ -24,10 +24,10 @@ VivadoRoutingCheckpointInfo = provider(
 VivadoIPBlockInfo = provider(
     doc = "Info for a vivado ip block",
     fields = {
+        "library": "The library that the ip block belongs to.",
+        "module_top": "The name of the ip block top module.",
         "repo": "Repo containing ip block.",
         "vendor": "The vendor of the ip block.",
-        "library": "The library that the ip block belongs to.",
         "version": "The ip block version.",
-        "module_top": "The name of the ip block top module.",
     },
 )
