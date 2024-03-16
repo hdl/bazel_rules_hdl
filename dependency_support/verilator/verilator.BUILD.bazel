@@ -308,6 +308,7 @@ cc_library(
         "include/verilatedos.h",
         "include/verilated_types.h",
         "include/verilated_funcs.h",
+        "include/verilated_timing.h",
     ],
     # TODO: Remove these once upstream fixes these warnings
     copts = [
