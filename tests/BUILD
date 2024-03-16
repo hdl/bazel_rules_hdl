@@ -118,14 +118,14 @@ place_and_route(
 ##########################################################################
 
 EXTRA_ARGS = {
-    "verilog_counter": {
-        "place_and_route": dict(
-            sdc = "constraint.sdc",
-        ),
-    },
     "verilog_adder": {
         "place_and_route": dict(
             clock_period = None,  # Combinational only design
+        ),
+    },
+    "verilog_counter": {
+        "place_and_route": dict(
+            sdc = "constraint.sdc",
         ),
     },
 }

@@ -132,9 +132,9 @@ def _extract_lef_and_liberty_impl(ctx):
 extract_lef_and_liberty = rule(
     implementation = _extract_lef_and_liberty_impl,
     attrs = {
-        "standard_cell": attr.label(providers = [StandardCellInfo]),
         "cell_lef_paths": attr.string_list(),
-        "tech_lef_path": attr.string(),
         "liberty_path": attr.string(),
+        "standard_cell": attr.label(providers = [StandardCellInfo]),
+        "tech_lef_path": attr.string(),
     },
 )

@@ -17,36 +17,36 @@
 StandardCellInfo = provider(
     "Contains information about the standard cells used for synthesis",
     fields = {
+        "cell_lef_definitions": "list of Abstract LEFs files for each standard cell.",
         "corners": "list of CornerInfos for the PDK",
         "default_corner": "A default corner info defined for the PDK.",
-        "tech_lef": "Tech LEF file for the PDK",
-        "cell_lef_definitions": "list of Abstract LEFs files for each standard cell.",
-        "platform_gds": "list of Platform GDS files.",
-        "ha_fa_mapping": "HA/FA techmapping file",
-        "parasitic_extraction_benchmark": "Optional calibration file for OpenRCX.",
-        "open_road_configuration": "OpenROAD PDK configuration.",
         "default_input_driver_cell": "The cell to assume is driving primary input nets (very useful for synthesis)",
+        "ha_fa_mapping": "HA/FA techmapping file",
+        "open_road_configuration": "OpenROAD PDK configuration.",
+        "parasitic_extraction_benchmark": "Optional calibration file for OpenRCX.",
+        "platform_gds": "list of Platform GDS files.",
+        "tech_lef": "Tech LEF file for the PDK",
     },
 )
 
 CornerInfo = provider(
     "Contains information about standard cells at different corners",
     fields = {
+        "corner_name": "Name of the process corner",
         "liberty": "A file that points to the liberty file for this corner",
         "with_ccsnoise": "boolean Indicates that this is a ccsnoise model.",
         "with_leakage": "boolean Indicates whether leakage is included in model",
-        "corner_name": "Name of the process corner",
     },
 )
 
 StandardCellOptionsInfo = provider(
     "Provides information about what standard cell options are available",
     fields = {
-        "libraries": "A list of available standard cell library names.",
-        "vts": "A list of voltage thresholds names.",
         "corners": "A list of valid corners names.",
-        "volts": "A list of (normalize) voltage levels names used in timing characterization.",
+        "libraries": "A list of available standard cell library names.",
         "temps": "A list of (normalize) temperature values names used in timing characterization.",
+        "volts": "A list of (normalize) voltage levels names used in timing characterization.",
+        "vts": "A list of voltage thresholds names.",
     },
 )
 

@@ -193,6 +193,60 @@ def _cocotb_test_impl(ctx):
     ]
 
 _cocotb_test_attrs = {
+    "build_args": attr.string_list(
+        doc = "Extra build arguments for the simulator",
+        default = [],
+    ),
+    "cocotb_wrapper": attr.label(
+        cfg = "exec",
+        executable = True,
+        doc = "Cocotb wrapper script",
+        default = Label("//cocotb:cocotb_wrapper"),
+    ),
+    "defines": attr.string_dict(
+        doc = "Defines to set",
+        default = {},
+    ),
+    "deps": attr.label_list(
+        doc = "The list of python libraries to be linked in to the simulation target",
+        providers = [PyInfo],
+    ),
+    "extra_env": attr.string_list(
+        doc = "Extra environment variables to set",
+        default = [],
+    ),
+    "gpi_interfaces": attr.string_list(
+        doc = "List of GPI interfaces to use, with the first one being the entry point",
+        default = [],
+    ),
+    "hdl_library": attr.string(
+        doc = "The library name to compile into",
+        default = "top",
+    ),
+    "hdl_toplevel": attr.string(
+        doc = "The name of the HDL toplevel module",
+        mandatory = True,
+    ),
+    "hdl_toplevel_lang": attr.string(
+        doc = "Language of the HDL toplevel module",
+        mandatory = True,
+    ),
+    "includes": attr.string_list(
+        doc = "Verilog include directories",
+        default = [],
+    ),
+    "parameters": attr.string_dict(
+        doc = "Verilog parameters or VHDL generics",
+        default = {},
+    ),
+    "plus_args": attr.string_list(
+        doc = "'plusargs' to set for the simulator",
+        default = [],
+    ),
+    "seed": attr.string(
+        doc = "A specific random seed to use",
+        default = "",
+    ),
     "sim": attr.label_list(
         doc = "Simulator to use",
         default = [
@@ -205,9 +259,23 @@ _cocotb_test_attrs = {
         default = "icarus",
         values = ["ghdl", "icarus", "questa", "verilator", "vcs"],
     ),
-    "hdl_library": attr.string(
-        doc = "The library name to compile into",
-        default = "top",
+    "test_args": attr.string_list(
+        doc = "Extra arguments for the simulator",
+        default = [],
+    ),
+    "test_module": attr.label_list(
+        doc = "Name(s) of the Python module(s) containing the tests to run",
+        allow_files = [".py"],
+        allow_empty = False,
+        mandatory = True,
+    ),
+    "testcase": attr.string_list(
+        doc = "Name(s) of a specific testcase(s) to run. If not set, run all testcases found in *test_module*",
+        default = [],
+    ),
+    "verbose": attr.bool(
+        doc = "Enable verbose messages",
+        default = False,
     ),
     "verilog_sources": attr.label_list(
         doc = "Verilog source files to build",
@@ -220,77 +288,9 @@ _cocotb_test_attrs = {
         allow_files = [".vhd", ".vhdl"],
         default = [],
     ),
-    "includes": attr.string_list(
-        doc = "Verilog include directories",
-        default = [],
-    ),
-    "defines": attr.string_dict(
-        doc = "Defines to set",
-        default = {},
-    ),
-    "parameters": attr.string_dict(
-        doc = "Verilog parameters or VHDL generics",
-        default = {},
-    ),
-    "build_args": attr.string_list(
-        doc = "Extra build arguments for the simulator",
-        default = [],
-    ),
-    "hdl_toplevel": attr.string(
-        doc = "The name of the HDL toplevel module",
-        mandatory = True,
-    ),
-    "verbose": attr.bool(
-        doc = "Enable verbose messages",
-        default = False,
-    ),
-    "test_module": attr.label_list(
-        doc = "Name(s) of the Python module(s) containing the tests to run",
-        allow_files = [".py"],
-        allow_empty = False,
-        mandatory = True,
-    ),
-    "hdl_toplevel_lang": attr.string(
-        doc = "Language of the HDL toplevel module",
-        mandatory = True,
-    ),
-    "gpi_interfaces": attr.string_list(
-        doc = "List of GPI interfaces to use, with the first one being the entry point",
-        default = [],
-    ),
-    "testcase": attr.string_list(
-        doc = "Name(s) of a specific testcase(s) to run. If not set, run all testcases found in *test_module*",
-        default = [],
-    ),
-    "seed": attr.string(
-        doc = "A specific random seed to use",
-        default = "",
-    ),
-    "test_args": attr.string_list(
-        doc = "Extra arguments for the simulator",
-        default = [],
-    ),
-    "plus_args": attr.string_list(
-        doc = "'plusargs' to set for the simulator",
-        default = [],
-    ),
-    "extra_env": attr.string_list(
-        doc = "Extra environment variables to set",
-        default = [],
-    ),
     "waves": attr.bool(
         doc = "Record signal traces",
         default = True,
-    ),
-    "deps": attr.label_list(
-        doc = "The list of python libraries to be linked in to the simulation target",
-        providers = [PyInfo],
-    ),
-    "cocotb_wrapper": attr.label(
-        cfg = "exec",
-        executable = True,
-        doc = "Cocotb wrapper script",
-        default = Label("//cocotb:cocotb_wrapper"),
     ),
 }
 

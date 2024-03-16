@@ -109,26 +109,39 @@ def _skywater_cell_library_impl(ctx):
 skywater_cell_library = rule(
     implementation = _skywater_cell_library_impl,
     attrs = {
-        "srcs": attr.label_list(allow_files = True),
+        "default_corner": attr.string(
+            mandatory = True,
+        ),
+        "openroad_configuration": attr.label(
+            providers = [OpenRoadPdkInfo],
+        ),
         "process_corners": attr.label_list(
             providers = [CornerInfo],
         ),
-        "tech_lef": attr.label(allow_single_file = True, doc = "The tech lef file for these standard cells"),
-        "default_corner": attr.string(mandatory = True),
-        "openroad_configuration": attr.label(providers = [OpenRoadPdkInfo]),
+        "srcs": attr.label_list(
+            allow_files = True,
+        ),
+        "tech_lef": attr.label(
+            allow_single_file = True,
+            doc = "The tech lef file for these standard cells",
+        ),
     },
 )
 
 skywater_corner = rule(
     implementation = _skywater_corner_impl,
     attrs = {
+        "corner": attr.string(
+            default = "",
+            doc = "The selected process corner to generate liberty files for.",
+        ),
         "srcs": attr.label_list(
             allow_files = True,
             allow_empty = False,
         ),
-        "corner": attr.string(
-            default = "",
-            doc = "The selected process corner to generate liberty files for.",
+        "standard_cell_name": attr.string(
+            mandatory = True,
+            doc = "The name of the standar cell variant ex. sky130_fd_sc_hd",
         ),
         "standard_cell_root": attr.string(
             default = "",
@@ -138,10 +151,6 @@ skywater_corner = rule(
         "with_ccsnoise": attr.bool(
             default = False,
             doc = "Whether to generate ccsnoise.",
-        ),
-        "standard_cell_name": attr.string(
-            mandatory = True,
-            doc = "The name of the standar cell variant ex. sky130_fd_sc_hd",
         ),
         "with_leakage": attr.bool(
             default = False,

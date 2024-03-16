@@ -108,15 +108,8 @@ def _openroad_step_impl(ctx):
 openroad_step = rule(
     implementation = _openroad_step_impl,
     attrs = {
-        "_openroad": attr.label(
-            default = Label("@org_theopenroadproject//:openroad"),
-            executable = True,
-            cfg = "exec",
-        ),
-        "script": attr.label(
-            doc = "OpenROAD Tcl script implementing this step.",
-            allow_single_file = [".tcl"],
-            mandatory = True,
+        "constants": attr.string_list(
+            doc = "Names of strings constants used by the Tcl script",
         ),
         "inputs": attr.string_list(
             doc = "Names of logical inputs to the Tcl script",
@@ -124,8 +117,15 @@ openroad_step = rule(
         "outputs": attr.string_list(
             doc = "Names of logical outputs of the Tcl script",
         ),
-        "constants": attr.string_list(
-            doc = "Names of strings constants used by the Tcl script",
+        "script": attr.label(
+            doc = "OpenROAD Tcl script implementing this step.",
+            allow_single_file = [".tcl"],
+            mandatory = True,
+        ),
+        "_openroad": attr.label(
+            default = Label("@org_theopenroadproject//:openroad"),
+            executable = True,
+            cfg = "exec",
         ),
     },
     executable = True,

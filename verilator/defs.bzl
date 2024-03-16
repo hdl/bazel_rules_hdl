@@ -16,6 +16,7 @@
 """Functions for verilator."""
 
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
+load("@rules_cc//cc:defs.bzl", "CcInfo")
 load("//verilog:providers.bzl", "VerilogInfo")
 
 def cc_compile_and_link_static_library(ctx, srcs, hdrs, deps, runfiles, includes = [], defines = []):

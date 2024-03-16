@@ -30,10 +30,10 @@ ExternalSynthesisInfo = provider(
     "Surelog/UHDM based RTL representation",
     fields = {
         "env": "Map of env variables",
-        "yosys_script": "yosys script file",
         "inputs": "File inputs",
-        "verilog_files": "Verilog Inputs",
         "uhdm_files": "UHDM files",
+        "verilog_files": "Verilog Inputs",
+        "yosys_script": "yosys script file",
     },
 )
 
@@ -108,7 +108,6 @@ def _synthesize_design_impl(ctx):
     inputs.append(default_liberty_file)
     inputs.extend(additional_liberty_files)
 
-
     (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr.yosys_tool])
 
     yosys_runfiles_dir = ctx.executable.yosys_tool.path + ".runfiles"
@@ -137,15 +136,15 @@ def _synthesize_design_impl(ctx):
             dont_use_args += " -dont_use {} ".format(dont_use_pattern)
 
     script_env_files = {
-        "FLIST": verilog_flist,
-        "UHDM_FLIST": uhdm_flist,
-        "TOP": ctx.attr.top_module,
-        "OUTPUT": output_file,
-        "LIBERTY": default_liberty_file,
-        "ADDITIONAL_LIBERTIES": additional_liberty_files,
-        "DONT_USE_ARGS": dont_use_args,
         "ABC_SCRIPT": abc_script,
+        "ADDITIONAL_LIBERTIES": additional_liberty_files,
         "CONSTR": constr,
+        "DONT_USE_ARGS": dont_use_args,
+        "FLIST": verilog_flist,
+        "LIBERTY": default_liberty_file,
+        "OUTPUT": output_file,
+        "TOP": ctx.attr.top_module,
+        "UHDM_FLIST": uhdm_flist,
     }
 
     if ctx.attr.target_clock_period_pico_seconds:
@@ -164,8 +163,8 @@ def _synthesize_design_impl(ctx):
         inputs.append(ha_fa_mapping.files.to_list()[0])
 
     env = {
-        "YOSYS_DATDIR": yosys_runfiles_dir + "/at_clifford_yosys/techlibs/",
         "ABC": yosys_runfiles_dir + "/edu_berkeley_abc/abc",
+        "YOSYS_DATDIR": yosys_runfiles_dir + "/at_clifford_yosys/techlibs/",
     }
 
     for k, v in script_env_files.items():
@@ -271,23 +270,6 @@ synthesis_binary = rule(
 synthesize_rtl = rule(
     implementation = _synthesize_design_impl,
     attrs = {
-        "srcs": attr.label_list(allow_files = True),
-        "standard_cells": attr.label(
-            providers = [StandardCellInfo],
-            default = "@com_google_skywater_pdk_sky130_fd_sc_hd//:sky130_fd_sc_hd",
-        ),
-        "deps": attr.label_list(providers = [[VerilogInfo], [UhdmInfo]]),
-        "top_module": attr.string(default = "top"),
-        "yosys_tool": attr.label(
-            default = Label("@at_clifford_yosys//:yosys"),
-            executable = True,
-            cfg = "exec",
-        ),
-        "synth_tcl": attr.label(
-            default = Label("//synthesis:synth.tcl"),
-            allow_single_file = True,
-            doc = "Tcl synthesis script compatible with the environment-variable API of synth.tcl",
-        ),
         "abc_script": attr.label(
             default = Label("//synthesis:abc.script"),
             allow_single_file = True,
@@ -297,8 +279,25 @@ synthesize_rtl = rule(
             allow_single_file = True,
             doc = "Verilog file that maps yosys adder to PDK adders.",
         ),
-        "target_clock_period_pico_seconds": attr.int(doc = "target clock period in picoseconds"),
+        "deps": attr.label_list(providers = [[VerilogInfo], [UhdmInfo]]),
         "output_file_name": attr.string(doc = "The output file name."),
+        "srcs": attr.label_list(allow_files = True),
+        "standard_cells": attr.label(
+            providers = [StandardCellInfo],
+            default = "@com_google_skywater_pdk_sky130_fd_sc_hd//:sky130_fd_sc_hd",
+        ),
+        "synth_tcl": attr.label(
+            default = Label("//synthesis:synth.tcl"),
+            allow_single_file = True,
+            doc = "Tcl synthesis script compatible with the environment-variable API of synth.tcl",
+        ),
+        "target_clock_period_pico_seconds": attr.int(doc = "target clock period in picoseconds"),
+        "top_module": attr.string(default = "top"),
+        "yosys_tool": attr.label(
+            default = Label("@at_clifford_yosys//:yosys"),
+            executable = True,
+            cfg = "exec",
+        ),
     },
 )
 

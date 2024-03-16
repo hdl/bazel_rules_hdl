@@ -24,19 +24,18 @@ This is used by the Bazel rules to set up the proper workspaces and targets."""
 CELL_LIBRARIES = {
     "sky130_fd_io": {
         "commit": "7ec511f1a4689e174c63b3964d1ba8da9a3565e5",  # v0.2.1, 2020-12-09
-        "shallow_since": "1606239275 -0800",
-        "library_type": "ip_library",
         "corners": {},
+        "library_type": "ip_library",
+        "shallow_since": "1606239275 -0800",
     },
     "sky130_fd_pr": {
         "commit": "f62031a1be9aefe902d6d54cddd6f59b57627436",  # v0.20.1, 2020-12-09
-        "shallow_since": "1605038979 -0800",
-        "library_type": "ip_library",
         "corners": {},
+        "library_type": "ip_library",
+        "shallow_since": "1605038979 -0800",
     },
     "sky130_fd_sc_hd": {
         "commit": "ac7fb61f06e6470b94e8afdf7c25268f62fbd7b1",  # v0.0.2, 2020-12-04
-        "shallow_since": "1605028103 -0800",
         "corners": {
             "ff_100C_1v65": ["basic"],
             "ff_100C_1v95": ["basic"],
@@ -60,10 +59,10 @@ CELL_LIBRARIES = {
         "patches": [
             Label("@rules_hdl//dependency_support/com_google_skywater_pdk/sky130_fd_sc_hd:pdk.patch"),
         ],
+        "shallow_since": "1605028103 -0800",
     },
     "sky130_fd_sc_hdll": {
         "commit": "0694bd23893de20f5233ef024acf6cca1e750ac6",  # v0.1.1, 2020-12-04
-        "shallow_since": "1604475910 -0800",
         "corners": {
             "ff_100C_1v65": ["basic"],
             "ff_100C_1v95": ["basic"],
@@ -78,10 +77,10 @@ CELL_LIBRARIES = {
             "tt_025C_1v80": ["basic"],
         },
         "default_corner": "ff_100C_1v95",
+        "shallow_since": "1604475910 -0800",
     },
     "sky130_fd_sc_hs": {
         "commit": "1d051f49bfe4e2fe9108d702a8bc2e9c081005a4",  # v0.0.2, 2020-12-04
-        "shallow_since": "1605574092 -0800",
         "corners": {
             "ff_100C_1v95": ["basic"],
             "ff_150C_1v95": ["basic"],
@@ -106,10 +105,10 @@ CELL_LIBRARIES = {
             "tt_150C_1v80": ["basic"],
         },
         "default_corner": "ff_100C_1v95",
+        "shallow_since": "1605574092 -0800",
     },
     "sky130_fd_sc_hvl": {
         "commit": "4fd4f858d16c558a6a488b200649e909bb4dd800",  # v0.0.3, 2020-12-04
-        "shallow_since": "1604476031 -0800",
         "corners": {
             "ff_085C_5v50": ["basic"],
             "ff_085C_5v50_lv1v95": ["basic"],
@@ -170,10 +169,10 @@ CELL_LIBRARIES = {
             #"tt_150C_3v30_lv1v80": ["basic"],
         },
         "default_corner": "ss_100C_1v95",
+        "shallow_since": "1604476031 -0800",
     },
     "sky130_fd_sc_lp": {
         "commit": "e2c1e0646999163d35ea7b2521c3ec5c28633e63",  # v0.0.2, 2020-12-04
-        "shallow_since": "1604476084 -0800",
         "corners": {
             "ff_100C_1v95": ["basic"],
             "ff_125C_3v15": ["basic"],
@@ -191,10 +190,10 @@ CELL_LIBRARIES = {
             "ss_n40C_1v65": ["basic"],
         },
         "default_corner": "ff_100C_1v95",
+        "shallow_since": "1604476084 -0800",
     },
     "sky130_fd_sc_ls": {
         "commit": "4f549e30dd91a1c264f8895e07b2872fe410a8c2",  # v0.1.1, 2020-12-04
-        "shallow_since": "1604476021 -0800",
         "corners": {
             "ff_085C_1v95": ["basic"],
             #"ff_100C_1v65_dest1v76_destvpb1v76_ka1v76": ["basic"],
@@ -217,10 +216,10 @@ CELL_LIBRARIES = {
             "tt_100C_1v80": ["basic"],
         },
         "default_corner": "ff_100C_1v95",
+        "shallow_since": "1604476021 -0800",
     },
     "sky130_fd_sc_ms": {
         "commit": "ae1b7f68821505cf2d93d9d44cce5ece22710fad",  # v0.0.2, 2020-12-04
-        "shallow_since": "1605631186 -0800",
         "corners": {
             "ff_085C_1v95": ["leakage"],
             "ff_100C_1v65": ["basic"],
@@ -239,5 +238,6 @@ CELL_LIBRARIES = {
             "tt_100C_1v80": ["basic"],
         },
         "default_corner": "ff_100C_1v95",
+        "shallow_since": "1605631186 -0800",
     },
 }

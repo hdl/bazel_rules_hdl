@@ -89,11 +89,11 @@ def _gds_write_impl(ctx):
 gds_write = rule(
     implementation = _gds_write_impl,
     attrs = {
-        "implemented_rtl": attr.label(mandatory = True, providers = [OpenRoadInfo, SynthesisInfo]),
-        "klayout_lyt": attr.label(allow_single_file = True),
-        "input_lef": attr.label_list(allow_files = True),
-        "input_gds": attr.label_list(allow_files = True),
         "gds_allow_empty": attr.string(),
+        "implemented_rtl": attr.label(mandatory = True, providers = [OpenRoadInfo, SynthesisInfo]),
+        "input_gds": attr.label_list(allow_files = True),
+        "input_lef": attr.label_list(allow_files = True),
+        "klayout_lyt": attr.label(allow_single_file = True),
         "_gds_write": attr.label(
             cfg = "exec",
             executable = True,

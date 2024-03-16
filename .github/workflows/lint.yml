@@ -15,4 +15,4 @@ jobs:
       - run: sudo wget https://github.com/bazelbuild/buildtools/releases/download/${{env.BUILDIFIER_VERSION}}/buildifier-linux-amd64 -O /usr/local/bin/buildifier
       - run: sudo chmod +x /usr/local/bin/buildifier
 
-      - run: buildifier -lint warn -r .
+      - run: buildifier -lint=warn -mode=check -warnings=all -r .

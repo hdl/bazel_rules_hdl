@@ -96,17 +96,18 @@ genlex = rule(
     implementation = _genlex_impl,
     doc = "Generate C/C++-language sources from a lex file using Flex.",
     attrs = {
-        "src": attr.label(
-            mandatory = True,
-            allow_single_file = [".l", ".ll", ".lex", ".lpp"],
-            doc = "The .lex source file for this rule",
+        "header_out": attr.output(
+            mandatory = False,
+            doc = "The generated header file",
         ),
         "includes": attr.label_list(
             allow_files = True,
             doc = "A list of headers that are included by the .lex file",
         ),
+        "lexopts": attr.string_list(
+            doc = "A list of options to be added to the flex command line.",
+        ),
         "out": attr.output(mandatory = True, doc = "The generated source file"),
-        "header_out": attr.output(mandatory = False, doc = "The generated header file"),
         "prefix": attr.string(
             doc = "External symbol prefix for Flex. This string is " +
                   "passed to flex as the -P option, causing the resulting C " +
@@ -115,15 +116,21 @@ genlex = rule(
                   "file without the .lex extension.",
             default = "yy",
         ),
-        "lexopts": attr.string_list(
-            doc = "A list of options to be added to the flex command line.",
+        "src": attr.label(
+            mandatory = True,
+            allow_single_file = [".l", ".ll", ".lex", ".lpp"],
+            doc = "The .lex source file for this rule",
         ),
         "_flex": attr.label(
             default = "@com_github_westes_flex//:flex",
             executable = True,
             cfg = "exec",
         ),
-        "_m4": attr.label(default = "@org_gnu_m4//:m4", executable = True, cfg = "exec"),
+        "_m4": attr.label(
+            default = "@org_gnu_m4//:m4",
+            executable = True,
+            cfg = "exec",
+        ),
     },
     output_to_genfiles = True,
 )

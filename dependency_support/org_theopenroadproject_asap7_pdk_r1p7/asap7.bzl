@@ -89,8 +89,8 @@ def asap7_cells_files(name = None, rev = None, tracks = None, vt = None, has_gds
         "rev": rev,
         "tracks": tracks,
         "vt_long": vt,
+        "vt_short": {"lvt": "L", "rvt": "R", "slvt": "SL"}[vt],
         "vt_upper": vt.upper(),
-        "vt_short": {"rvt": "R", "lvt": "L", "slvt": "SL"}[vt],
     }
 
     # Layouts for GDS generation
@@ -262,14 +262,14 @@ def _asap7_cell_library_impl(ctx):
 asap7_cell_library = rule(
     implementation = _asap7_cell_library_impl,
     attrs = {
-        "srcs": attr.label_list(allow_files = True),
-        "tech_lef": attr.label(allow_single_file = True, mandatory = True, doc = "The tech lef file for these standard cells"),
-        "default_corner_swing": attr.string(mandatory = True, values = ["SS", "FF", "TT"]),
+        "cell_lef": attr.label(allow_single_file = True, mandatory = True, doc = "The lef file for the standard cells"),
         "default_corner_delay_model": attr.string(mandatory = True, values = ["ccs", "ccsn", "ccsa"]),
+        "default_corner_swing": attr.string(mandatory = True, values = ["SS", "FF", "TT"]),
         #TODO(b/212480812): Support multiple VTs in a single design.
         "openroad_configuration": attr.label(providers = [OpenRoadPdkInfo]),
-        "cell_lef": attr.label(allow_single_file = True, mandatory = True, doc = "The lef file for the standard cells"),
         "platform_gds": attr.label(allow_single_file = True, mandatory = False, doc = "Platform GDS files"),
+        "srcs": attr.label_list(allow_files = True),
+        "tech_lef": attr.label(allow_single_file = True, mandatory = True, doc = "The tech lef file for these standard cells"),
         "_combine_liberty": attr.label(
             default = Label("@rules_hdl//pdk/liberty:combine_liberty"),
             executable = True,
