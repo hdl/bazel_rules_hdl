@@ -1,4 +1,4 @@
-# Copyright 2021 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,10 @@
 
 # Synthesis tool package.
 
+load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_python//python:proto.bzl", "py_proto_library")
 
 package(
     default_applicable_licenses = ["//:package_license"],
@@ -30,4 +33,19 @@ pkg_tar(
     srcs = ["@at_clifford_yosys//:yosys"],
     include_runfiles = True,
     strip_prefix = "./",
+)
+
+proto_library(
+    name = "performance_power_area_result_proto",
+    srcs = ["performance_power_area_result.proto"],
+)
+
+py_proto_library(
+    name = "performance_power_area_result_py_proto",
+    deps = [":performance_power_area_result_proto"],
+)
+
+cc_proto_library(
+    name = "performance_power_area_result_cc_proto",
+    deps = [":performance_power_area_result_proto"],
 )
