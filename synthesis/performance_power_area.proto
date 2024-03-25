@@ -1,0 +1,63 @@
+syntax = "proto2";
+
+package bazel_rules_hdl.ppa;
+
+message PerformancePowerAreaProto {
+  // ====== Performance ======
+  // The worst slack min.
+  optional float worst_slack_min = 1;
+  // The worst slack max.
+  optional float worst_slack_max = 2;
+  // The total negative slack max.
+  optional float total_negative_slack_max = 3;
+  // The clock skew.
+  optional float clock_skew = 4;
+  // The number of cells in the longest topological path.
+  optional int32 longest_topological_path = 5;
+  // The count of max slew violations.
+  optional float max_slew_violations = 6;
+  // The count of max fanout violations.
+  optional float max_fanout_violations = 7;
+  // The count of max capacitance violations.
+  optional float max_capacitance_violations = 8;
+
+  // ====== Power ======
+  optional Power power_total = 10;
+  optional Power power_sqeuential = 11;
+  optional Power power_combinational = 12;
+  optional Power power_macro = 13;
+  optional Power power_pad = 14;
+
+  // ====== Area ======
+  // The die area in um^2.
+  optional float area_micro_meters_squared = 20;
+  // The die area utilization percentage.
+  optional float area_utilization_percentage = 21;
+  // The die height in micro meters.
+  optional float die_height_micro_meters = 22;
+  // The die width in micro meters.
+  optional float die_width_micro_meters = 23;
+  // The total number of standard cells.
+  optional int32 num_total_cells = 24;
+  // The number of non-timing buffers.
+  optional int32 num_buffers = 25;
+  // The number of timing buffers.
+  optional int32 num_timing_buffers = 26;
+  // The number of flops.
+  optional int32 num_flops = 27;
+  // The number of combinational gates.
+  optional int32 num_combinational_gates = 28;
+}
+
+message Power {
+  // The unit scale such as micro (u), nano (n), etc.
+  optional string magnitude = 1;
+  // The internal power simulated
+  optional float internal_package_watts = 2;
+  // The switching power simulated
+  optional float switching_package_watts = 3;
+  // The leakage power simulated
+  optional float leakage_package_watts = 4;
+  // The total power simulated
+  optional float total_package_watts = 5;
+}

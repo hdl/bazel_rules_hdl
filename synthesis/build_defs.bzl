@@ -223,20 +223,19 @@ def _benchmark_synth(ctx, synth_log_file):
 
     cat = "zcat" if ("log.gz" in synth_log_file.path) else "cat"
 
-    prefix = "metric=$({cat} {log} | awk ".format(cat = cat, log = synth_log_file.path)
-    suffix = "; echo \"{name}: $metric\" >> {out};"
-    awk_cmds = {
-        "area_micro_meters_squared": "'/Chip area for/ {{ print $6 }}')",
-        "longest_topological_path": "-F '[=)]' '/Longest topological path/ {{ print $2}}')",
-        "num_flops": "'/Flop count:/ {{ print $3 }}')",
-        "num_total_cells": "'/Number of cells/ {{ cells = $4 }} END {{print cells}}')",
-    }
-
     cmds = [
-        "echo \"# proto-file: synthesis/performance_power_area_result.proto\" >> {out};".format(out = benchmark_path),
-        "echo \"# proto-message: bazel_rules_hdl.ppa.PerformancePowerAreaResultProto\n\" >> {out};".format(out = benchmark_path),
+        "echo \"# proto-file: synthesis/performance_power_area.proto\" >> {out};".format(out = benchmark_path),
+        "echo \"# proto-message: bazel_rules_hdl.ppa.PerformancePowerAreaProto\n\" >> {out};".format(out = benchmark_path),
     ]
-    cmds.extend([prefix + cmd + suffix.format(name = name, out = benchmark_path) for name, cmd in awk_cmds.items()])
+    prefix = "metric=$({cat} {log} | awk ".format(cat = cat, log = synth_log_file.path)
+    suffix = "; echo \"{field} $metric\" >> {out};"
+    awk_cmds = [
+        ("area_micro_meters_squared:", "'/Chip area for/ {{ print $6 }}')"),
+        ("num_total_cells:", "'/Number of cells/ {{ cells = $4 }} END {{print cells}}')"),
+        ("num_flops:", "'/Flop count:/ {{ print $3 }}')"),
+        ("longest_topological_path:", "-F '[=)]' '/Longest topological path/ {{ print $2}}')"),
+    ]
+    cmds.extend([prefix + cmd + suffix.format(field = field, out = benchmark_path) for field, cmd in awk_cmds])
 
     ctx.actions.run_shell(
         outputs = [benchmark_file],

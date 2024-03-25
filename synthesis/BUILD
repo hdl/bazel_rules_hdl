@@ -36,16 +36,16 @@ pkg_tar(
 )
 
 proto_library(
-    name = "performance_power_area_result_proto",
-    srcs = ["performance_power_area_result.proto"],
+    name = "performance_power_area_proto",
+    srcs = ["performance_power_area.proto"],
 )
 
 py_proto_library(
-    name = "performance_power_area_result_py_proto",
-    deps = [":performance_power_area_result_proto"],
+    name = "performance_power_area_py_proto",
+    deps = [":performance_power_area_proto"],
 )
 
 cc_proto_library(
-    name = "performance_power_area_result_cc_proto",
-    deps = [":performance_power_area_result_proto"],
+    name = "performance_power_area_cc_proto",
+    deps = [":performance_power_area_proto"],
 )

@@ -53,27 +53,28 @@ def benchmark(ctx, open_road_info):
     benchmark_file = ctx.actions.declare_file(ctx.label.name + "_report.textproto")
     benchmark_path = benchmark_file.path
 
-    prefix = "metric=$(cat {log} | awk ".format(log = command_output.log_file.path)
-    suffix = "; echo \"{name}: $metric\" >> {out};"
-    awk_cmds = {
-        "area_micro_meters_squared": "'/Design area/ {{ print $3 }}')",
-        "area_utilization_percentage": "-F '[ %]' '/Design area/ {{ print $5 }}')",
-        "num_buffers": "'/Buffer/ {{ buffers=$2; exit }} END {{ print buffers }}')",
-        "num_combinational_gates": "'/Complex combinational cells:/ {{ print $4 }}')",
-        "num_flops": "'/Sequential cells:/ {{ print $3 }}')",
-        "num_timing_buffers": "'/Timing Repair/ {{ print $4 }}')",
-        "total_internal_package_power_watts": "'/Total/ {{ intern_power=$2 }} END {{ print intern_power }}')",
-        "total_negative_slack_max": "'/tns/ {{ print $2 }}')",
-        "total_switching_package_power_watts": "'/Total/ {{ switch_power=$3 }} END {{ print switch_power }}')",
-        "total_total_package_power_watts": "'/Total/ {{ total_power=$5 }} END {{ print total_power }}')",
-        "worst_slack_max": "'/wns/ {{ print $2 }}')",
-    }
-
     cmds = [
-        "echo \"# proto-file: synthesis/performance_power_area_result.proto\" >> {out};".format(out = benchmark_path),
-        "echo \"# proto-message: bazel_rules_hdl.ppa.PerformancePowerAreaResultProto\n\" >> {out};".format(out = benchmark_path),
+        "echo \"# proto-file: synthesis/performance_power_area.proto\" >> {out};".format(out = benchmark_path),
+        "echo \"# proto-message: bazel_rules_hdl.ppa.PerformancePowerAreaProto\n\" >> {out};".format(out = benchmark_path),
     ]
-    cmds.extend([prefix + cmd + suffix.format(name = name, out = benchmark_path) for name, cmd in awk_cmds.items()])
+    prefix = "metric=$(cat {log} | awk ".format(log = command_output.log_file.path)
+    suffix = "; echo \"{field} $metric\" >> {out};"
+    awk_cmds = [
+        ("worst_slack_max:", "'/wns/ {{ print $2 }}')"),
+        ("total_negative_slack_max:", "'/tns/ {{ print $2 }}')"),
+        ("power_total {", "'')"),
+        ("  internal_package_watts:", "'/Total/ {{ intern_power=$2 }} END {{ print intern_power }}')"),
+        ("  switching_package_watts:", "'/Total/ {{ switch_power=$3 }} END {{ print switch_power }}')"),
+        ("  total_package_watts:", "'/Total/ {{ total_power=$5 }} END {{ print total_power }}')"),
+        ("}", "'')"),
+        ("area_micro_meters_squared:", "'/Design area/ {{ print $3 }}')"),
+        ("area_utilization_percentage:", "-F '[ %]' '/Design area/ {{ print $5 }}')"),
+        ("num_combinational_gates:", "'/Complex combinational cells:/ {{ print $4 }}')"),
+        ("num_flops:", "'/Sequential cells:/ {{ print $3 }}')"),
+        ("num_buffers:", "'/Buffer/ {{ buffers=$2; exit }} END {{ print buffers }}')"),
+        ("num_timing_buffers:", "'/Timing Repair/ {{ print $4 }}')"),
+    ]
+    cmds.extend([prefix + cmd + suffix.format(field = field, out = benchmark_path) for field, cmd in awk_cmds])
 
     ctx.actions.run_shell(
         outputs = [benchmark_file],
