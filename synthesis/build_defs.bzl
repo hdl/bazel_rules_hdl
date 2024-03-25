@@ -1,4 +1,4 @@
-# Copyright 2021 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -187,10 +187,12 @@ def _synthesize_design_impl(ctx):
         toolchain = None,
     )
 
+    benchmark_file = _benchmark_synth(ctx, log_file)
+
     return [
         DefaultInfo(
-            runfiles = ctx.runfiles(files = [output_file, log_file]),
-            files = depset([output_file, log_file]),
+            runfiles = ctx.runfiles(files = [output_file, log_file, benchmark_file]),
+            files = depset([output_file, log_file, benchmark_file]),
         ),
         SynthesisInfo(
             standard_cell_info = ctx.attr.standard_cells[StandardCellInfo],
@@ -206,6 +208,42 @@ def _synthesize_design_impl(ctx):
             uhdm_files = uhdm_files,
         ),
     ]
+
+def _benchmark_synth(ctx, synth_log_file):
+    """Computes and prints various metrics from the synthesis log.
+
+    Args:
+      ctx: The current rule's context object.
+      synth_log_file: Output log file from Yosys for parsing.
+    Returns:
+      Benchmark file with metrics.
+    """
+    benchmark_file = ctx.actions.declare_file(ctx.label.name + "_report.textproto")
+    benchmark_path = benchmark_file.path
+
+    cat = "zcat" if ("log.gz" in synth_log_file.path) else "cat"
+
+    cmds = [
+        "echo \"# proto-file: synthesis/performance_power_area.proto\" >> {out};".format(out = benchmark_path),
+        "echo \"# proto-message: bazel_rules_hdl.ppa.PerformancePowerAreaProto\n\" >> {out};".format(out = benchmark_path),
+    ]
+    prefix = "metric=$({cat} {log} | awk ".format(cat = cat, log = synth_log_file.path)
+    suffix = "; echo \"{field} $metric\" >> {out};"
+    awk_cmds = [
+        ("area_micro_meters_squared:", "'/Chip area for/ {{ print $6 }}')"),
+        ("num_total_cells:", "'/Number of cells/ {{ cells = $4 }} END {{print cells}}')"),
+        ("num_flops:", "'/Flop count:/ {{ print $3 }}')"),
+        ("longest_topological_path:", "-F '[=)]' '/Longest topological path/ {{ print $2}}')"),
+    ]
+    cmds.extend([prefix + cmd + suffix.format(field = field, out = benchmark_path) for field, cmd in awk_cmds])
+
+    ctx.actions.run_shell(
+        outputs = [benchmark_file],
+        command = "".join(cmds),
+        mnemonic = "BenchmarkingSynthesis",
+        inputs = [synth_log_file],
+    )
+    return benchmark_file
 
 def _synthesize_binary_impl(ctx):
     script = ""

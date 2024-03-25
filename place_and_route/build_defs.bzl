@@ -1,4 +1,4 @@
-# Copyright 2021 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 """These build rules run automated place and route on a synthesized netlist"""
 
 load("@rules_hdl//pdk:open_road_configuration.bzl", "assert_has_open_road_configuration")
+load("//place_and_route:private/benchmark.bzl", "benchmark")
 load("//place_and_route:private/clock_tree_synthesis.bzl", "clock_tree_synthesis")
 load("//place_and_route:private/detailed_routing.bzl", "detailed_routing")
 load("//place_and_route:private/export_def.bzl", "export_def")
@@ -50,6 +51,7 @@ def _place_and_route_impl(ctx):
             output_files.append(output_def)
         if step_name == ctx.attr.stop_after_step:
             break
+    open_road_provider = benchmark(ctx, open_road_provider)
 
     output_files.append(open_road_provider.output_db)
     output_files.extend(open_road_provider.logs.to_list())
