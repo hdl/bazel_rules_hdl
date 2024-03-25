@@ -59,14 +59,14 @@ def benchmark(ctx, open_road_info):
         "area_micro_meters_squared": "'/Design area/ {{ print $3 }}')",
         "area_utilization_percentage": "-F '[ %]' '/Design area/ {{ print $5 }}')",
         "num_buffers": "'/Buffer/ {{ buffers=$2; exit }} END {{ print buffers }}')",
-        "num_timing_buffers": "'/Timing Repair/ {{ print $4 }}')",
-        "num_flops": "'/Sequential cells:/ {{ print $3 }}')",
         "num_combinational_gates": "'/Complex combinational cells:/ {{ print $4 }}')",
-        "worst_slack_max": "'/wns/ {{ print $2 }}')",
-        "total_negative_slack_max": "'/tns/ {{ print $2 }}')",
-        "total_total_package_power_watts": "'/Total/ {{ total_power=$5 }} END {{ print total_power }}')",
+        "num_flops": "'/Sequential cells:/ {{ print $3 }}')",
+        "num_timing_buffers": "'/Timing Repair/ {{ print $4 }}')",
         "total_internal_package_power_watts": "'/Total/ {{ intern_power=$2 }} END {{ print intern_power }}')",
+        "total_negative_slack_max": "'/tns/ {{ print $2 }}')",
         "total_switching_package_power_watts": "'/Total/ {{ switch_power=$3 }} END {{ print switch_power }}')",
+        "total_total_package_power_watts": "'/Total/ {{ total_power=$5 }} END {{ print total_power }}')",
+        "worst_slack_max": "'/wns/ {{ print $2 }}')",
     }
 
     cmds = [

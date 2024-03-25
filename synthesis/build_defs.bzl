@@ -227,9 +227,9 @@ def _benchmark_synth(ctx, synth_log_file):
     suffix = "; echo \"{name}: $metric\" >> {out};"
     awk_cmds = {
         "area_micro_meters_squared": "'/Chip area for/ {{ print $6 }}')",
-        "num_total_cells": "'/Number of cells/ {{ cells = $4 }} END {{print cells}}')",
-        "num_flops": "'/Flop count:/ {{ print $3 }}')",
         "longest_topological_path": "-F '[=)]' '/Longest topological path/ {{ print $2}}')",
+        "num_flops": "'/Flop count:/ {{ print $3 }}')",
+        "num_total_cells": "'/Number of cells/ {{ cells = $4 }} END {{print cells}}')",
     }
 
     cmds = [
