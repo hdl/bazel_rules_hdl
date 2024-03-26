@@ -29,8 +29,6 @@ def resize(ctx, open_road_info):
        open_road_info: OpenRoadInfo provider from a previous step.
 
     """
-    open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
-
     placement_padding_struct = placement_padding_commands(ctx)
 
     inputs = placement_padding_struct.inputs
