@@ -15,7 +15,6 @@
 """Resize openROAD commands"""
 
 load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "placement_padding_commands")
-load("//synthesis:build_defs.bzl", "SynthesisInfo")
 
 def resize(ctx, open_road_info):
     """Performs resizing operation of the standard cells.
