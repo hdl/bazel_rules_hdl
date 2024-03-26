@@ -24,6 +24,7 @@ load("//place_and_route:private/global_placement.bzl", "global_placement")
 load("//place_and_route:private/global_routing.bzl", "global_routing")
 load("//place_and_route:private/pdn_gen.bzl", "pdn_gen")
 load("//place_and_route:private/place_pins.bzl", "place_pins")
+load("//place_and_route:private/repair.bzl", "repair")
 load("//place_and_route:private/resize.bzl", "resize")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
 
@@ -32,6 +33,7 @@ PLACE_AND_ROUTE_STEPS = [
     ("place_pins", place_pins, ""),
     ("pdn_gen", pdn_gen, ""),
     ("global_placement", global_placement, "global_placement"),
+    ("repair", repair, ""),
     ("resize", resize, ""),
     ("clock_tree_synthesis", clock_tree_synthesis, ""),
     ("global_routing", global_routing, "post_pnr"),

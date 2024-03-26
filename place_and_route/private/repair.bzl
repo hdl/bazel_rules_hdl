@@ -1,4 +1,4 @@
-# Copyright 2021 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Resize openROAD commands"""
+"""Repair openROAD commands"""
 
-load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "format_openroad_do_not_use_list", "merge_open_road_info", "openroad_command", "placement_padding_commands", "timing_setup_commands")
+load("//pdk:open_road_configuration.bzl", "get_open_road_configuration")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "format_openroad_do_not_use_list", "merge_open_road_info", "openroad_command", "timing_setup_commands")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
 
-def resize(ctx, open_road_info):
-    """Performs resizing operation of the standard cells.
+def repair(ctx, open_road_info):
+    """Performs several repair operations on a placed design.
 
     Returns:
         OpenRoadInfo: the openROAD info provider containing required input files and
@@ -31,17 +31,24 @@ def resize(ctx, open_road_info):
     """
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
 
-    placement_padding_struct = placement_padding_commands(ctx)
+    timing_setup_command_struct = timing_setup_commands(ctx)
 
-    inputs = placement_padding_struct.inputs
+    inputs = timing_setup_command_struct.inputs
 
-    open_road_commands = placement_padding_struct.commands + [
-        "detailed_placement",
-        "improve_placement" if ctx.attr.enable_improve_placement else "",
-        "optimize_mirroring",
-        "check_placement -verbose",
-        "report_checks -path_delay min_max -format full_clock_expanded -fields {input_pin slew capacitance} -digits 3",
-        "report_check_types -max_slew -max_capacitance -max_fanout -violators",
+    open_road_commands = timing_setup_command_struct.commands + [
+        format_openroad_do_not_use_list(open_road_configuration.do_not_use_cell_list),
+        "estimate_parasitics -placement",
+        "remove_buffers",
+        "buffer_ports",
+        "repair_design",
+        "repair_tie_fanout -separation {separation} \"{high_cell}\"".format(
+            separation = open_road_configuration.tie_separation,
+            high_cell = open_road_configuration.tie_high_port,
+        ),
+        "repair_tie_fanout -separation {separation} \"{low_cell}\"".format(
+            separation = open_road_configuration.tie_separation,
+            low_cell = open_road_configuration.tie_low_port,
+        ),
     ]
 
     command_output = openroad_command(
@@ -49,7 +56,7 @@ def resize(ctx, open_road_info):
         commands = open_road_commands,
         input_db = open_road_info.output_db,
         inputs = inputs,
-        step_name = "resizing",
+        step_name = "repair",
     )
 
     current_action_open_road_info = OpenRoadInfo(
