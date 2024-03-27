@@ -14,9 +14,7 @@
 
 """Resize openROAD commands"""
 
-load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "format_openroad_do_not_use_list", "merge_open_road_info", "openroad_command", "placement_padding_commands", "timing_setup_commands")
-load("//synthesis:build_defs.bzl", "SynthesisInfo")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "placement_padding_commands")
 
 def resize(ctx, open_road_info):
     """Performs resizing operation of the standard cells.
@@ -29,27 +27,11 @@ def resize(ctx, open_road_info):
        open_road_info: OpenRoadInfo provider from a previous step.
 
     """
-    open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
-
-    timing_setup_command_struct = timing_setup_commands(ctx)
     placement_padding_struct = placement_padding_commands(ctx)
 
-    inputs = timing_setup_command_struct.inputs + placement_padding_struct.inputs
+    inputs = placement_padding_struct.inputs
 
-    open_road_commands = timing_setup_command_struct.commands + [
-        format_openroad_do_not_use_list(open_road_configuration.do_not_use_cell_list),
-        "estimate_parasitics -placement",
-        "buffer_ports",
-        "repair_design",
-        "repair_tie_fanout -separation {separation} \"{high_cell}\"".format(
-            separation = open_road_configuration.tie_separation,
-            high_cell = open_road_configuration.tie_high_port,
-        ),
-        "repair_tie_fanout -separation {separation} \"{low_cell}\"".format(
-            separation = open_road_configuration.tie_separation,
-            low_cell = open_road_configuration.tie_low_port,
-        ),
-    ] + placement_padding_struct.commands + [
+    open_road_commands = placement_padding_struct.commands + [
         "detailed_placement",
         "improve_placement" if ctx.attr.enable_improve_placement else "",
         "optimize_mirroring",
