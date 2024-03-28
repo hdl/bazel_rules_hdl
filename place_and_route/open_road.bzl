@@ -132,7 +132,6 @@ def clock_commands(ctx):
         commands = commands,
     )
 
-
 def format_openroad_do_not_use_list(do_not_use_list):
     if do_not_use_list:
         return "set_dont_use {{ {cell_patterns} }}".format(
