@@ -108,32 +108,30 @@ def clock_commands(ctx):
     Returns:
         Struct with params inputs and commands. Both return values are lists.
     """
-    sdc = ctx.file.sdc
 
-    if sdc:
-        return struct(inputs = [sdc], commands = ["read_sdc {}".format(sdc.path)])
-
-    # If no name is passed, the clock is assumed to be named "clk".
-    if ctx.attr.clock_period:
-        return struct(
-            inputs = [],
-            commands = [
-                "create_clock [get_ports clk] -period {period}".format(
-                    period = ctx.attr.clock_period,
-                ),
-            ],
+    inputs = []
+    commands = [
+        "create_clock [get_ports {clock_name}] -period {period}".format(
+            clock_name = clock_name,
+            period = period,
         )
+        for clock_name, period in ctx.attr.clocks.items()
+    ]
+
+    # If ctx.attr.clock_period is set, assume the clock name is "clk".
+    if ctx.attr.clock_period:
+        commands.append("create_clock [get_ports clk] -period {}".format(ctx.attr.clock_period))
+
+    sdc = ctx.file.sdc
+    if sdc:
+        inputs.append(sdc)
+        commands.append("read_sdc {}".format(sdc.path))
 
     return struct(
-        inputs = [],
-        commands = [
-            "create_clock [get_ports {clock_name}] -period {period}".format(
-                period = ctx.attr.clocks[clock_name],
-                clock_name = clock_name,
-            )
-            for clock_name in ctx.attr.clocks
-        ],
+        inputs = inputs,
+        commands = commands,
     )
+
 
 def format_openroad_do_not_use_list(do_not_use_list):
     if do_not_use_list:
