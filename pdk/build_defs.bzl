@@ -18,9 +18,10 @@ StandardCellInfo = provider(
     "Contains information about the standard cells used for synthesis",
     fields = {
         "cell_lef_definitions": "list of Abstract LEFs files for each standard cell.",
-        "corners": "list of CornerInfos for the PDK",
+        "corners": "list of CornerInfos for the PDK.",
         "default_corner": "A default corner info defined for the PDK.",
-        "default_input_driver_cell": "The cell to assume is driving primary input nets (very useful for synthesis)",
+        "default_input_driver_cell": "The cell to assume is driving primary input nets.",
+        "default_output_load": "Capacitance load in fF to assume for each primary output.",
         "ha_fa_mapping": "HA/FA techmapping file",
         "open_road_configuration": "OpenROAD PDK configuration.",
         "parasitic_extraction_benchmark": "Optional calibration file for OpenRCX.",
