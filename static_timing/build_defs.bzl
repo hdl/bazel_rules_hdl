@@ -34,7 +34,6 @@ def _run_opensta_impl(ctx):
     if default_liberty_file in additional_liberty_files:
         additional_liberty_files.remove(default_liberty_file)
 
-    (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [ctx.attr._opensta])
     opensta_runfiles_dir = ctx.executable._opensta.path + ".runfiles"
 
     sta_tcl = ctx.file.sta_tcl
@@ -51,11 +50,9 @@ def _run_opensta_impl(ctx):
 
     ctx.actions.run(
         outputs = [sta_log],
-        inputs = tool_inputs.to_list() + [default_liberty_file, sta_tcl, netlist] + additional_liberty_files,
+        inputs = [default_liberty_file, sta_tcl, netlist] + additional_liberty_files,
         arguments = ["-exit", sta_tcl.path],
         executable = ctx.executable._opensta,
-        tools = tool_inputs,
-        input_manifests = input_manifests,
         env = env,
         mnemonic = "RunningSTA",
         toolchain = None,
