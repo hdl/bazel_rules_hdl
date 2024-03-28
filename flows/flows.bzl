@@ -169,9 +169,6 @@ flow_binary = rule(
 )
 
 def _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict):
-    # inputs and output manifests are for the runfiles of the step executable.
-    (tool_inputs, input_manifests) = ctx.resolve_tools(tools = [step])
-
     # The inputs_env and inputs handle the named inputs of the step.
     inputs = []
     inputs_env = {}
@@ -208,11 +205,10 @@ def _run_step_with_inputs(ctx, step, inputs_dict, outputs_step_dict):
         outputs = outputs,
         inputs = inputs,
         command = step[DefaultInfo].files_to_run.executable.path,
-        tools = tool_inputs,
+        tools = [step.files_to_run],
         arguments = step[FlowStepInfo].arguments,
         mnemonic = step[FlowStepInfo].executable_type,
         env = dicts.add(constants_env, inputs_env, outputs_env),
-        input_manifests = input_manifests,
         toolchain = None,
     )
 
