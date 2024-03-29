@@ -92,7 +92,7 @@ place_and_route = rule(
         ),
         "create_die_shot": attr.bool(
             default = False,
-            doc = "Exports a die shot image of the design. This require qt support.",
+            doc = "Exports a die shot image of the design. This requires qt support.",
         ),
         "density_fill_config": attr.label(
             allow_single_file = True,
