@@ -42,12 +42,20 @@ def benchmark(ctx, open_road_info):
         "report_cell_usage",
     ]
 
+    cmd_outputs = []
+
+    if ctx.attr.create_die_shot:
+        image_file = ctx.actions.declare_file(ctx.label.name + "_die.png")
+        open_road_commands.append("save_image -width 2048 {out}".format(out = image_file.path))
+        cmd_outputs.append(image_file)
+
     command_output = openroad_command(
         ctx,
         commands = open_road_commands,
         input_db = open_road_info.output_db,
         inputs = inputs,
         step_name = "benchmark",
+        outputs = cmd_outputs,
     )
 
     benchmark_file = ctx.actions.declare_file(ctx.label.name + "_report.textproto")
@@ -87,7 +95,7 @@ def benchmark(ctx, open_road_info):
         commands = open_road_commands,
         input_files = depset(inputs),
         output_db = command_output.db,
-        logs = depset([command_output.log_file, benchmark_file]),
+        logs = depset([command_output.log_file, benchmark_file] + cmd_outputs),
     )
 
     return merge_open_road_info(open_road_info, current_action_open_road_info)

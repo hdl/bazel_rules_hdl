@@ -90,6 +90,14 @@ place_and_route = rule(
         "core_padding_microns": attr.int(
             mandatory = True,
         ),
+        "create_die_shot": attr.bool(
+            default = False,
+            doc = "Exports a die shot image of the design. This require qt support.",
+        ),
+        "qt_qpa_platform": attr.string(
+            default = "minimal",
+            doc = "The qt platform to use with OpenROAD.",
+        ),
         "density_fill_config": attr.label(
             allow_single_file = True,
         ),
