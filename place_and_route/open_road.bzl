@@ -256,6 +256,7 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
         tools = tool_inputs,
         input_manifests = input_manifests,
         env = {
+            "QT_QPA_PLATFORM": ctx.attr.qt_qpa_platform,
             "TCL_LIBRARY": openroad_runfiles_dir + "/tk_tcl/library",
         },
         execution_requirements = execution_requirements,

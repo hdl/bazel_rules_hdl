@@ -90,6 +90,10 @@ place_and_route = rule(
         "core_padding_microns": attr.int(
             mandatory = True,
         ),
+        "create_die_shot": attr.bool(
+            default = False,
+            doc = "Exports a die shot image of the design. This requires qt support.",
+        ),
         "density_fill_config": attr.label(
             allow_single_file = True,
         ),
@@ -113,6 +117,10 @@ place_and_route = rule(
         "placement_density": attr.string(
             default = "0.69",
             doc = "When performing global placement this is how densely our cells should be packaged on the die parameter is (0-1]",
+        ),
+        "qt_qpa_platform": attr.string(
+            default = "minimal",
+            doc = "The qt platform to use with OpenROAD.",
         ),
         "sdc": attr.label(
             allow_single_file = True,
