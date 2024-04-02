@@ -24,6 +24,10 @@ def _extract_lef_and_liberty_impl(ctx):
 
         content.append("liberty_path: \"{}\"".format(standard_cell.default_corner.liberty.short_path))
         out_files.append(standard_cell.default_corner.liberty)
+
+        for file in [corner.liberty for corner in standard_cell.corners]:
+            content.append("additional_liberty_paths: \"{}\"".format(file.short_path))
+            out_files.append(file)
     else:
         for file in ctx.attr.cell_lef_paths:
             content.append("cell_lef_paths: \"{}\"".format(file))
