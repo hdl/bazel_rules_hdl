@@ -224,7 +224,7 @@ def _benchmark_synth(ctx, synth_log_file):
 
     cmds = [
         "echo \"# proto-file: synthesis/performance_power_area.proto\" >> {out};".format(out = benchmark_path),
-        "echo \"# proto-message: bazel_rules_hdl.ppa.PerformancePowerAreaProto\n\" >> {out};".format(out = benchmark_path),
+        "echo \"# proto-message: hdl.ppa.PerformancePowerAreaProto\n\" >> {out};".format(out = benchmark_path),
     ]
     prefix = "metric=$({cat} {log} | awk ".format(cat = cat, log = synth_log_file.path)
     suffix = "; echo \"{field} $metric\" >> {out};"

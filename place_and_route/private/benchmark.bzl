@@ -63,7 +63,7 @@ def benchmark(ctx, open_road_info):
 
     cmds = [
         "echo \"# proto-file: synthesis/performance_power_area.proto\" >> {out};".format(out = benchmark_path),
-        "echo \"# proto-message: bazel_rules_hdl.ppa.PerformancePowerAreaProto\n\" >> {out};".format(out = benchmark_path),
+        "echo \"# proto-message: hdl.ppa.PerformancePowerAreaProto\n\" >> {out};".format(out = benchmark_path),
     ]
     prefix = "metric=$(cat {log} | awk ".format(log = command_output.log_file.path)
     suffix = "; echo \"{field} $metric\" >> {out};"
