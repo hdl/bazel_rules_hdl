@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package bazel_rules_hdl.pdk;
+package hdl.pdk;
 
 message PdkInfoProto {
   repeated string cell_lef_paths = 1;
