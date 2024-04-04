@@ -15,7 +15,7 @@
 """Floorplaning openROAD commands"""
 
 load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "openroad_command")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "openroad_command", "timing_setup_commands")
 load("//place_and_route:private/report_area.bzl", "generate_area_results")
 load("//place_and_route:private/report_power.bzl", "generate_power_results")
 load("//synthesis:build_defs.bzl", "SynthesisInfo")
@@ -73,6 +73,10 @@ def init_floor_plan(ctx):
     tieoneport = open_road_configuration.tie_high_port
     tiezeroport = open_road_configuration.tie_low_port
 
+    timing_setup_command_struct = timing_setup_commands(ctx)
+
+    input_open_road_files = timing_setup_command_struct.inputs
+
     open_road_commands = [
         "read_lef {tech_lef}".format(
             tech_lef = tech_lef.path,
@@ -89,6 +93,9 @@ def init_floor_plan(ctx):
         "link_design {top_module}".format(
             top_module = top_module,
         ),
+    ])
+    open_road_commands.extend(timing_setup_command_struct.commands)
+    open_road_commands.extend([
         _initialize_floorplan_command(ctx),
         "source {tracks_file}".format(
             tracks_file = open_road_configuration.tracks_file.path,
@@ -104,12 +111,14 @@ def init_floor_plan(ctx):
     open_road_commands.extend(generate_power_results(ctx, verilog_based_power_results))
     open_road_commands.extend(generate_area_results(verilog_based_area_results))
 
-    input_open_road_files = [
+    input_open_road_files.extend([
         netlist,
         liberty,
         tech_lef,
         open_road_configuration.tracks_file,
-    ] + std_cell_lef + additional_liberties
+    ])
+    input_open_road_files.extend(std_cell_lef)
+    input_open_road_files.extend(additional_liberties)
 
     command_output = openroad_command(
         ctx,
