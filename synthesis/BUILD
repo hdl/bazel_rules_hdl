@@ -21,7 +21,7 @@ load("@rules_python//python:proto.bzl", "py_proto_library")
 
 package(
     default_applicable_licenses = ["//:package_license"],
-    default_visibility = ["//visibility:private"],
+    default_visibility = ["//visibility:public"],
 )
 
 exports_files(["synth.tcl"])
