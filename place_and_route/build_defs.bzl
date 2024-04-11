@@ -15,6 +15,7 @@
 """These build rules run automated place and route on a synthesized netlist"""
 
 load("@rules_hdl//pdk:open_road_configuration.bzl", "assert_has_open_road_configuration")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo")
 load("//place_and_route:private/benchmark.bzl", "benchmark")
 load("//place_and_route:private/clock_tree_synthesis.bzl", "clock_tree_synthesis")
 load("//place_and_route:private/detailed_routing.bzl", "detailed_routing")
@@ -58,6 +59,8 @@ def _place_and_route_impl(ctx):
     output_files.append(open_road_provider.output_db)
     output_files.extend(open_road_provider.logs.to_list())
 
+    if open_road_provider.benchmark_report != None:
+        output_files.append(open_road_provider.benchmark_report)
     if open_road_provider.verilog_based_power_results != None:
         output_files.append(open_road_provider.verilog_based_power_results)
     if open_road_provider.verilog_based_area_results != None:
@@ -149,5 +152,21 @@ place_and_route = rule(
             executable = True,
             cfg = "exec",
         ),
+    },
+)
+
+def _collect_benchmark_reports_impl(ctx):
+    reports = depset(direct = [src[OpenRoadInfo].benchmark_report for src in ctx.attr.srcs])
+    return [
+        DefaultInfo(
+            files = reports,
+            runfiles = ctx.runfiles(transitive_files = reports),
+        ),
+    ]
+
+collect_benchmark_reports = rule(
+    implementation = _collect_benchmark_reports_impl,
+    attrs = {
+        "srcs": attr.label_list(providers = [OpenRoadInfo]),
     },
 )

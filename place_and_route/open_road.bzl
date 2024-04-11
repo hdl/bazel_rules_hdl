@@ -28,6 +28,7 @@ OpenRoadInfo = provider(
         "verilog_based_area_results",
         "general_routing_power_results",
         "general_routing_area_results",
+        "benchmark_report",
         "logs",
     ],
 )
@@ -168,6 +169,7 @@ def merge_open_road_info(left, right):
         OpenRoadInfo: merged left and right OpenRoadInfo provider
     """
     routed_def = _merge_right(left, right, "routed_def")
+    benchmark_report = _merge_right(left, right, "benchmark_report")
     verilog_based_power_results = _merge_right(left, right, "verilog_based_power_results")
     verilog_based_area_results = _merge_right(left, right, "verilog_based_area_results")
     general_routing_power_results = _merge_right(left, right, "general_routing_power_results")
@@ -179,6 +181,7 @@ def merge_open_road_info(left, right):
         logs = depset([], transitive = [left.logs, right.logs]),
         output_db = right.output_db,
         routed_def = routed_def,
+        benchmark_report = benchmark_report,
         verilog_based_power_results = verilog_based_power_results,
         verilog_based_area_results = verilog_based_area_results,
         general_routing_power_results = general_routing_power_results,

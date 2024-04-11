@@ -58,8 +58,8 @@ def benchmark(ctx, open_road_info):
         outputs = cmd_outputs,
     )
 
-    benchmark_file = ctx.actions.declare_file(ctx.label.name + "_report.textproto")
-    benchmark_path = benchmark_file.path
+    benchmark_report = ctx.actions.declare_file(ctx.label.name + "_report.textproto")
+    benchmark_path = benchmark_report.path
 
     cmds = [
         "echo \"# proto-file: synthesis/performance_power_area.proto\" >> {out};".format(out = benchmark_path),
@@ -85,7 +85,7 @@ def benchmark(ctx, open_road_info):
     cmds.extend([prefix + cmd + suffix.format(field = field, out = benchmark_path) for field, cmd in awk_cmds])
 
     ctx.actions.run_shell(
-        outputs = [benchmark_file],
+        outputs = [benchmark_report],
         command = "".join(cmds),
         mnemonic = "BenchmarkingDesign",
         inputs = [command_output.log_file],
@@ -95,7 +95,8 @@ def benchmark(ctx, open_road_info):
         commands = open_road_commands,
         input_files = depset(inputs),
         output_db = command_output.db,
-        logs = depset([command_output.log_file, benchmark_file] + cmd_outputs),
+        benchmark_report = benchmark_report,
+        logs = depset([command_output.log_file] + cmd_outputs),
     )
 
     return merge_open_road_info(open_road_info, current_action_open_road_info)
