@@ -159,9 +159,9 @@ def _synthesize_design_impl(ctx):
 
     ha_fa_mapping = or_config.ha_fa_mapping
     if ha_fa_mapping:
-        ha_fa_mapping_path = ha_fa_mapping.files.to_list()[0].path
+        ha_fa_mapping_path = ha_fa_mapping[DefaultInfo].files.to_list()[0].path
         script_env_files["ADDER_MAPPING"] = str(ha_fa_mapping_path)
-        inputs.append(ha_fa_mapping.files.to_list()[0])
+        inputs.append(ha_fa_mapping[DefaultInfo].files.to_list()[0])
 
     env = {
         "ABC": yosys_runfiles_dir + "/edu_berkeley_abc/abc",
