@@ -1,0 +1,166 @@
+syntax = "proto2";
+
+package hdl.ppa;
+
+// A word about units: The units used by the EDA-tools internally might vary
+// depending on context or as provided by the PDK.
+//
+// This proto is meant to always use standardized units so that it is
+// easy to compare; the program that is closest to the source of the data
+// reading logfiles and reports can convert these metrics once;
+// downstream we don't have to worry about it anymore.
+//
+// We're using
+//  - power units:  always watts (that reads easiest in scientific notation).
+//  - time units:   always picoseconds. This allows sufficient resolution to
+//                  store them as integer values.
+//  - length units: always micrometers (or micrometers squared for area).
+
+// A protocol buffer describing performance metrics for a particular design.
+message PowerPerformanceAreaProto {
+  optional Power power = 1;
+  optional Performance performance = 2;
+  optional Area area = 3;
+
+  // Information about the operating corner.
+  optional string cell_library = 4;
+  optional float operating_voltage = 5;
+
+  // Arbitrary string that might be used to describe the
+  // job that created this data, e.g. command line options.
+  optional string build_info = 10;
+}
+
+message Area {
+  // Length units here are abbreviated in ASCII-compatible
+  // way in the identifier suffixes.
+  //  `um`  - Micrometer (length)
+  //  `um2` - square Micrometer (area)
+
+  // The whole die area.
+  optional float die_area_um2 = 1;
+
+  // Area only covered by cells.
+  optional float cell_area_um2 = 2;
+
+  // If height and width are provided, this allows to
+  // calculate die_area_um2. Protocol buffer writers
+  // that know and provide width and height SHOULD also
+  // always provide die_area_um2.
+  // The following invariants hold:
+  //   die_area_um2  = die_height_um * die_width_um;
+  //   cell_area_um2 = die_area_um2 * cell_utilization_fraction
+  optional float die_height_um = 3;
+  optional float die_width_um = 4;
+
+  // A fraction of die_area_um2 used by cells. Range of [0..1]
+  optional float cell_utilization_fraction = 5;
+
+  // Leaving out proto tags 6..9 for later use.
+
+  // The total number of standard cells used.
+  // Invariance:
+  // total_cells = buffers + timing_buffers + sequential + combinational;
+  optional int32 num_total_cells = 10;
+
+  // The number of combinational gate cells.
+  optional int32 num_combinational = 11;
+
+  // The number of non-timing buffers.
+  optional int32 num_buffers = 12;
+
+  // The number of timing buffers.
+  optional int32 num_timing_buffers = 13;
+
+  // The number of sequential elements, such as flops.
+  optional int32 num_sequential = 14;
+
+  // Leaving out proto tags 15..19 for later use.
+
+  // Cell type mapping to fraction used in the area, e.g.
+  // {{ "svt: 0.7 }, { "lvt": 0.3}}
+  map<string, float> celltype_fractions = 20;
+}
+
+message Performance {
+  // Desired clock period this PPA metric was generated for.
+  // It influences the choice of area-impacting optimization, so this
+  // helps to understand area size in that context.
+  optional int32 clock_period_ps = 1;
+
+  // Longest path in picoseconds.
+  optional int32 critical_path_ps = 2;
+
+  // == Slack ==
+  // Abbreviations
+  // wns = worst negative slack (worst negative slack observed in all paths)
+  //       (encoded as sint32 as these are always negative and zigzag encoding
+  //        is preferable)
+  // tns = total negative slack (sum of slacks over all paths that have
+  //      negative slack). Can get big, so sint64
+  //
+  // Slack is the amount we have leftover in some clock period,
+  // so if positive, we're good. Negative slack is the one interesting
+  // to evaluate timing. In fact, tools rarely report a positive slack
+  // just simply zero as 'mission accomplished'.
+  // So the following numbers are negative if there is anything to
+  // worry about.
+  // Approximate invariant:
+  //   clock_period_ps - critical_path_ps = setup_wns_ps
+
+  // If negative, not enough time to have data ready for DFF to take data, i.e.
+  // the combinational path that exceeds that time the most.
+  optional sint32 setup_wns_ps = 3;
+  optional sint64 setup_tns_ps = 4;
+
+  // If negative, new data arrives too early for the DFF to ingest
+  // the previous one reliably.
+  optional sint32 hold_wns_ps = 5;
+  optional sint64 hold_tns_ps = 6;
+
+  // How far off the clock is between two different parts of the chip.
+  optional sint32 clock_skew_ps = 7;
+
+  // Leaving out proto tags 8..9 for later use.
+
+  optional int32 num_setup_violations = 10;
+  optional int32 num_hold_violations = 11;
+  optional int32 num_slew_violations = 12;
+  optional int32 num_fanout_violations = 13;
+  optional int32 num_capacitance_violations = 14;
+
+  // The number of cells in the longest topological path which can be
+  // determined before timing analysis has been done.
+  optional int32 longest_topological_path = 15;
+
+  // Number of cells in the critical path based on timing if available.
+  optional int32 critical_path_cells = 16;
+}
+
+message Power {
+  // The total power. Typically the sum of all of the below,
+  // but could be more if not all summands are mentioned below.
+  optional PowerBreakdown total = 1;
+
+  optional PowerBreakdown sequential = 2;
+  optional PowerBreakdown combinational = 3;
+
+  // Macro and/or black_box
+  optional PowerBreakdown macro = 4;
+
+  // IO pads
+  optional PowerBreakdown pad = 5;
+
+  // Clock tree
+  optional PowerBreakdown clock = 6;
+}
+
+message PowerBreakdown {
+  // The total power. Typically the sum of all of the below,
+  // but could be more if not all summands are mentioned below.
+  optional float total_watts = 1;
+
+  optional float internal_watts = 2;
+  optional float switching_watts = 3;
+  optional float leakage_watts = 4;
+}
