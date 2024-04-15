@@ -2,6 +2,9 @@ syntax = "proto2";
 
 package hdl.ppa;
 
+// Deprecated. Will go away. Have a look at
+// PowerPerformanceArea proto in this same directory.
+
 message PerformancePowerAreaProto {
   // ====== Performance ======
   // The worst slack min.
@@ -22,11 +25,11 @@ message PerformancePowerAreaProto {
   optional float max_capacitance_violations = 8;
 
   // ====== Power ======
-  optional Power power_total = 10;
-  optional Power power_sqeuential = 11;
-  optional Power power_combinational = 12;
-  optional Power power_macro = 13;
-  optional Power power_pad = 14;
+  optional PowerElements power_total = 10;
+  optional PowerElements power_sqeuential = 11;
+  optional PowerElements power_combinational = 12;
+  optional PowerElements power_macro = 13;
+  optional PowerElements power_pad = 14;
 
   // ====== Area ======
   // The die area in um^2.
@@ -49,7 +52,7 @@ message PerformancePowerAreaProto {
   optional int32 num_combinational_gates = 28;
 }
 
-message Power {
+message PowerElements {
   // The unit scale such as micro (u), nano (n), etc.
   optional string magnitude = 1;
   // The internal power simulated

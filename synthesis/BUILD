@@ -36,6 +36,22 @@ pkg_tar(
 )
 
 proto_library(
+    name = "power_performance_area_proto",
+    srcs = ["power_performance_area.proto"],
+)
+
+py_proto_library(
+    name = "power_performance_area_py_proto",
+    deps = [":power_performance_area_proto"],
+)
+
+cc_proto_library(
+    name = "power_performance_area_cc_proto",
+    deps = [":power_performance_area_proto"],
+)
+
+# Deprecated old version of the above.
+proto_library(
     name = "performance_power_area_proto",
     srcs = ["performance_power_area.proto"],
 )
