@@ -20,7 +20,7 @@ maybe(
     sha256 = rules_hdl_git_sha256,
     strip_prefix = "bazel_rules_hdl-%s" % rules_hdl_git_hash,
     urls = [
-        "https://github.com/hdl/bazel_rules_hdl/archive/%s.tar.gz" % git_hash,
+        "https://github.com/hdl/bazel_rules_hdl/archive/%s.tar.gz" % rules_hdl_git_hash,
     ],
 )
 
