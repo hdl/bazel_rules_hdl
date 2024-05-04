@@ -17,7 +17,7 @@
 
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@rules_cc//cc:defs.bzl", "CcInfo")
-load("//verilog:providers.bzl", "VerilogInfo")
+load("//verilog:defs.bzl", "VerilogInfo")
 
 def cc_compile_and_link_static_library(ctx, srcs, hdrs, deps, runfiles, includes = [], defines = []):
     """Compile and link C++ source into a static library

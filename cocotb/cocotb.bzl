@@ -15,7 +15,7 @@
 """Rules for running tests using Cocotb framework"""
 
 load("@rules_python//python:defs.bzl", "PyInfo")
-load("//verilog:providers.bzl", "VerilogInfo")
+load("//verilog:defs.bzl", "VerilogInfo")
 
 ## Helpers for parsing arguments
 
@@ -83,7 +83,7 @@ def _collect_python_direct_imports(ctx):
     return depset(direct = [module.dirname for module in ctx.files.test_module])
 
 def _collect_transitive_files(ctx):
-    py_toolchain = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
+    py_toolchain = ctx.toolchains["@rules_python//python:toolchain_type"].py3_runtime
     return depset(
         direct = [py_toolchain.interpreter],
         transitive = [dep[PyInfo].transitive_sources for dep in ctx.attr.deps] +
@@ -132,7 +132,7 @@ def _get_test_command(ctx, verilog_files, vhdl_files):
     seed_args = " --seed {}".format(ctx.attr.seed) if ctx.attr.seed != "" else ""
 
     test_module_args = _pymodules_to_argstring(ctx.files.test_module, "test_module")
-    python_interpreter = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime.interpreter.path
+    python_interpreter = ctx.toolchains["@rules_python//python:toolchain_type"].py3_runtime.interpreter.path
 
     command = (
         "PATH={}:$PATH ".format(_get_path_to_set(ctx)) +
@@ -297,6 +297,6 @@ _cocotb_test_attrs = {
 cocotb_test = rule(
     implementation = _cocotb_test_impl,
     attrs = _cocotb_test_attrs,
-    toolchains = ["@bazel_tools//tools/python:toolchain_type"],
+    toolchains = ["@rules_python//python:toolchain_type"],
     test = True,
 )

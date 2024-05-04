@@ -1,6 +1,6 @@
 """Defines rules for the Xilinx tool, vivado."""
 
-load("//verilog:providers.bzl", "VerilogInfo")
+load("//verilog:defs.bzl", "VerilogInfo")
 load("//vivado:providers.bzl", "VivadoIPBlockInfo", "VivadoPlacementCheckpointInfo", "VivadoRoutingCheckpointInfo", "VivadoSynthCheckpointInfo")
 
 def run_tcl_template(ctx, template, substitutions, xilinx_env, input_files, output_files, post_processing_command = ""):

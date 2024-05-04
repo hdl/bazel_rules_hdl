@@ -20,7 +20,7 @@ load("//gds_write:build_defs.bzl", "gds_write")
 load("//place_and_route:build_defs.bzl", "place_and_route")
 load("//static_timing:build_defs.bzl", "run_opensta")
 load("//synthesis:build_defs.bzl", "synthesize_rtl")
-load("//verilog:providers.bzl", "verilog_library")
+load("//verilog:defs.bzl", "verilog_library")
 
 package(
     default_applicable_licenses = ["//:package_license"],
