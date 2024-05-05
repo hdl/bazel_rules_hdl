@@ -114,11 +114,11 @@ verilog_library = rule(
         ),
         "hdrs": attr.label_list(
             doc = "Verilog or SystemVerilog headers.",
-            allow_files = [".vh", ".svh"],
+            allow_files = True,
         ),
         "srcs": attr.label_list(
             doc = "Verilog or SystemVerilog sources.",
-            allow_files = [".v", ".sv"],
+            allow_files = True,
         ),
     },
 )
