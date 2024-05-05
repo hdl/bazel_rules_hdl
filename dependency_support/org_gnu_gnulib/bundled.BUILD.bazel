@@ -14,7 +14,7 @@ exports_files(["COPYING"])
 cc_library(
     name = "config_h",
     hdrs = select({
-        "@bazel_tools//src/conditions:darwin": [
+        "@platforms//os:macos": [
             "config-darwin/config.h",
         ],
         "//conditions:default": [
@@ -22,7 +22,7 @@ cc_library(
         ],
     }),
     includes = select({
-        "@bazel_tools//src/conditions:darwin": [
+        "@platforms//os:macos": [
             "config-darwin",
         ],
         "//conditions:default": [
@@ -146,7 +146,7 @@ cc_library(
     # https://github.com/bazelbuild/bazel/issues/3828
     # https://github.com/bazelbuild/bazel/issues/6337
     srcs = _GNULIB_SRCS + _GNULIB_HDRS + select({
-        "@bazel_tools//src/conditions:darwin": _GNULIB_DARWIN_SRCS,
+        "@platforms//os:macos": _GNULIB_DARWIN_SRCS,
         "//conditions:default": _GNULIB_LINUX_SRCS,
     }),
     hdrs = _GNULIB_HDRS,

@@ -78,7 +78,7 @@ def make_verilog_info(
         ),
     )
 
-def _produce_dag_impl(ctx):
+def _verilog_library_impl(ctx):
     """Produces a DAG for the given verilog_X target.
 
     Args:
@@ -103,12 +103,22 @@ def _produce_dag_impl(ctx):
     ]
 
 verilog_library = rule(
+    doc = "Define a Verilog module.",
+    implementation = _verilog_library_impl,
     attrs = {
-        "deps": attr.label_list(providers = [
-            VerilogInfo,
-        ]),
-        "hdrs": attr.label_list(allow_files = True),
-        "srcs": attr.label_list(allow_files = True),
+        "deps": attr.label_list(
+            doc = "The list of other libraries to be linked.",
+            providers = [
+                VerilogInfo,
+            ],
+        ),
+        "hdrs": attr.label_list(
+            doc = "Verilog or SystemVerilog headers.",
+            allow_files = True,
+        ),
+        "srcs": attr.label_list(
+            doc = "Verilog or SystemVerilog sources.",
+            allow_files = True,
+        ),
     },
-    implementation = _produce_dag_impl,
 )
