@@ -37,14 +37,14 @@ ExternalSynthesisInfo = provider(
     },
 )
 
-# Args:
-#    standard_cell_info: The StandardCellInfo provider this target was synthesized against.
-#    synthesized_netlist: The structural verilog syntheized with standard_cell_info
-#    top_module: The name of the top level module of the synthesized netlist
-#    log_file: Log output file from the synthesis step.
 SynthesisInfo = provider(
     "Information about the synthesis target",
-    fields = ["standard_cell_info", "synthesized_netlist", "top_module", "log_file"],
+    fields = {
+        "log_file": "Log output file from the synthesis step.",
+        "standard_cell_info": "The StandardCellInfo provider this target was synthesized against.",
+        "synthesized_netlist": "he structural verilog syntheized with standard_cell_info",
+        "top_module": "The name of the top level module of the synthesized netlist",
+    },
 )
 
 def _transitive_srcs(deps):
@@ -294,7 +294,9 @@ def _synthesize_binary_impl(ctx):
 synthesis_binary = rule(
     implementation = _synthesize_binary_impl,
     attrs = {
-        "synthesize_rtl_rule": attr.label(providers = [ExternalSynthesisInfo]),
+        "synthesize_rtl_rule": attr.label(
+            providers = [ExternalSynthesisInfo],
+        ),
         "yosys_tool": attr.label(
             default = Label("@at_clifford_yosys//:yosys"),
             executable = True,
@@ -316,9 +318,15 @@ synthesize_rtl = rule(
             allow_single_file = True,
             doc = "Verilog file that maps yosys adder to PDK adders.",
         ),
-        "deps": attr.label_list(providers = [[VerilogInfo], [UhdmInfo]]),
-        "output_file_name": attr.string(doc = "The output file name."),
-        "srcs": attr.label_list(allow_files = True),
+        "deps": attr.label_list(
+            providers = [[VerilogInfo], [UhdmInfo]],
+        ),
+        "output_file_name": attr.string(
+            doc = "The output file name.",
+        ),
+        "srcs": attr.label_list(
+            allow_files = True,
+        ),
         "standard_cells": attr.label(
             providers = [StandardCellInfo],
             default = "@com_google_skywater_pdk_sky130_fd_sc_hd//:sky130_fd_sc_hd",
@@ -328,8 +336,12 @@ synthesize_rtl = rule(
             allow_single_file = True,
             doc = "Tcl synthesis script compatible with the environment-variable API of synth.tcl",
         ),
-        "target_clock_period_pico_seconds": attr.int(doc = "target clock period in picoseconds"),
-        "top_module": attr.string(default = "top"),
+        "target_clock_period_pico_seconds": attr.int(
+            doc = "target clock period in picoseconds",
+        ),
+        "top_module": attr.string(
+            default = "top",
+        ),
         "yosys_tool": attr.label(
             default = Label("@at_clifford_yosys//:yosys"),
             executable = True,

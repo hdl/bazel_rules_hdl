@@ -19,7 +19,7 @@ load("//flows:basic_asic.bzl", "basic_asic_flow")
 load("//gds_write:build_defs.bzl", "gds_write")
 load("//place_and_route:build_defs.bzl", "place_and_route")
 load("//static_timing:build_defs.bzl", "run_opensta")
-load("//synthesis:build_defs.bzl", "synthesize_rtl")
+load("//synthesis:defs.bzl", "synthesize_rtl")
 load("//verilog:defs.bzl", "verilog_library")
 
 package(

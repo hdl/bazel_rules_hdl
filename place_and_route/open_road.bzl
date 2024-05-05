@@ -14,8 +14,8 @@
 
 """File encapsulating the open road command"""
 
-load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
-load("//synthesis:build_defs.bzl", "SynthesisInfo")
+load("//pdk:open_road_configuration.bzl", "get_open_road_configuration")
+load("//synthesis:defs.bzl", "SynthesisInfo")
 
 OpenRoadInfo = provider(
     "Provider to support running openroad outside of bazel",

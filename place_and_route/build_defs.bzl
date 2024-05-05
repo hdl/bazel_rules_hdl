@@ -27,7 +27,7 @@ load("//place_and_route:private/pdn_gen.bzl", "pdn_gen")
 load("//place_and_route:private/place_pins.bzl", "place_pins")
 load("//place_and_route:private/repair.bzl", "repair")
 load("//place_and_route:private/resize.bzl", "resize")
-load("//synthesis:build_defs.bzl", "SynthesisInfo")
+load("//synthesis:defs.bzl", "SynthesisInfo")
 
 PLACE_AND_ROUTE_STEPS = [
     ("init_floor_plan", init_floor_plan, "pre_pnr"),

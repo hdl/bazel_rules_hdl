@@ -14,11 +14,11 @@
 
 """Global Routing openROAD commands"""
 
-load("@rules_hdl//pdk:open_road_configuration.bzl", "get_open_road_configuration")
+load("//pdk:open_road_configuration.bzl", "get_open_road_configuration")
 load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
 load("//place_and_route:private/report_area.bzl", "generate_area_results")
 load("//place_and_route:private/report_power.bzl", "generate_power_results")
-load("//synthesis:build_defs.bzl", "SynthesisInfo")
+load("//synthesis:defs.bzl", "SynthesisInfo")
 
 def _global_routing_layer_adjustments(adjustments):
     adjustment_command = "{"

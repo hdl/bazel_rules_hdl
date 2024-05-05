@@ -14,7 +14,7 @@
 
 """Report Power Commands"""
 
-load("//synthesis:build_defs.bzl", "SynthesisInfo")
+load("//synthesis:defs.bzl", "SynthesisInfo")
 
 def generate_power_results(ctx, output_file):
     netlist_target = ctx.attr.synthesized_rtl

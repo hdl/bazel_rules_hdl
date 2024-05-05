@@ -14,9 +14,9 @@
 
 """Detailed Routing openROAD commands"""
 
-load("@rules_hdl//pdk:open_road_configuration.bzl", "DetailedRoutingInfo", "get_open_road_configuration")
+load("//pdk:open_road_configuration.bzl", "DetailedRoutingInfo", "get_open_road_configuration")
 load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
-load("//synthesis:build_defs.bzl", "SynthesisInfo")
+load("//synthesis:defs.bzl", "SynthesisInfo")
 
 def detailed_routing(ctx, open_road_info):
     """Performs detailed routing.
