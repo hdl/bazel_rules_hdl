@@ -47,6 +47,8 @@ verilog_library(
     name = "load_and_count",
     srcs = [
         "load_and_count.sv",
+    ],
+    data = [
         "test_data.dat",
     ],
 )

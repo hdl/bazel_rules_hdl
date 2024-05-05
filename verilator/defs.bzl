@@ -74,7 +74,10 @@ def cc_compile_and_link_static_library(ctx, srcs, hdrs, deps, runfiles, includes
         output_files.append(linking_output.library_to_link.dynamic_library)
 
     return [
-        DefaultInfo(files = depset(output_files), runfiles = ctx.runfiles(files = runfiles)),
+        DefaultInfo(
+            files = depset(output_files),
+            runfiles = runfiles,
+        ),
         CcInfo(
             compilation_context = compilation_context,
             linking_context = linking_context,
@@ -83,7 +86,6 @@ def cc_compile_and_link_static_library(ctx, srcs, hdrs, deps, runfiles, includes
 
 _CPP_SRC = ["cc", "cpp", "cxx", "c++"]
 _HPP_SRC = ["h", "hh", "hpp"]
-_RUNFILES = ["dat", "mem"]
 
 def _only_cpp(f):
     """Filter for just C++ source/headers"""
@@ -98,18 +100,9 @@ def _only_hpp(f):
     return None
 
 def _verilator_cc_library(ctx):
-    transitive_srcs = depset([], transitive = [ctx.attr.module[VerilogInfo].dag])
-    all_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs.to_list()]
-    all_files = [src for sub_tuple in all_srcs for src in sub_tuple]
-
-    # Filter out .dat files.
-    runfiles = []
-    verilog_files = []
-    for file in all_files:
-        if file.extension in _RUNFILES:
-            runfiles.append(file)
-        else:
-            verilog_files.append(file)
+    dag = ctx.attr.module[VerilogInfo].dag
+    all_srcs = depset(transitive = [verilog_info_struct.srcs for verilog_info_struct in dag.to_list()])
+    all_data = depset(transitive = [verilog_info_struct.data for verilog_info_struct in dag.to_list()])
 
     verilator_output = ctx.actions.declare_directory(ctx.label.name + "-gen")
 
@@ -123,15 +116,14 @@ def _verilator_cc_library(ctx):
     args.add("--prefix", prefix)
     if ctx.attr.trace:
         args.add("--trace")
-    for verilog_file in verilog_files:
-        args.add(verilog_file.path)
+    args.add_all(all_srcs)
     args.add_all(ctx.attr.vopts, expand_directories = False)
 
     ctx.actions.run(
         arguments = [args],
         mnemonic = "VerilatorCompile",
         executable = ctx.executable._verilator,
-        inputs = verilog_files,
+        inputs = depset(transitive = [all_srcs, all_data]),
         outputs = [verilator_output],
         progress_message = "[Verilator] Compiling {}".format(ctx.label),
     )
@@ -162,7 +154,7 @@ def _verilator_cc_library(ctx):
         srcs = [verilator_output_cpp],
         hdrs = [verilator_output_hpp],
         defines = defines,
-        runfiles = runfiles,
+        runfiles = ctx.runfiles(transitive_files = all_data),
         includes = [verilator_output_hpp.path],
         deps = deps,
     )
