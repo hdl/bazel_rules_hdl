@@ -14,15 +14,16 @@
 
 """Registers Bazel workspaces for the GNU readline library."""
 
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 def com_google_protobuf():
     maybe(
-        git_repository,
+        http_archive,
         name = "com_google_protobuf",
-        tag = "v23.3",
-        patches = ["@com_google_ortools//patches:protobuf-v23.3.patch"],
+        urls = ["https://github.com/protocolbuffers/protobuf/releases/download/v23.3/protobuf-23.3.tar.gz"],
+        strip_prefix = "protobuf-23.3",
+        integrity = "sha256-Ol9HrTqhAZLFV3/whrJLlzmjaTfDTOq225EqFqPvf44=",
         patch_args = ["-p1"],
-        remote = "https://github.com/protocolbuffers/protobuf.git",
+        patches = ["@com_google_ortools//patches:protobuf-v23.3.patch"],
     )
