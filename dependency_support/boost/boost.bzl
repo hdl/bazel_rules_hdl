@@ -14,17 +14,17 @@
 
 """Registers Bazel workspaces for the Boost C++ libraries."""
 
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 def boost():
     maybe(
-        git_repository,
+        http_archive,
         name = "com_github_nelhage_rules_boost",
         # This equivalent to boost 1.82
-        commit = "1217caae292dc9f14e8109777ba43c988cf89c5b",
-        remote = "https://github.com/nelhage/rules_boost",
-        shallow_since = "1640124117 -0800",
+        urls = ["https://github.com/nelhage/rules_boost/archive/1217caae292dc9f14e8109777ba43c988cf89c5b.zip"],
+        strip_prefix = "rules_boost-1217caae292dc9f14e8109777ba43c988cf89c5b",
+        integrity = "sha256-dBOuD+owIZaNbz07AXJJmwdPYcZsQU54rD/s+D8VL/I=",
         patches = [
             # rules_boost does not include Boost Python, see
             # https://github.com/nelhage/rules_boost/issues/67
