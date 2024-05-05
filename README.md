@@ -66,7 +66,7 @@ This is the `BUILD` file. Every thing in bazel needs a rule description of what
 to build. The rules use yosys and OpenROAD to place and route your design.
 
 ```python
-load("@rules_hdl//synthesis:build_defs.bzl", "synthesize_rtl")
+load("@rules_hdl//synthesis:defs.bzl", "synthesize_rtl")
 load("@rules_hdl//place_and_route:build_defs.bzl", "place_and_route")
 load("@rules_hdl//verilog:defs.bzl", "verilog_library")
 
