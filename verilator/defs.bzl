@@ -157,7 +157,7 @@ def _verilator_cc_library(ctx):
     defines = ["VM_TRACE"] if ctx.attr.trace else []
     deps = [ctx.attr._verilator_lib, ctx.attr._zlib, ctx.attr._verilator_svdpi]
 
-    return cc_compile_and_link_static_library(
+    [default, cc] = cc_compile_and_link_static_library(
         ctx,
         srcs = [verilator_output_cpp],
         hdrs = [verilator_output_hpp],
@@ -166,6 +166,7 @@ def _verilator_cc_library(ctx):
         includes = [verilator_output_hpp.path],
         deps = deps,
     )
+    return [default, cc, OutputGroupInfo(hdrs = depset([verilator_output_hpp]))]
 
 verilator_cc_library = rule(
     implementation = _verilator_cc_library,
@@ -223,6 +224,7 @@ verilator_cc_library = rule(
     provides = [
         CcInfo,
         DefaultInfo,
+        OutputGroupInfo,
     ],
     toolchains = [
         "@bazel_tools//tools/cpp:toolchain_type",
