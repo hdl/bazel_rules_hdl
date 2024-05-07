@@ -46,10 +46,10 @@ def make_dag_entry(srcs, hdrs, data, deps, label):
       struct with all these fields properly stored.
     """
     return struct(
-        srcs = depset(srcs),
-        hdrs = depset(hdrs),
-        deps = depset(deps),
-        data = depset(data),
+        srcs = tuple(srcs),
+        hdrs = tuple(hdrs),
+        data = tuple(data),
+        deps = tuple(deps),
         label = label,
     )
 

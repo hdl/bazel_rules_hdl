@@ -63,12 +63,11 @@ def _collect_verilog_files(ctx):
         verilog_info_struct.srcs
         for verilog_info_struct in transitive_srcs_depset.to_list()
     ]
-    verilog_data = [
-        verilog_info_struct.data
-        for verilog_info_struct in transitive_srcs_depset.to_list()
-    ]
 
-    return depset(transitive = verilog_srcs + verilog_data)
+    return depset(
+        [src for sub_tuple in verilog_srcs for src in sub_tuple] +
+        ctx.files.verilog_sources,
+    )
 
 def _collect_vhdl_files(ctx):
     return depset(direct = ctx.files.vhdl_sources)
