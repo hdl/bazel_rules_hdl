@@ -75,7 +75,9 @@ def cc_compile_and_link_static_library(ctx, srcs, hdrs, deps, runfiles, includes
 
     return [
         DefaultInfo(
-            files = depset(output_files), runfiles = ctx.runfiles(files = runfiles)),
+            files = depset(output_files),
+            runfiles = ctx.runfiles(files = runfiles),
+        ),
         CcInfo(
             compilation_context = compilation_context,
             linking_context = linking_context,
