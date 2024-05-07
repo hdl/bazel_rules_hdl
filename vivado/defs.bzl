@@ -98,7 +98,8 @@ def generate_file_load_tcl(module):
     """
     transitive_srcs = depset([], transitive = [module[VerilogInfo].dag])
     all_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs.to_list()]
-    all_files = [src for sub_tuple in all_srcs for src in sub_tuple]
+    all_data = [verilog_info_struct.data for verilog_info_struct in transitive_srcs.to_list()]
+    all_files = [src for sub_tuple in (all_srcs + all_data) for src in sub_tuple]
 
     hdl_source_content, constraints_content, tcl_content = get_content_from_files(all_files)
 
