@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_cc//cc:defs.bzl", "cc_test")
-load("@rules_python//python:defs.bzl", "py_binary")
 load("//verilator:defs.bzl", "verilator_cc_library")
 load("//verilog:defs.bzl", "verilog_library")
 load(
@@ -33,6 +33,8 @@ verilog_library(
     name = "johnson_counter",
     srcs = [
         "johnson_counter.sv",
+    ],
+    data = [
         "test.mem",
     ],
 )
@@ -70,8 +72,10 @@ xsim_test(
 verilog_library(
     name = "johnson_counter_top",
     srcs = [
-        "io_constraints.xdc",
         "johnson_counter_top.sv",
+    ],
+    data = [
+        "io_constraints.xdc",
         "zcu111_gpio.tcl",
     ],
     deps = [
@@ -88,23 +92,30 @@ vivado_flow(
     xilinx_env = ":xilinx_env.sh",
 )
 
-py_binary(
-    name = "gen_values",
-    srcs = ["gen_values.py"],
-)
-
-genrule(
+write_file(
     name = "test_mem",
-    outs = ["test.mem"],
-    cmd = "$(location :gen_values) > $(OUTS)",
-    tools = [":gen_values"],
+    out = "test.mem",
+    content = [
+        "00",
+        "05",
+        "0A",
+        "0F",
+        "14",
+        "19",
+        "1E",
+        "28",
+        "",
+    ],
+    newline = "unix",
 )
 
 verilog_library(
     name = "weights_replay",
     srcs = [
-        "test.mem",
         "weights_replay.sv",
+    ],
+    data = [
+        "test.mem",
     ],
 )
 
@@ -131,6 +142,8 @@ verilog_library(
     name = "weights_replay_top",
     srcs = [
         "weights_replay_top.sv",
+    ],
+    data = [
         "zcu111_weights.tcl",
     ],
 )
@@ -194,7 +207,7 @@ vivado_create_ip(
 
 verilog_library(
     name = "weights_replay_and_save_bd",
-    srcs = [
+    data = [
         "weights_replay_and_save_bd.tcl",
     ],
 )

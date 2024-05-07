@@ -1,5 +1,7 @@
 # Vivado rules
 
+Bazel rules for the [Vivado Design Suite](https://www.xilinx.com/developer/products/vivado.html).
+
 The following are defined in `//vivado:defs.bzl`:
 
 * `vivado_create_project`

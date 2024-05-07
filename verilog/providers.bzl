@@ -24,7 +24,7 @@ VerilogInfo = provider(
     },
 )
 
-def make_dag_entry(srcs, hdrs, deps, label):
+def make_dag_entry(srcs, hdrs, data, deps, label):
     """Create a new DAG entry for use in VerilogInfo.
 
     As VerilogInfo should be created via 'merge_verilog_info' (rather than directly),
@@ -39,6 +39,7 @@ def make_dag_entry(srcs, hdrs, deps, label):
     Args:
       srcs: A list of File that are 'srcs'.
       hdrs: A list of File that are 'hdrs'.
+      data: A list of File that are `data`.
       deps: A list of Label that are deps of this entry.
       label: A Label to use as the name for this entry.
     Returns:
@@ -47,6 +48,7 @@ def make_dag_entry(srcs, hdrs, deps, label):
     return struct(
         srcs = tuple(srcs),
         hdrs = tuple(hdrs),
+        data = tuple(data),
         deps = tuple(deps),
         label = label,
     )
@@ -69,7 +71,7 @@ def make_verilog_info(
       # dpis: Verilog DPI files.
     Returns:
       VerilogInfo that combines all the DAGs together.
-      """
+    """
     return VerilogInfo(
         dag = depset(
             direct = new_entries,
@@ -91,6 +93,7 @@ def _verilog_library_impl(ctx):
     verilog_info = make_verilog_info(
         new_entries = [make_dag_entry(
             srcs = ctx.files.srcs,
+            data = ctx.files.data,
             hdrs = ctx.files.hdrs,
             deps = ctx.attr.deps,
             label = ctx.label,
@@ -106,6 +109,10 @@ verilog_library = rule(
     doc = "Define a Verilog module.",
     implementation = _verilog_library_impl,
     attrs = {
+        "data": attr.label_list(
+            doc = "Compile data ready by sources.",
+            allow_files = True,
+        ),
         "deps": attr.label_list(
             doc = "The list of other libraries to be linked.",
             providers = [
@@ -114,11 +121,11 @@ verilog_library = rule(
         ),
         "hdrs": attr.label_list(
             doc = "Verilog or SystemVerilog headers.",
-            allow_files = True,
+            allow_files = [".vh", ".svh"],
         ),
         "srcs": attr.label_list(
             doc = "Verilog or SystemVerilog sources.",
-            allow_files = True,
+            allow_files = [".v", ".sv"],
         ),
     },
 )

@@ -74,7 +74,10 @@ def cc_compile_and_link_static_library(ctx, srcs, hdrs, deps, runfiles, includes
         output_files.append(linking_output.library_to_link.dynamic_library)
 
     return [
-        DefaultInfo(files = depset(output_files), runfiles = ctx.runfiles(files = runfiles)),
+        DefaultInfo(
+            files = depset(output_files),
+            runfiles = ctx.runfiles(files = runfiles),
+        ),
         CcInfo(
             compilation_context = compilation_context,
             linking_context = linking_context,
@@ -100,7 +103,8 @@ def _only_hpp(f):
 def _verilator_cc_library(ctx):
     transitive_srcs = depset([], transitive = [ctx.attr.module[VerilogInfo].dag])
     all_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs.to_list()]
-    all_files = [src for sub_tuple in all_srcs for src in sub_tuple]
+    all_data = [verilog_info_struct.data for verilog_info_struct in transitive_srcs.to_list()]
+    all_files = [src for sub_tuple in (all_srcs + all_data) for src in sub_tuple]
 
     # Filter out .dat files.
     runfiles = []
