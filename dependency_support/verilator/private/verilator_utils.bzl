@@ -1,5 +1,7 @@
 """Utility rules used to compile Verilator"""
 
+load("//dependency_support/org_gnu_bison:bison.bzl", "locate_bison_data_root")
+
 def _verilator_astgen_impl(ctx):
     args = ctx.actions.args()
     args.add("--astgen", ctx.file.astgen)
@@ -65,15 +67,19 @@ def _verilator_bisonpre_impl(ctx):
         ctx.expand_location(a, data) if _is_expandable(a) else a
         for a in ctx.attr.args
     ])
+
     envs = {
+        "BISON_PKGDATADIR": locate_bison_data_root(ctx.files.bison_data),
+    }
+    envs.update({
         # Expand $(location) / $(locations) in the values.
         k: ctx.expand_location(v, data) if _is_expandable(v) else v
         for k, v in ctx.attr.env.items()
-    }
+    })
     ctx.actions.run(
         outputs = ctx.outputs.outs,
         inputs = ctx.files.srcs,
-        tools = [ctx.file.bisonpre] + ctx.files.tools,
+        tools = [ctx.file.bisonpre] + ctx.files.tools + ctx.files.bison_data,
         executable = ctx.executable._process_wrapper,
         arguments = [args],
         mnemonic = "VerilatorBisonPre",
@@ -91,6 +97,11 @@ verilator_bisonpre = rule(
     attrs = {
         "args": attr.string_list(
             doc = "Command line arguments of the `bisonpre`",
+        ),
+        "bison_data": attr.label(
+            doc = "Runtime data for GNU Bison.",
+            allow_files = True,
+            mandatory = True,
         ),
         "bisonpre": attr.label(
             doc = "The path to the `bisonpre` tool.",

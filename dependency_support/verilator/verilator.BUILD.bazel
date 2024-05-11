@@ -186,7 +186,6 @@ verilator_bisonpre(
     name = "verilator_bison",
     srcs = [
         "src/verilog.y",
-        "@org_gnu_bison//:data",
     ],
     outs = [
         "V3ParseBison.c",
@@ -202,8 +201,8 @@ verilator_bisonpre(
         "$(execpath src/verilog.y)",
     ],
     bisonpre = "src/bisonpre",
+    bison_data = "@org_gnu_bison//:bison_runtime_data",
     env = {
-        "BISON_PKGDATADIR": "$(execpath @org_gnu_bison//:data)",
         "M4": "$(execpath @org_gnu_m4//:m4)",
     },
     tools = [

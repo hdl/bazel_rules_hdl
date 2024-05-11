@@ -42,9 +42,11 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-exports_files([
-    "data",
-])
+alias(
+    name = "data",
+    actual = ":bison_runtime_data",
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
     name = "bison_src_headers",
