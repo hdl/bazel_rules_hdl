@@ -66,8 +66,13 @@ load("@rules_hdl//dependency_support/rules_license:rules_license.bzl", "rules_li
 load("@rules_hdl//dependency_support/tk_tcl:tk_tcl.bzl", "tk_tcl")
 load("@rules_hdl//dependency_support/verilator:verilator.bzl", "verilator")
 
-def dependency_support():
-    """ Registers dependencies """
+# buildifier: disable=unnamed-macro
+def dependency_support(register_toolchains = True):
+    """Registers dependencies
+
+    Args:
+        register_toolchains (bool, optional): Register rules_hdl toolchains.
+    """
     at_clifford_icestorm()
     at_clifford_yosys()
     bazel_skylib()
@@ -115,3 +120,6 @@ def dependency_support():
     rules_license()
     tk_tcl()
     verilator()
+
+    if register_toolchains:
+        native.register_toolchains(str(Label("//verilator:verilator_toolchain")))

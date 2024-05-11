@@ -101,6 +101,8 @@ def _only_hpp(f):
     return None
 
 def _verilator_cc_library(ctx):
+    verilator_toolchain = ctx.toolchains["@rules_hdl//verilator:toolchain_type"]
+
     transitive_srcs = depset([], transitive = [ctx.attr.module[VerilogInfo].dag])
     all_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs.to_list()]
     all_data = [verilog_info_struct.data for verilog_info_struct in transitive_srcs.to_list()]
@@ -129,12 +131,14 @@ def _verilator_cc_library(ctx):
         args.add("--trace")
     for verilog_file in verilog_files:
         args.add(verilog_file.path)
+    args.add_all(verilator_toolchain.extra_vopts)
     args.add_all(ctx.attr.vopts, expand_directories = False)
 
     ctx.actions.run(
         arguments = [args],
         mnemonic = "VerilatorCompile",
-        executable = ctx.executable._verilator,
+        executable = verilator_toolchain.verilator,
+        tools = verilator_toolchain.all_files,
         inputs = verilog_files,
         outputs = [verilator_output],
         progress_message = "[Verilator] Compiling {}".format(ctx.label),
@@ -159,7 +163,6 @@ def _verilator_cc_library(ctx):
 
     # Do actual compile
     defines = ["VM_TRACE"] if ctx.attr.trace else []
-    deps = [ctx.attr._verilator_lib, ctx.attr._zlib, ctx.attr._verilator_svdpi]
 
     return cc_compile_and_link_static_library(
         ctx,
@@ -168,7 +171,7 @@ def _verilator_cc_library(ctx):
         defines = defines,
         runfiles = runfiles,
         includes = [verilator_output_hpp.path],
-        deps = deps,
+        deps = verilator_toolchain.deps,
     )
 
 verilator_cc_library = rule(
@@ -205,24 +208,6 @@ verilator_cc_library = rule(
             executable = True,
             default = Label("//verilator/private:verilator_copy_tree"),
         ),
-        "_verilator": attr.label(
-            doc = "Verilator binary.",
-            executable = True,
-            cfg = "exec",
-            default = Label("@verilator//:verilator_executable"),
-        ),
-        "_verilator_lib": attr.label(
-            doc = "Verilator library",
-            default = Label("@verilator//:libverilator"),
-        ),
-        "_verilator_svdpi": attr.label(
-            doc = "Verilator svdpi lib",
-            default = Label("@verilator//:svdpi"),
-        ),
-        "_zlib": attr.label(
-            doc = "zlib dependency",
-            default = Label("@net_zlib//:zlib"),
-        ),
     },
     provides = [
         CcInfo,
@@ -230,6 +215,37 @@ verilator_cc_library = rule(
     ],
     toolchains = [
         "@bazel_tools//tools/cpp:toolchain_type",
+        "@rules_hdl//verilator:toolchain_type",
     ],
     fragments = ["cpp"],
+)
+
+def _verilator_toolchain_impl(ctx):
+    all_files = ctx.attr.verilator[DefaultInfo].default_runfiles.files
+
+    return [platform_common.ToolchainInfo(
+        verilator = ctx.executable.verilator,
+        deps = ctx.attr.deps,
+        extra_vopts = ctx.attr.extra_vopts,
+        all_files = all_files,
+    )]
+
+verilator_toolchain = rule(
+    doc = "Define a Verilator toolchain.",
+    implementation = _verilator_toolchain_impl,
+    attrs = {
+        "deps": attr.label_list(
+            doc = "Global Verilator dependencies to link into downstream targets.",
+            providers = [CcInfo],
+        ),
+        "extra_vopts": attr.string_list(
+            doc = "Extra flags to pass to Verilator compile actions.",
+        ),
+        "verilator": attr.label(
+            doc = "The Verilator binary.",
+            executable = True,
+            cfg = "exec",
+            mandatory = True,
+        ),
+    },
 )
