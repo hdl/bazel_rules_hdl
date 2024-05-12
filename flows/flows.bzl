@@ -41,7 +41,7 @@ FlowStepInfo = provider(
 
 script_prefix = """
 #!/usr/bin/env bash
-export RUNFILES="${RUNFILES:-$0.runfiles/rules_hdl}"
+export RUNFILES="${RUNFILES:-$0.runfiles/_main}"
 """
 
 tcl_script_prefix = "set runfiles_dir $::env(RUNFILES)"

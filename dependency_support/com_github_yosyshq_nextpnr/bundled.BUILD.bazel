@@ -42,8 +42,8 @@ DEPS = [
     "@boost//:python",
     "@boost//:system",
     "@boost//:thread",
-    "@eigen//:eigen3",
-    "@rules_python//python/cc:current_py_cc_headers",
+    "@local_config_python//:python_headers",
+    "@eigen//:eigen",
 ]
 
 DEFINES = [

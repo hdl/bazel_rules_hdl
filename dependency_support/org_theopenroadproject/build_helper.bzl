@@ -299,7 +299,7 @@ OPENROAD_LIBRARY_DEPS = [
     "@boost//:property_tree",
     "@boost//:stacktrace",
     "@boost//:thread",
-    "@eigen//:eigen3",
+    "@eigen//:eigen",
     "@com_github_quantamhd_lemon//:lemon",
     "@org_llvm_openmp//:openmp",
     "@com_github_gabime_spdlog//:spdlog",

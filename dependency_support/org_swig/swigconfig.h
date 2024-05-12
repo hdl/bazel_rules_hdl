@@ -89,7 +89,7 @@
 #define SWIG_CXX "g++"
 
 /* Directory for SWIG system-independent libraries */
-#define SWIG_LIB "external/org_swig/Lib"
+#define SWIG_LIB "external/+_repo_rules+org_swig/Lib"
 
 /* Directory for SWIG system-independent libraries (Unix install on native
    Windows) */

@@ -1,0 +1,21 @@
+--- MODULE.bazel
++++ MODULE.bazel
+@@ -13,3 +13,18 @@
+     non_module_boost_repositories,
+     "boost",
+ )
++
++http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
++http_archive(
++    name = "com_github_libbacktrace",
++    urls = [
++        "https://github.com/ianlancetaylor/libbacktrace/archive/4d2dd0b172f2c9192f83ba93425f868f2a13c553.zip",
++    ],
++    strip_prefix = "libbacktrace-4d2dd0b172f2c9192f83ba93425f868f2a13c553",
++    sha256 = "90d224a18c0a0c0f1f22fe73b89ebebd4f1ee368e55d646718b7f3b294a52705",
++    build_file = "@com_github_nelhage_rules_boost//:libbacktrace.BUILD",
++    patches = [
++        "@com_github_nelhage_rules_boost//:config.h.patch",
++        "@com_github_nelhage_rules_boost//:backtrace-supported.h.patch",
++    ],
++)

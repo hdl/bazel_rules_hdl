@@ -1020,7 +1020,7 @@ cc_library(
         "@boost//:phoenix",
         "@boost//:polygon",
         "@boost//:spirit",
-        "@com_github_gabime_spdlog//:spdlog_with_exceptions",
+        "@com_github_gabime_spdlog//:spdlog",
         "@tk_tcl//:tcl",
         "@net_zlib//:zlib",
     ],
