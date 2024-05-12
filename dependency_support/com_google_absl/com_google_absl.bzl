@@ -14,15 +14,15 @@
 
 """Registers Bazel workspaces for the GNU readline library."""
 
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 def com_google_absl():
     maybe(
-        git_repository,
+        new_git_repository,
         name = "com_google_absl",
-        tag = "20230125.3",
-        patches = ["@com_google_ortools//patches:abseil-cpp-20230125.3.patch"],
+        tag = "20240116.2",
+        patches = ["@com_google_ortools//patches:abseil-cpp-20240116.2.patch"],
         patch_args = ["-p1"],
         remote = "https://github.com/abseil/abseil-cpp.git",
     )

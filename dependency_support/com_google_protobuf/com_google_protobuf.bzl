@@ -21,9 +21,9 @@ def com_google_protobuf():
     maybe(
         http_archive,
         name = "com_google_protobuf",
-        urls = ["https://github.com/protocolbuffers/protobuf/releases/download/v23.3/protobuf-23.3.tar.gz"],
-        strip_prefix = "protobuf-23.3",
-        integrity = "sha256-Ol9HrTqhAZLFV3/whrJLlzmjaTfDTOq225EqFqPvf44=",
+        urls = ["https://github.com/protocolbuffers/protobuf/archive/refs/tags/v26.1.tar.gz"],
+        strip_prefix = "protobuf-26.1",
+        sha256 = "4fc5ff1b2c339fb86cd3a25f0b5311478ab081e65ad258c6789359cd84d421f8",
         patch_args = ["-p1"],
-        patches = ["@com_google_ortools//patches:protobuf-v23.3.patch"],
+        patches = ["@com_google_ortools//patches:protobuf-v26.1.patch"],
     )
