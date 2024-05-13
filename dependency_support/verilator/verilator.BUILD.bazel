@@ -278,6 +278,16 @@ cc_library(
 )
 
 cc_library(
+    name = "vltstd",
+    hdrs = [
+        "include/vltstd/svdpi.h",
+        "include/vltstd/sv_vpi_user.h",
+        "include/vltstd/vpi_user.h",
+    ],
+    strip_include_prefix = "include/vltstd",
+)
+
+cc_library(
     name = "verilator",
     srcs = [
         "include/gtkwave/fastlz.h",
@@ -285,30 +295,32 @@ cc_library(
         "include/gtkwave/fstapi.h",
         "include/gtkwave/lz4.h",
         "include/gtkwave/wavealloca.h",
-        "include/verilated.cpp",
         "include/verilated_fst_c.cpp",
         "include/verilated_imp.h",
         "include/verilated_syms.h",
         "include/verilated_threads.cpp",
         "include/verilated_vcd_c.cpp",
+        "include/verilated_vpi.cpp",
+        "include/verilated.cpp",
     ],
     hdrs = [
-        "include/verilated.h",
         "include/verilated_config.h",
         "include/verilated_dpi.h",
         "include/verilated_fst_c.h",
+        "include/verilated_funcs.h",
         "include/verilated_intrinsics.h",
-        "include/verilated_threads.h",
         "include/verilated_sc.h",
         "include/verilated_sym_props.h",
-        "include/verilated_trace.h",
+        "include/verilated_threads.h",
+        "include/verilated_timing.h",
         # Needed for verilated_vcd_c.cpp and verilated_fst_c.cpp
         "include/verilated_trace_imp.h",
-        "include/verilated_vcd_c.h",
-        "include/verilatedos.h",
+        "include/verilated_trace.h",
         "include/verilated_types.h",
-        "include/verilated_funcs.h",
-        "include/verilated_timing.h",
+        "include/verilated_vcd_c.h",
+        "include/verilated_vpi.h",
+        "include/verilated.h",
+        "include/verilatedos.h",
     ],
     # TODO: Remove these once upstream fixes these warnings
     copts = [
@@ -329,6 +341,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "@net_zlib//:zlib",
+        ":vltstd",
     ],
 )
 
