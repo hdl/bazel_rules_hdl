@@ -12,7 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load(":defs.bzl", "verilator_toolchain")
+
 package(
     default_applicable_licenses = ["//:package_license"],
     default_visibility = ["//visibility:private"],
+)
+
+toolchain_type(
+    name = "toolchain_type",
+    visibility = ["//visibility:public"],
+)
+
+verilator_toolchain(
+    name = "verilator_toolchain_impl",
+    verilator = "@verilator//:verilator_executable",
+    deps = [
+        "@net_zlib//:zlib",
+        "@verilator//:libverilator",
+        "@verilator//:svdpi",
+    ],
+)
+
+toolchain(
+    name = "verilator_toolchain",
+    toolchain = ":verilator_toolchain_impl",
+    toolchain_type = ":toolchain_type",
+    visibility = ["//visibility:public"],
 )
