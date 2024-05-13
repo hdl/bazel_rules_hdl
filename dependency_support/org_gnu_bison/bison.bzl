@@ -15,6 +15,28 @@
 """Build rule for generating C or C++ sources with Bison.
 """
 
+def locate_bison_data_root(files):
+    """Locate the GNU Bison runtime data directory based on a set of inputs
+
+    This function assumes all files are located within the same directory.
+
+    Args:
+        files (list[File]): A list of files to use for locating Bison runtime data.
+
+    Returns:
+        str: The execpath of the data directory.
+    """
+    if not files:
+        fail("No bison data files provided")
+
+    file = files[0]
+
+    parent, _, _ = file.path.partition("/data/")
+    if parent == file.path:
+        fail("Unable to locate data directory from: {}", file.owner)
+
+    return "{}/data".format(parent)
+
 def _genyacc_impl(ctx):
     """Implementation for genyacc rule."""
 
@@ -36,7 +58,7 @@ def _genyacc_impl(ctx):
     ctx.actions.run(
         executable = ctx.executable._bison,
         env = {
-            "BISON_PKGDATADIR": ctx.attr._bison_data_path.files.to_list()[0].path,
+            "BISON_PKGDATADIR": locate_bison_data_root(ctx.files._bison_data),
             "M4": ctx.executable._m4.path,
         },
         arguments = [args],
@@ -89,10 +111,7 @@ genyacc = rule(
         ),
         "_bison_data": attr.label(
             default = Label("@org_gnu_bison//:bison_runtime_data"),
-        ),
-        "_bison_data_path": attr.label(
-            default = Label("@org_gnu_bison//:data"),
-            allow_single_file = True,
+            allow_files = True,
         ),
         "_m4": attr.label(
             default = Label("@org_gnu_m4//:m4"),
