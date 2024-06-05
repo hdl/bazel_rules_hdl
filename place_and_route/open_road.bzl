@@ -45,17 +45,8 @@ def timing_setup_commands(ctx):
     inputs = []
     commands = []
 
-    netlist_target = ctx.attr.synthesized_rtl
-    liberty = netlist_target[SynthesisInfo].standard_cell_info.default_corner.liberty
-    additional_liberties = [corner.liberty for corner in netlist_target[SynthesisInfo].standard_cell_info.corners]
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
     rc_script = open_road_configuration.rc_script_configuration
-
-    # Liberty Setup
-    inputs.append(liberty)
-    inputs.extend(additional_liberties)
-    for file in [liberty] + additional_liberties:
-        commands.append("read_liberty {liberty}".format(liberty = file.path))
 
     # SDC/Clock Setup
     clock_commands_struct = clock_commands(ctx)
@@ -219,8 +210,26 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
         output_db = ctx.actions.declare_file("{}{}.odb".format(input_hash, command_hash))
 
     real_commands = []
+
+    # Liberty Setup
+    stdcell_info = ctx.attr.synthesized_rtl[SynthesisInfo].standard_cell_info
+    liberty = stdcell_info.default_corner.liberty
+    additional_liberties = [corner.liberty for corner in stdcell_info.corners]
+
+    inputs.append(liberty)
+    inputs.extend(additional_liberties)
+    for file in [liberty] + additional_liberties:
+        real_commands.append("read_liberty {liberty}".format(liberty = file.path))
+
+    input_db_dependency = []
     if input_db:
+        input_db_dependency.append(input_db)
+        timing_setup_command_struct = timing_setup_commands(ctx)
+        input_db_dependency.extend(timing_setup_command_struct.inputs)
+
         real_commands.append("read_db {}".format(input_db.path))
+        real_commands.extend(timing_setup_command_struct.commands)
+
     real_commands.extend(commands)
     real_commands.append("write_db {}".format(output_db.path))
 

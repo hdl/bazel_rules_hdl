@@ -15,7 +15,7 @@
 """Global Routing openROAD commands"""
 
 load("//pdk:open_road_configuration.bzl", "get_open_road_configuration")
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command")
 load("//place_and_route:private/report_area.bzl", "generate_area_results")
 load("//place_and_route:private/report_power.bzl", "generate_power_results")
 load("//synthesis:defs.bzl", "SynthesisInfo")
@@ -43,13 +43,11 @@ def global_routing(ctx, open_road_info):
 
     """
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
-    timing_setup_command_struct = timing_setup_commands(ctx)
-    inputs = timing_setup_command_struct.inputs
 
     general_routing_power_results = ctx.actions.declare_file("{}_general_routing_power_results.textproto".format(ctx.attr.name))
     general_routing_area_results = ctx.actions.declare_file("{}_general_routing_area_results.textproto".format(ctx.attr.name))
 
-    open_road_commands = timing_setup_command_struct.commands + [
+    open_road_commands = [
         """
 foreach layer_adjustment {global_routing_layer_adjustments} {{
     lassign $layer_adjustment layer adjustment
@@ -79,7 +77,7 @@ foreach layer_adjustment {global_routing_layer_adjustments} {{
         ctx,
         commands = open_road_commands,
         input_db = open_road_info.output_db,
-        inputs = inputs,
+        inputs = [],
         outputs = [
             general_routing_power_results,
             general_routing_area_results,
@@ -89,7 +87,7 @@ foreach layer_adjustment {global_routing_layer_adjustments} {{
 
     current_action_open_road_info = OpenRoadInfo(
         commands = open_road_commands,
-        input_files = depset(inputs),
+        input_files = depset(),
         output_db = command_output.db,
         logs = depset([command_output.log_file]),
         general_routing_power_results = general_routing_power_results,

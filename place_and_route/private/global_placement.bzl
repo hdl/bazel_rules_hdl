@@ -15,7 +15,7 @@
 """Global placement openROAD commands"""
 
 load("//pdk:open_road_configuration.bzl", "get_open_road_configuration")
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command")
 load("//synthesis:defs.bzl", "SynthesisInfo")
 
 def global_placement(ctx, open_road_info):
@@ -30,11 +30,8 @@ def global_placement(ctx, open_road_info):
 
     """
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
-    timing_setup_command_struct = timing_setup_commands(ctx)
 
-    inputs = timing_setup_command_struct.inputs
-
-    open_road_commands = timing_setup_command_struct.commands + [
+    open_road_commands = [
         "global_placement -timing_driven -routability_driven -density {density} -pad_left {pad_left} -pad_right {pad_right}".format(
             density = ctx.attr.placement_density,  #TODO(bazel): When bazel 4.0.0 is avaliable use float command
             pad_left = open_road_configuration.global_placement_cell_pad,
@@ -47,12 +44,12 @@ def global_placement(ctx, open_road_info):
         commands = open_road_commands,
         input_db = open_road_info.output_db,
         step_name = "global_placement",
-        inputs = inputs,
+        inputs = [],
     )
 
     global_place_open_road_info = OpenRoadInfo(
         commands = open_road_commands,
-        input_files = depset(inputs),
+        input_files = depset(),
         output_db = command_output.db,
         logs = depset([command_output.log_file]),
     )

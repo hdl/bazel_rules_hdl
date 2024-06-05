@@ -15,7 +15,7 @@
 """Detailed Routing openROAD commands"""
 
 load("//pdk:open_road_configuration.bzl", "DetailedRoutingInfo", "get_open_road_configuration")
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command")
 load("//synthesis:defs.bzl", "SynthesisInfo")
 
 def detailed_routing(ctx, open_road_info):
@@ -30,8 +30,7 @@ def detailed_routing(ctx, open_road_info):
 
     """
 
-    timing_setup_command_struct = timing_setup_commands(ctx)
-    inputs = timing_setup_command_struct.inputs
+    inputs = []
 
     output_drc = ctx.actions.declare_file("{}_output_drc".format(ctx.attr.name))
     routed_def = ctx.actions.declare_file("{}_detail_routed.def".format(ctx.attr.name))
@@ -55,7 +54,7 @@ def detailed_routing(ctx, open_road_info):
         if detailed_routing_configs.enable_via_gen:
             detailed_routing_args += " -disable_via_gen "
 
-    open_road_commands = timing_setup_command_struct.commands + [
+    open_road_commands = [
         "set_propagated_clock [all_clocks]",
         "detailed_route -output_drc {} {}".format(output_drc.path, detailed_routing_args),
     ]

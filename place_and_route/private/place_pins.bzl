@@ -15,7 +15,7 @@
 """Pin Placement openROAD commands"""
 
 load("//pdk:open_road_configuration.bzl", "get_open_road_configuration")
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command")
 load("//synthesis:defs.bzl", "SynthesisInfo")
 
 def place_pins(ctx, open_road_info):
@@ -31,8 +31,7 @@ def place_pins(ctx, open_road_info):
     """
 
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
-    timing_setup_command_struct = timing_setup_commands(ctx)
-    inputs = timing_setup_command_struct.inputs
+    inputs = []
 
     tapcell_command = "tapcell -distance {tapcell_distance} -tapcell_master {tapcell}".format(
         tapcell = open_road_configuration.tap_cell,
@@ -49,7 +48,7 @@ def place_pins(ctx, open_road_info):
         if ctx.file.pin_placement_script:
             inputs.append(ctx.file.pin_placement_script)
 
-    open_road_commands = timing_setup_command_struct.commands + [
+    open_road_commands = [
         "source {}".format(ctx.file.pin_placement_script.path) if ctx.file.pin_placement_script else "",
         "place_pins -hor_layers {hor_layers} -ver_layers {ver_layers} {min_pin_distance}".format(
             hor_layers = open_road_configuration.pin_horizontal_metal_layer,

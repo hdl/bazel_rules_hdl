@@ -15,7 +15,7 @@
 """Clock Tree Synthesis openROAD commands"""
 
 load("//pdk:open_road_configuration.bzl", "get_open_road_configuration")
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "format_openroad_do_not_use_list", "merge_open_road_info", "openroad_command", "placement_padding_commands", "timing_setup_commands")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "format_openroad_do_not_use_list", "merge_open_road_info", "openroad_command", "placement_padding_commands")
 load("//synthesis:defs.bzl", "SynthesisInfo")
 
 def clock_tree_synthesis(ctx, open_road_info):
@@ -32,12 +32,11 @@ def clock_tree_synthesis(ctx, open_road_info):
 
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
 
-    timing_setup_command_struct = timing_setup_commands(ctx)
     placement_padding_struct = placement_padding_commands(ctx)
 
-    inputs = timing_setup_command_struct.inputs + placement_padding_struct.inputs
+    inputs = placement_padding_struct.inputs
 
-    open_road_commands = timing_setup_command_struct.commands + [
+    open_road_commands = [
         format_openroad_do_not_use_list(open_road_configuration.do_not_use_cell_list),
         "estimate_parasitics -placement",
         "repair_clock_inverters",
