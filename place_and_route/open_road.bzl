@@ -233,10 +233,6 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
     real_commands.extend(commands)
     real_commands.append("write_db {}".format(output_db.path))
 
-    # This is here to make it easy to append to the input arguments of the run command.
-    # Otherwise it would fail when no input_db is provided.
-    input_db_dependency = [input_db] if input_db else []
-
     file_name = "{}_script.tcl".format(output_db.basename[:-(len(output_db.extension) + 1)])
     command_file = ctx.actions.declare_file(file_name)
     ctx.actions.write(command_file, content = "\n".join(real_commands))
