@@ -15,7 +15,7 @@
 """Repair openROAD commands"""
 
 load("//pdk:open_road_configuration.bzl", "get_open_road_configuration")
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "format_openroad_do_not_use_list", "merge_open_road_info", "openroad_command", "timing_setup_commands")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "format_openroad_do_not_use_list", "merge_open_road_info", "openroad_command")
 load("//synthesis:defs.bzl", "SynthesisInfo")
 
 def repair(ctx, open_road_info):
@@ -31,11 +31,7 @@ def repair(ctx, open_road_info):
     """
     open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
 
-    timing_setup_command_struct = timing_setup_commands(ctx)
-
-    inputs = timing_setup_command_struct.inputs
-
-    open_road_commands = timing_setup_command_struct.commands + [
+    open_road_commands = [
         format_openroad_do_not_use_list(open_road_configuration.do_not_use_cell_list),
         "estimate_parasitics -placement",
         "remove_buffers",
@@ -55,13 +51,13 @@ def repair(ctx, open_road_info):
         ctx,
         commands = open_road_commands,
         input_db = open_road_info.output_db,
-        inputs = inputs,
+        inputs = [],
         step_name = "repair",
     )
 
     current_action_open_road_info = OpenRoadInfo(
         commands = open_road_commands,
-        input_files = depset(inputs),
+        input_files = depset(),
         output_db = command_output.db,
         logs = depset([command_output.log_file]),
     )

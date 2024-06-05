@@ -14,7 +14,7 @@
 
 """Benchmark OpenROAD commands"""
 
-load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "timing_setup_commands")
+load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command")
 
 def benchmark(ctx, open_road_info):
     """Benchmarks and reports metrics for a placed design.
@@ -28,11 +28,7 @@ def benchmark(ctx, open_road_info):
 
     """
 
-    timing_setup_command_struct = timing_setup_commands(ctx)
-
-    inputs = timing_setup_command_struct.inputs
-
-    open_road_commands = timing_setup_command_struct.commands + [
+    open_road_commands = [
         "report_power",
         "report_wns",
         "report_tns",
@@ -53,7 +49,7 @@ def benchmark(ctx, open_road_info):
         ctx,
         commands = open_road_commands,
         input_db = open_road_info.output_db,
-        inputs = inputs,
+        inputs = [],
         step_name = "benchmark",
         outputs = cmd_outputs,
     )
@@ -93,7 +89,7 @@ def benchmark(ctx, open_road_info):
 
     current_action_open_road_info = OpenRoadInfo(
         commands = open_road_commands,
-        input_files = depset(inputs),
+        input_files = depset(),
         output_db = command_output.db,
         benchmark_report = benchmark_report,
         logs = depset([command_output.log_file] + cmd_outputs),
