@@ -114,6 +114,14 @@ skywater_cell_library = rule(
         "default_corner": attr.string(
             mandatory = True,
         ),
+        "default_input_driver_cell": attr.string(
+            default = "",
+            doc = "Cell to assume drives primary input nets",
+        ),
+        "default_output_load": attr.string(
+            default = "",
+            doc = "Cell to assume is being driven by each primary output",
+        ),
         "openroad_configuration": attr.label(
             providers = [OpenRoadPdkInfo],
         ),
@@ -126,14 +134,6 @@ skywater_cell_library = rule(
         "tech_lef": attr.label(
             allow_single_file = True,
             doc = "The tech lef file for these standard cells",
-        ),
-        "default_input_driver_cell": attr.string(
-            default = "",
-            doc = "Cell to assume drives primary input nets",
-        ),
-        "default_output_load": attr.string(
-            default = "",
-            doc = "Cell to assume is being driven by each primary output",
         ),
     },
 )
