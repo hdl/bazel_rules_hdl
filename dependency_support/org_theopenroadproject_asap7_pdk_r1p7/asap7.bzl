@@ -67,7 +67,7 @@ def asap7_srams_files(name = None, rev = None, tracks = None, has_gds = True):
         srcs = native.glob(["LEF/asap7sc{tracks}_{rev}*_SRAM_*.lef".format(**args)]),
     )
 
-def asap7_cells_files(name = None, rev = None, tracks = None, vt = None, has_gds = True):
+def asap7_cells_files(name = None, rev = None, tracks = None, vt = None, has_gds = True, default_input_driver_cell = "", default_output_load = ""):
     """Generate ASAP7 cell's filegroup targets (asap7-cells-XXX).
 
     Args:
@@ -76,6 +76,8 @@ def asap7_cells_files(name = None, rev = None, tracks = None, vt = None, has_gds
       tracks: Number of tracks ("7p5t", "6t").
       vt: VT type ("rvt", "lvt", "slvt").
       has_gds: Cells have GDS layouts.
+      default_input_driver_cell: Cell to assume drives primary input nets
+      default_output_load: Cell to assume is being driven by each primary output
     """
 
     if rev not in ["26", "27", "28"]:
@@ -164,6 +166,8 @@ def asap7_cells_files(name = None, rev = None, tracks = None, vt = None, has_gds
         visibility = [
             "//visibility:public",
         ],
+        default_input_driver_cell = default_input_driver_cell,
+        default_output_load = default_output_load,
     )
     asap7_cell_library(
         name = "asap7-sc{tracks}_rev{rev}_{vt_long}-ccs_tt".format(**args),
@@ -180,6 +184,8 @@ def asap7_cells_files(name = None, rev = None, tracks = None, vt = None, has_gds
         visibility = [
             "//visibility:public",
         ],
+        default_input_driver_cell = default_input_driver_cell,
+        default_output_load = default_output_load,
     )
     asap7_cell_library(
         name = "asap7-sc{tracks}_rev{rev}_{vt_long}-ccs_ff".format(**args),
@@ -196,6 +202,8 @@ def asap7_cells_files(name = None, rev = None, tracks = None, vt = None, has_gds
         visibility = [
             "//visibility:public",
         ],
+        default_input_driver_cell = default_input_driver_cell,
+        default_output_load = default_output_load,
     )
 
 def _asap7_cell_library_impl(ctx):
@@ -246,7 +254,10 @@ def _asap7_cell_library_impl(ctx):
         open_road_configuration = ctx.attr.openroad_configuration[OpenRoadPdkInfo]
 
     return [
-        DefaultInfo(files = depset([default_output_liberty] + default_corner_libraries)),
+        DefaultInfo(
+            files = depset([default_output_liberty] + default_corner_libraries),
+            runfiles = ctx.runfiles(files = [default_output_liberty] + default_corner_libraries),
+        ),
         StandardCellInfo(
             corners = [],
             cell_lef_definitions = [ctx.file.cell_lef],
@@ -255,6 +266,8 @@ def _asap7_cell_library_impl(ctx):
             default_corner = CornerInfo(
                 liberty = default_output_liberty,
             ),
+            default_input_driver_cell = ctx.attr.default_input_driver_cell,
+            default_output_load = ctx.attr.default_output_load,
             open_road_configuration = open_road_configuration,
         ),
     ]
@@ -265,6 +278,8 @@ asap7_cell_library = rule(
         "cell_lef": attr.label(allow_single_file = True, mandatory = True, doc = "The lef file for the standard cells"),
         "default_corner_delay_model": attr.string(mandatory = True, values = ["ccs", "ccsn", "ccsa"]),
         "default_corner_swing": attr.string(mandatory = True, values = ["SS", "FF", "TT"]),
+        "default_input_driver_cell": attr.string(doc = "The cell to assume is driving primary input nets"),
+        "default_output_load": attr.string(doc = "The cell to assume is being driven by each primary output"),
         #TODO(b/212480812): Support multiple VTs in a single design.
         "openroad_configuration": attr.label(providers = [OpenRoadPdkInfo]),
         "platform_gds": attr.label(allow_single_file = True, mandatory = False, doc = "Platform GDS files"),
