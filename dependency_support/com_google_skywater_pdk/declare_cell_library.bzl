@@ -19,12 +19,14 @@ load("@rules_hdl//dependency_support/com_google_skywater_pdk:build_defs.bzl", "s
 load("@rules_hdl//dependency_support/com_google_skywater_pdk:cells_info.bzl", "sky130_cell_normalize")
 load(":cell_libraries.bzl", "CELL_LIBRARIES")
 
-def declare_cell_library(workspace_name, name):
+def declare_cell_library(workspace_name, name, default_input_driver_cell = "", default_output_load = ""):
     """This should be called from the BUILD file of a cell library workspace. It sets up the targets for the generated files of the given library.
 
     Args:
       workspace_name: The name of the skywater workspace
       name: The name of the top level standard cell library
+      default_input_driver_cell: Cell to assume drives primary input nets
+      default_output_load: Cell to assume is being driven by each primary output
     """
     native.filegroup(
         name = "spice_models",
@@ -86,6 +88,8 @@ def declare_cell_library(workspace_name, name):
             visibility = ["//visibility:public"],
             openroad_configuration = library.get("open_road_configuration", None),
             tech_lef = "tech/{}.tlef".format(name) if library.get("library_type", None) != "ip_library" else None,
+            default_input_driver_cell = default_input_driver_cell,
+            default_output_load = default_output_load,
         )
 
     # Multi-corner library
@@ -115,4 +119,6 @@ def declare_cell_library(workspace_name, name):
         visibility = ["//visibility:public"],
         openroad_configuration = library.get("open_road_configuration", None),
         tech_lef = "tech/{}.tlef".format(name) if library.get("library_type", None) != "ip_library" else None,
+        default_input_driver_cell = default_input_driver_cell,
+        default_output_load = default_output_load,
     )
