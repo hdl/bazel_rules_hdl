@@ -103,6 +103,8 @@ def _skywater_cell_library_impl(ctx):
             tech_lef = tech_lef,
             cell_lef_definitions = cell_lef_files,
             platform_gds = platform_gds_files,
+            default_input_driver_cell = ctx.attr.default_input_driver_cell,
+            default_output_load = ctx.attr.default_output_load,
         ),
     ]
 
@@ -111,6 +113,14 @@ skywater_cell_library = rule(
     attrs = {
         "default_corner": attr.string(
             mandatory = True,
+        ),
+        "default_input_driver_cell": attr.string(
+            default = "",
+            doc = "Cell to assume drives primary input nets",
+        ),
+        "default_output_load": attr.string(
+            default = "",
+            doc = "Cell to assume is being driven by each primary output",
         ),
         "openroad_configuration": attr.label(
             providers = [OpenRoadPdkInfo],
