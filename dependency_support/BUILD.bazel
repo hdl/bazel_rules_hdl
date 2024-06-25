@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# See https://github.com/bazelbuild/rules_python/blob/main/examples/pip_parse_vendored/BUILD.bazel
+# for canonical vendoring setup.
+
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
@@ -21,14 +24,25 @@ package(
     default_visibility = ["//visibility:private"],
 )
 
-compile_pip_requirements(name = "pip_requirements")
+compile_pip_requirements(
+    name = "pip_requirements",
+    src = "pip_requirements.in",
+)
 
 genrule(
     name = "clean_requirements",
-    srcs = ["@rules_hdl_pip_deps//:requirements.bzl"],
+    srcs = ["@rules_hdl_pip_deps_to_vendor//:requirements.bzl"],
     outs = ["requirements.clean.bzl"],
     cmd = " | ".join([
         "cat $<",
+        # Substitute for vendored dependencies directly.
+        # We want to remove any references to the pip_parse repo used to generate
+        # the dependencies,  otherwise the vendoring is not useful.
+        "sed -e 's/rules_hdl_pip_deps_to_vendor/rules_hdl_pip_deps_vendored/g'",
+        "sed -e 's|//\\([^:]*\\):pkg|_\\1//:pkg|g'",
+        "sed -e 's|//\\([^:]*\\):whl|_\\1//:whl|g'",
+        "sed -e 's|//\\([^:]*\\):data|_\\1//:data|g'",
+        "sed -e 's|//{}:{}|_{}//:{}|g' >$@",
         # Replace the bazel 6.0.0 specific comment with something that bazel 5.4.0 would produce.
         # This enables this example to be run as a test under bazel 5.4.0.
         """sed -e 's#@rules_hdl//#@//#'""",
