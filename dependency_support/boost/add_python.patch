@@ -57,7 +57,7 @@ index e5d0b60..4f52d3c 100644
 +        ":tuple",
 +        ":type",
 +        ":utility",
-+        "@local_config_python//:python_headers",
++        "@rules_python//python/cc:current_py_cc_headers",
 +    ],
 +    copts = ["-w"],
 +)

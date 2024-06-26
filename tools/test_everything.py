@@ -65,7 +65,6 @@ ALL_TARGETS = [
   '@org_theopenroadproject_asap7sc6t_26//...',
   '@org_theopenroadproject_asap7sc7p5t_27//...',
   '@org_theopenroadproject_asap7sc7p5t_28//...',
-  '@pybind11//...',
   '@rules_pkg//...',
   '@tk_tcl//...',
 ]

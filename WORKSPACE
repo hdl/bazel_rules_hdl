@@ -167,7 +167,7 @@ dependency_support()
 
 load("//:init.bzl", "init")
 
-init(python_interpreter_target = "@python39_host//:python")
+init()
 
 load("@rules_python//python:pip.bzl", "pip_parse")
 

@@ -23,7 +23,6 @@ load(
 )
 load("//dependency_support:requirements.bzl", install_pip_deps = "install_deps")
 load("//dependency_support/boost:init_boost.bzl", "init_boost")
-load("//dependency_support/pybind11:init_pybind11.bzl", "init_pybind11")
 
 def init(python_interpreter = None, python_interpreter_target = None):
     """Initializes the bazel_rules_hdl workspace.
@@ -59,7 +58,6 @@ def init(python_interpreter = None, python_interpreter_target = None):
     install_pip_deps(**install_deps_kwargs)
 
     init_boost()
-    init_pybind11(python_interpreter_target = python_interpreter_target)
 
     protobuf_deps()
 
