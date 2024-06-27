@@ -49,7 +49,7 @@ DEPS = [
     "@boost//:system",
     "@boost//:thread",
     "@com_google_absl//absl/strings",
-    "@local_config_python//:python_headers",
+    "@rules_python//python/cc:current_py_cc_headers",
 ]
 
 COPTS = [

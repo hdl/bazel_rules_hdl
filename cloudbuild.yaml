@@ -34,7 +34,7 @@ steps:
     path: /root/.ssh
 
 # Run the build
-- name: gcr.io/cloud-builders/bazel
+- name: gcr.io/cloud-builders/bazel:6.4.0
   entrypoint: 'bash'
   args:
   - '-c'
