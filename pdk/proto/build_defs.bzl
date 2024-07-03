@@ -7,27 +7,28 @@ def _extract_lef_and_liberty_impl(ctx):
     open_road_configuration = standard_cell.open_road_configuration
 
     content = []
-    out_files = []
+    core_out_files = []
+    corner_files = []
 
     manual_override = ctx.attr.cell_lef_paths or ctx.attr.tech_lef_path or ctx.attr.liberty_path
 
     if not manual_override:
         for file in standard_cell.cell_lef_definitions:
             content.append("cell_lef_paths: \"{}\"".format(file.short_path))
-        out_files.extend(standard_cell.cell_lef_definitions)
+        core_out_files.extend(standard_cell.cell_lef_definitions)
 
         content.append("tech_lef_path: \"{}\"".format(standard_cell.tech_lef.short_path))
-        out_files.append(standard_cell.tech_lef)
+        core_out_files.append(standard_cell.tech_lef)
 
         if not standard_cell.default_corner:
             fail("No default corner found on " + str(ctx.attr.standard_cell))
 
         content.append("liberty_path: \"{}\"".format(standard_cell.default_corner.liberty.short_path))
-        out_files.append(standard_cell.default_corner.liberty)
+        core_out_files.append(standard_cell.default_corner.liberty)
 
         for file in [corner.liberty for corner in standard_cell.corners]:
             content.append("additional_liberty_paths: \"{}\"".format(file.short_path))
-            out_files.append(file)
+            corner_files.append(file)
     else:
         for file in ctx.attr.cell_lef_paths:
             content.append("cell_lef_paths: \"{}\"".format(file))
@@ -38,7 +39,7 @@ def _extract_lef_and_liberty_impl(ctx):
     content.append("tracks_file_path: \"{}\"".format(
         open_road_configuration.tracks_file.short_path,
     ))
-    out_files.append(open_road_configuration.tracks_file)
+    core_out_files.append(open_road_configuration.tracks_file)
 
     content.append("pin_horizontal_metal_layer: \"{}\"".format(
         open_road_configuration.pin_horizontal_metal_layer,
@@ -61,16 +62,16 @@ def _extract_lef_and_liberty_impl(ctx):
         content.append("tapcell_tcl_path: \"{}\"".format(
             open_road_configuration.tapcell_tcl.short_path,
         ))
-        out_files.append(open_road_configuration.tapcell_tcl)
+        core_out_files.append(open_road_configuration.tapcell_tcl)
 
     if open_road_configuration.placement_padding_tcl:
         content.append("placement_padding_tcl_path: \"{}\"".format(
             open_road_configuration.placement_padding_tcl.short_path,
         ))
-        out_files.append(open_road_configuration.placement_padding_tcl)
+        core_out_files.append(open_road_configuration.placement_padding_tcl)
 
     content.append("pdn_config_path: \"{}\"".format(open_road_configuration.pdn_config.short_path))
-    out_files.append(open_road_configuration.pdn_config)
+    core_out_files.append(open_road_configuration.pdn_config)
 
     content.append("wire_rc_signal_metal_layer: \"{}\"".format(
         open_road_configuration.wire_rc_signal_metal_layer,
@@ -97,7 +98,7 @@ def _extract_lef_and_liberty_impl(ctx):
         content.append("rc_script_configuration_path: \"{}\"".format(
             open_road_configuration.rc_script_configuration.short_path,
         ))
-        out_files.append(open_road_configuration.rc_script_configuration)
+        core_out_files.append(open_road_configuration.rc_script_configuration)
 
     content.append("cts_buffer_cell: \"{}\"".format(open_road_configuration.cts_buffer_cell))
 
@@ -126,12 +127,17 @@ def _extract_lef_and_liberty_impl(ctx):
 
     pdk_info_textproto = ctx.actions.declare_file("{}_pdk_info.textproto".format(ctx.attr.name))
     ctx.actions.write(pdk_info_textproto, "\n".join(content))
-    out_files.append(pdk_info_textproto)
+    core_out_files.append(pdk_info_textproto)
 
-    return DefaultInfo(
-        files = depset(out_files),
-        runfiles = ctx.runfiles(files = out_files),
-    )
+    return [
+        DefaultInfo(
+            files = depset(core_out_files + corner_files),
+            runfiles = ctx.runfiles(files = core_out_files + corner_files),
+        ),
+        OutputGroupInfo(
+            default_corner_only = depset(core_out_files),
+        ),
+    ]
 
 extract_lef_and_liberty = rule(
     implementation = _extract_lef_and_liberty_impl,
