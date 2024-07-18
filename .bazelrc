@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+common --noexperimental_enable_bzlmod
+
 build --cxxopt "-std=c++17"
 build --cxxopt "-ffp-contract=off"
 build --host_cxxopt "-std=c++17"
