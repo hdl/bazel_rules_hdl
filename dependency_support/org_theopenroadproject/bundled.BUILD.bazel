@@ -1428,7 +1428,10 @@ cc_library(
     hdrs = glob(
         include = ["src/sta/include/sta/*.hh"],
     ) + [
+        "src/sta/util/MachineApple.cc",
         "src/sta/util/MachineLinux.cc",
+        "src/sta/util/MachineUnknown.cc",
+        "src/sta/util/MachineWin32.cc",
     ],
     copts = [
         "-fexceptions",
