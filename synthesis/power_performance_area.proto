@@ -57,16 +57,16 @@ message Area {
   optional float cell_utilization_fraction = 5;
 
   // Area only covered by combinationals.
-  optional float area_combinationals = 6;
+  optional float area_combinationals_um2 = 6;
 
   // Area only covered by buffers.
-  optional float area_buffers = 7;
+  optional float area_buffers_um2 = 7;
 
-  // Area only covered by timing_buffers.
-  optional float area_timing_buffers = 8;
+  // Area only covered by timing buffers.
+  optional float area_timing_buffers_um2 = 8;
 
   // Area only covered by sequentials.
-  optional float area_sequentials = 9;
+  optional float area_sequentials_um2 = 9;
 
   // The total number of standard cells used.
   // Invariance:
