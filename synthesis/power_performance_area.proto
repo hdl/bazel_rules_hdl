@@ -56,7 +56,17 @@ message Area {
   // A fraction of die_area_um2 used by cells. Range of [0..1]
   optional float cell_utilization_fraction = 5;
 
-  // Leaving out proto tags 6..9 for later use.
+  // Area only covered by combinationals.
+  optional float area_combinationals = 6;
+
+  // Area only covered by buffers.
+  optional float area_buffers = 7;
+
+  // Area only covered by timing_buffers.
+  optional float area_timing_buffers = 8;
+
+  // Area only covered by sequentials.
+  optional float area_sequentials = 9;
 
   // The total number of standard cells used.
   // Invariance:
