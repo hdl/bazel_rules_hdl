@@ -47,9 +47,6 @@ def correct_bison_env_for_action(env, bison):
         "{}/external/{}".format(bison.root.path, bison.owner.workspace_name),
     )
 
-    for key, value in bison_env.items():
-        bison_env[key] = value.replace(bison_runfiles_dir, actual)
-
     return bison_env
 
 def _genyacc_impl(ctx):
