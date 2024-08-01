@@ -26,7 +26,6 @@ ALL_TARGETS = [
   '//...',
   '@at_clifford_icestorm//...',
   '@at_clifford_yosys//...',
-  '@com_github_westes_flex//...',
   '@com_github_fmtlib_fmt//...',
   '@com_github_gabime_spdlog//...',
   '@com_github_libbacktrace//...',
