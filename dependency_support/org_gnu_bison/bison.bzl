@@ -38,7 +38,14 @@ def correct_bison_env_for_action(env, bison):
         bison.owner.workspace_name,
     )
 
-    actual = "external/{}".format(bison.owner.workspace_name)
+    bison_env["BISON_PKGDATADIR"] = bison_env["BISON_PKGDATADIR"].replace(
+        bison_runfiles_dir,
+        "external/{}".format(bison.owner.workspace_name),
+    )
+    bison_env["M4"] = bison_env["M4"].replace(
+        bison_runfiles_dir,
+        "{}/external/{}".format(bison.root.path, bison.owner.workspace_name),
+    )
 
     for key, value in bison_env.items():
         bison_env[key] = value.replace(bison_runfiles_dir, actual)
