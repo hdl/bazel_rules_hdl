@@ -16,6 +16,9 @@
 
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+load("@rules_bison//bison:bison.bzl", "bison_register_toolchains")
+load("@rules_flex//flex:flex.bzl", "flex_register_toolchains")
+load("@rules_m4//m4:m4.bzl", "m4_register_toolchains")
 load(
     "@rules_proto//proto:repositories.bzl",
     "rules_proto_dependencies",
@@ -62,3 +65,7 @@ def init(python_interpreter = None, python_interpreter_target = None):
     protobuf_deps()
 
     bazel_skylib_workspace()
+
+    m4_register_toolchains(version = "1.4.18")
+    bison_register_toolchains(version = "3.3.2")
+    flex_register_toolchains(version = "2.6.4")

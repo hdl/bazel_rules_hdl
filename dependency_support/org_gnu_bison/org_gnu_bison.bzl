@@ -20,12 +20,14 @@ load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 def org_gnu_bison():
     maybe(
         http_archive,
-        name = "org_gnu_bison",
-        urls = [
-            "http://ftp.acc.umu.se/mirror/gnu.org/gnu/bison/bison-3.5.tar.xz",
-            "http://ftp.gnu.org/gnu/bison/bison-3.5.tar.xz",
-        ],
-        strip_prefix = "bison-3.5",
-        sha256 = "55e4a023b1b4ad19095a5f8279f0dc048fa29f970759cea83224a6d5e7a3a641",
-        build_file = Label("@rules_hdl//dependency_support:org_gnu_bison/bundled.BUILD.bazel"),
+        name = "rules_m4",
+        sha256 = "10ce41f150ccfbfddc9d2394ee680eb984dc8a3dfea613afd013cfb22ea7445c",
+        urls = ["https://github.com/jmillikin/rules_m4/releases/download/v0.2.3/rules_m4-v0.2.3.tar.xz"],
+    )
+
+    maybe(
+        http_archive,
+        name = "rules_bison",
+        sha256 = "2279183430e438b2dc77cacd7b1dbb63438971b2411406570f1ddd920b7c9145",
+        urls = ["https://github.com/jmillikin/rules_bison/releases/download/v0.2.2/rules_bison-v0.2.2.tar.xz"],
     )

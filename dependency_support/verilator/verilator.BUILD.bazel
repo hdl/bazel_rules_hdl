@@ -184,31 +184,10 @@ verilator_flexfix(
 
 verilator_bisonpre(
     name = "verilator_bison",
-    srcs = [
-        "src/verilog.y",
-    ],
-    outs = [
-        "V3ParseBison.c",
-        "V3ParseBison.h",
-    ],
-    args = [
-        "--yacc",
-        "$(execpath @org_gnu_bison//:bison)",
-        "-d",
-        "-v",
-        "-o",
-        "$(execpath V3ParseBison.c)",
-        "$(execpath src/verilog.y)",
-    ],
+    yacc_src = "src/verilog.y",
+    out_src = "V3ParseBison.c",
+    out_hdr = "V3ParseBison.h",
     bisonpre = "src/bisonpre",
-    bison_data = "@org_gnu_bison//:bison_runtime_data",
-    env = {
-        "M4": "$(execpath @org_gnu_m4//:m4)",
-    },
-    tools = [
-        "@org_gnu_bison//:bison",
-        "@org_gnu_m4//:m4",
-    ],
 )
 
 cc_library(
@@ -272,7 +251,7 @@ cc_library(
     ],
     deps = [
         ":verilatedos",
-        "@com_github_westes_flex//:FlexLexer",
+        # "@com_github_westes_flex//:FlexLexer",
     ],
 )
 

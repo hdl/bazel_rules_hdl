@@ -50,10 +50,8 @@ ALL_TARGETS = [
   '@net_sourceforge_ngspice//...',
   '@net_zlib//...',
   '@org_fftw//...',
-  '@org_gnu_bison//...',
   '@org_gnu_glpk//...',
   '@org_gnu_gperf//...',
-  '@org_gnu_m4//...',
   '@org_gnu_readline//...',
   '@org_llvm_openmp//...',
   '@org_pcre_ftp//...',
@@ -65,7 +63,6 @@ ALL_TARGETS = [
   '@org_theopenroadproject_asap7sc6t_26//...',
   '@org_theopenroadproject_asap7sc7p5t_27//...',
   '@org_theopenroadproject_asap7sc7p5t_28//...',
-  '@rules_pkg//...',
   '@tk_tcl//...',
 ]
 
