@@ -72,7 +72,7 @@ def _genyacc_impl(ctx):
             bison = bison_toolchain.bison_tool.executable,
         ),
         arguments = [args],
-        inputs = ctx.files._bison_data + ctx.files.src,
+        inputs = ctx.files.src,
         tools = [bison_toolchain.all_files],
         outputs = outputs,
         mnemonic = "Yacc",
