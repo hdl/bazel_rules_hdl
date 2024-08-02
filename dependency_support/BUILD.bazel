@@ -26,6 +26,7 @@ package(
 
 compile_pip_requirements(
     name = "pip_requirements",
+    timeout = "moderate",
     src = "pip_requirements.in",
 )
 
