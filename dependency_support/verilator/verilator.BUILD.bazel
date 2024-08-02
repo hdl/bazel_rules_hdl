@@ -199,12 +199,12 @@ cc_library(
 
 current_flex_lexer_header(
     name = "current_flex_lexer_header",
-    out = "fles/src/FlexLexer.h"
+    out = "flex/src/FlexLexer.h"
 )
 
 cc_library(
     name = "FlexLexer",
-    srcs = [":fles/src/FlexLexer.h"],
+    srcs = [":flex/src/FlexLexer.h"],
     includes = ["flex/src"],
 )
 
