@@ -169,18 +169,3 @@ genlex(
     ],
     output_to_genfiles = True,
 )
-
-def _currrent_flex_lexer_header_impl(ctx):
-    flex_toolchain = ctx.toolchains["@rules_flex//flex:toolchain_type"].flex_toolchain
-
-    return [DefaultInfo(
-        files = depset([flex_toolchain.flex_lexer_h]),
-    )]
-
-current_flex_lexer_header = rule(
-    doc = "Access `FlexLexer.h` from the current toolchain.",
-    implementation = _currrent_flex_lexer_header_impl,
-    toolchains = [
-        "@rules_flex//flex:toolchain_type",
-    ],
-)

@@ -15,7 +15,7 @@
 
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("@rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex", "current_flex_lexer_header")
+load("@rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex")
 load(
     "@rules_hdl//dependency_support/verilator/private:verilator_utils.bzl",
     "verilator_astgen",
@@ -23,6 +23,7 @@ load(
     "verilator_build_template",
     "verilator_flexfix",
     "verilator_version",
+    "current_flex_lexer_header"
 )
 
 package(default_visibility = ["//visibility:private"])
@@ -198,11 +199,13 @@ cc_library(
 
 current_flex_lexer_header(
     name = "current_flex_lexer_header",
+    out = "fles/src/FlexLexer.h"
 )
 
 cc_library(
     name = "FlexLexer",
-    srcs = [":current_flex_lexer_header"],
+    srcs = [":fles/src/FlexLexer.h"],
+    includes = ["flex/src"],
 )
 
 # TODO(kkiningh): Verilator also supports multithreading, should we enable it?
