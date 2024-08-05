@@ -20,11 +20,7 @@ load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 def com_github_westes_flex():
     maybe(
         http_archive,
-        name = "com_github_westes_flex",
-        urls = [
-            "https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz",
-        ],
-        strip_prefix = "flex-2.6.4",
-        sha256 = "e87aae032bf07c26f85ac0ed3250998c37621d95f8bd748b31f15b33c45ee995",
-        build_file = Label("@rules_hdl//dependency_support:com_github_westes_flex/bundled.BUILD.bazel"),
+        name = "rules_flex",
+        sha256 = "8929fedc40909d19a4b42548d0785f796c7677dcef8b5d1600b415e5a4a7749f",
+        urls = ["https://github.com/jmillikin/rules_flex/releases/download/v0.2.1/rules_flex-v0.2.1.tar.xz"],
     )

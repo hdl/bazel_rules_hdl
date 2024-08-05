@@ -15,30 +15,44 @@
 """Build rule for generating C or C++ sources with Bison.
 """
 
-def locate_bison_data_root(files):
-    """Locate the GNU Bison runtime data directory based on a set of inputs
+def correct_bison_env_for_action(env, bison):
+    """Modify the Bison environment variables to work in an action that doesn't a have built bison runfiles directory.
 
-    This function assumes all files are located within the same directory.
+    The `bison_toolchain.bison_env` parameter assumes that Bison will provided via an executable attribute
+    and thus have built runfiles available to it. This is not the case for this action and any other actions
+    trying to use bison as a tool via the toolchain. This function transforms existing environment variables
+    to support running Bison as desired.
 
     Args:
-        files (list[File]): A list of files to use for locating Bison runtime data.
+        env (dict): The existing bison environment variables
+        bison (File): The Bison executable
 
     Returns:
-        str: The execpath of the data directory.
+        Dict: Environment variables required for running Bison.
     """
-    if not files:
-        fail("No bison data files provided")
+    bison_env = dict(env)
 
-    file = files[0]
+    # Convert the environment variables to non-runfiles forms
+    bison_runfiles_dir = "{}.runfiles/{}".format(
+        bison.path,
+        bison.owner.workspace_name,
+    )
 
-    parent, _, _ = file.path.partition("/data/")
-    if parent == file.path:
-        fail("Unable to locate data directory from: {}", file.owner)
+    bison_env["BISON_PKGDATADIR"] = bison_env["BISON_PKGDATADIR"].replace(
+        bison_runfiles_dir,
+        "external/{}".format(bison.owner.workspace_name),
+    )
+    bison_env["M4"] = bison_env["M4"].replace(
+        bison_runfiles_dir,
+        "{}/external/{}".format(bison.root.path, bison.owner.workspace_name),
+    )
 
-    return "{}/data".format(parent)
+    return bison_env
 
 def _genyacc_impl(ctx):
     """Implementation for genyacc rule."""
+
+    bison_toolchain = ctx.toolchains["@rules_bison//bison:toolchain_type"].bison_toolchain
 
     # Argument list
     args = ctx.actions.args()
@@ -56,14 +70,14 @@ def _genyacc_impl(ctx):
     ]
 
     ctx.actions.run(
-        executable = ctx.executable._bison,
-        env = {
-            "BISON_PKGDATADIR": locate_bison_data_root(ctx.files._bison_data),
-            "M4": ctx.executable._m4.path,
-        },
+        executable = bison_toolchain.bison_tool.executable,
+        env = correct_bison_env_for_action(
+            env = bison_toolchain.bison_env,
+            bison = bison_toolchain.bison_tool.executable,
+        ),
         arguments = [args],
-        inputs = ctx.files._bison_data + ctx.files.src,
-        tools = [ctx.executable._m4],
+        inputs = ctx.files.src,
+        tools = [bison_toolchain.all_files],
         outputs = outputs,
         mnemonic = "Yacc",
         progress_message = "Generating %s and %s from %s" %
@@ -104,20 +118,9 @@ genyacc = rule(
             allow_single_file = [".y", ".yy", ".yc", ".ypp", ".yxx"],
             doc = "The .y, .yy, or .yc source file for this rule",
         ),
-        "_bison": attr.label(
-            default = Label("@org_gnu_bison//:bison"),
-            executable = True,
-            cfg = "exec",
-        ),
-        "_bison_data": attr.label(
-            default = Label("@org_gnu_bison//:bison_runtime_data"),
-            allow_files = True,
-        ),
-        "_m4": attr.label(
-            default = Label("@org_gnu_m4//:m4"),
-            executable = True,
-            cfg = "exec",
-        ),
     },
+    toolchains = [
+        "@rules_bison//bison:toolchain_type",
+    ],
     output_to_genfiles = True,
 )
