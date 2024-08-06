@@ -39,6 +39,13 @@ test:ciremotebuild --build_metadata=VISIBILITY=PUBLIC
 test:ciremotebuild --remote_timeout=3600
 
 ###############################################################################
+## Incompatibility flags
+###############################################################################
+
+# https://github.com/bazelbuild/bazel/issues/8195
+build --incompatible_disallow_empty_glob=true
+
+###############################################################################
 ## User flags
 ###############################################################################
 # Optionally allow users to define custom flags when developing new features.

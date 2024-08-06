@@ -21,7 +21,6 @@ exports_files([
     "LICENSE",
 ] + glob([
     "ECP5/**/*",
-    "ECP5/*",
 ]))
 
 filegroup(

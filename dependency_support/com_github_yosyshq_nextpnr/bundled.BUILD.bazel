@@ -145,6 +145,7 @@ cc_binary(
             "tests/%s/*.h" % family,
         ],
         exclude = TEXTUAL_HDRS,
+        allow_empty = True,
     ),
     copts = COPTS,
     defines = DEFINES + [

@@ -25,6 +25,11 @@ def com_google_ortools():
         strip_prefix = "or-tools-9.7",
         urls = ["https://github.com/google/or-tools/archive/refs/tags/v9.7.tar.gz"],
         sha256 = "054d9517fc6c83f15150c93ef1c2c674ffd7d4a0d1fdc78f6ef8bc3e25c2e339",
+        patch_args = ["-p1"],
+        patches = [
+            # TODO: Newer versions of ortools should not need this patch
+            Label("//dependency_support/com_google_ortools:scip.patch"),
+        ],
     )
     maybe(
         new_git_repository,

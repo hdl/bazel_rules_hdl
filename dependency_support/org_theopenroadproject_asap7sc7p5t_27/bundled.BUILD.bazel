@@ -364,6 +364,7 @@ asap7_srams_files(
     name = "asap7-srams-sc7p5t_rev27",
     rev = "27",
     tracks = "7p5t",
+    has_gds = False,
 )
 
 # FIXME: Where is the 1x techlef?

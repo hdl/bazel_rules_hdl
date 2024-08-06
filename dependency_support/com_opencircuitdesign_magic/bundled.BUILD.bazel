@@ -105,7 +105,6 @@ cc_library(
         "plow/*.c",
         "resis/*.c",
         "router/*.c",
-        "scmos/*.c",
         "select/*.c",
         "sim/*.c",
         "textio/*.c",

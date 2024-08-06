@@ -118,7 +118,6 @@ cc_library(
             "ncurses/tinfo/*.c",
             "ncurses/trace/*.c",
             "ncurses/tty/*.c",
-            "build_sources/*.c",
         ],
         exclude = glob([
             "ncurses/base/lib_driver.c",
@@ -127,8 +126,6 @@ cc_library(
             "ncurses/tinfo/tinfo_driver.c",
             "ncurses/tinfo/make_hash.c",
             "ncurses/report_offsets.c",
-            "ncurses/*_test.c",
-            "build_sources/*_test.c",
         ]),
     ) + [
         # Generated files are not found by glob.

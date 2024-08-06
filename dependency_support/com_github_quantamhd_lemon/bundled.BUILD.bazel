@@ -35,9 +35,7 @@ genrule(
 
 cc_library(
     name = "lemon",
-    srcs = glob([
-        "lemon/*.c",
-    ]) + [
+    srcs = [
       "lemon/arg_parser.cc",
       "lemon/random.cc",
       "lemon/base.cc",
