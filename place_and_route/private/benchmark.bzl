@@ -73,10 +73,10 @@ def benchmark(ctx, open_road_info):
         ("}", "'')"),
         ("area_micro_meters_squared:", "'/Design area/ {{ print $3 }}')"),
         ("area_utilization_percentage:", "-F '[ %]' '/Design area/ {{ print $5 }}')"),
-        ("num_combinational_gates:", "'/combinational cells:/ {{ print $4 }}')"),
-        ("num_flops:", "'/Sequential cells:/ {{ print $3 }}')"),
-        ("num_buffers:", "'/Buffer/ {{ buffers=$2; exit }} END {{ print buffers }}')"),
-        ("num_timing_buffers:", "'/Timing Repair/ {{ print $4 }}')"),
+        ("num_combinational_gates:", "'/combinational cell/ {{ print 0 + $4 }}')"),
+        ("num_flops:", "'/Sequential cell/ {{ print 0 + $3 }}')"),
+        ("num_buffers:", "'/Buffer/ {{ buffer=$2; exit }} END {{ print 0 + buffers }}')"),
+        ("num_timing_buffers:", "'/Timing Repair/ {{ print 0 + $4 }}')"),
     ]
     cmds.extend([prefix + cmd + suffix.format(field = field, out = benchmark_path) for field, cmd in awk_cmds])
 
