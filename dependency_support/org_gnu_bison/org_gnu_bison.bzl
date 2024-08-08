@@ -30,4 +30,9 @@ def org_gnu_bison():
         name = "rules_bison",
         sha256 = "2279183430e438b2dc77cacd7b1dbb63438971b2411406570f1ddd920b7c9145",
         urls = ["https://github.com/jmillikin/rules_bison/releases/download/v0.2.2/rules_bison-v0.2.2.tar.xz"],
+        patch_args = ["-p1"],
+        patches = [
+            # TODO(https://github.com/jmillikin/rules_bison/pull/14): Delete after this PR is merged
+            Label("//dependency_support/org_gnu_bison:bison_empty_glob.patch"),
+        ],
     )

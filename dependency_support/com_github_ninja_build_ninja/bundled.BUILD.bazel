@@ -58,12 +58,3 @@ cc_binary(
     ],
     visibility = ["//visibility:public"],
 )
-
-# Expose prebuilt binaries for opensourced projects that require them to build.
-filegroup(
-    name = "ninja_binaries",
-    srcs = glob(["files/bin/**"]) + [
-        "README.md",
-    ],
-    visibility = ["//visibility:public"],
-)

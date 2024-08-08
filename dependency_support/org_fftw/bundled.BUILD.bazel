@@ -113,14 +113,11 @@ filegroup(
         [
             "api/*.c",
             "api/*.h",
-            "cell/*.c",
-            "cell/*.h",
             "dft/*.c",
             "dft/*.h",
             "dft/scalar/*.c",
             "dft/scalar/*.h",
             "dft/scalar/*/*.c",
-            "dft/scalar/*/*.h",
             "kernel/*.c",
             "kernel/*.h",
             "rdft/*.c",
@@ -128,7 +125,6 @@ filegroup(
             "rdft/scalar/*.c",
             "rdft/scalar/*.h",
             "rdft/scalar/*/*.c",
-            "rdft/scalar/*/*.h",
             "reodft/*.c",
             "reodft/*.h",
         ],
@@ -220,9 +216,7 @@ fftw_arch_copts = select({
 filegroup(
     name = "fftw_extra_simd_srcs",
     srcs = glob([
-        "dft/simd/*.c",
         "dft/simd/*.h",
-        "rdft/simd/*.c",
         "rdft/simd/*.h",
         "simd-support/*.c",
         "simd-support/*.h",

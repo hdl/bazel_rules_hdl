@@ -22,6 +22,9 @@ def org_theopenroadproject():
         new_git_repository,
         name = "org_theopenroadproject",
         commit = "f6da0454e350e93c62264f7b7c95029e1ad2b9fd",
+        # TODO: Convert to http_archive whenever there is an archive
+        # which contains submodules.
+        # https://github.com/dear-github/dear-github/issues/214
         init_submodules = True,
         remote = "https://github.com/The-OpenROAD-Project/OpenROAD.git",
         build_file = Label("@rules_hdl//dependency_support/org_theopenroadproject:bundled.BUILD.bazel"),

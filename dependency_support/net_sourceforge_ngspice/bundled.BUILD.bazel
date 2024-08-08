@@ -79,12 +79,15 @@ COPTS = ["-w"]
 
 [genrule(
     name = "%s_cmextrn_h" % subdir,
-    srcs = glob([
-        "src/xspice/icm/%s/modpath.lst" % subdir,
-        "src/xspice/icm/%s/udnpath.lst" % subdir,
-        "src/xspice/icm/%s/**/*.ifs" % subdir,
-        "src/xspice/icm/%s/**/*.c" % subdir,
-    ]),
+    srcs = glob(
+        [
+            "src/xspice/icm/%s/modpath.lst" % subdir,
+            "src/xspice/icm/%s/udnpath.lst" % subdir,
+            "src/xspice/icm/%s/**/*.ifs" % subdir,
+            "src/xspice/icm/%s/**/*.c" % subdir,
+        ],
+        allow_empty = True,
+    ),
     outs = [
         "src/xspice/icm/%s/cmextrn.h" % subdir,
         "src/xspice/icm/%s/cminfo.h" % subdir,
@@ -140,7 +143,6 @@ cc_library(
     name = "libngspice",
     srcs = glob([
         "src/**/*.c",
-        "src/spicelib/parser/inpptree-parser.c",
     ], exclude = [
         "**/test_*.c",
         "src/main.c",

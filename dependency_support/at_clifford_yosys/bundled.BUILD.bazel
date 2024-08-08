@@ -173,7 +173,6 @@ cc_library(
             "backends/**/*.h",
             "frontends/**/*.h",
             "passes/**/*.h",
-            "techlibs/**/*.h",
         ],
         exclude = [
             "backends/protobuf/*.h",
