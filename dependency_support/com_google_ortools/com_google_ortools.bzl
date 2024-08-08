@@ -22,23 +22,23 @@ def com_google_ortools():
     maybe(
         http_archive,
         name = "com_google_ortools",
-        strip_prefix = "or-tools-9.7",
-        urls = ["https://github.com/google/or-tools/archive/refs/tags/v9.7.tar.gz"],
-        sha256 = "054d9517fc6c83f15150c93ef1c2c674ffd7d4a0d1fdc78f6ef8bc3e25c2e339",
+        strip_prefix = "or-tools-9.10",
+        urls = ["https://github.com/google/or-tools/archive/refs/tags/v9.10.tar.gz"],
+        sha256 = "e7c27a832f3595d4ae1d7e53edae595d0347db55c82c309c8f24227e675fd378",
     )
     maybe(
         new_git_repository,
         name = "scip",
-        build_file = "@com_google_ortools//bazel:scip.BUILD",
-        patches = ["@com_google_ortools//bazel:scip.patch"],
+        build_file = "@com_google_ortools//bazel:scip.BUILD.bazel",
+        patches = ["@com_google_ortools//bazel:scip-v900.patch"],
         patch_args = ["-p1"],
-        tag = "v803",
+        tag = "v900",
         remote = "https://github.com/scipopt/scip.git",
     )
     maybe(
         http_archive,
         name = "bliss",
-        build_file = "@com_google_ortools//bazel:bliss.BUILD",
+        build_file = "@com_google_ortools//bazel:bliss.BUILD.bazel",
         patches = ["@com_google_ortools//bazel:bliss-0.73.patch"],
         sha256 = "f57bf32804140cad58b1240b804e0dbd68f7e6bf67eba8e0c0fa3a62fd7f0f84",
         url = "https://github.com/google/or-tools/releases/download/v9.0/bliss-0.73.zip",
