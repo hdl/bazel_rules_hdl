@@ -21,10 +21,10 @@ def net_zlib():
     maybe(
         http_archive,
         name = "net_zlib",
-        sha256 = "f5cc4ab910db99b2bdbba39ebbdc225ffc2aa04b4057bc2817f1b94b6978cfc3",
-        strip_prefix = "zlib-1.2.11",
+        sha256 = "72af66d44fcc14c22013b46b814d5d2514673dda3d115e64b690c1ad636e7b17",
+        strip_prefix = "zlib-1.3.1",
         urls = [
-            "https://github.com/madler/zlib/archive/v1.2.11.zip",
+            "https://github.com/madler/zlib/archive/v1.3.1.zip",
         ],
         build_file = "@rules_hdl//dependency_support/net_zlib:bundled.BUILD.bazel",
     )
