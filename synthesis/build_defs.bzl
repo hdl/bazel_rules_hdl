@@ -137,6 +137,9 @@ def _synthesize_design_impl(ctx):
         for dont_use_pattern in or_config.do_not_use_cell_list:
             dont_use_args += " -dont_use {} ".format(dont_use_pattern)
 
+    if ctx.attr.verilog_defines:
+        for define in ctx.attr.verilog_defines:
+            args.add(define)
     script_env_files = {
         "ABC_SCRIPT": abc_script,
         "ADDITIONAL_LIBERTIES": additional_liberty_files,
@@ -342,6 +345,9 @@ synthesize_rtl = rule(
         ),
         "top_module": attr.string(
             default = "top",
+        ),
+        "verilog_defines": attr.string_list(
+            doc = "Verilog defines to pass to the synthesis tool.",
         ),
         "yosys_tool": attr.label(
             default = Label("@at_clifford_yosys//:yosys"),
