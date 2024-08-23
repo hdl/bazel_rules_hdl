@@ -184,7 +184,7 @@ def _synthesize_design_impl(ctx):
             env[k] = v
 
     ctx.actions.run(
-        outputs = [output_file, log_file],
+        outputs = [output_file, log_file, standard_cell_black_box],
         inputs = inputs,
         arguments = [args],
         executable = ctx.executable.yosys_tool,

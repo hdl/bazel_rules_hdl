@@ -27,6 +27,7 @@ set srcs_flist_path $::env(FLIST)
 set srcs_flist_file [open $srcs_flist_path "r"]
 set srcs_flist_data [read $srcs_flist_file]
 set srcs [split $srcs_flist_data "\n"]
+set srcs [linsert $srcs 0 $::env(STANDARD_CELL_BLACK_BOX)]
 puts $srcs
 foreach src $srcs {
     # Skip empty lines, including the implict one after the last \n delimiter
