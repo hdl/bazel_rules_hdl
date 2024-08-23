@@ -137,6 +137,11 @@ def _synthesize_design_impl(ctx):
         for dont_use_pattern in or_config.do_not_use_cell_list:
             dont_use_args += " -dont_use {} ".format(dont_use_pattern)
 
+    if ctx.attr.verilog_defines:
+        for define in ctx.attr.verilog_defines:
+            args.add(define)
+
+    standard_cell_black_box = ctx.actions.declare_file("{}_stdcells_blackbox.v".format(ctx.attr.name))
     script_env_files = {
         "ABC_SCRIPT": abc_script,
         "ADDITIONAL_LIBERTIES": additional_liberty_files,
@@ -145,6 +150,7 @@ def _synthesize_design_impl(ctx):
         "FLIST": verilog_flist,
         "LIBERTY": default_liberty_file,
         "OUTPUT": output_file,
+        "STANDARD_CELL_BLACK_BOX": standard_cell_black_box,
         "TOP": ctx.attr.top_module,
         "UHDM_FLIST": uhdm_flist,
     }
@@ -178,7 +184,7 @@ def _synthesize_design_impl(ctx):
             env[k] = v
 
     ctx.actions.run(
-        outputs = [output_file, log_file],
+        outputs = [output_file, log_file, standard_cell_black_box],
         inputs = inputs,
         arguments = [args],
         executable = ctx.executable.yosys_tool,
@@ -342,6 +348,9 @@ synthesize_rtl = rule(
         ),
         "top_module": attr.string(
             default = "top",
+        ),
+        "verilog_defines": attr.string_list(
+            doc = "Verilog defines to pass to the synthesis tool.",
         ),
         "yosys_tool": attr.label(
             default = Label("@at_clifford_yosys//:yosys"),
