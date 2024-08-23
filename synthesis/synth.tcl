@@ -12,6 +12,16 @@
 
 yosys -import
 
+set all_liberties [split $::env(ADDITIONAL_LIBERTIES) ","]
+lappend all_liberties $::env(LIBERTY)
+
+# create liberty blackbox so cells can be manually created.
+foreach lib $all_liberties {
+  read_liberty -lib -overwrite $lib
+}
+
+write_verilog -blackboxes $::env(STANDARD_CELL_BLACK_BOX)
+
 # read design
 set srcs_flist_path $::env(FLIST)
 set srcs_flist_file [open $srcs_flist_path "r"]

@@ -140,6 +140,8 @@ def _synthesize_design_impl(ctx):
     if ctx.attr.verilog_defines:
         for define in ctx.attr.verilog_defines:
             args.add(define)
+
+    standard_cell_black_box = ctx.actions.declare_file("{}_stdcells_blackbox.v".format(ctx.attr.name))
     script_env_files = {
         "ABC_SCRIPT": abc_script,
         "ADDITIONAL_LIBERTIES": additional_liberty_files,
@@ -150,6 +152,7 @@ def _synthesize_design_impl(ctx):
         "OUTPUT": output_file,
         "TOP": ctx.attr.top_module,
         "UHDM_FLIST": uhdm_flist,
+        "STANDARD_CELL_BLACK_BOX": standard_cell_black_box,
     }
 
     if ctx.attr.target_clock_period_pico_seconds:
