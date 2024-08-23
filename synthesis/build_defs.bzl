@@ -150,9 +150,9 @@ def _synthesize_design_impl(ctx):
         "FLIST": verilog_flist,
         "LIBERTY": default_liberty_file,
         "OUTPUT": output_file,
+        "STANDARD_CELL_BLACK_BOX": standard_cell_black_box,
         "TOP": ctx.attr.top_module,
         "UHDM_FLIST": uhdm_flist,
-        "STANDARD_CELL_BLACK_BOX": standard_cell_black_box,
     }
 
     if ctx.attr.target_clock_period_pico_seconds:
