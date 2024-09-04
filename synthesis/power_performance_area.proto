@@ -118,15 +118,29 @@ message Performance {
   // Approximate invariant:
   //   clock_period_ps - critical_path_ps = setup_wns_ps
 
-  // If negative, not enough time to have data ready for DFF to take data, i.e.
-  // the combinational path that exceeds that time the most.
+  // A negative value indicates that the data is not available in time at the
+  // endpoint to properly sample the value. A zero value indicates
+  // that timing is met - positive values are atypical but can be used to report
+  // margin. These values are the worst of in2reg, reg2reg, reg2out, and in2out.
   optional sint32 setup_wns_ps = 3;
   optional sint64 setup_tns_ps = 4;
 
-  // If negative, new data arrives too early for the DFF to ingest
-  // the previous one reliably.
+  // A negative value indicates that new data arrives too early for the
+  // endpoint to properly sample the previous value. A zero value indicates
+  // that timing is met - positive values are atypical but can be used to report
+  // margin. These values are the worst of in2reg, reg2reg, reg2out, and in2out.
   optional sint32 hold_wns_ps = 5;
   optional sint64 hold_tns_ps = 6;
+
+  // Additional timing breakdowns for each timing path category.
+  // Paths of primary top-level inputs to their first inner block registers.
+  optional TimingBreakdown in2reg = 20;
+  // Paths of inner block registers to inner block registers.
+  optional TimingBreakdown reg2reg = 21;
+  // Paths of final inner block registers to block primary top-level outputs.
+  optional TimingBreakdown reg2out = 22;
+  // Paths of primary top-level inputs to outputs that do not contain registers.
+  optional TimingBreakdown in2out = 23;
 
   // How far off the clock is between two different parts of the chip.
   optional sint32 clock_skew_ps = 7;
@@ -145,6 +159,15 @@ message Performance {
 
   // Number of cells in the critical path based on timing if available.
   optional int32 critical_path_cells = 16;
+}
+
+message TimingBreakdown {
+  // See `setup_wns_ps` and `setup_tns_ps` descriptions for details.
+  optional sint32 setup_wns_ps = 1;
+  optional sint64 setup_tns_ps = 2;
+  // See `hold_wns_ps` and `hold_tns_ps` descriptions for details.
+  optional sint32 hold_wns_ps = 3;
+  optional sint64 hold_tns_ps = 4;
 }
 
 message Power {
