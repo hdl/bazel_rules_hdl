@@ -9,6 +9,9 @@ In your `WORKSPACE` file. Which is a file at the top directory of every bazel
 repo:
 
 ```starlark
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+
 # You don't need these variables, but are useful for configurability.
 # Feel free to hardcode these values in the maybe http_archive below.
 rules_hdl_git_hash = "{LATEST_HASH}"
