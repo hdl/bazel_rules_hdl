@@ -58,27 +58,48 @@ def benchmark(ctx, open_road_info):
     benchmark_path = benchmark_report.path
 
     cmds = [
-        "echo \"# proto-file: synthesis/performance_power_area.proto\" >> {out};".format(out = benchmark_path),
-        "echo \"# proto-message: hdl.ppa.PerformancePowerAreaProto\n\" >> {out};".format(out = benchmark_path),
+        "echo \"# proto-file: synthesis/power_performance_area.proto\" >> {out};".format(out = benchmark_path),
+        "echo \"# proto-message: hdl.ppa.PowerPerformanceAreaProto\n\" >> {out};".format(out = benchmark_path),
     ]
-    prefix = "metric=$(cat {log} | awk ".format(log = command_output.log_file.path)
-    suffix = "; echo \"{field} $metric\" >> {out};"
     awk_cmds = [
-        ("worst_slack_max:", "'/wns/ {{ print $2 }}')"),
-        ("total_negative_slack_max:", "'/tns/ {{ print $2 }}')"),
-        ("power_total {", "'')"),
-        ("  internal_package_watts:", "'/^Total / {{ intern_power=$2 }} END {{ print intern_power }}')"),
-        ("  switching_package_watts:", "'/^Total / {{ switch_power=$3 }} END {{ print switch_power }}')"),
-        ("  total_package_watts:", "'/^Total / {{ total_power=$5 }} END {{ print total_power }}')"),
-        ("}", "'')"),
-        ("area_micro_meters_squared:", "'/Design area/ {{ print $3 }}')"),
-        ("area_utilization_percentage:", "-F '[ %]' '/Design area/ {{ print $5 }}')"),
-        ("num_combinational_gates:", "'/combinational cell/ {{ print 0 + $4 }}')"),
-        ("num_flops:", "'/Sequential cell/ {{ print 0 + $3 }}')"),
-        ("num_buffers:", "'/Buffer/ {{ buffer=$2; exit }} END {{ print 0 + buffers }}')"),
-        ("num_timing_buffers:", "'/Timing Repair/ {{ print 0 + $4 }}')"),
+        "area=$(cat {log} | awk '/Design area/ {{ print $3 }}');",
+        "util=$(cat {log} | awk -F '[ %]' '/Design area/ {{ print $5 }}');",
+        "combos=$(cat {log} | awk '/combinational cell/ {{ print 0 + $4 }}');",
+        "flops=$(cat {log} | awk '/Sequential cell/ {{ print 0 + $3 }}');",
+        "buffs=$(cat {log} | awk '/Buffer/ {{ buffer=$2; exit }} END {{ print 0 + buffers }}');",
+        "tbuffs=$(cat {log} | awk '/Timing Repair/ {{ print 0 + $4 }}');",
+        "wns=$(cat {log} | awk '/wns/ {{ print $2 }}');",
+        "tns=$(cat {log} | awk '/tns/ {{ print $2 }}');",
+        "tot_pow=$(cat {log} | awk '/^Total / {{ total_power=$5 }} END {{ print total_power }}');",
+        "int_pow=$(cat {log} | awk '/^Total / {{ intern_power=$2 }} END {{ print intern_power }}');",
+        "swi_pow=$(cat {log} | awk '/^Total / {{ switch_power=$3 }} END {{ print switch_power }}');",
     ]
-    cmds.extend([prefix + cmd + suffix.format(field = field, out = benchmark_path) for field, cmd in awk_cmds])
+    cmds.extend([cmd.format(log = command_output.log_file.path) for cmd in awk_cmds])
+    textproto = proto.encode_text(
+        struct(
+            area = struct(
+                cell_area_um2 = "$area",
+                cell_utilization_fraction = "$util",
+                num_total_cells = "$(($combos + $flops + $buffs + $tbuffs))",
+                num_sequential = "$flops",
+                num_combinational = "$combos",
+                num_buffers = "$buffs",
+                num_timing_buffers = "$tbuffs",
+            ),
+            performance = struct(
+                setup_wns_ps = "$(printf %.0f $(bc<<<$wns*1000))",
+                setup_tns_ps = "$(printf %.0f $(bc<<<$tns*1000))",
+            ),
+            power = struct(
+                total = struct(
+                    internal_watts = "$int_pow",
+                    switching_watts = "$swi_pow",
+                    total_watts = "$tot_pow",
+                ),
+            ),
+        ),
+    )
+    cmds.append("echo \"{textproto}\" >> {out}".format(textproto = textproto, out = benchmark_path))
 
     ctx.actions.run_shell(
         outputs = [benchmark_report],
