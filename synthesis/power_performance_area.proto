@@ -136,7 +136,7 @@ message Performance {
   optional TimingBreakdown in2reg = 20;
   optional TimingBreakdown reg2reg = 21;
   optional TimingBreakdown reg2out = 22;
-  optional TimingBreakdown in2out = 22;
+  optional TimingBreakdown in2out = 23;
 
   // How far off the clock is between two different parts of the chip.
   optional sint32 clock_skew_ps = 7;
