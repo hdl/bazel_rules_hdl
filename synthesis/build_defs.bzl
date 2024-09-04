@@ -230,18 +230,27 @@ def _benchmark_synth(ctx, synth_log_file):
     cat = "zcat" if ("log.gz" in synth_log_file.path) else "cat"
 
     cmds = [
-        "echo \"# proto-file: synthesis/performance_power_area.proto\" >> {out};".format(out = benchmark_path),
-        "echo \"# proto-message: hdl.ppa.PerformancePowerAreaProto\n\" >> {out};".format(out = benchmark_path),
+        "echo \"# proto-file: synthesis/power_performance_area.proto\" >> {out};".format(out = benchmark_path),
+        "echo \"# proto-message: hdl.ppa.PowerPerformanceAreaProto\n\" >> {out};".format(out = benchmark_path),
     ]
-    prefix = "metric=$({cat} {log} | awk ".format(cat = cat, log = synth_log_file.path)
-    suffix = "; echo \"{field} $metric\" >> {out};"
     awk_cmds = [
-        ("area_micro_meters_squared:", "'/Chip area for/ {{ print $6 }}')"),
-        ("num_total_cells:", "'/Number of cells/ {{ cells = $4 }} END {{print cells}}')"),
-        ("num_flops:", "'/Flop count:/ {{ print $3 }}')"),
-        ("longest_topological_path:", "-F '[=)]' '/Longest topological path/ {{ print $2}}')"),
+        "area=$({cat} {log} | awk '/Chip area for/ {{ print $6; }}');",
+        "cells=$({cat} {log} | tac | awk '/Number of cells/ {{ print $4; exit }}');",
+        "flops=$({cat} {log} | awk '/Flop count:/ {{ print $3 }}');",
+        "ltp=$({cat} {log} | awk -F '[=)]' '/Longest topological path/ {{ print $2}}');",
     ]
-    cmds.extend([prefix + cmd + suffix.format(field = field, out = benchmark_path) for field, cmd in awk_cmds])
+    cmds.extend([cmd.format(cat = cat, log = synth_log_file.path) for cmd in awk_cmds])
+    textproto = proto.encode_text(
+        struct(
+            area = struct(
+                cell_area_um2 = "$area",
+                num_total_cells = "$cells",
+                num_sequential = "$flops",
+            ),
+            performance = struct(longest_topological_path = "$ltp"),
+        ),
+    )
+    cmds.append("echo \"{textproto}\" >> {out}".format(textproto = textproto, out = benchmark_path))
 
     ctx.actions.run_shell(
         outputs = [benchmark_file],
