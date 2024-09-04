@@ -132,10 +132,14 @@ message Performance {
   optional sint32 hold_wns_ps = 5;
   optional sint64 hold_tns_ps = 6;
 
-  // Additional timing breakdowns for in2reg, reg2reg, reg2out, and in2out.
+  // Additional timing breakdowns for each timing path category.
+  // Paths of primary top-level inputs to their first inner block registers.
   optional TimingBreakdown in2reg = 20;
+  // Paths of inner block registers to inner block registers.
   optional TimingBreakdown reg2reg = 21;
+  // Paths of final inner block registers to block primary top-level outputs.
   optional TimingBreakdown reg2out = 22;
+  // Paths of primary top-level inputs to outputs that do not contain registers.
   optional TimingBreakdown in2out = 23;
 
   // How far off the clock is between two different parts of the chip.
