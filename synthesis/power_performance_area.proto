@@ -165,9 +165,11 @@ message TimingBreakdown {
   // See `setup_wns_ps` and `setup_tns_ps` descriptions for details.
   optional sint32 setup_wns_ps = 1;
   optional sint64 setup_tns_ps = 2;
+  optional int32 num_setup_violations = 5;
   // See `hold_wns_ps` and `hold_tns_ps` descriptions for details.
   optional sint32 hold_wns_ps = 3;
   optional sint64 hold_tns_ps = 4;
+  optional int32 num_hold_violations = 6;
 }
 
 message Power {
