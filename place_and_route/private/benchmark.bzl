@@ -67,7 +67,7 @@ def benchmark(ctx, open_road_info):
         "combos=$(cat {log} | awk '/combinational cell/ {{ print 0 + $4 }}');",
         "flops=$(cat {log} | awk '/Sequential cell/ {{ print 0 + $3 }}');",
         "buffs=$(cat {log} | awk '/Buffer/ {{ buffer=$2; exit }} END {{ print 0 + buffers }}');",
-        "tbuffs=$(cat {log} | awk '/Timing Repair/ {{ print 0 + $4 }}');",
+        "tbuffs=$(cat {log} | awk '/Timing Repair Buffer/ {{ print 0 + $4 }}');",
         "wns=$(cat {log} | awk '/wns/ {{ print $2 }}');",
         "tns=$(cat {log} | awk '/tns/ {{ print $2 }}');",
         "tot_pow=$(cat {log} | awk '/^Total / {{ total_power=$5 }} END {{ print total_power }}');",
