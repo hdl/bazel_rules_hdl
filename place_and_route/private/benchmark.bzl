@@ -59,7 +59,7 @@ def benchmark(ctx, open_road_info):
     benchmark_path = benchmark_report.path
 
     cmds = [
-        "echo \"# proto-file: third_party/bazel_rules_hdl/synthesis/power_performance_area.proto\" >> {out};".format(out = benchmark_path),
+        "echo \"# proto-file: synthesis/power_performance_area.proto\" >> {out};".format(out = benchmark_path),
         "echo \"# proto-message: hdl.ppa.PowerPerformanceAreaProto\n\" >> {out};".format(out = benchmark_path),
     ]
     awk_cmds = [
