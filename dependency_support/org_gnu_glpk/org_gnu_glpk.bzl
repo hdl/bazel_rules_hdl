@@ -23,6 +23,7 @@ def org_gnu_glpk():
         name = "org_gnu_glpk",
         urls = [
             "http://ftp.gnu.org/gnu/glpk/glpk-4.47.tar.gz",
+            "http://mirrors.kernel.org/gnu/glpk/glpk-4.47.tar.gz",
         ],
         strip_prefix = "glpk-4.47",
         sha256 = "c35438e3ba74a8d85236810e6b84879272c87cfa7473b4075201e2967839f48d",
