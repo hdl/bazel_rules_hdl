@@ -51,7 +51,7 @@ def clock_tree_synthesis(ctx, open_road_info):
         "estimate_parasitics -placement",
     ] + placement_padding_struct.commands + [
         "detailed_placement",
-        "repair_timing",
+        "repair_timing -repair_tns 100",
         "report_checks -path_delay min_max -format full_clock_expanded -fields {input_pin slew capacitance} -digits 3",
         "detailed_placement",
         "filler_placement \"{filler_cells}\"".format(
