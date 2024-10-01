@@ -19,10 +19,11 @@ load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 def com_google_absl():
     maybe(
-        git_repository,
+        http_archive,
         name = "com_google_absl",
-        tag = "20230125.3",
-        patches = ["@com_google_ortools//patches:abseil-cpp-20230125.3.patch"],
+        urls = ["https://github.com/abseil/abseil-cpp/archive/refs/tags/20240116.2.tar.gz"],
+        strip_prefix = "abseil-cpp-20240116.2",
+        sha256 = "733726b8c3a6d39a4120d7e45ea8b41a434cdacde401cba500f14236c49b39dc",
+        patches = ["@com_google_ortools//patches:abseil-cpp-20240116.2.patch"],
         patch_args = ["-p1"],
-        remote = "https://github.com/abseil/abseil-cpp.git",
     )
