@@ -29,33 +29,33 @@ def com_google_ortools():
     maybe(
         new_git_repository,
         name = "scip",
-        build_file = "@com_google_ortools//bazel:scip.BUILD",
-        patches = ["@com_google_ortools//bazel:scip.patch"],
+        build_file = "@com_google_ortools//bazel:scip.BUILD.bazel",
+        patches = ["@com_google_ortools//bazel:scip-v900.patch"],
         patch_args = ["-p1"],
-        tag = "v803",
+        tag = "v900",
         remote = "https://github.com/scipopt/scip.git",
     )
     maybe(
         http_archive,
         name = "bliss",
-        build_file = "@com_google_ortools//bazel:bliss.BUILD",
+        build_file = "@com_google_ortools//bazel:bliss.BUILD.bazel",
         patches = ["@com_google_ortools//bazel:bliss-0.73.patch"],
         sha256 = "f57bf32804140cad58b1240b804e0dbd68f7e6bf67eba8e0c0fa3a62fd7f0f84",
         url = "https://github.com/google/or-tools/releases/download/v9.0/bliss-0.73.zip",
         #url = "http://www.tcs.hut.fi/Software/bliss/bliss-0.73.zip",
     )
     maybe(
-        http_archive,
+        new_git_repository,
         name = "eigen",
-        sha256 = "37f0a3859e42112b0b4ea4e7ba2e8167159cbb00dc6cf03cf46b877e360e6dfd",
-        strip_prefix = "eigen-454f89af9d6f3525b1df5f9ef9c86df58bf2d4d3",
-        url = "https://gitlab.com/libeigen/eigen/-/archive/454f89af9d6f3525b1df5f9ef9c86df58bf2d4d3/eigen-454f89af9d6f3525b1df5f9ef9c86df58bf2d4d3.tar.gz",
+        tag = "3.4.0",
+        remote = "https://gitlab.com/libeigen/eigen.git",
         build_file_content = """
 cc_library(
     name = 'eigen3',
     srcs = [],
     includes = ['.'],
     hdrs = glob(['Eigen/**']),
+    defines = ["EIGEN_MPL2_ONLY",],
     visibility = ['//visibility:public'],
 )
 """,
