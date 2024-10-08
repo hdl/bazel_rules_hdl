@@ -28,8 +28,12 @@ def benchmark(ctx, open_road_info):
 
     """
 
+    est_parasitic_cmd = "estimate_parasitics -placement"
+    if ctx.attr.stop_after_step in ["global_routing", "detailed_routing"]:
+        est_parasitic_cmd = "estimate_parasitics -global_routing"
+
     open_road_commands = [
-        "report_power",
+        est_parasitic_cmd,
         "report_wns",
         "report_tns",
         "report_checks -path_delay min_max -format full_clock_expanded -fields {input_pin slew capacitance} -digits 3",
