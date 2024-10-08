@@ -34,6 +34,7 @@ def benchmark(ctx, open_road_info):
 
     open_road_commands = [
         est_parasitic_cmd,
+        "report_power",
         "report_wns",
         "report_tns",
         "report_checks -path_delay min_max -format full_clock_expanded -fields {input_pin slew capacitance} -digits 3",
