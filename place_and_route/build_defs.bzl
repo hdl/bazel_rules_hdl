@@ -111,7 +111,14 @@ place_and_route = rule(
             doc = "Whether to run detailed routing on a remote executor. If the detailed routing exceeds 15 minutes flip this setting.",
         ),
         "min_pin_distance": attr.string(
-            doc = "The minimum distance in microns between pins around the outside of the block.",
+            doc = "The minimum distance in microns, or tracks if `set_min_distance_in_tracks` is true, between pins around the outside of the block.",
+        ),
+        "corner_avoidance": attr.string(
+            doc = "The distance (in microns) from each corner within which pin placement should be avoided.",
+        ),
+        "set_min_distance_in_tracks": attr.bool(
+            default = False,
+            doc = "Change the units of `min_pin_distance` in tracks instead of microns",
         ),
         "pin_placement_script": attr.label(
             allow_single_file = [".tcl"],

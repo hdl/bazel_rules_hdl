@@ -50,10 +50,12 @@ def place_pins(ctx, open_road_info):
 
     open_road_commands = [
         "source {}".format(ctx.file.pin_placement_script.path) if ctx.file.pin_placement_script else "",
-        "place_pins -hor_layers {hor_layers} -ver_layers {ver_layers} {min_pin_distance}".format(
+        "place_pins -hor_layers {hor_layers} -ver_layers {ver_layers} {min_pin_distance} {set_min_distance_in_tracks} {corner_avoidance}".format(
             hor_layers = open_road_configuration.pin_horizontal_metal_layer,
             ver_layers = open_road_configuration.pin_vertical_metal_layer,
             min_pin_distance = "-min_distance {}".format(ctx.attr.min_pin_distance) if ctx.attr.min_pin_distance else "",
+            set_min_distance_in_tracks = "-min_distance_in_tracks" if ctx.attr.set_min_distance_in_tracks else "",
+            corner_avoidance = "-corner_avoidance {}".format(ctx.attr.corner_avoidance) if ctx.attr.corner_avoidance else "",
         ),
         tapcell_command,
     ]

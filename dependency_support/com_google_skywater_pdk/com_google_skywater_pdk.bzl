@@ -48,7 +48,7 @@ def com_google_skywater_pdk():
             new_git_repository,
             name = workspace_name,
             commit = library["commit"],
-            remote = "https://foss-eda-tools.googlesource.com/skywater-pdk/libs/%s.git" % library_name,
+            remote = "https://github.com/google/skywater-pdk-libs-%s.git" % library_name,
             shallow_since = library["shallow_since"],
             build_file_content = _build_file(workspace_name, library_name),
             patches = library.get("patches", []),
