@@ -194,6 +194,10 @@ message Power {
 
   // Clock tree
   optional PowerBreakdown clock = 6;
+
+  // Description of the method used to estimate power, e.g. probabilistic
+  // switching or a vector power analysis.
+  optional string estimation_method = 7;
 }
 
 message PowerBreakdown {

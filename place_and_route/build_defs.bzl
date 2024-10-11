@@ -124,6 +124,10 @@ place_and_route = rule(
             default = "0.69",
             doc = "When performing global placement this is how densely our cells should be packaged on the die parameter is (0-1]",
         ),
+        "power_switching_activity": attr.string(
+            doc = "Assumed input switching activity fraction [0.0-1.0] for probabistic power estimation.",
+            default = "0.5",
+        ),
         "qt_qpa_platform": attr.string(
             default = "minimal",
             doc = "The qt platform to use with OpenROAD.",
