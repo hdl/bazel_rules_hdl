@@ -68,7 +68,7 @@ foreach layer_adjustment {global_routing_layer_adjustments} {{
         "report_check_types -max_slew -max_capacitance -max_fanout -violators",
         "report_floating_nets -verbose",
         "report_units",
-        "set_power_activity -input -activity 1 -duty 0.5",
+        "set_power_activity -input -activity {} -duty 0.5".format(ctx.attr.power_switching_activity),
     ]
     open_road_commands.extend(generate_power_results(ctx, general_routing_power_results))
     open_road_commands.extend(generate_area_results(general_routing_area_results))

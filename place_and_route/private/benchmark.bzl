@@ -34,6 +34,7 @@ def benchmark(ctx, open_road_info):
 
     open_road_commands = [
         est_parasitic_cmd,
+        "set_power_activity -input -activity {} -duty 0.5".format(ctx.attr.power_switching_activity),
         "report_power",
         "report_wns",
         "report_tns",
@@ -85,6 +86,7 @@ def benchmark(ctx, open_road_info):
         "cpl=$(cat {log} | awk '/period_min/ {{ cpl=$4; exit }} END {{ print cpl }}');",
         "tot_pow=$(cat {log} | awk '/^Total / {{ total_power=$5 }} END {{ print total_power }}');",
         "int_pow=$(cat {log} | awk '/^Total / {{ intern_power=$2 }} END {{ print intern_power }}');",
+        "leak_pow=$(cat {log} | awk '/^Total / {{ leak_power=$4 }} END {{ print leak_power }}');",
         "swi_pow=$(cat {log} | awk '/^Total / {{ switch_power=$3 }} END {{ print switch_power }}');",
     ]
     cmds.extend([cmd.format(log = command_output.log_file.path) for cmd in awk_cmds])
@@ -115,7 +117,9 @@ def benchmark(ctx, open_road_info):
                 total = struct(
                     internal_watts = "$int_pow",
                     switching_watts = "$swi_pow",
+                    leakage_watts = "$leak_pow",
                     total_watts = "$tot_pow",
+                    estimation_method = "{} probabilistic switching fraction".format(ctx.attr.power_switching_activity),
                 ),
             ),
         ),
