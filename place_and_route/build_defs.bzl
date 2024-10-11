@@ -93,6 +93,9 @@ place_and_route = rule(
         "core_padding_microns": attr.int(
             mandatory = True,
         ),
+        "corner_avoidance": attr.string(
+            doc = "The distance (in microns) from each corner within which pin placement should be avoided.",
+        ),
         "create_die_shot": attr.bool(
             default = False,
             doc = "Exports a die shot image of the design. This requires qt support.",
@@ -113,13 +116,6 @@ place_and_route = rule(
         "min_pin_distance": attr.string(
             doc = "The minimum distance in microns, or tracks if `set_min_distance_in_tracks` is true, between pins around the outside of the block.",
         ),
-        "corner_avoidance": attr.string(
-            doc = "The distance (in microns) from each corner within which pin placement should be avoided.",
-        ),
-        "set_min_distance_in_tracks": attr.bool(
-            default = False,
-            doc = "Change the units of `min_pin_distance` in tracks instead of microns",
-        ),
         "pin_placement_script": attr.label(
             allow_single_file = [".tcl"],
             doc = "See https://openroad.readthedocs.io/en/latest/main/src/ppl/README.html for syntax",
@@ -134,6 +130,10 @@ place_and_route = rule(
         ),
         "sdc": attr.label(
             allow_single_file = True,
+        ),
+        "set_min_distance_in_tracks": attr.bool(
+            default = False,
+            doc = "Change the units of `min_pin_distance` in tracks instead of microns",
         ),
         "sink_clustering_max_diameter": attr.int(
             doc = "Clock tree synthesis sink group desired diamater in microns",
