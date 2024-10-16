@@ -119,8 +119,8 @@ def benchmark(ctx, open_road_info):
                     switching_watts = "$swi_pow",
                     leakage_watts = "$leak_pow",
                     total_watts = "$tot_pow",
-                    estimation_method = "{} probabilistic switching fraction".format(ctx.attr.power_switching_activity),
                 ),
+                estimation_method = "\"{} probabilistic switching fraction\"".format(ctx.attr.power_switching_activity),
             ),
         ),
     )
