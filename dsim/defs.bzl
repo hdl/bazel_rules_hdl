@@ -61,6 +61,18 @@ def _dsim_run(ctx):
 
     inputs = [ctx.file.dsim_env] + verilog_files + all_hdrs
     outputs = [dsim_log] + ctx.outputs.outs
+    generated_files = [dsim_log]
+
+    # Coverage file
+    if ctx.attr.enable_code_coverage:
+        dsim_cov = ctx.actions.declare_file("{}.db".format(ctx.label.name))
+        command += " -cov-db " + dsim_cov.path
+        if ctx.attr.code_coverage_type in ["toggle", "all"]:
+            command += " +acc+b "
+        command += " -code-cov " + ctx.attr.code_coverage_type
+        outputs.append(dsim_cov)
+        generated_files.append(dsim_cov)
+
 
     ctx.actions.run_shell(
         outputs = outputs,
@@ -71,7 +83,7 @@ def _dsim_run(ctx):
 
     return [
         DefaultInfo(
-            files = depset([dsim_log]),
+            files = depset(generated_files),
             runfiles = ctx.runfiles(files = runfiles),
         ),
     ]
@@ -93,6 +105,14 @@ dsim_run = rule(
                   "point to license server",
             mandatory = True,
             allow_single_file = [".sh"],
+        ),
+        "enable_code_coverage": attr.bool(
+            doc = "Gather simulation coverage",
+            default = False,
+        ),
+        "code_coverage_type": attr.string(
+            doc = "Select coverage type: block, expression, toggle or all",
+            default = "all",
         ),
         "outs": attr.output_list(
             doc = "List of simulation products",
