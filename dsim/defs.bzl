@@ -70,9 +70,22 @@ def _dsim_run(ctx):
         if ctx.attr.code_coverage_type in ["toggle", "all"]:
             command += " +acc+b "
         command += " -code-cov " + ctx.attr.code_coverage_type
+        if ctx.attr.code_coverage_scope != "":
+            scope_file = ctx.actions.declare_file("{}.scope".format(ctx.label.name))
+            ctx.actions.write(
+                output = scope_file,
+                content = "path {} +".format(ctx.attr.code_coverage_scope),
+            )
+            command += " -code-cov-scope-specs {}".format(scope_file.path)
+            inputs.append(scope_file)
         outputs.append(dsim_cov)
         generated_files.append(dsim_cov)
 
+        if ctx.attr.code_coverage_report:
+            dsim_report = ctx.actions.declare_directory("{}_report".format(ctx.label.name))
+            command += " && dcreport -out_dir {} {}".format(dsim_report.path, dsim_cov.path)
+            outputs.append(dsim_report)
+            generated_files.append(dsim_report)
 
     ctx.actions.run_shell(
         outputs = outputs,
@@ -91,14 +104,17 @@ def _dsim_run(ctx):
 dsim_run = rule(
     implementation = _dsim_run,
     attrs = {
-        "module": attr.label(
-            doc = "The top level build.",
-            providers = [VerilogInfo],
-            mandatory = True,
+        "code_coverage_report": attr.bool(
+            doc = "Run dcreport after dsim run",
+            default = False,
         ),
-        "module_top": attr.string(
-            doc = "The name of the top level verilog module.",
-            mandatory = True,
+        "code_coverage_scope": attr.string(
+            doc = "Select coverage scope using hierarchical path",
+            default = "",
+        ),
+        "code_coverage_type": attr.string(
+            doc = "Select coverage type: block, expression, toggle or all",
+            default = "all",
         ),
         "dsim_env": attr.label(
             doc = "A shell script to source the DSIM environment and " +
@@ -110,17 +126,21 @@ dsim_run = rule(
             doc = "Gather simulation coverage",
             default = False,
         ),
-        "code_coverage_type": attr.string(
-            doc = "Select coverage type: block, expression, toggle or all",
-            default = "all",
+        "module": attr.label(
+            doc = "The top level build.",
+            providers = [VerilogInfo],
+            mandatory = True,
         ),
-        "outs": attr.output_list(
-            doc = "List of simulation products",
+        "module_top": attr.string(
+            doc = "The name of the top level verilog module.",
+            mandatory = True,
         ),
         "opts": attr.string_list(
             doc = "Additional command line options to pass to DSIM",
             default = [],
         ),
+        "outs": attr.output_list(
+            doc = "List of simulation products",
+        ),
     },
 )
-
