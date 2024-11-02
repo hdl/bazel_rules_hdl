@@ -221,7 +221,7 @@ def _synthesize_design_impl(ctx):
                 data = [],
                 deps = [],
                 tags = [],
-            )]
+            )],
         ),
     ]
 

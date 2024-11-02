@@ -3,9 +3,9 @@
 load(
     ":providers.bzl",
     _VerilogInfo = "VerilogInfo",
-    _verilog_library = "verilog_library",
     _make_dag_entry = "make_dag_entry",
     _make_verilog_info = "make_verilog_info",
+    _verilog_library = "verilog_library",
 )
 
 VerilogInfo = _VerilogInfo
