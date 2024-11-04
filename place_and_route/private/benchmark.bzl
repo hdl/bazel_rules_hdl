@@ -94,7 +94,8 @@ def benchmark(ctx, open_road_info):
         struct(
             area = struct(
                 cell_area_um2 = "${area:=0}",
-                cell_utilization_fraction = "$(printf %.0f $(bc<<<$util/100.0))",
+                # Use bc -l to set scale, otherwise XX/100 will evaluate to zero.
+                cell_utilization_fraction = "$(printf %.3f $(bc -l<<<$util/100.0))",
                 area_sequentials_um2 = "${seq_area:=0}",
                 area_combinationals_um2 = "${combos_area:=0}",
                 area_buffers_um2 = "${buffs_area:=0}",
