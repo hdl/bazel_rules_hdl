@@ -61,11 +61,16 @@ def clock_tree_synthesis(ctx, open_road_info):
     if open_road_configuration.check_placement:
         open_road_commands.append("check_placement")
 
+    execution_requirements = {}
+    if ctx.attr.local_clock_tree_synthesis_execution:
+        execution_requirements["no-remote-exec"] = ""
+
     command_output = openroad_command(
         ctx,
         commands = open_road_commands,
         input_db = open_road_info.output_db,
         inputs = inputs,
+        execution_requirements = execution_requirements,
         step_name = "clock_tree_synthesis",
     )
 
