@@ -109,6 +109,10 @@ place_and_route = rule(
             default = True,
             doc = "Enable/Disable improve_placement pass.",
         ),
+        "local_clock_tree_synthesis_execution": attr.bool(
+            default = False,
+            doc = "Whether to run clock tree synthesis on a remote executor. If the clock tree synthesis exceeds 15 minutes flip this setting.",
+        ),
         "local_detailed_routing_execution": attr.bool(
             default = False,
             doc = "Whether to run detailed routing on a remote executor. If the detailed routing exceeds 15 minutes flip this setting.",
