@@ -245,6 +245,14 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
         ),
     )
 
+    # Don't overwhelm remote executors (which may be running multiple actions)
+    # with too many threads. Just use one unless the job is required to be run
+    # locally, in which case we expect an action will often have the entire
+    # system to itself.
+    num_threads = "1"
+    if "no-remote-exec" in execution_requirements:
+        num_threads = "max"
+
     ctx.actions.run(
         outputs = [output_db, log_file] + outputs,
         inputs = inputs + [command_file] + input_db_dependency,
@@ -252,7 +260,7 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
             "-no_init",
             "-no_splash",
             "-threads",
-            "max",
+            num_threads,
             "-exit",
             "-log",
             log_file.path,
