@@ -15,7 +15,7 @@
 """Rules for synthesizing (System)Verilog code."""
 
 load("@rules_hdl//pdk:build_defs.bzl", "StandardCellInfo")
-load("//verilog:defs.bzl", "VerilogInfo")
+load("//verilog:defs.bzl", "VerilogInfo", "make_dag_entry", "make_verilog_info")
 
 # There are no rules to generate this provider, but it does provide the mechansim to build
 # rules based on surelog in the open source world.
@@ -212,6 +212,16 @@ def _synthesize_design_impl(ctx):
             inputs = inputs,
             verilog_files = verilog_files,
             uhdm_files = uhdm_files,
+        ),
+        make_verilog_info(
+            new_entries = [make_dag_entry(
+                label = ctx.label,
+                srcs = [output_file],
+                hdrs = [],
+                data = [],
+                deps = [],
+                tags = [],
+            )],
         ),
     ]
 
