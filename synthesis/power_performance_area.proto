@@ -108,7 +108,7 @@ message Performance {
   optional int32 critical_path_ps = 2;
 
   // The highest achievable clock frequency (reciprocal of `critical_path_ps`).
-  // Unit is gigahertz (1*10^9/s).
+  // Unit is gigahertz (1e^9/s).
   optional float fmax_ghz = 8;
 
   // == Slack ==
