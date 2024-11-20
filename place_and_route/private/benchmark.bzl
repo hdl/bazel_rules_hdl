@@ -43,6 +43,7 @@ def benchmark(ctx, open_road_info):
         "report_design_area",
         "report_cell_usage",
         "report_clock_min_period",
+        "report_clock_properties",
     ]
 
     cmd_outputs = []
@@ -83,7 +84,9 @@ def benchmark(ctx, open_road_info):
         "inverters_area=$(cat {log} | awk '/Inverter/ {{ print $2 }}');",
         "wns=$(cat {log} | awk '/wns/ {{ print $2 }}');",
         "tns=$(cat {log} | awk '/tns/ {{ print $2 }}');",
+        "period=$(cat {log} | awk '/clk  / {{ period=$2; exit }} END {{ print period }}');",
         "cpl=$(cat {log} | awk '/period_min/ {{ cpl=$4; exit }} END {{ print cpl }}');",
+        "fmax=$(cat {log} | awk '/fmax/ {{ fmax=$7; exit }} END {{ print fmax }}');",
         "tot_pow=$(cat {log} | awk '/^Total / {{ total_power=$5 }} END {{ print total_power }}');",
         "int_pow=$(cat {log} | awk '/^Total / {{ intern_power=$2 }} END {{ print intern_power }}');",
         "leak_pow=$(cat {log} | awk '/^Total / {{ leak_power=$4 }} END {{ print leak_power }}');",
@@ -109,8 +112,9 @@ def benchmark(ctx, open_road_info):
                 num_inverters = "${inverters:=0}",
             ),
             performance = struct(
-                clock_period_ps = ctx.attr.clock_period if ctx.attr.clock_period else 0,
+                clock_period_ps = "$(printf %.0f $(bc<<<$period*1000))",
                 critical_path_ps = "$(printf %.0f $(bc<<<$cpl*1000))",
+                fmax_ghz = "${fmax:=0}",
                 setup_wns_ps = "$(printf %.0f $(bc<<<$wns*1000))",
                 setup_tns_ps = "$(printf %.0f $(bc<<<$tns*1000))",
             ),

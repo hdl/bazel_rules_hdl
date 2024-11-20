@@ -107,6 +107,10 @@ message Performance {
   // Longest path in picoseconds.
   optional int32 critical_path_ps = 2;
 
+  // The highest achievable clock frequency (reciprocal of `critical_path_ps`).
+  // Unit is gigahertz (1*10^9/s).
+  optional int32 fmax_ghz = 2;
+
   // == Slack ==
   // Abbreviations
   // wns = worst negative slack (worst negative slack observed in all paths)
