@@ -109,7 +109,7 @@ message Performance {
 
   // The highest achievable clock frequency (reciprocal of `critical_path_ps`).
   // Unit is gigahertz (1*10^9/s).
-  optional int32 fmax_ghz = 2;
+  optional float fmax_ghz = 8;
 
   // == Slack ==
   // Abbreviations
@@ -155,7 +155,7 @@ message Performance {
   // How far off the clock is between two different parts of the chip.
   optional sint32 clock_skew_ps = 7;
 
-  // Leaving out proto tags 8..9 for later use.
+  // Leaving out proto tag 9 for later use.
 
   optional int32 num_setup_violations = 10;
   optional int32 num_hold_violations = 11;
