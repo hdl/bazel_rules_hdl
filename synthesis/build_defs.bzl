@@ -130,6 +130,8 @@ def _synthesize_design_impl(ctx):
     args.add("-Q")  # Don't print header
     args.add_all("-l", [log_file])  # put output in log file
     args.add_all("-c", [synth_tcl])  # run synthesis tcl script
+    if ctx.attr.extra_tcl_command:
+        args.add("-p", ctx.attr.extra_tcl_command)
 
     dont_use_args = ""
     or_config = ctx.attr.standard_cells[StandardCellInfo].open_road_configuration
@@ -346,6 +348,9 @@ synthesize_rtl = rule(
         ),
         "deps": attr.label_list(
             providers = [[VerilogInfo], [UhdmInfo]],
+        ),
+        "extra_tcl_command": attr.string(
+            default = "",
         ),
         "output_file_name": attr.string(
             doc = "The output file name.",
