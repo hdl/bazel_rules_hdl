@@ -14,7 +14,9 @@
 
 """Resize openROAD commands"""
 
+load("//pdk:open_road_configuration.bzl", "get_open_road_configuration")
 load("//place_and_route:open_road.bzl", "OpenRoadInfo", "merge_open_road_info", "openroad_command", "placement_padding_commands")
+load("//synthesis:defs.bzl", "SynthesisInfo")
 
 def resize(ctx, open_road_info):
     """Performs resizing operation of the standard cells.
@@ -28,12 +30,14 @@ def resize(ctx, open_road_info):
 
     """
     placement_padding_struct = placement_padding_commands(ctx)
+    open_road_configuration = get_open_road_configuration(ctx.attr.synthesized_rtl[SynthesisInfo])
 
     inputs = placement_padding_struct.inputs
 
     open_road_commands = placement_padding_struct.commands + [
+        "balance_row_usage" if open_road_configuration.enable_balance_row_usage else "",
         "detailed_placement",
-        "improve_placement" if ctx.attr.enable_improve_placement else "",
+        "improve_placement" if ctx.attr.enable_improve_placement and open_road_configuration.enable_improve_placement else "",
         "optimize_mirroring",
         "check_placement -verbose",
         "report_checks -path_delay min_max -format full_clock_expanded -fields {input_pin slew capacitance} -digits 3",
