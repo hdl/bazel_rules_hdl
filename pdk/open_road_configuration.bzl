@@ -24,6 +24,8 @@ OpenRoadPdkInfo = provider(
         "density_fill_config": "optional path to file with metal fill configuration",
         "detailed_routing_configuration": "optional detailed routing configuration",
         "do_not_use_cell_list": "Do not use cells in timing repair. This supports wild card * cell names",
+        "enable_balance_row_usage": "Enable/Disable balance row usage pass.",
+        "enable_improve_placement": "Enable/Disable improve_placement pass.",
         "endcap_cell": "The endcap cell to use in place and route",
         "fill_cells": "Metal fill cells",
         "global_placement_cell_pad": "Global placement cell padding to aide in routing",
@@ -46,8 +48,6 @@ OpenRoadPdkInfo = provider(
         "tracks_file": "Track setup script",
         "wire_rc_clock_metal_layer": "The metal layer to pull RC information for clock nets",
         "wire_rc_signal_metal_layer": "The metal layer to pull RC information for signal nets",
-        "enable_improve_placement": "Enable/Disable improve_placement pass.",
-        "enable_balance_row_usage": "Enable/Disable balance row usage pass.",
     },
 )
 
@@ -121,6 +121,14 @@ open_road_pdk_configuration = rule(
             mandatory = True,
             doc = "This value can be an empty list if all cells should be used in P&R",
         ),
+        "enable_balance_row_usage": attr.bool(
+            default = False,
+            doc = "Enable/Disable balance row usage pass.",
+        ),
+        "enable_improve_placement": attr.bool(
+            default = True,
+            doc = "Enable/Disable improve_placement pass.",
+        ),
         "endcap_cell": attr.string(
         ),
         "fill_cells": attr.string_list(
@@ -191,14 +199,6 @@ open_road_pdk_configuration = rule(
         ),
         "wire_rc_signal_metal_layer": attr.string(
             mandatory = True,
-        ),
-        "enable_improve_placement": attr.bool(
-            default = True,
-            doc = "Enable/Disable improve_placement pass.",
-        ),
-        "enable_balance_row_usage": attr.bool(
-            default = False,
-            doc = "Enable/Disable balance row usage pass.",
         ),
     },
 )
