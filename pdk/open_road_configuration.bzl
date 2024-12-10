@@ -46,6 +46,8 @@ OpenRoadPdkInfo = provider(
         "tracks_file": "Track setup script",
         "wire_rc_clock_metal_layer": "The metal layer to pull RC information for clock nets",
         "wire_rc_signal_metal_layer": "The metal layer to pull RC information for signal nets",
+        "enable_improve_placement": "Enable/Disable improve_placement pass.",
+        "enable_balance_row_usage": "Enable/Disable balance row usage pass.",
     },
 )
 
@@ -86,6 +88,8 @@ def _open_road_pdk_configuration_impl(ctx):
             detailed_routing_configuration = ctx.attr.detailed_routing_configuration,
             density_fill_config = ctx.attr.density_fill_config,
             klayout_tech_file = ctx.attr.klayout_tech_file,
+            enable_improve_placement = ctx.attr.enable_improve_placement,
+            enable_balance_row_usage = ctx.attr.enable_balance_row_usage,
         ),
     ]
 
@@ -187,6 +191,14 @@ open_road_pdk_configuration = rule(
         ),
         "wire_rc_signal_metal_layer": attr.string(
             mandatory = True,
+        ),
+        "enable_improve_placement": attr.bool(
+            default = True,
+            doc = "Enable/Disable improve_placement pass.",
+        ),
+        "enable_balance_row_usage": attr.bool(
+            default = False,
+            doc = "Enable/Disable balance row usage pass.",
         ),
     },
 )
