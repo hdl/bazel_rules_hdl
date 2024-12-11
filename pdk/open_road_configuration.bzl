@@ -24,6 +24,8 @@ OpenRoadPdkInfo = provider(
         "density_fill_config": "optional path to file with metal fill configuration",
         "detailed_routing_configuration": "optional detailed routing configuration",
         "do_not_use_cell_list": "Do not use cells in timing repair. This supports wild card * cell names",
+        "enable_balance_row_usage": "Enable/Disable balance row usage pass.",
+        "enable_improve_placement": "Enable/Disable improve_placement pass.",
         "endcap_cell": "The endcap cell to use in place and route",
         "fill_cells": "Metal fill cells",
         "global_placement_cell_pad": "Global placement cell padding to aide in routing",
@@ -86,6 +88,8 @@ def _open_road_pdk_configuration_impl(ctx):
             detailed_routing_configuration = ctx.attr.detailed_routing_configuration,
             density_fill_config = ctx.attr.density_fill_config,
             klayout_tech_file = ctx.attr.klayout_tech_file,
+            enable_improve_placement = ctx.attr.enable_improve_placement,
+            enable_balance_row_usage = ctx.attr.enable_balance_row_usage,
         ),
     ]
 
@@ -116,6 +120,14 @@ open_road_pdk_configuration = rule(
         "do_not_use_cell_list": attr.string_list(
             mandatory = True,
             doc = "This value can be an empty list if all cells should be used in P&R",
+        ),
+        "enable_balance_row_usage": attr.bool(
+            default = False,
+            doc = "Enable/Disable balance row usage pass.",
+        ),
+        "enable_improve_placement": attr.bool(
+            default = True,
+            doc = "Enable/Disable improve_placement pass.",
         ),
         "endcap_cell": attr.string(
         ),
