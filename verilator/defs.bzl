@@ -198,10 +198,6 @@ verilator_cc_library = rule(
             doc = "Additional command line options to pass to Verilator",
             default = ["-Wall"],
         ),
-        "_cc_toolchain": attr.label(
-            doc = "CC compiler.",
-            default = Label("@bazel_tools//tools/cpp:current_cc_toolchain"),
-        ),
         "_copy_tree": attr.label(
             doc = "A tool for copying a tree of files",
             cfg = "exec",
