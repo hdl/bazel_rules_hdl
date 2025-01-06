@@ -1421,14 +1421,16 @@ cc_library(
             "src/sta/util/Machine*.cc",
         ],
     ) + [
-        "src/sta/util/Machine.cc",
         ":StaConfig",
-    ],
+    ] + select({
+        "@bazel_tools//src/conditions:windows": ["src/sta/util/MachineWin32.cc"],
+        "@bazel_tools//src/conditions:darwin": ["src/sta/util/MachineApple.cc"],
+        "@bazel_tools//src/conditions:linux": ["src/sta/util/MachineLinux.cc"],
+        "//conditions:default": ["src/sta/util/MachineUnknown.cc"],
+    }),
     hdrs = glob(
         include = ["src/sta/include/sta/*.hh"],
-    ) + [
-        "src/sta/util/MachineLinux.cc",
-    ],
+    ),
     copts = [
         "-fexceptions",
         "-Wno-error",
@@ -1468,3 +1470,4 @@ filegroup(
 )
 
 ## OpenSTA
+
