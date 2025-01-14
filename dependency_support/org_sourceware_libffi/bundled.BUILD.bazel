@@ -89,6 +89,7 @@ ARM64_MAC_DEFINES = [
     "FFI_EXEC_TRAMPOLINE_TABLE=1",
     "HAVE_RO_EH_FRAME=1",
     "EH_FRAME_FLAGS=\"a\"",
+    "FFI_GO_CLOSURES=1",
 ]
 
 copy(
