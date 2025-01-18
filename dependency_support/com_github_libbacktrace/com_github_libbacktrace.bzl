@@ -26,5 +26,5 @@ def com_github_libbacktrace():
         ],
         strip_prefix = "libbacktrace-4d2dd0b172f2c9192f83ba93425f868f2a13c553",
         sha256 = "90d224a18c0a0c0f1f22fe73b89ebebd4f1ee368e55d646718b7f3b294a52705",
-        build_file = Label("@rules_hdl//dependency_support/com_github_libbacktrace:bundled.BUILD.bazel"),
+        build_file = Label("//dependency_support/com_github_libbacktrace:bundled.BUILD.bazel"),
     )

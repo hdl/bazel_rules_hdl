@@ -26,5 +26,5 @@ def org_theopenroadproject_asap7sc7p5t_27():
         ],
         strip_prefix = "asap7sc7p5t_27-900f55ed8bef025f39edcc8b8be5e04a2c55c15a",
         sha256 = "db5531736a34f34e919488468e8ee09ae87495ff8a6188fad375d68c19e10e20",
-        build_file = Label("@rules_hdl//dependency_support/org_theopenroadproject_asap7sc7p5t_27:bundled.BUILD.bazel"),
+        build_file = Label("//dependency_support/org_theopenroadproject_asap7sc7p5t_27:bundled.BUILD.bazel"),
     )

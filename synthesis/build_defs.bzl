@@ -14,7 +14,7 @@
 
 """Rules for synthesizing (System)Verilog code."""
 
-load("@rules_hdl//pdk:build_defs.bzl", "StandardCellInfo")
+load("//pdk:build_defs.bzl", "StandardCellInfo")
 load("//verilog:defs.bzl", "VerilogInfo", "make_dag_entry", "make_verilog_info")
 
 # There are no rules to generate this provider, but it does provide the mechansim to build

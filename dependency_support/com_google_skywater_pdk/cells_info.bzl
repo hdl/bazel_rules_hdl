@@ -14,8 +14,8 @@
 
 """Standard cell options for SkyWater 130nm PDK."""
 
-load("@rules_hdl//dependency_support/com_google_skywater_pdk:cell_libraries.bzl", "CELL_LIBRARIES")
-load("@rules_hdl//pdk:build_defs.bzl", "StandardCellOptionsInfo", "check_for_each_cells_args", "temp_normalize", "voltage_normalize")
+load("//dependency_support/com_google_skywater_pdk:cell_libraries.bzl", "CELL_LIBRARIES")
+load("//pdk:build_defs.bzl", "StandardCellOptionsInfo", "check_for_each_cells_args", "temp_normalize", "voltage_normalize")
 
 SKY130_OPTIONS = StandardCellOptionsInfo(
     libraries = [
@@ -104,7 +104,7 @@ def for_each_sky130_cells(libname, include_vts = None, include_corners = None, i
 
     Use this to create bazel rules for every standard cell version like shown below;
         ```
-        load("@rules_hdl//dependency_support/com_google_skywater_pdk:build_info.bzl", "for_each_sky130_cells")
+        load("//dependency_support/com_google_skywater_pdk:build_info.bzl", "for_each_sky130_cells")
         [
             extract_lef_and_liberty(
                 name = cell_name + "-data",

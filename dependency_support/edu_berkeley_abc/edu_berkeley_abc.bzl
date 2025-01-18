@@ -26,5 +26,5 @@ def edu_berkeley_abc():
         ],
         strip_prefix = "abc-0d579a430d57e5b864a62407aac2da0faba7c3b0",
         sha256 = "9ea3d8b7a104a2394e8967c93b3faaa12c3444a8901c11786494119b8088a1d9",
-        build_file = Label("@rules_hdl//dependency_support:edu_berkeley_abc/bundled.BUILD.bazel"),
+        build_file = Label("//dependency_support:edu_berkeley_abc/bundled.BUILD.bazel"),
     )

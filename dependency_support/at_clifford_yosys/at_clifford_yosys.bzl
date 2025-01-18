@@ -26,9 +26,9 @@ def at_clifford_yosys():
         ],
         sha256 = "46a9a4d969770fa20a2fd12c8e83307a597126609645c9655c370c0c365da344",
         strip_prefix = "yosys-8f07a0d8404f63349d8d3111217b73c9eafbd667",
-        build_file = Label("@rules_hdl//dependency_support:at_clifford_yosys/bundled.BUILD.bazel"),
+        build_file = Label("//dependency_support:at_clifford_yosys/bundled.BUILD.bazel"),
         patches = [
-            Label("@rules_hdl//dependency_support:at_clifford_yosys/yosys.patch"),
-            Label("@rules_hdl//dependency_support:at_clifford_yosys/autoname.patch"),
+            Label("//dependency_support:at_clifford_yosys/yosys.patch"),
+            Label("//dependency_support:at_clifford_yosys/autoname.patch"),
         ],
     )

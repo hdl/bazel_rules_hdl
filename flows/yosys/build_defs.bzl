@@ -14,7 +14,7 @@
 
 """Reimplementing place-and-route using composable and externalizable pieces"""
 
-load("@rules_hdl//pdk:build_defs.bzl", "StandardCellInfo")
+load("//pdk:build_defs.bzl", "StandardCellInfo")
 load("//flows:flows.bzl", "FlowStepInfo", "script_prefix")
 
 def _yosys_synth_file_step_impl(ctx):

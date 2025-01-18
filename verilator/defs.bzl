@@ -101,7 +101,7 @@ def _only_hpp(f):
     return None
 
 def _verilator_cc_library(ctx):
-    verilator_toolchain = ctx.toolchains["@rules_hdl//verilator:toolchain_type"]
+    verilator_toolchain = ctx.toolchains["//verilator:toolchain_type"]
 
     transitive_srcs = depset([], transitive = [ctx.attr.module[VerilogInfo].dag])
     all_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs.to_list()]
@@ -215,7 +215,7 @@ verilator_cc_library = rule(
     ],
     toolchains = [
         "@bazel_tools//tools/cpp:toolchain_type",
-        "@rules_hdl//verilator:toolchain_type",
+        "//verilator:toolchain_type",
     ],
     fragments = ["cpp"],
 )

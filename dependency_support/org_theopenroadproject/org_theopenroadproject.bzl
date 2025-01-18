@@ -27,7 +27,7 @@ def org_theopenroadproject():
         # https://github.com/dear-github/dear-github/issues/214
         init_submodules = True,
         remote = "https://github.com/The-OpenROAD-Project/OpenROAD.git",
-        build_file = Label("@rules_hdl//dependency_support/org_theopenroadproject:bundled.BUILD.bazel"),
+        build_file = Label("//dependency_support/org_theopenroadproject:bundled.BUILD.bazel"),
         shallow_since = "1709242873 -0800",
         patches = [
             Label("@rules_hdl//dependency_support/org_theopenroadproject:0001-logging-change-to-support-silence.patch"),
