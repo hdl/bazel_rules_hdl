@@ -14,8 +14,8 @@
 
 """Reimplementing place-and-route using composable and externalizable pieces"""
 
-load("//pdk:build_defs.bzl", "StandardCellInfo")
 load("//flows:flows.bzl", "FlowStepInfo", "script_prefix")
+load("//pdk:build_defs.bzl", "StandardCellInfo")
 
 def assemble_openroad_step(
         ctx,
