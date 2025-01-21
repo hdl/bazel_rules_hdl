@@ -1,6 +1,6 @@
 """These build rules run a full hardware tools flow"""
 
-load("@rules_hdl//pdk:build_defs.bzl", "StandardCellInfo")
+load("//pdk:build_defs.bzl", "StandardCellInfo")
 
 def _extract_lef_and_liberty_impl(ctx):
     standard_cell = ctx.attr.standard_cell[StandardCellInfo]

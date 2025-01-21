@@ -13,8 +13,8 @@
 # limitations under the License.
 
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
-load("@rules_hdl//dependency_support/com_google_skywater_pdk:cells_info.bzl", "for_each_sky130_cells")
-load("@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:cells_info.bzl", "for_each_asap7_cells")
+load("//dependency_support/com_google_skywater_pdk:cells_info.bzl", "for_each_sky130_cells")
+load("//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:cells_info.bzl", "for_each_asap7_cells")
 load("//flows:basic_asic.bzl", "basic_asic_flow")
 load("//gds_write:build_defs.bzl", "gds_write")
 load("//place_and_route:build_defs.bzl", "place_and_route")

@@ -26,5 +26,5 @@ def com_github_ninja_build_ninja():
         ],
         strip_prefix = "ninja-55f54511d35716c43637dee2bcb5fbc7839f967b",
         sha256 = "99b70ac3bd7d5c303a5b770888342af22b701d2a5cbc26da0912f79ebd6bd458",
-        build_file = Label("@rules_hdl//dependency_support/com_github_ninja_build_ninja:bundled.BUILD.bazel"),
+        build_file = Label("//dependency_support/com_github_ninja_build_ninja:bundled.BUILD.bazel"),
     )

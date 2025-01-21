@@ -14,7 +14,7 @@
 
 """These build rules run automated place and route on a synthesized netlist"""
 
-load("@rules_hdl//pdk:open_road_configuration.bzl", "assert_has_open_road_configuration")
+load("//pdk:open_road_configuration.bzl", "assert_has_open_road_configuration")
 load("//place_and_route:open_road.bzl", "OpenRoadInfo")
 load("//place_and_route:private/benchmark.bzl", "benchmark")
 load("//place_and_route:private/clock_tree_synthesis.bzl", "clock_tree_synthesis")

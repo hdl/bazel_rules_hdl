@@ -217,7 +217,7 @@ vivado_create_project = rule(
     attrs = {
         "create_project_tcl_template": attr.label(
             doc = "The create project tcl template",
-            default = "@rules_hdl//vivado:create_project.tcl.template",
+            default = "//vivado:create_project.tcl.template",
             allow_single_file = [".template"],
         ),
         "ip_blocks": attr.label_list(
@@ -275,7 +275,7 @@ vivado_synthesize = rule(
     attrs = {
         "create_project_tcl_template": attr.label(
             doc = "The create project tcl template",
-            default = "@rules_hdl//vivado:create_project.tcl.template",
+            default = "//vivado:create_project.tcl.template",
             allow_single_file = [".template"],
         ),
         "ip_blocks": attr.label_list(
@@ -365,7 +365,7 @@ vivado_synthesis_optimize = rule(
         ),
         "synthesis_optimize_template": attr.label(
             doc = "The synthesis optimzation tcl template",
-            default = "@rules_hdl//vivado:synth_optimize.tcl.template",
+            default = "//vivado:synth_optimize.tcl.template",
             allow_single_file = [".template"],
         ),
         "threads": attr.int(
@@ -431,7 +431,7 @@ vivado_placement = rule(
         ),
         "placement_template": attr.label(
             doc = "The placement tcl template",
-            default = "@rules_hdl//vivado:placement.tcl.template",
+            default = "//vivado:placement.tcl.template",
             allow_single_file = [".template"],
         ),
         "threads": attr.int(
@@ -497,7 +497,7 @@ vivado_place_optimize = rule(
         ),
         "place_optimize_template": attr.label(
             doc = "The placement tcl template",
-            default = "@rules_hdl//vivado:place_optimize.tcl.template",
+            default = "//vivado:place_optimize.tcl.template",
             allow_single_file = [".template"],
         ),
         "threads": attr.int(
@@ -579,7 +579,7 @@ vivado_routing = rule(
         ),
         "route_template": attr.label(
             doc = "The placement tcl template",
-            default = "@rules_hdl//vivado:route.tcl.template",
+            default = "//vivado:route.tcl.template",
             allow_single_file = [".template"],
         ),
         "threads": attr.int(
@@ -651,7 +651,7 @@ vivado_write_bitstream = rule(
         ),
         "write_bitstream_template": attr.label(
             doc = "The write bitstream tcl template",
-            default = "@rules_hdl//vivado:write_bitstream.tcl.template",
+            default = "//vivado:write_bitstream.tcl.template",
             allow_single_file = [".template"],
         ),
         "xilinx_env": attr.label(
@@ -824,7 +824,7 @@ xsim_test = rule(
         ),
         "xsim_test_template": attr.label(
             doc = "The tcl template to run on vivado.",
-            default = "@rules_hdl//vivado:xsim_test.tcl.template",
+            default = "//vivado:xsim_test.tcl.template",
             allow_single_file = [".template"],
         ),
     },
@@ -931,7 +931,7 @@ vivado_create_ip = rule(
     attrs = {
         "create_ip_block_template": attr.label(
             doc = "The create project tcl template",
-            default = "@rules_hdl//vivado:create_ip_block.tcl.template",
+            default = "//vivado:create_ip_block.tcl.template",
             allow_single_file = [".template"],
         ),
         "encrypt": attr.bool(
@@ -961,7 +961,7 @@ vivado_create_ip = rule(
         ),
         "keyfile": attr.label(
             doc = "The keyfile to use when optionally encrypting",
-            default = "@rules_hdl//vivado:xilinx_keyfile.txt",
+            default = "//vivado:xilinx_keyfile.txt",
             allow_single_file = [".txt"],
         ),
         "module": attr.label(

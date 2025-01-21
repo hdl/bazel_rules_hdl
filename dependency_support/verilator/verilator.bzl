@@ -21,7 +21,7 @@ def verilator():
     maybe(
         http_archive,
         name = "verilator",
-        build_file = Label("@rules_hdl//dependency_support/verilator:verilator.BUILD.bazel"),
+        build_file = Label("//dependency_support/verilator:verilator.BUILD.bazel"),
         urls = ["https://github.com/verilator/verilator/archive/refs/tags/v5.022.tar.gz"],
         sha256 = "3c2f5338f4b6ce7e2f47a142401acdd18cbf4c5da06092618d6d036c0afef12d",
         strip_prefix = "verilator-5.022",
