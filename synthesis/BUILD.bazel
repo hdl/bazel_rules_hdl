@@ -14,7 +14,6 @@
 
 # Synthesis tool package.
 
-load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_python//python:proto.bzl", "py_proto_library")
@@ -48,4 +47,4 @@ py_proto_library(
 cc_proto_library(
     name = "power_performance_area_cc_proto",
     deps = [":power_performance_area_proto"],
-)
+)  # buildifier: disable=native-cc-proto
