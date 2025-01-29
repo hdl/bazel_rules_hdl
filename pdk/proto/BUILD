@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_python//python:proto.bzl", "py_proto_library")
 
@@ -34,7 +33,7 @@ proto_library(
 cc_proto_library(
     name = "pdk_info_cc_proto",
     deps = [":pdk_info_proto"],
-)
+)  # buildifier: disable=native-cc-proto
 
 py_proto_library(
     name = "pdk_info_py_proto",
