@@ -40,7 +40,7 @@ package(
         "-parse_headers",
         "-layering_check",
         # TODO(b/299593765): Fix strict ordering.
-        "-libcxx_strict_weak_ordering_check",
+        "-libcxx_assertions",
     ],
 )
 
