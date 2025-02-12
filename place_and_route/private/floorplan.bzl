@@ -48,7 +48,7 @@ def _initialize_floorplan_command(ctx):
             additional_cell_sites = " ".join(open_road_configuration.additional_cell_sites),
         )
 
-    fail("either (die_width_microns and die_height_microns) or `utilization` must be set")
+    fail("either (die_width_microns and die_height_microns) or `target_die_utilization_percentage` must be set")
 
 def init_floor_plan(ctx):
     """Initializes the floor plan based on user ctx args.
