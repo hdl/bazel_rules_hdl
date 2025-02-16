@@ -71,7 +71,7 @@ def benchmark(ctx, open_road_info):
     ]
     awk_cmds = [
         "area=$(cat {log} | awk '/Design area/ {{ print $3 }}');",
-        "util=$(cat {log} | awk -F '[ %]' '/Design area/ {{ print $5 }}');",
+        "util_fraction=$(cat {log} | awk -F '[ %]' '/Design area/ {{ printf(\"%.3f\", $5 / 100.0); }}');",
         "combos=$(cat {log} | awk '/combinational cell/ {{ print $4 }}');",
         "combos_area=$(cat {log} | awk '/combinational cell/ {{ print $5 }}');",
         "seq=$(cat {log} | awk '/Sequential cell/ {{ print $3 }}');",
@@ -82,10 +82,10 @@ def benchmark(ctx, open_road_info):
         "tbuffs_area=$(cat {log} | awk '/Timing Repair Buffer/ {{ print $4 }}');",
         "inverters=$(cat {log} | awk '/Inverter/ {{ print $2 }}');",
         "inverters_area=$(cat {log} | awk '/Inverter/ {{ print $2 }}');",
-        "wns=$(cat {log} | awk '/wns/ {{ print $2 }}');",
-        "tns=$(cat {log} | awk '/tns/ {{ print $2 }}');",
-        "period=$(cat {log} | awk '/clk  / {{ period=$2; exit }} END {{ print period }}');",
-        "cpl=$(cat {log} | awk '/period_min/ {{ cpl=$4; exit }} END {{ print cpl }}');",
+        "wns_ps=$(cat {log} | awk '/wns/ {{ printf(\"%.0f\", $2 * 1000); }}');",
+        "tns_ps=$(cat {log} | awk '/tns/ {{ printf(\"%.0f\", $2 * 1000); }}');",
+        "period=$(cat {log} | awk '/clk  / {{ period=$2; exit }} END {{ printf(\"%.0f\", period * 1000); }}');",
+        "cpl=$(cat {log} | awk '/period_min/ {{ cpl=$4; exit }} END {{ printf(\"%.0f\", cpl * 1000); }}');",
         "fmax=$(cat {log} | awk '/fmax/ {{ fmax=$7; exit }} END {{ print fmax }}');",
         "tot_pow=$(cat {log} | awk '/^Total / {{ total_power=$5 }} END {{ print total_power }}');",
         "int_pow=$(cat {log} | awk '/^Total / {{ intern_power=$2 }} END {{ print intern_power }}');",
@@ -97,8 +97,7 @@ def benchmark(ctx, open_road_info):
         struct(
             area = struct(
                 cell_area_um2 = "${area:=0}",
-                # Use bc -l to set scale, otherwise XX/100 will evaluate to zero.
-                cell_utilization_fraction = "$(printf %.3f $(bc -l<<<$util/100.0))",
+                cell_utilization_fraction = "${util_fraction:=0}",
                 area_sequentials_um2 = "${seq_area:=0}",
                 area_combinationals_um2 = "${combos_area:=0}",
                 area_buffers_um2 = "${buffs_area:=0}",
@@ -112,11 +111,11 @@ def benchmark(ctx, open_road_info):
                 num_inverters = "${inverters:=0}",
             ),
             performance = struct(
-                clock_period_ps = "$(printf %.0f $(bc<<<$period*1000))",
-                critical_path_ps = "$(printf %.0f $(bc<<<$cpl*1000))",
+                clock_period_ps = "${period:=0}",
+                critical_path_ps = "${cpl:=0}",
                 fmax_ghz = "${fmax:=0}",
-                setup_wns_ps = "$(printf %.0f $(bc<<<$wns*1000))",
-                setup_tns_ps = "$(printf %.0f $(bc<<<$tns*1000))",
+                setup_wns_ps = "${wns_ps:=0}",
+                setup_tns_ps = "${tns_ps:=0}",
             ),
             power = struct(
                 total = struct(
