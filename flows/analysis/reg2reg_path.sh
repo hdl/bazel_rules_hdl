@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 export CONSTANT_CLOCK_PORT=clk
 export CONSTANT_TOP=$3
 export OUTPUT_NETLIST=`mktemp -p /tmp XXXXXXXX.v`

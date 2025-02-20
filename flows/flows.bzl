@@ -40,7 +40,7 @@ FlowStepInfo = provider(
 )
 
 script_prefix = """
-#!/bin/bash
+#!/usr/bin/env bash
 export RUNFILES="${RUNFILES:-$0.runfiles/rules_hdl}"
 """
 
