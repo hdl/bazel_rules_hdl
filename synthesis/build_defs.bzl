@@ -293,7 +293,7 @@ def _synthesize_binary_impl(ctx):
 
     env["OUTPUT"] = "/tmp/{}.v".format(ctx.attr.name)
 
-    script += "#!/bin/bash\n"
+    script += "#!/usr/bin/env bash\n"
 
     for k, v in env.items():
         script += "export {}='{}'\n".format(k, v.short_path if type(v) == "File" else v)
@@ -413,7 +413,7 @@ def _benchmark_synth_impl(ctx):
     ctx.actions.write(
         output = executable_file,
         content = "\n".join([
-            "#!/bin/bash",
+            "#!/usr/bin/env bash",
             "set -e",
             cmd1,
             cmd2,

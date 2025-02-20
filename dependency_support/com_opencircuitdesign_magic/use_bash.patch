@@ -22,7 +22,7 @@ index 01e4fa5..f587a72 100755
 +++ scripts/makedbh
 @@ -1,189 +1,185 @@
 -#!/bin/csh -f
-+#!/bin/bash
++#!/usr/bin/env bash
  #
 -# makes the "database.h" (1st argument, $1) file from "database.h.in"
 -# (2nd argument, $2), setting various mask operation definitions

@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 export HOME=/tmp
 source /opt/xilinx/Vivado/2021.2/settings64.sh
