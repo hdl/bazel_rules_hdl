@@ -42,7 +42,7 @@ bazel_dep(name = "rules_m4", version = "0.2.4")
 bazel_dep(name = "rules_python", version = "1.0.0")
 bazel_dep(name = "rules_pkg", version = "1.0.1")
 bazel_dep(name = "spdlog", version = "1.15.1", repo_name = "com_github_gabime_spdlog")
-bazel_dep(name = "toolchains_llvm", version = "1.0.0")
+bazel_dep(name = "toolchains_llvm", version = "1.0.0", dev_dependency = True)
 bazel_dep(name = "zlib", version = "1.3.1.bcr.4")
 bazel_dep(name = "or-tools", version = "9.12", repo_name = "com_google_ortools")
 
@@ -64,7 +64,7 @@ _org_gnu_gnulib(
 )
 
 # Configure and register the toolchain.
-llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
+llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm", dev_dependency = True)
 llvm.toolchain(
     name = "llvm_toolchain",
     link_flags = {
@@ -102,7 +102,7 @@ llvm.toolchain(
 )
 use_repo(llvm, "llvm_toolchain")
 
-register_toolchains("@llvm_toolchain//:all")
+register_toolchains("@llvm_toolchain//:all", dev_dependency = True)
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
