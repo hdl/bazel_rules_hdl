@@ -71,6 +71,9 @@ message Area {
   // Area only covered by inverters.
   optional float area_inverters_um2 = 16;
 
+  // Area only covered by macros.
+  optional float area_macros_um2 = 17;
+
   // The total number of standard cells used.
   // Invariance:
   // total_cells = buffers + timing_buffers + sequential + combinational;
@@ -91,7 +94,10 @@ message Area {
   // The number of inverters.
   optional int32 num_inverters = 15;
 
-  // Leaving out proto tags 17..19 for later use.
+  // The number of macros.
+  optional float num_macros = 18;
+
+  // Leaving out proto tag 19 for later use.
 
   // Cell type mapping to fraction used in the area, e.g.
   // {{ "svt: 0.7 }, { "lvt": 0.3}}
