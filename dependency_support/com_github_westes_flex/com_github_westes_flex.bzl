@@ -21,6 +21,6 @@ def com_github_westes_flex():
     maybe(
         http_archive,
         name = "rules_flex",
-        sha256 = "8929fedc40909d19a4b42548d0785f796c7677dcef8b5d1600b415e5a4a7749f",
-        urls = ["https://github.com/jmillikin/rules_flex/releases/download/v0.2.1/rules_flex-v0.2.1.tar.xz"],
+        sha256 = "04f709d84237b63b6f7dce17be69e460589e546fdc6caca924ed7e53de42a3a8",
+        urls = ["https://github.com/jmillikin/rules_flex/releases/download/v0.3.1/rules_flex-v0.3.1.tar.xz"],
     )
