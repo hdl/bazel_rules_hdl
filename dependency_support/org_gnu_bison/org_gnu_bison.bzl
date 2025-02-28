@@ -21,18 +21,13 @@ def org_gnu_bison():
     maybe(
         http_archive,
         name = "rules_m4",
-        sha256 = "10ce41f150ccfbfddc9d2394ee680eb984dc8a3dfea613afd013cfb22ea7445c",
-        urls = ["https://github.com/jmillikin/rules_m4/releases/download/v0.2.3/rules_m4-v0.2.3.tar.xz"],
+        sha256 = "e62cc7f358a2de3e6f30159039277e0dd58e2918d9769d1cb5a965f1c322e6cd",
+        urls = ["https://github.com/jmillikin/rules_m4/releases/download/v0.2.4/rules_m4-v0.2.4.tar.xz"],
     )
 
     maybe(
         http_archive,
         name = "rules_bison",
-        sha256 = "2279183430e438b2dc77cacd7b1dbb63438971b2411406570f1ddd920b7c9145",
-        urls = ["https://github.com/jmillikin/rules_bison/releases/download/v0.2.2/rules_bison-v0.2.2.tar.xz"],
-        patch_args = ["-p1"],
-        patches = [
-            # TODO(https://github.com/jmillikin/rules_bison/pull/14): Delete after this PR is merged
-            Label("//dependency_support/org_gnu_bison:bison_empty_glob.patch"),
-        ],
+        sha256 = "d3897d735c013c220fb6daefe8d46dc527a7756da9c2743951efac2f02da6d99",
+        urls = ["https://github.com/jmillikin/rules_bison/releases/download/v0.3.1/rules_bison-v0.3.1.tar.xz"],
     )
