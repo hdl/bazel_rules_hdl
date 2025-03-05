@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load(":defs.bzl", "verilator_toolchain")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 
 package(
     default_applicable_licenses = ["//:package_license"],
     default_visibility = ["//visibility:public"],
 )
-
-load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 
 # A build flag for deleting files known to be non-deterministic from `VerilatorCompile`
 # actions such as the `__verFiles.dat` file which contains timing data for each generated
