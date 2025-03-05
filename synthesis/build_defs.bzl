@@ -350,11 +350,19 @@ synthesize_rtl = rule(
             allow_single_file = True,
             doc = "Verilog file that maps yosys adder to PDK adders.",
         ),
+        "autoidx_seed": attr.int(
+            mandatory = False,
+            doc = "Controls the starting point for the autoidx pass; introduces additional variability into the synthesis logic.",
+        ),
         "deps": attr.label_list(
             providers = [[VerilogInfo], [UhdmInfo]],
         ),
         "extra_tcl_command": attr.string(
             default = "",
+        ),
+        "hash_seed": attr.int(
+            mandatory = False,
+            doc = "Salts the hashes used in Yosys for (e.g.) iteration order; introduces additional variability into the synthesis logic.",
         ),
         "output_file_name": attr.string(
             doc = "The output file name.",
@@ -379,14 +387,6 @@ synthesize_rtl = rule(
         ),
         "verilog_defines": attr.string_list(
             doc = "Verilog defines to pass to the synthesis tool.",
-        ),
-        "autoidx_seed": attr.int(
-            mandatory = False,
-            doc = "Controls the starting point for the autoidx pass; introduces additional variability into the synthesis logic.",
-        ),
-        "hash_seed": attr.int(
-            mandatory = False,
-            doc = "Salts the hashes used in Yosys for (e.g.) iteration order; introduces additional variability into the synthesis logic.",
         ),
         "yosys_tool": attr.label(
             default = Label("@at_clifford_yosys//:yosys"),
