@@ -132,6 +132,10 @@ def _synthesize_design_impl(ctx):
     args.add_all("-c", [synth_tcl])  # run synthesis tcl script
     if ctx.attr.extra_tcl_command:
         args.add("-p", ctx.attr.extra_tcl_command)
+    if ctx.attr.autoidx_seed:
+        args.add("--autoidx", ctx.attr.autoidx_seed)
+    if ctx.attr.hash_seed:
+        args.add("--hash-seed", ctx.attr.hash_seed)
 
     dont_use_args = ""
     or_config = ctx.attr.standard_cells[StandardCellInfo].open_road_configuration
@@ -375,6 +379,14 @@ synthesize_rtl = rule(
         ),
         "verilog_defines": attr.string_list(
             doc = "Verilog defines to pass to the synthesis tool.",
+        ),
+        "autoidx_seed": attr.int(
+            mandatory = False,
+            doc = "Controls the starting point for the autoidx pass; introduces additional variability into the synthesis logic.",
+        ),
+        "hash_seed": attr.int(
+            mandatory = False,
+            doc = "Salts the hashes used in Yosys for (e.g.) iteration order; introduces additional variability into the synthesis logic.",
         ),
         "yosys_tool": attr.label(
             default = Label("@at_clifford_yosys//:yosys"),
