@@ -405,14 +405,6 @@ synthesize_rtl = rule(
         "verilog_defines": attr.string_list(
             doc = "Verilog defines to pass to the synthesis tool.",
         ),
-        "autoidx_seed": attr.int(
-            mandatory = False,
-            doc = "Controls the starting point for the autoidx pass; introduces additional variability into the synthesis logic.",
-        ),
-        "hash_seed": attr.int(
-            mandatory = False,
-            doc = "Salts the hashes used in Yosys for (e.g.) iteration order; introduces additional variability into the synthesis logic.",
-        ),
         "yosys_tool": attr.label(
             default = Label("@at_clifford_yosys//:yosys"),
             executable = True,
