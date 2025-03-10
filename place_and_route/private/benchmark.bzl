@@ -34,14 +34,16 @@ def benchmark(ctx, open_road_info):
 
     open_road_commands = [
         est_parasitic_cmd,
-        "set_power_activity -input -activity {} -duty 0.5".format(ctx.attr.power_switching_activity),
-        "report_power",
-        "report_wns",
-        "report_tns",
-        "report_checks -path_delay min_max -format full_clock_expanded -fields {input_pin slew capacitance} -digits 3",
-        "report_check_types -max_slew -max_capacitance -max_fanout -violators",
+        "report_units",
         "report_design_area",
         "report_cell_usage",
+        "report_wns -digits 3",
+        "report_tns -digits 3",
+        "report_timing_histogram -num_bins 25",
+        "set_power_activity -input -activity {} -duty 0.5".format(ctx.attr.power_switching_activity),
+        "report_power -digits 3",
+        "report_checks -path_delay min_max -format full_clock_expanded -fields {input_pin slew capacitance} -digits 3",
+        "report_check_types -max_slew -max_capacitance -max_fanout -violators",
         "report_clock_min_period",
         "report_clock_properties",
     ]
