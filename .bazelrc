@@ -17,7 +17,7 @@ build --cxxopt "-std=c++17"
 build --cxxopt "-ffp-contract=off"
 build --host_cxxopt "-std=c++17"
 build --host_cxxopt "-ffp-contract=off"
-# build --crosstool_top=@llvm_toolchain//:toolchain
+build --crosstool_top=@llvm_toolchain//:toolchain
 
 build:ciremotebuild --crosstool_top=@llvm_toolchain//:toolchain
 build:ciremotebuild --bes_backend=grpcs://cloud.buildbuddy.io
