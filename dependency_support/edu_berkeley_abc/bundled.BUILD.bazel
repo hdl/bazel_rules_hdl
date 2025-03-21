@@ -38,6 +38,7 @@ cc_binary(
     ],
     includes = ["src/"],
     deps = [":abc-lib"],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
