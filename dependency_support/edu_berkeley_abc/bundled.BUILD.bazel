@@ -1227,13 +1227,11 @@ cc_library(
         "ABC_USE_PTHREADS",
         "ABC_USE_READLINE",
         "_DEFAULT_SOURCE",
+        "ABC_NAMESPACE=abc",
     ],
     includes = ["src/"],
     linkopts = ["-ldl", "-lpthread"],
     linkstatic = True,
-    local_defines = [
-        "ABC_NAMESPACE=abc",
-    ],
     textual_hdrs = glob(
         [
             "src/base/abci/abciUnfold2.c",
