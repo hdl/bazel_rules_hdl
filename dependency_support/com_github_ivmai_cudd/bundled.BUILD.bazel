@@ -136,16 +136,6 @@ cc_library(
     deps = [":cudd"],
 )
 
-load("@bazel_skylib//rules:build_test.bzl", "build_test")
-
-build_test(
-    name = "cudd_build_test",
-    targets = [
-        ":cudd",
-        ":cudd++",
-    ],
-)
-
 genrule(
   name = "config",
   srcs = ["@rules_hdl//dependency_support/com_github_ivmai_cudd:config.h"],
