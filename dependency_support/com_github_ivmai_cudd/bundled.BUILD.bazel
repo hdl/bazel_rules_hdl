@@ -144,6 +144,7 @@ build_test(
     ],
 )
 
+genrule(
   name = "config",
   srcs = ["@rules_hdl//dependency_support/com_github_ivmai_cudd:config.h"],
   outs = ["config.h"],
