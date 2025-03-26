@@ -24,7 +24,7 @@ cc_binary(
     srcs = ["src/base/main/main.c"],
     copts = [
         "-x c++",
-        "-std=c++11",
+        "-std=c++17",
     ],
     defines = [
         "LIN64",
@@ -1218,7 +1218,7 @@ cc_library(
         "-Wno-parentheses-equality",
         "-Wno-constant-logical-operand",
         "-x c++",
-        "-std=c++11",
+        "-std=c++17",
     ],
     defines = [
         "LIN64",
