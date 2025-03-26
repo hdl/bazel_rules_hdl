@@ -26,5 +26,5 @@ def com_github_davidkebo_cudd():
         ],
         strip_prefix = "cudd-3.0.0",
         sha256 = "b8e966b4562c96a03e7fbea239729587d7b395d53cadcc39a7203b49cf7eeb69",
-        build_file = "//dependency_support/com_github_davidkebo_cudd:bundled.BUILD.bazel",
+        build_file = Label("//dependency_support/com_github_davidkebo_cudd:bundled.BUILD.bazel"),
     )
