@@ -60,7 +60,7 @@ cc_binary(
 =======
     copts = [
         "-x c++",
-        "-std=c++11",
+        "-std=c++17",
     ],
     defines = [
         "LIN64",
