@@ -1218,6 +1218,7 @@ cc_library(
         "-Wno-parentheses-equality",
         "-Wno-constant-logical-operand",
         "-x c++",
+        "-std=c++11",
     ],
     defines = [
         "LIN64",
