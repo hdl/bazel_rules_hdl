@@ -17,14 +17,14 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-def com_github_ivmai_cudd():
+def com_github_davidkebo_cudd():
     maybe(
         http_archive,
-        name = "com_github_ivmai_cudd",
+        name = "com_github_davidkebo_cudd",
         urls = [
-            "https://github.com/ivmai/cudd/archive/f54f533303640afd5dbe47a05ebeabb3066f2a25.zip",
+            "https://github.com/davidkebo/cudd/raw/refs/heads/main/cudd_versions/cudd-3.0.0.tar.gz",
         ],
-        strip_prefix = "cudd-f54f533303640afd5dbe47a05ebeabb3066f2a25",
-        sha256 = "",
-        build_file = Label("//dependency_support/com_github_ivmai_cudd:bundled.BUILD.bazel"),
+        strip_prefix = "cudd-3.0.0",
+        sha256 = "b8e966b4562c96a03e7fbea239729587d7b395d53cadcc39a7203b49cf7eeb69",
+        build_file = "//dependency_support/com_github_davidkebo_cudd:bundled.BUILD.bazel",
     )

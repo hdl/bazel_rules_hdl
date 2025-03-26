@@ -140,7 +140,7 @@ cc_library(
 
 genrule(
   name = "config",
-  srcs = ["@rules_hdl//dependency_support/com_github_ivmai_cudd:config.h"],
+  srcs = ["@rules_hdl//dependency_support/com_github_davidkebo_cudd:config.h"],
   outs = ["config.h"],
-  cmd = "cat $(location @rules_hdl//dependency_support/com_github_ivmai_cudd:config.h) > $@",
+  cmd = "cat $(location @rules_hdl//dependency_support/com_github_davidkebo_cudd:config.h) > $@",
 )
