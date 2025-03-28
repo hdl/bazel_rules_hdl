@@ -41,13 +41,13 @@ def pseudo_configure(name, out, src = None, defs = [], mappings = {}, additional
         cmd += "echo"
     all_defs = ""
     for def_ in defs:
-        cmd += r"| perl -p -e 's/#\s*undef \b(" + def_ + r")\b/#define $$1 1/'"
+        cmd += r"| sed 's/#\s*undef \b\(" + def_ + r"\)\b/#define \1 1/'"
         all_defs += "#define " + def_ + " 1\\n"
     for key, value in mappings.items():
-        cmd += r"| perl -p -e 's/#\s*undef \b" + key + r"\b/#define " + str(key) + " " + str(value) + "/'"
-        cmd += r"| perl -p -e 's/#\s*define \b(" + key + r")\b 0/#define $$1 " + str(value) + "/'"
+        cmd += r"| sed 's/#\s*undef \b" + key + r"\b/#define " + str(key) + " " + str(value) + "/'"
+        cmd += r"| sed 's/#\s*define \b\(" + key + r"\)\b 0/#define \1 " + str(value) + "/'"
         all_defs += "#define " + key + " " + value + "\\n"
-    cmd += r"| perl -p -e 's/\@DEFS\@/" + all_defs + "/'"
+    cmd += r"| sed 's/\@DEFS\@/" + all_defs + "/'"
     cmd += " >> $@"
     native.genrule(
         name = name,
