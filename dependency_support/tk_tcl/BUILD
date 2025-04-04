@@ -16,3 +16,8 @@ package(
     default_applicable_licenses = ["//:package_license"],
     default_visibility = ["//visibility:private"],
 )
+
+exports_files(
+    ["bundled.BUILD.bazel", "dynamic_search_path.patch"],
+    visibility = ["//visibility:public"],
+)

@@ -62,7 +62,6 @@ load("//dependency_support/org_theopenroadproject_asap7sc6t_26:org_theopenroadpr
 load("//dependency_support/org_theopenroadproject_asap7sc7p5t_27:org_theopenroadproject_asap7sc7p5t_27.bzl", "org_theopenroadproject_asap7sc7p5t_27")
 load("//dependency_support/org_theopenroadproject_asap7sc7p5t_28:org_theopenroadproject_asap7sc7p5t_28.bzl", "org_theopenroadproject_asap7sc7p5t_28")
 load("//dependency_support/rules_license:rules_license.bzl", "rules_license")
-load("//dependency_support/tk_tcl:tk_tcl.bzl", "tk_tcl")
 load("//dependency_support/verilator:verilator.bzl", "verilator")
 
 # buildifier: disable=unnamed-macro
@@ -116,7 +115,6 @@ def dependency_support(register_toolchains = True):
     org_theopenroadproject_asap7sc7p5t_27()
     org_theopenroadproject_asap7sc7p5t_28()
     rules_license()
-    tk_tcl()
     verilator()
 
     if register_toolchains:
