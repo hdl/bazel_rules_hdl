@@ -763,7 +763,6 @@ filegroup(
         "Lib/xml/xml.swg",
     ],
     licenses = ["notice"],  # simple notice license for Lib/
-    path = "Lib",
 )
 
 # find . -name '*.h' -print | awk '!/Examples/' | awk '{gsub(/^.\//, "", $0); printf("\"%s\"\n", $0) }'

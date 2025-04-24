@@ -15,6 +15,7 @@
 
 """Functions for verilator."""
 
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@rules_cc//cc:defs.bzl", "CcInfo")
 load("//verilog:defs.bzl", "VerilogInfo")
@@ -122,6 +123,7 @@ def _verilator_cc_library(ctx):
     prefix = "V" + ctx.attr.module_top
 
     args = ctx.actions.args()
+    args.add(verilator_toolchain.verilator)
     args.add("--no-std")
     args.add("--cc")
     args.add("--Mdir", verilator_output.path)
@@ -134,22 +136,27 @@ def _verilator_cc_library(ctx):
     args.add_all(verilator_toolchain.extra_vopts)
     args.add_all(ctx.attr.vopts, expand_directories = False)
 
+    env = {}
+    if verilator_toolchain._avoid_nondeterministic_outputs:
+        env["VERILATOR_AVOID_NONDETERMINISTIC_OUTPUTS"] = "1"
+
     ctx.actions.run(
         arguments = [args],
         mnemonic = "VerilatorCompile",
-        executable = verilator_toolchain.verilator,
+        executable = ctx.executable._process_wrapper,
         tools = verilator_toolchain.all_files,
         inputs = verilog_files,
         outputs = [verilator_output],
         progress_message = "[Verilator] Compiling {}".format(ctx.label),
+        env = env,
     )
 
     verilator_output_cpp = ctx.actions.declare_directory(ctx.label.name + "_cpp")
     verilator_output_hpp = ctx.actions.declare_directory(ctx.label.name + "_h")
 
     cp_args = ctx.actions.args()
-    cp_args.add("--src_output", verilator_output_cpp.path)
-    cp_args.add("--hdr_output", verilator_output_hpp.path)
+    cp_args.add(verilator_output_cpp.path, format = "--src_output=%s")
+    cp_args.add(verilator_output_hpp.path, format = "--hdr_output=%s")
     cp_args.add_all([verilator_output], map_each = _only_cpp, format_each = "--src=%s")
     cp_args.add_all([verilator_output], map_each = _only_hpp, format_each = "--hdr=%s")
 
@@ -208,6 +215,12 @@ verilator_cc_library = rule(
             executable = True,
             default = Label("//verilator/private:verilator_copy_tree"),
         ),
+        "_process_wrapper": attr.label(
+            doc = "The Verilator process wrapper binary.",
+            executable = True,
+            cfg = "exec",
+            default = Label("//verilator/private:verilator_process_wrapper"),
+        ),
     },
     provides = [
         CcInfo,
@@ -228,12 +241,16 @@ def _verilator_toolchain_impl(ctx):
         deps = ctx.attr.deps,
         extra_vopts = ctx.attr.extra_vopts,
         all_files = all_files,
+        _avoid_nondeterministic_outputs = ctx.attr.avoid_nondeterministic_outputs[BuildSettingInfo].value,
     )]
 
 verilator_toolchain = rule(
     doc = "Define a Verilator toolchain.",
     implementation = _verilator_toolchain_impl,
     attrs = {
+        "avoid_nondeterministic_outputs": attr.label(
+            default = Label("//verilator/settings:avoid_nondeterministic_outputs"),
+        ),
         "deps": attr.label_list(
             doc = "Global Verilator dependencies to link into downstream targets.",
             providers = [CcInfo],

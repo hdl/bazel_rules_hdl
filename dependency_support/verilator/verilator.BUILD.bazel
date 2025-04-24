@@ -18,12 +18,12 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("@rules_hdl//dependency_support/com_github_westes_flex:flex.bzl", "genlex")
 load(
     "@rules_hdl//dependency_support/verilator/private:verilator_utils.bzl",
+    "current_flex_lexer_header",
     "verilator_astgen",
     "verilator_bisonpre",
     "verilator_build_template",
     "verilator_flexfix",
     "verilator_version",
-    "current_flex_lexer_header"
 )
 
 package(default_visibility = ["//visibility:private"])
@@ -193,13 +193,16 @@ verilator_bisonpre(
 
 cc_library(
     name = "verilatedos",
-    hdrs = ["include/verilatedos.h"],
+    hdrs = [
+        "include/verilatedos.h",
+        "include/verilatedos_c.h",
+    ],
     strip_include_prefix = "include/",
 )
 
 current_flex_lexer_header(
     name = "current_flex_lexer_header",
-    out = "flex/src/FlexLexer.h"
+    out = "flex/src/FlexLexer.h",
 )
 
 cc_library(
@@ -310,7 +313,6 @@ cc_library(
         "include/verilated_vcd_c.h",
         "include/verilated_vpi.h",
         "include/verilated.h",
-        "include/verilatedos.h",
     ],
     # TODO: Remove these once upstream fixes these warnings
     copts = [
@@ -332,6 +334,7 @@ cc_library(
     deps = [
         "@net_zlib//:zlib",
         ":vltstd",
+        ":verilatedos",
     ],
 )
 
