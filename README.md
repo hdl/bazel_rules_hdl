@@ -1,4 +1,4 @@
-# bazel_rules_hdl
+# rules_hdl
 Hardware Description Language (Verilog, VHDL, Chisel, nMigen, etc) with open tools (Yosys, Verilator, OpenROAD, etc) rules for Bazel (https://bazel.build)
 
 **THIS REPO REQUIRES BAZEL 5.4.0 or greater**

@@ -2,3 +2,5 @@ bazel-*/
 bazel-*
 user.bazelrc
 MODULE.bazel.lock
+/.envrc
+/.direnv
