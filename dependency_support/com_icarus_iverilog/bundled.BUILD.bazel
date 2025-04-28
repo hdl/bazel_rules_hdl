@@ -39,6 +39,19 @@ exports_files([
     "build-plugins",
 ])
 
+filegroup(
+    name = "system_vpis",
+    srcs = [
+        ":system_vpi",
+        ":v2005_math_vpi",
+        ":v2009_vpi",
+        ":va_math_vpi",
+        ":vhdl_sys_vpi",
+        ":vhdl_textio_vpi",
+        ":vpi_debug_vpi",
+    ],
+)
+
 # This wrapper around iverilog compiler is to be used by
 # simulations. A typical genrule will look similar to gen_hello.vvp
 # below.
@@ -52,6 +65,7 @@ sh_binary(
         ":ivlpp",
         ":vvp_tgt",
     ],
+    deps = ["@bazel_tools//tools/bash/runfiles"],
     output_licenses = ["unencumbered"],
     visibility = ["//visibility:public"],
 )
@@ -69,16 +83,11 @@ sh_binary(
     name = "vvp",
     srcs = ["@rules_hdl//dependency_support/com_icarus_iverilog:vvp.sh"],
     data = [
-        ":system_vpi",
-        ":v2005_math_vpi",
-        ":v2009_vpi",
-        ":va_math_vpi",
-        ":vhdl_sys_vpi",
-        ":vhdl_textio_vpi",
-        ":vpi_debug_vpi",
         ":vvp-bin",
+        ":system_vpis",
     ],
     output_licenses = ["unencumbered"],
+    deps = ["@bazel_tools//tools/bash/runfiles"],
     visibility = ["//visibility:public"],
 )
 

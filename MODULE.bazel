@@ -56,47 +56,6 @@ _org_gnu_gnulib(
     name = "org_gnu_gnulib",
 )
 
-# Configure and register the toolchain.
-llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm", dev_dependency = True)
-llvm.toolchain(
-    name = "llvm_toolchain",
-    link_flags = {
-        "linux-x86_64": [
-            "--target=x86_64-unknown-linux-gnu",
-            "-lm",
-            "-no-canonical-prefixes",
-            "-fuse-ld=lld",
-            "-Wl,--build-id=md5",
-            "-Wl,--hash-style=gnu",
-            "-Wl,-z,relro,-z,now",
-            "-l:libc++.a",
-            "-l:libc++abi.a",
-            "-lpthread",
-            "-ldl",
-        ],
-    },
-    llvm_version = "10.0.1",
-    sha256 = {
-        "linux-x86_64": "02a73cfa031dfe073ba8d6c608baf795aa2ddc78eed1b3e08f3739b803545046",
-    },
-    strip_prefix = {
-        "linux-x86_64": "clang+llvm-10.0.1-x86_64-pc-linux-gnu",
-    },
-    urls = {
-        "linux-x86_64": [
-            # Use a custom built Clang+LLVM binrary distribution that is more portable than
-            # the official builds because it's built against an older glibc and does not have
-            # dynamic library dependencies to tinfo, gcc_s or stdlibc++.
-            #
-            # For more details, see the files under toolchains/clang.
-            "https://github.com/retone/deps/releases/download/na5/clang+llvm-10.0.1-x86_64-pc-linux-gnu.tar.xz",
-        ],
-    },
-)
-use_repo(llvm, "llvm_toolchain")
-
-register_toolchains("@llvm_toolchain//:all", dev_dependency = True)
-
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
     ignore_root_user_error = True,
@@ -241,16 +200,6 @@ http_archive(
     sha256 = "002da98e316ca6eee40407f5deb7d7c43a0788847d39c90d4d31ddbbc03020e8",
     strip_prefix = "verilator-5.034",
     urls = ["https://github.com/verilator/verilator/archive/refs/tags/v5.034.tar.gz"],
-)
-
-http_archive(
-    name = "com_icarus_iverilog",
-    build_file = "@rules_hdl//dependency_support:com_icarus_iverilog/bundled.BUILD.bazel",
-    sha256 = "a68cb1ef7c017ef090ebedb2bc3e39ef90ecc70a3400afb4aa94303bc3beaa7d",
-    strip_prefix = "iverilog-12_0",
-    urls = [
-        "https://github.com/steveicarus/iverilog/archive/v12_0.tar.gz",
-    ],
 )
 
 http_archive(
@@ -402,5 +351,6 @@ hdl.pdk(
 )
 use_repo(hdl, "com_google_skywater_pdk_sky130_fd_io")
 use_repo(hdl, "com_google_skywater_pdk_sky130_fd_sc_hd")
+use_repo(hdl, "com_icarus_iverilog")
 
 register_toolchains("//verilator:verilator_toolchain")

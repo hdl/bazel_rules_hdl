@@ -17,8 +17,18 @@
 # the command line of vvp.
 
 set -eu
+# Copy-pasted from the Bazel Bash runfiles library v3.
+set -uo pipefail; set +e; f=bazel_tools/tools/bash/runfiles/runfiles.bash
+# shellcheck disable=SC1090
+source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
+    source "$(grep -sm1 "^$f " "${RUNFILES_MANIFEST_FILE:-/dev/null}" | cut -f2- -d' ')" 2>/dev/null || \
+    source "$0.runfiles/$f" 2>/dev/null || \
+    source "$(grep -sm1 "^$f " "$0.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
+    source "$(grep -sm1 "^$f " "$0.exe.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
+    { echo>&2 "ERROR: cannot find $f"; exit 1; }; f=; set -e
 
-dir="$0.runfiles/com_icarus_iverilog"
+repo_name=$(runfiles_current_repository)
+dir="$0.runfiles/$repo_name"
 if [[ ! -d "$dir" ]]; then
   dir=$(dirname $0)  # use current directory it not launched directly from the :vvp target.
 fi
