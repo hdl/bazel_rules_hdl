@@ -11,47 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-common --noenable_bzlmod
+common --enable_bzlmod
+
+
+common --registry=https://raw.githubusercontent.com/bazelboost/registry/main
+common --registry=https://bcr.bazel.build
 
 build --cxxopt "-std=c++17"
 build --cxxopt "-ffp-contract=off"
 build --host_cxxopt "-std=c++17"
 build --host_cxxopt "-ffp-contract=off"
 
-build:ciremotebuild --crosstool_top=@llvm_toolchain//:toolchain
-build:ciremotebuild --bes_backend=grpcs://cloud.buildbuddy.io
-build:ciremotebuild --remote_cache=https://storage.googleapis.com/bazel-cache-rules-hdl
-build:ciremotebuild --google_default_credentials
-build:ciremotebuild --remote_download_outputs=all
-build:ciremotebuild --tls_client_certificate=/root/.ssh/buildbuddy-cert.pem
-build:ciremotebuild --tls_client_key=/root/.ssh/buildbuddy-key.pem
-build:ciremotebuild --build_metadata=VISIBILITY=PUBLIC
-
-test:ciremotebuild --crosstool_top=@llvm_toolchain//:toolchain
-test:ciremotebuild --bes_backend=grpcs://cloud.buildbuddy.io
-test:ciremotebuild --remote_cache=grpcs://cloud.buildbuddy.io
-test:ciremotebuild --remote_download_outputs=all
-test:ciremotebuild --google_default_credentials
-test:ciremotebuild --noremote_upload_local_results # Uploads logs & artifacts without writing to cache
-test:ciremotebuild --tls_client_certificate=/root/.ssh/buildbuddy-cert.pem
-test:ciremotebuild --tls_client_key=/root/.ssh/buildbuddy-key.pem
-test:ciremotebuild --build_metadata=VISIBILITY=PUBLIC
-test:ciremotebuild --remote_timeout=3600
-
-###############################################################################
-## Incompatibility flags
-###############################################################################
-
 # https://github.com/bazelbuild/bazel/issues/8195
 build --incompatible_disallow_empty_glob=true
 
-###############################################################################
-## User flags
-###############################################################################
-# Optionally allow users to define custom flags when developing new features.
-# https://bazel.build/configure/best-practices#bazelrc-file
-#
-# Note: This line should always be last in this file to ensure consistent behavior
-# with flags defined in this file.
-#
 try-import %workspace$/user.bazelrc

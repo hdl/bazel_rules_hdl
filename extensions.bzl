@@ -1,6 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//dependency_support/com_google_skywater_pdk:cell_libraries.bzl", "CELL_LIBRARIES")
+load("//:repositories.bzl", "load_external")
 
 def _hdl_ext_impl(module_ctx):
     root_direct_deps = []
@@ -36,18 +36,6 @@ declare_cell_library("{}", "{}")
                         ],
                     )
 
-    # Expose the internal repos so that third parties can access them.
-    http_archive(
-        name = "com_icarus_iverilog",
-        build_file = "//dependency_support:com_icarus_iverilog/bundled.BUILD.bazel",
-        sha256 = "a68cb1ef7c017ef090ebedb2bc3e39ef90ecc70a3400afb4aa94303bc3beaa7d",
-        strip_prefix = "iverilog-12_0",
-        urls = [
-            "https://github.com/steveicarus/iverilog/archive/v12_0.tar.gz",
-        ],
-    )
-    root_direct_deps.append("com_icarus_iverilog")
-
     return module_ctx.extension_metadata(
         root_module_direct_deps = root_direct_deps,
         root_module_direct_dev_deps = root_direct_dev_deps,
@@ -72,4 +60,45 @@ hdl_ext = module_extension(
             attrs = _PDK_TAG_ATTRS,
         ),
     },
+)
+
+def _hdl_tools_ext_impl(module_ctx):
+    # Expose the internal repos so that third parties can access them.
+    load_external()
+    root_direct_deps = [
+        "org_gnu_gnulib",
+        "org_theopenroadproject",
+        "org_theopenroadproject_asap7sc6t_26",
+        "org_theopenroadproject_asap7sc7p5t_27",
+        "org_theopenroadproject_asap7_pdk_r1p7",
+        "org_theopenroadproject_asap7sc7p5t_28",
+        "at_clifford_yosys",
+        "edu_berkeley_abc",
+        "tk_tcl",
+        "org_sourceware_libffi",
+        "com_google_skywater_pdk",
+        "net_zlib",
+        "verilator",
+        "org_sourceware_bzip2",
+        "org_gnu_readline",
+        "org_gnu_gperf",
+        "net_invisible_island_ncurses",
+        "org_7zip",
+        "org_swig",
+        "com_github_quantamhd_lemon",
+        "org_llvm_openmp",
+        "bliss",
+        "org_gnu_glpk",
+        "org_pcre_ftp",
+        "com_github_libbacktrace",
+        "com_icarus_iverilog",
+    ]
+    return module_ctx.extension_metadata(
+        root_module_direct_deps = root_direct_deps,
+        root_module_direct_dev_deps = [],
+    )
+
+
+hdl_tools_ext = module_extension(
+    implementation = _hdl_tools_ext_impl,
 )
