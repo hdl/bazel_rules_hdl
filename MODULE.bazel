@@ -5,7 +5,10 @@
 # For more details, please check https://github.com/bazelbuild/bazel/issues/18958
 ###############################################################################
 
-module(name = "rules_hdl")
+module(
+    name = "rules_hdl",
+    version = "0.0.1"
+)
 
 bazel_dep(name = "platforms", version = "0.0.11")
 bazel_dep(name = "abseil-cpp", version = "20240722.0.bcr.2")
@@ -30,10 +33,9 @@ bazel_dep(name = "boost.bind", version = "1.83.0")
 bazel_dep(name = "boost.optional", version = "1.83.0")
 bazel_dep(name = "boost.thread", version = "1.83.0")
 
-
 bazel_dep(name = "eigen", version = "4.0.0-20241125.bcr.1")
-bazel_dep(name = "fmt", version = "11.1.3", repo_name = "com_github_fmtlib_fmt")
-bazel_dep(name = "googletest", version = "1.15.2", repo_name = "com_google_googletest")
+bazel_dep(name = "fmt", version = "11.1.3")
+bazel_dep(name = "googletest", version = "1.15.2")
 bazel_dep(name = "protobuf", version = "29.3")
 bazel_dep(name = "rules_bison", version = "0.3")
 bazel_dep(name = "rules_cc", version = "0.1.1")
@@ -43,10 +45,76 @@ bazel_dep(name = "rules_license", version = "1.0.0")
 bazel_dep(name = "rules_m4", version = "0.2.4")
 bazel_dep(name = "rules_python", version = "1.0.0")
 bazel_dep(name = "rules_pkg", version = "1.0.1")
-bazel_dep(name = "spdlog", version = "1.15.1", repo_name = "com_github_gabime_spdlog")
+bazel_dep(name = "spdlog", version = "1.15.1")
 
 bazel_dep(name = "zlib", version = "1.3.1.bcr.4")
 bazel_dep(name = "or-tools", version = "9.12")
+bazel_dep(name = "readline", version = "8.2.bcr.1")
+bazel_dep(name = "verilator", version = "5.034")
+bazel_dep(name = "lemon", version = "1.3.1")
+bazel_dep(name = "iverilog", version = "12.0.0")
+bazel_dep(name = "abc", version = "0.0.0-20250408-yosyshq.bcr.1")
+bazel_dep(name = "ncurses", version = "6.4.20221231.bcr.8")
+bazel_dep(name = "llvm-project", version = "21.0.0")
+bazel_dep(name = "tcl", version = "8.6.10")
+bazel_dep(name = "openroad", version = "1.0.0")
+bazel_dep(name = "swig", version = "4.3.0")
+bazel_dep(name = "yosys", version = "0.52.0")
+
+# Custom patches with our fixes. Some of these are transitive deps.
+# It's still necessary to override them here.
+git_override(
+    module_name = "yosys",
+    commit = "dabe0e6c8c4706f880b8b7cd010dac987a6465ef",
+    remote = "https://github.com/amorphic-io/swig.git",
+)
+git_override(
+    module_name = "swig",
+    commit = "52ed25274e9042611bda40c42e48aae8b6748686",
+    remote = "https://github.com/amorphic-io/swig.git",
+)
+git_override(
+    module_name = "iverilog",
+    commit = "760dfa28d8f863164a2fbbaabebd1202850249c8",
+    remote = "https://github.com/amorphic-io/iverilog.git",
+)
+git_override(
+    module_name = "lemon",
+    commit = "f8be7b96fbdfa789a4dae0429967b7724e89d5f5",
+    remote = "https://github.com/amorphic-io/lemon",
+)
+git_override(
+    module_name = "abc",
+    commit = "2fa8f6e551a85da586fbe01792e6cfdaa7ce72cc",
+    remote = "https://github.com/amorphic-io/abc",
+)
+git_override(
+    module_name = "ncurses",
+    commit = "f918fafc9f7aeb1745d02e7978597abf8e580de2",
+    remote = "https://github.com/amorphic-io/ncurses",
+)
+git_override(
+    module_name = "llvm-project",
+    commit = "93c4a9c7b9d2fef50ad97c80efa54ccaed7df0c8",
+    remote = "https://github.com/amorphic-io/llvm-project",
+)
+git_override(
+    module_name = "tcl",
+    commit = "4ca5c6850eae1a24b611a76a68eff0b31c840823",
+    remote = "https://github.com/amorphic-io/tcl.git",
+)
+#local_path_override(module_name = "openroad", path = "/home/lromor/Projects/Job/amorphic/OpenROAD")
+git_override(
+    module_name = "openroad",
+    commit = "c9236a6d6a90410969123575e54ff23dd4f4398e",
+    remote = "https://github.com/amorphic-io/OpenROAD",
+    init_submodules = True,
+)
+git_override(
+    module_name = "bazel-orfs",
+    commit = "126765508161956f8f82ae169084da0235230637",
+    remote = "https://github.com/The-OpenROAD-Project/bazel-orfs.git",
+)
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
@@ -79,10 +147,8 @@ hdl.pdk(
 use_repo(hdl, "com_google_skywater_pdk_sky130_fd_io")
 use_repo(hdl, "com_google_skywater_pdk_sky130_fd_sc_hd")
 
-# Non bzlmodified tooling, importable from dependent modules.
-hdl_tools = use_extension(":extensions.bzl", "hdl_tools_ext")
-use_repo(hdl_tools, "com_icarus_iverilog")
-use_repo(hdl_tools, "verilator")
-use_repo(hdl_tools, "at_clifford_yosys", "bliss", "com_github_libbacktrace", "com_github_quantamhd_lemon", "com_google_skywater_pdk", "edu_berkeley_abc", "net_invisible_island_ncurses", "net_zlib", "org_7zip", "org_gnu_glpk", "org_gnu_gnulib", "org_gnu_gperf", "org_gnu_readline", "org_llvm_openmp", "org_pcre_ftp", "org_sourceware_bzip2", "org_sourceware_libffi", "org_swig", "org_theopenroadproject", "org_theopenroadproject_asap7_pdk_r1p7", "org_theopenroadproject_asap7sc6t_26", "org_theopenroadproject_asap7sc7p5t_27", "org_theopenroadproject_asap7sc7p5t_28", "tk_tcl")
+# # Non bzlmodified tooling, importable from dependent modules.
+# # hdl_tools = use_extension(":extensions.bzl", "hdl_tools_ext")
+# # use_repo(hdl_tools, "at_clifford_yosys", "com_google_skywater_pdk", "org_7zip", "org_theopenroadproject_asap7_pdk_r1p7", "org_theopenroadproject_asap7sc6t_26", "org_theopenroadproject_asap7sc7p5t_27", "org_theopenroadproject_asap7sc7p5t_28")
 
 register_toolchains("//verilator:verilator_toolchain")

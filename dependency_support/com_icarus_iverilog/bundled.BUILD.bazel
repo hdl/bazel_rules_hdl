@@ -585,13 +585,32 @@ genrule(
 HAVE_CONFIG_SUFFIXES = "TIMES|IOSFWD|GETOPT_H|INTTYPES_H|DLFCN_H|LIBREADLINE|LIBZ|LIBBZ2|LROUND|SYS_WAIT_H|ALLOCA_H|FSEEKO|LIBPTHREAD|REALPATH"
 HAVE_CONFIG_RE = "HAVE_(%s)" % HAVE_CONFIG_SUFFIXES
 
-DEFS = ["HAVE_IOSFWD", "HAVE_DLFCN_H", "HAVE_GETOPT_H", "HAVE_LIBREADLINE", "HAVE_READLINE_READLINE_H", "HAVE_LIBHISTORY", "HAVE_READLINE_HISTORY_H", "HAVE_INTTYPES_H", "HAVE_LROUND", "HAVE_LLROUND", "HAVE_NAN", "UINT64_T_AND_ULONG_SAME", "HAVE_SYS_RESOURCE_H", "LINUX"]
+DEFS = [
+    "HAVE_IOSFWD",
+    "HAVE_DLFCN_H",
+    "HAVE_GETOPT_H",
+    "HAVE_LIBREADLINE",
+    "HAVE_READLINE_READLINE_H",
+    "HAVE_LIBHISTORY",
+    "HAVE_READLINE_HISTORY_H",
+    "HAVE_INTTYPES_H",
+    "HAVE_LROUND",
+    "HAVE_LLROUND",
+    "HAVE_NAN",
+    "UINT64_T_AND_ULONG_SAME",
+    "HAVE_SYS_RESOURCE_H",
+    "LINUX"
+]
 
 pseudo_configure(
     name = "tgt_vvp__vvp_config_h",
     src = "tgt-vvp/vvp_config.h.in",
     out = "tgt-vvp/vvp_config.h",
-    defs = ["HAVE_STDINT_H", "HAVE_INTTYPES_H", "_LARGEFILE_SOURCE"],
+    defs = [
+        "HAVE_STDINT_H",
+        "HAVE_INTTYPES_H",
+        "_LARGEFILE_SOURCE"
+    ],
     mappings = {},
 )
 
@@ -599,7 +618,22 @@ pseudo_configure(
     name = "config_h",
     src = "config.h.in",
     out = "config.h",
-    defs = ["HAVE_TIMES", "HAVE_IOSFWD", "HAVE_GETOPT_H", "HAVE_INTTYPES_H", "HAVE_DLFCN_H", "HAVE_LIBREADLINE", "HAVE_LIBZ", "HAVE_LIBBZ2", "HAVE_LROUND", "HAVE_SYS_WAIT_H", "HAVE_ALLOCA_H", "HAVE_FSEEKO", "HAVE_LIBPTHREAD", "HAVE_REALPATH"],
+    defs = [
+        "HAVE_TIMES",
+        "HAVE_IOSFWD",
+        "HAVE_GETOPT_H",
+        "HAVE_INTTYPES_H",
+        "HAVE_DLFCN_H",
+        "HAVE_LIBREADLINE",
+        "HAVE_LIBZ",
+        "HAVE_LIBBZ2",
+        "HAVE_LROUND",
+        "HAVE_SYS_WAIT_H",
+        "HAVE_ALLOCA_H",
+        "HAVE_FSEEKO",
+        "HAVE_LIBPTHREAD",
+        "HAVE_REALPATH"
+    ],
     mappings = {},
 )
 
@@ -616,7 +650,25 @@ pseudo_configure(
     src = "vvp/config.h.in",
     out = "vvp_gen/config.h",
     defs = DEFS,
-    mappings = {"SIZEOF_UNSIGNED_LONG_LONG": "8", "SIZEOF_UNSIGNED_LONG": "8", "SIZEOF_UNSIGNED": "4", "SIZEOF_VOID_P": "8", "USE_READLINE": "", "USE_HISTORY": "", "MODULE_DIR": '"."', "__STDC_FORMAT_MACROS": "", "TIME_FMT_O": '"lo"', "TIME_FMT_U": '"lu"', "TIME_FMT_X": '"lx"', "UL_AND_TIME64_SAME": "", "i64round": "lround", "nan(x)": "(NAN)", "INFINITY": "HUGE_VAL", "LU": '""', "TU": '""'},
+    mappings = {
+        "SIZEOF_UNSIGNED_LONG_LONG": "8",
+        "SIZEOF_UNSIGNED_LONG": "8",
+        "SIZEOF_UNSIGNED": "4",
+        "SIZEOF_VOID_P": "8",
+        "USE_READLINE": "",
+        "USE_HISTORY": "",
+        "MODULE_DIR": '"."',
+        "__STDC_FORMAT_MACROS": "",
+        "TIME_FMT_O": '"lo"',
+        "TIME_FMT_U": '"lu"',
+        "TIME_FMT_X": '"lx"',
+        "UL_AND_TIME64_SAME": "",
+        "i64round": "lround",
+        "nan(x)": "(NAN)",
+        "INFINITY": "HUGE_VAL",
+        "LU": '""',
+        "TU": '""'
+    },
 )
 
 touch(
@@ -629,7 +681,7 @@ touch(
 
 genrule(
     name = "hello_vvp",
-    srcs = ["@rules_hdl//dependency_support/com_icarus_iverilog:hello.v"],
+    srcs = [":hello.v"],
     outs = ["hello.vvp"],
     cmd = (
         "$(location :iverilog) " +
@@ -644,7 +696,7 @@ genrule(
 
 vpi_binary(
     name = "hello_vpi",
-    srcs = ["@rules_hdl//dependency_support/com_icarus_iverilog:hello_vpi.c"],
+    srcs = [":hello_vpi.c"],
     out = "hello.vpi",
     deps = [":vpi_user"],
 )
@@ -666,7 +718,7 @@ genrule(
 
 sh_test(
     name = "hello_verilog_test",
-    srcs = ["@rules_hdl//dependency_support/com_icarus_iverilog:hello_verilog_test.sh"],
+    srcs = [":hello_verilog_test.sh"],
     args = ["$(location :run_hello)"],
     data = [":run_hello"],
 )
