@@ -60,9 +60,27 @@ bazel_dep(name = "tcl", version = "8.6.10")
 bazel_dep(name = "openroad", version = "1.0.0")
 bazel_dep(name = "swig", version = "4.3.0")
 bazel_dep(name = "yosys", version = "0.52.0")
+bazel_dep(name = "nextpnr", version = "0.8.0")
+bazel_dep(name = "icestorm", version = "0.0.1")
+bazel_dep(name = "prjtrellis", version = "1.4.0")
 
 # Custom patches with our fixes. Some of these are transitive deps.
 # It's still necessary to override them here.
+git_override(
+    module_name = "prjtrellis",
+    commit = "3332d029295a8e424969126f5c61a5ea111882a8",
+    remote = "https://github.com/amorphic-io/prjtrellis.git",
+)
+git_override(
+    module_name = "icestorm",
+    commit = "85fd1682b58581b82d1d14f63c089fb033177c21",
+    remote = "https://github.com/amorphic-io/icestorm.git",
+)
+git_override(
+    module_name = "nextpnr",
+    commit = "2ab1f5e7e6be52e2a59347cace86f5c16348a115",
+    remote = "https://github.com/amorphic-io/nextpnr.git",
+)
 git_override(
     module_name = "cxxopts",
     commit = "0fc4bdab71ea25e3623e2b609b4e5b2bd20bb938",
