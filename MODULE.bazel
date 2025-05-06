@@ -64,9 +64,15 @@ bazel_dep(name = "yosys", version = "0.52.0")
 # Custom patches with our fixes. Some of these are transitive deps.
 # It's still necessary to override them here.
 git_override(
+    module_name = "cxxopts",
+    commit = "0fc4bdab71ea25e3623e2b609b4e5b2bd20bb938",
+    remote = "https://github.com/amorphic-io/cxxopts.git",
+)
+git_override(
     module_name = "yosys",
-    commit = "dabe0e6c8c4706f880b8b7cd010dac987a6465ef",
-    remote = "https://github.com/amorphic-io/swig.git",
+    commit = "cb3f8fe3e75db0b7c97fbc95b88596a00c611736",
+    remote = "https://github.com/amorphic-io/yosys.git",
+    init_submodules = True,
 )
 git_override(
     module_name = "swig",
@@ -103,7 +109,6 @@ git_override(
     commit = "4ca5c6850eae1a24b611a76a68eff0b31c840823",
     remote = "https://github.com/amorphic-io/tcl.git",
 )
-#local_path_override(module_name = "openroad", path = "/home/lromor/Projects/Job/amorphic/OpenROAD")
 git_override(
     module_name = "openroad",
     commit = "c9236a6d6a90410969123575e54ff23dd4f4398e",
