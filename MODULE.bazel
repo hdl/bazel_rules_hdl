@@ -63,9 +63,15 @@ bazel_dep(name = "yosys", version = "0.52.0")
 bazel_dep(name = "nextpnr", version = "0.8.0")
 bazel_dep(name = "icestorm", version = "0.0.1")
 bazel_dep(name = "prjtrellis", version = "1.4.0")
+bazel_dep(name = "p7zip", version = "24.9.0")
 
 # Custom patches with our fixes. Some of these are transitive deps.
 # It's still necessary to override them here.
+git_override(
+    module_name = "p7zip",
+    commit = "be778d8e29b3f21bd3b0c661be0d4f4ab49d3ffa",
+    remote = "https://github.com/amorphic-io/7zip.git",
+)
 git_override(
     module_name = "prjtrellis",
     commit = "3332d029295a8e424969126f5c61a5ea111882a8",
@@ -159,19 +165,31 @@ pip.parse(
 )
 use_repo(pip, "rules_hdl_pip_deps")
 
+register_toolchains("//verilator:verilator_toolchain")
+
 hdl = use_extension(":extensions.bzl", "hdl_ext")
-hdl.pdk(
+hdl.skywater_pdk(
     name = "com_google_skywater_pdk",
     libraries = [
         "sky130_fd_io",
         "sky130_fd_sc_hd",
     ],
 )
+
+use_repo(hdl, "com_google_skywater_pdk")
 use_repo(hdl, "com_google_skywater_pdk_sky130_fd_io")
 use_repo(hdl, "com_google_skywater_pdk_sky130_fd_sc_hd")
 
-# # Non bzlmodified tooling, importable from dependent modules.
-# # hdl_tools = use_extension(":extensions.bzl", "hdl_tools_ext")
-# # use_repo(hdl_tools, "at_clifford_yosys", "com_google_skywater_pdk", "org_7zip", "org_theopenroadproject_asap7_pdk_r1p7", "org_theopenroadproject_asap7sc6t_26", "org_theopenroadproject_asap7sc7p5t_27", "org_theopenroadproject_asap7sc7p5t_28")
+hdl.asap7_pdk(
+    name = "org_theopenroadproject_asap7_pdk",
+    libraries = [
+        "sc6t_26",
+        "sc7p5t_27",
+        "sc7p5t_28",
+    ],
+)
 
-register_toolchains("//verilator:verilator_toolchain")
+use_repo(hdl, "org_theopenroadproject_asap7_pdk")
+use_repo(hdl, "org_theopenroadproject_asap7_pdk_sc7p5t_28")
+use_repo(hdl, "org_theopenroadproject_asap7_pdk_sc6t_26")
+use_repo(hdl, "org_theopenroadproject_asap7_pdk_sc7p5t_27")

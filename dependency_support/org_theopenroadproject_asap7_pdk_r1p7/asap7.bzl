@@ -292,7 +292,7 @@ asap7_cell_library = rule(
             cfg = "exec",
         ),
         "_uncompress": attr.label(
-            default = Label("@7zip//:7za"),
+            default = Label("@p7zip//:7za"),
             executable = True,
             cfg = "exec",
         ),
