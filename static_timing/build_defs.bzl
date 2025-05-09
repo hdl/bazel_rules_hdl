@@ -44,7 +44,7 @@ def _run_opensta_impl(ctx):
         "LIBERTY": default_liberty_file.path,
         "LOGFILE": sta_log.path,
         "NETLIST": netlist.path,
-        "TCL_LIBRARY": opensta_runfiles_dir + "/tk_tcl/library",
+        "TCL_LIBRARY": opensta_runfiles_dir + "/+_repo_rules+tk_tcl/library",
         "TOP": synth_info.top_module,
     }
 

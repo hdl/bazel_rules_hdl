@@ -1,8 +1,6 @@
-diff --git boost.BUILD boost.BUILD
-index e5d0b60..bade47f 100644
 --- boost.BUILD
 +++ boost.BUILD
-@@ -1908,13 +1908,13 @@ boost_library(
+@@ -1927,13 +1927,13 @@
      exclude_src = ["libs/stacktrace/src/*.cpp"],
      linkopts = select({
          ":linux_ppc": [
@@ -19,7 +17,7 @@ index e5d0b60..bade47f 100644
          ],
          "//conditions:default": [],
      }),
-@@ -1927,6 +1927,7 @@ boost_library(
+@@ -1946,6 +1946,7 @@
          ":predef",
          ":static_assert",
          ":type_traits",

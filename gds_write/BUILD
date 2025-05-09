@@ -14,8 +14,8 @@
 
 # GDS write tool package.
 
+load("@rules_hdl_pip_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//dependency_support:requirements.bzl", "requirement")
 
 package(
     default_applicable_licenses = ["//:package_license"],

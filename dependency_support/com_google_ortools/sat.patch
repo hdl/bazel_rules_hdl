@@ -1,0 +1,18 @@
+--- ortools/sat/BUILD.bazel
++++ ortools/sat/BUILD.bazel
+@@ -13,10 +13,11 @@
+ 
+ # Home of CP/SAT solver (which includes SAT, max-SAT and PB problems).
+ 
+-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_proto_library")
+-load("@rules_java//java:defs.bzl", "java_proto_library")
+-load("@rules_proto//proto:defs.bzl", "proto_library")
+-load("@rules_python//python:proto.bzl", "py_proto_library")
++load("@protobuf//bazel:cc_proto_library.bzl", "cc_proto_library")
++load("@protobuf//bazel:java_proto_library.bzl", "java_proto_library")
++load("@protobuf//bazel:proto_library.bzl", "proto_library")
++load("@protobuf//bazel:py_proto_library.bzl", "py_proto_library")
++load("@rules_cc//cc:defs.bzl", "cc_library")
+ 
+ package(default_visibility = ["//visibility:public"])
+ 

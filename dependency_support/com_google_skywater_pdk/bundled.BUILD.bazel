@@ -14,8 +14,7 @@
 
 """ BUILD file for Skywater PDK """
 
-load("@rules_hdl//dependency_support:requirements.bzl", "requirement")
-load("@rules_hdl//dependency_support/com_google_skywater_pdk:cell_libraries.bzl", "CELL_LIBRARIES")
+load("@rules_hdl_pip_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 licenses(["notice"])

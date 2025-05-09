@@ -1,0 +1,406 @@
+###############################################################################
+# Bazel now uses Bzlmod by default to manage external dependencies.
+# Please consider migrating your external dependencies from WORKSPACE to MODULE.bazel.
+#
+# For more details, please check https://github.com/bazelbuild/bazel/issues/18958
+###############################################################################
+
+module(name = "rules_hdl")
+
+bazel_dep(name = "platforms", version = "0.0.11")
+bazel_dep(name = "abseil-cpp", version = "20240722.0.bcr.2", repo_name = "com_google_absl")
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+bazel_dep(name = "boost.asio", version = "1.83.0.bcr.1")
+bazel_dep(name = "boost.config", version = "1.83.0.bcr.1")
+bazel_dep(name = "boost.fusion", version = "1.83.0.bcr.1")
+bazel_dep(name = "boost.geometry", version = "1.83.0.bcr.2")
+bazel_dep(name = "boost.graph", version = "1.83.0.bcr.2")
+bazel_dep(name = "boost.heap", version = "1.83.0")
+bazel_dep(name = "boost.icl", version = "1.83.0")
+bazel_dep(name = "boost.lambda", version = "1.83.0")
+bazel_dep(name = "boost.multi_array", version = "1.83.0")
+bazel_dep(name = "boost.phoenix", version = "1.83.0")
+bazel_dep(name = "boost.polygon", version = "1.83.0.bcr.2")
+bazel_dep(name = "boost.stacktrace", version = "1.83.0")
+bazel_dep(name = "eigen", version = "3.4.0.bcr.2")
+bazel_dep(name = "fmt", version = "11.1.3", repo_name = "com_github_fmtlib_fmt")
+bazel_dep(name = "googletest", version = "1.15.2", repo_name = "com_google_googletest")
+bazel_dep(name = "protobuf", version = "29.3")
+bazel_dep(name = "rules_bison", version = "0.3")
+bazel_dep(name = "rules_cc", version = "0.1.1")
+bazel_dep(name = "rules_flex", version = "0.3")
+bazel_dep(name = "rules_java", version = "8.6.3")
+bazel_dep(name = "rules_license", version = "1.0.0")
+bazel_dep(name = "rules_m4", version = "0.2.4")
+bazel_dep(name = "rules_python", version = "1.0.0")
+bazel_dep(name = "rules_pkg", version = "1.0.1")
+bazel_dep(name = "spdlog", version = "1.15.1", repo_name = "com_github_gabime_spdlog")
+bazel_dep(name = "toolchains_llvm", version = "1.0.0", dev_dependency = True)
+bazel_dep(name = "zlib", version = "1.3.1.bcr.4")
+bazel_dep(name = "or-tools", version = "9.12", repo_name = "com_google_ortools")
+
+archive_override(
+    module_name = "or-tools",
+    integrity = "sha256-y7e/7plAn4tXBMQgyaa8wQVJY5UliMGWUdT1uwSA9TQ=",
+    strip_prefix = "or-tools-9.12",
+    urls = ["https://github.com/google/or-tools/releases/download/v9.12/or-tools-9.12.tar.gz"],
+)
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+_org_gnu_gnulib = use_repo_rule("//dependency_support/org_gnu_gnulib:org_gnu_gnulib.bzl", "_org_gnu_gnulib")
+
+_org_gnu_gnulib(
+    name = "org_gnu_gnulib",
+)
+
+# Configure and register the toolchain.
+llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm", dev_dependency = True)
+llvm.toolchain(
+    name = "llvm_toolchain",
+    link_flags = {
+        "linux-x86_64": [
+            "--target=x86_64-unknown-linux-gnu",
+            "-lm",
+            "-no-canonical-prefixes",
+            "-fuse-ld=lld",
+            "-Wl,--build-id=md5",
+            "-Wl,--hash-style=gnu",
+            "-Wl,-z,relro,-z,now",
+            "-l:libc++.a",
+            "-l:libc++abi.a",
+            "-lpthread",
+            "-ldl",
+        ],
+    },
+    llvm_version = "10.0.1",
+    sha256 = {
+        "linux-x86_64": "02a73cfa031dfe073ba8d6c608baf795aa2ddc78eed1b3e08f3739b803545046",
+    },
+    strip_prefix = {
+        "linux-x86_64": "clang+llvm-10.0.1-x86_64-pc-linux-gnu",
+    },
+    urls = {
+        "linux-x86_64": [
+            # Use a custom built Clang+LLVM binrary distribution that is more portable than
+            # the official builds because it's built against an older glibc and does not have
+            # dynamic library dependencies to tinfo, gcc_s or stdlibc++.
+            #
+            # For more details, see the files under toolchains/clang.
+            "https://github.com/retone/deps/releases/download/na5/clang+llvm-10.0.1-x86_64-pc-linux-gnu.tar.xz",
+        ],
+    },
+)
+use_repo(llvm, "llvm_toolchain")
+
+register_toolchains("@llvm_toolchain//:all", dev_dependency = True)
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    ignore_root_user_error = True,
+    is_default = False,
+    python_version = "3.11",
+)
+python.toolchain(
+    ignore_root_user_error = True,
+    is_default = False,
+    python_version = "3.13",
+)
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "rules_hdl_pip_deps",
+    python_version = "3.11",
+    requirements_lock = "@rules_hdl//dependency_support:pip_requirements.txt",
+)
+use_repo(pip, "rules_hdl_pip_deps")
+
+git_repository(
+    name = "org_theopenroadproject",
+    build_file = "@rules_hdl//dependency_support/org_theopenroadproject:bundled.BUILD.bazel",
+    commit = "f6da0454e350e93c62264f7b7c95029e1ad2b9fd",
+    init_submodules = True,
+    patch_args = ["-p1"],
+    patches = [
+        "@rules_hdl//dependency_support/org_theopenroadproject:0001-logging-change-to-support-silence.patch",
+        "@rules_hdl//dependency_support/org_theopenroadproject:0002-ortools-quotes.patch",
+    ],
+    remote = "https://github.com/The-OpenROAD-Project/OpenROAD.git",
+    shallow_since = "1709242873 -0800",
+)
+
+http_archive(
+    name = "org_theopenroadproject_asap7sc6t_26",
+    build_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7sc6t_26:bundled.BUILD.bazel",
+    sha256 = "4bfe15775eaab3a5cc443d444ef82bf7b9c818ba2ed948ce3d9cc6a4cfa1c36c",
+    strip_prefix = "asap7sc6t_26-f572bf760c8bdc853cbafd0742790aba0780089c",
+    urls = [
+        "https://github.com/The-OpenROAD-Project/asap7sc6t_26/archive/f572bf760c8bdc853cbafd0742790aba0780089c.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "org_theopenroadproject_asap7sc7p5t_27",
+    build_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7sc7p5t_27:bundled.BUILD.bazel",
+    sha256 = "db5531736a34f34e919488468e8ee09ae87495ff8a6188fad375d68c19e10e20",
+    strip_prefix = "asap7sc7p5t_27-900f55ed8bef025f39edcc8b8be5e04a2c55c15a",
+    urls = [
+        "https://github.com/The-OpenROAD-Project/asap7sc7p5t_27/archive/900f55ed8bef025f39edcc8b8be5e04a2c55c15a.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "org_theopenroadproject_asap7_pdk_r1p7",
+    build_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:bundled.BUILD.bazel",
+    sha256 = "b5847f93e55debb49d03ec581e22eb301109ff90c9ad19d35ae1223c70250391",
+    strip_prefix = "asap7_pdk_r1p7-1ff7649bbf423207f6f70293dc1cf630cd477365",
+    urls = [
+        "https://github.com/The-OpenROAD-Project/asap7_pdk_r1p7/archive/1ff7649bbf423207f6f70293dc1cf630cd477365.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "at_clifford_yosys",
+    build_file = "@rules_hdl//dependency_support:at_clifford_yosys/bundled.BUILD.bazel",
+    patches = [
+        "@rules_hdl//dependency_support:at_clifford_yosys/yosys.patch",
+        "@rules_hdl//dependency_support:at_clifford_yosys/autoname.patch",
+    ],
+    sha256 = "46a9a4d969770fa20a2fd12c8e83307a597126609645c9655c370c0c365da344",
+    strip_prefix = "yosys-8f07a0d8404f63349d8d3111217b73c9eafbd667",
+    urls = [
+        "https://github.com/YosysHQ/yosys/archive/8f07a0d8404f63349d8d3111217b73c9eafbd667.zip",
+    ],
+)
+
+http_archive(
+    name = "edu_berkeley_abc",
+    build_file = "@rules_hdl//dependency_support:edu_berkeley_abc/bundled.BUILD.bazel",
+    sha256 = "9ea3d8b7a104a2394e8967c93b3faaa12c3444a8901c11786494119b8088a1d9",
+    strip_prefix = "abc-0d579a430d57e5b864a62407aac2da0faba7c3b0",
+    urls = [
+        "https://github.com/berkeley-abc/abc/archive/0d579a430d57e5b864a62407aac2da0faba7c3b0.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "tk_tcl",
+    build_file = "@rules_hdl//dependency_support:tk_tcl/bundled.BUILD.bazel",
+    sha256 = "5196dbf6638e3df8d5c87b5815c8c2b758496eb6f0e41446596c9a4e638d87ed",
+    strip_prefix = "tcl8.6.10",
+    urls = [
+        "https://prdownloads.sourceforge.net/tcl/tcl8.6.10-src.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "org_sourceware_libffi",
+    build_file = "@rules_hdl//dependency_support:org_sourceware_libffi/bundled.BUILD.bazel",
+    sha256 = "b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e",
+    strip_prefix = "libffi-3.4.6",
+    urls = [
+        "https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "org_theopenroadproject_asap7sc7p5t_28",
+    build_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7sc7p5t_28:bundled.BUILD.bazel",
+    sha256 = "7f028a41425b8d736958cae994b3c1722d4bef2c0d28f6bf507b9ac8138ecc41",
+    strip_prefix = "asap7sc7p5t_28-d88477438935a5a388bd6294f682dc405c93c5d2",
+    urls = [
+        "https://github.com/The-OpenROAD-Project/asap7sc7p5t_28/archive/d88477438935a5a388bd6294f682dc405c93c5d2.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "com_google_skywater_pdk",
+    build_file = "@rules_hdl//dependency_support/com_google_skywater_pdk:bundled.BUILD.bazel",
+    sha256 = "49e5b03c26131a03eb038697d396a6ebf14058d78196f5d95c2bbdb0bdc8f32e",
+    strip_prefix = "skywater-pdk-3d7617a1acb92ea883539bcf22a632d6361a5de4",
+    urls = [
+        "https://github.com/google/skywater-pdk/archive/3d7617a1acb92ea883539bcf22a632d6361a5de4.tar.gz",  # 2020-12-04
+    ],
+)
+
+http_archive(
+    name = "net_zlib",
+    build_file = "@rules_hdl//dependency_support/net_zlib:bundled.BUILD.bazel",
+    sha256 = "f5cc4ab910db99b2bdbba39ebbdc225ffc2aa04b4057bc2817f1b94b6978cfc3",
+    strip_prefix = "zlib-1.2.11",
+    urls = [
+        "https://github.com/madler/zlib/archive/v1.2.11.zip",
+    ],
+)
+
+http_archive(
+    name = "verilator",
+    build_file = "@rules_hdl//dependency_support/verilator:verilator.BUILD.bazel",
+    sha256 = "002da98e316ca6eee40407f5deb7d7c43a0788847d39c90d4d31ddbbc03020e8",
+    strip_prefix = "verilator-5.034",
+    urls = ["https://github.com/verilator/verilator/archive/refs/tags/v5.034.tar.gz"],
+)
+
+http_archive(
+    name = "com_icarus_iverilog",
+    build_file = "@rules_hdl//dependency_support:com_icarus_iverilog/bundled.BUILD.bazel",
+    sha256 = "a68cb1ef7c017ef090ebedb2bc3e39ef90ecc70a3400afb4aa94303bc3beaa7d",
+    strip_prefix = "iverilog-12_0",
+    urls = [
+        "https://github.com/steveicarus/iverilog/archive/v12_0.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "org_sourceware_bzip2",
+    build_file = "@rules_hdl//dependency_support:org_sourceware_bzip2/bundled.BUILD.bazel",
+    sha256 = "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269",
+    strip_prefix = "bzip2-1.0.8",
+    urls = [
+        "https://mirrors.kernel.org/sourceware/bzip2/bzip2-1.0.8.tar.gz",
+        "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "org_gnu_readline",
+    build_file = "@rules_hdl//dependency_support/org_gnu_readline:bundled.BUILD.bazel",
+    patches = [
+        "@rules_hdl//dependency_support/org_gnu_readline:missing_include.patch",
+    ],
+    sha256 = "e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461",
+    strip_prefix = "readline-8.0",
+    urls = [
+        "https://ftp.gnu.org/gnu/readline/readline-8.0.tar.gz",
+        "http://ftp.vim.org/ftp/gnu/readline/readline-8.0.tar.gz",
+        "http://ftp.swin.edu.au/gnu/readline/readline-8.0.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "org_gnu_gperf",
+    build_file = "@rules_hdl//dependency_support:org_gnu_gperf/bundled.BUILD.bazel",
+    sha256 = "588546b945bba4b70b6a3a616e80b4ab466e3f33024a352fc2198112cdbb3ae2",
+    strip_prefix = "gperf-3.1",
+    urls = [
+        "http://ftp.acc.umu.se/mirror/gnu.org/gnu/gperf/gperf-3.1.tar.gz",
+        "http://ftp.gnu.org/gnu/gperf/gperf-3.1.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "net_invisible_island_ncurses",
+    build_file = "@rules_hdl//dependency_support:net_invisible_island_ncurses/bundled.BUILD.bazel",
+    sha256 = "30306e0c76e0f9f1f0de987cf1c82a5c21e1ce6568b9227f7da5b71cbea86c9d",
+    strip_prefix = "ncurses-6.2",
+    urls = [
+        "https://ftp.gnu.org/gnu/ncurses/ncurses-6.2.tar.gz",
+        "https://fossies.org/linux/misc/ncurses-6.2.tar.gz",
+        "http://ftp.vim.org/ftp/gnu/ncurses/ncurses-6.2.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "org_7zip",
+    build_file_content = """
+exports_files(
+  ["7zz"],
+  visibility = ["//visibility:public"],
+)
+""",
+    sha256 = "4a47877a7f6eba7fe6c900f7379bb2061b9620b588cf3189d99ae2a8aaa8f503",
+    urls = ["https://www.7-zip.org/a/7z2407-linux-x64.tar.xz"],
+)
+
+http_archive(
+    name = "org_swig",
+    build_file = "@rules_hdl//dependency_support/org_swig:bundled.BUILD.bazel",
+    sha256 = "e8a39cd6437e342cdcbd5af27a9bf11b62dc9efec9248065debcb8276fcbb925",
+    strip_prefix = "swig-4.0.0",
+    urls = [
+        "https://downloads.sourceforge.net/swig/swig-4.0.0.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "com_github_quantamhd_lemon",
+    build_file = "@rules_hdl//dependency_support/com_github_quantamhd_lemon:bundled.BUILD.bazel",
+    patch_args = [
+        "-p1",
+    ],
+    patches = [
+        "@rules_hdl//dependency_support/com_github_quantamhd_lemon:lemon.patch",
+        "@rules_hdl//dependency_support/com_github_quantamhd_lemon:allocator-patch.patch",
+    ],
+    sha256 = "a7f28821431b76505966e9a34c94c180130f6162ed2fc59ade8a685b5d5dcfeb",
+    strip_prefix = "lemon-1.3.1",
+    urls = [
+        "https://github.com/QuantamHD/lemon/archive/refs/tags/1.3.1.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "org_llvm_openmp",
+    build_file = "@rules_hdl//dependency_support/org_llvm_openmp:bundled.BUILD.bazel",
+    sha256 = "d19f728c8e04fb1e94566c8d76aef50ec926cd2f95ef3bf1e0a5de4909b28b44",
+    strip_prefix = "openmp-10.0.1.src",
+    urls = [
+        "https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.1/openmp-10.0.1.src.tar.xz",
+    ],
+)
+
+http_archive(
+    name = "bliss",
+    build_file = "@com_google_ortools//bazel:bliss.BUILD.bazel",
+    patches = ["@com_google_ortools//bazel:bliss-0.73.patch"],
+    sha256 = "f57bf32804140cad58b1240b804e0dbd68f7e6bf67eba8e0c0fa3a62fd7f0f84",
+    url = "https://github.com/google/or-tools/releases/download/v9.0/bliss-0.73.zip",
+)
+
+http_archive(
+    name = "org_gnu_glpk",
+    build_file = "@rules_hdl//dependency_support/org_gnu_glpk:bundled.BUILD.bazel",
+    patches = [
+        "@rules_hdl//dependency_support/org_gnu_glpk:glpk.patch",
+    ],
+    sha256 = "c35438e3ba74a8d85236810e6b84879272c87cfa7473b4075201e2967839f48d",
+    strip_prefix = "glpk-4.47",
+    urls = [
+        "http://ftp.gnu.org/gnu/glpk/glpk-4.47.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "org_pcre_ftp",
+    build_file = "@rules_hdl//dependency_support:org_pcre_ftp/bundled.BUILD.bazel",
+    sha256 = "aecafd4af3bd0f3935721af77b889d9024b2e01d96b58471bd91a3063fb47728",
+    strip_prefix = "pcre-8.44",
+    urls = [
+        "https://ftp.exim.org/pub/pcre/pcre-8.44.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "com_github_libbacktrace",
+    build_file = "@rules_hdl//dependency_support/com_github_libbacktrace:bundled.BUILD.bazel",
+    sha256 = "90d224a18c0a0c0f1f22fe73b89ebebd4f1ee368e55d646718b7f3b294a52705",
+    strip_prefix = "libbacktrace-4d2dd0b172f2c9192f83ba93425f868f2a13c553",
+    urls = [
+        "https://github.com/ianlancetaylor/libbacktrace/archive/4d2dd0b172f2c9192f83ba93425f868f2a13c553.zip",
+    ],
+)
+
+hdl = use_extension(":extensions.bzl", "hdl_ext")
+hdl.pdk(
+    name = "com_google_skywater_pdk",
+    libraries = [
+        "sky130_fd_io",
+        "sky130_fd_sc_hd",
+    ],
+)
+use_repo(hdl, "com_google_skywater_pdk_sky130_fd_io")
+use_repo(hdl, "com_google_skywater_pdk_sky130_fd_sc_hd")
+
+register_toolchains("//verilator:verilator_toolchain")
