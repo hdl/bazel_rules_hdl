@@ -60,8 +60,8 @@ ALL_TARGETS = [
   '@org_swig//...',
   '@org_theopenroadproject_asap7_pdk_r1p7//...',
   '@org_theopenroadproject_asap7sc6t_26//...',
-  '@org_theopenroadproject_asap7sc7p5t_27//...',
-  '@org_theopenroadproject_asap7sc7p5t_28//...',
+  '@org_theopenroadproject_asap7_pdk_sc7p5t_27//...',
+  '@org_theopenroadproject_asap7_pdk_sc7p5t_28//...',
   '@tk_tcl//...',
 ]
 

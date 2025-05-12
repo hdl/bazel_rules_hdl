@@ -54,7 +54,7 @@ tcl_encode = rule(
             doc = "Tcl files to be wrapped.",
         ),
         "_encode_script": attr.label(
-            default = "@org_theopenroadproject//:src/sta/etc/TclEncode.tcl",
+            default = "@openroad//:src/sta/etc/TclEncode.tcl",
             allow_single_file = True,
         ),
         "_tclsh": attr.label(

@@ -104,6 +104,7 @@ def _hdl_ext_impl(module_ctx):
             "https://github.com/The-OpenROAD-Project/asap7_pdk_r1p7/archive/1ff7649bbf423207f6f70293dc1cf630cd477365.tar.gz",
         ],
     )
+
     root_direct_deps.append("org_theopenroadproject_asap7_pdk")
     for module in module_ctx.modules:
         for pdk in module.tags.asap7_pdk:

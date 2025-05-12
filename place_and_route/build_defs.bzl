@@ -166,7 +166,7 @@ place_and_route = rule(
             doc = "string float value from 0-100 which sets the die area based on an estimated die area target utilization",
         ),
         "_openroad": attr.label(
-            default = Label("@org_theopenroadproject//:openroad"),
+            default = Label("@openroad//:openroad"),
             executable = True,
             cfg = "exec",
         ),

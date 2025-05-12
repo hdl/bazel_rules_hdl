@@ -58,8 +58,8 @@ def for_each_asap7_cells(libname, include_vts = None, include_corners = None, in
         Example:
             ```
             [
-                ('asap7-sc7p5t_rev27_rvt-ccs_ss', '@org_theopenroadproject_asap7sc7p5t_27//:asap7-sc7p5t_rev27_rvt-ccs_ss'),
-                ('asap7-sc7p5t_rev27_lvt-ccs_ss', '@org_theopenroadproject_asap7sc7p5t_27//:asap7-sc7p5t_rev27_lvt-ccs_ss'),
+                ('asap7-sc7p5t_rev27_rvt-ccs_ss', '@org_theopenroadproject_asap7_pdk_sc7p5t_27//:asap7-sc7p5t_rev27_rvt-ccs_ss'),
+                ('asap7-sc7p5t_rev27_lvt-ccs_ss', '@org_theopenroadproject_asap7_pdk_sc7p5t_27//:asap7-sc7p5t_rev27_lvt-ccs_ss'),
                 ...
             ]
             ```
@@ -105,7 +105,7 @@ def for_each_asap7_cells(libname, include_vts = None, include_corners = None, in
 
             libname_short = libname.replace("rev", "")
 
-            # "@org_theopenroadproject_asap7sc7p5t_27//:asap7-sc7p5t_rev27_rvt-ccs_ss
+            # "@org_theopenroadproject_asap7_pdk_sc7p5t_27//:asap7-sc7p5t_rev27_rvt-ccs_ss
             cell_target = "@org_theopenroadproject_asap7{}//:{}".format(libname_short, cell_name)
             output.append((cell_name, cell_target))
     return output

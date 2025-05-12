@@ -78,7 +78,7 @@ run_opensta_attrs = {
         providers = [SynthesisInfo],
     ),
     "_opensta": attr.label(
-        default = Label("@org_theopenroadproject//:opensta"),
+        default = Label("@openroad//:opensta"),
         executable = True,
         cfg = "exec",
     ),

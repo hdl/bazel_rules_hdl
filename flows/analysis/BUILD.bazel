@@ -48,7 +48,7 @@ analyze_rtl_binary(
     name = "critical_path_asap7",
     analysis_script = "critical_path.tcl",
     constants = ["clock_port"],
-    standard_cells = "@org_theopenroadproject_asap7sc7p5t_28//:asap7-sc7p5t_rev28_rvt",
+    standard_cells = "@org_theopenroadproject_asap7_pdk_sc7p5t_28//:asap7-sc7p5t_rev28_rvt",
 )
 
 analyze_rtl_binary(
@@ -59,14 +59,14 @@ analyze_rtl_binary(
         "reg_start",
         "reg_end",
     ],
-    standard_cells = "@org_theopenroadproject_asap7sc7p5t_28//:asap7-sc7p5t_rev28_rvt",
+    standard_cells = "@org_theopenroadproject_asap7_pdk_sc7p5t_28//:asap7-sc7p5t_rev28_rvt",
 )
 
 analyze_rtl_binary(
     name = "pipeline_balance_asap7",
     analysis_script = "pipeline_balance.tcl",
     constants = ["clock_port"],
-    standard_cells = "@org_theopenroadproject_asap7sc7p5t_28//:asap7-sc7p5t_rev28_rvt",
+    standard_cells = "@org_theopenroadproject_asap7_pdk_sc7p5t_28//:asap7-sc7p5t_rev28_rvt",
 )
 
 analyze_rtl_binary(
@@ -88,5 +88,5 @@ analyze_rtl_binary(
         "clock_period_ps",
     ],
     outputs = ["metrics"],
-    standard_cells = "@org_theopenroadproject_asap7sc7p5t_28//:asap7-sc7p5t_rev28_rvt",
+    standard_cells = "@org_theopenroadproject_asap7_pdk_sc7p5t_28//:asap7-sc7p5t_rev28_rvt",
 )

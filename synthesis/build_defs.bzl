@@ -113,7 +113,6 @@ def _synthesize_design_impl(ctx):
         inputs.append(ctx.file.early_techmap)
 
     yosys_runfiles_dir = ctx.executable.yosys_tool.path + ".runfiles"
-
     log_file = ctx.actions.declare_file("{}_yosys_output.log".format(ctx.attr.name))
 
     constr = ctx.actions.declare_file("{}_abc_constraints.constr".format(ctx.attr.name))
@@ -310,7 +309,6 @@ def _synthesize_binary_impl(ctx):
         script += "export {}='{}'\n".format(k, v.short_path if type(v) == "File" else v)
 
     yosys_runfiles_dir = ctx.executable.yosys_tool.short_path + ".runfiles"
-
     script += "export YOSYS_DATDIR='{}/at_clifford_yosys/techlibs/'\n".format(yosys_runfiles_dir)
     yosys = ctx.attr.yosys_tool[DefaultInfo]
     script += "${{PREFIX_COMMAND}} {} -c {}\n".format(ctx.executable.yosys_tool.short_path, external_info.yosys_script.short_path)
@@ -337,7 +335,7 @@ synthesis_binary = rule(
             providers = [ExternalSynthesisInfo],
         ),
         "yosys_tool": attr.label(
-            default = Label("@at_clifford_yosys//:yosys"),
+            default = Label("@yosys//:yosys"),
             executable = True,
             cfg = "target",
         ),
@@ -406,7 +404,7 @@ synthesize_rtl = rule(
             doc = "Verilog defines to pass to the synthesis tool.",
         ),
         "yosys_tool": attr.label(
-            default = Label("@at_clifford_yosys//:yosys"),
+            default = Label("@yosys//:yosys"),
             executable = True,
             cfg = "exec",
         ),

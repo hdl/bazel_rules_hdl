@@ -38,7 +38,6 @@ def _yosys_synth_file_step_impl(ctx):
         "-T",  # Don't print footer
         "-c ${RUNFILES}/" + synth_tcl.short_path,
     ]
-
     commands = [script_prefix]
     commands.append("export LIBERTY=${RUNFILES}/" + liberty.short_path)
 
@@ -89,7 +88,7 @@ yosys_synth_file_step = rule(
             doc = "Tcl script controlling Yosys synthesis, using the Flow Step API environment variables",
         ),
         "_yosys": attr.label(
-            default = Label("@at_clifford_yosys//:yosys"),
+            default = Label("@yosys//:yosys"),
             executable = True,
             cfg = "exec",
         ),
