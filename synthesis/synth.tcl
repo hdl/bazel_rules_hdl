@@ -73,7 +73,7 @@ yosys delete {*/t:$print}
 # pass.
 yosys opt_clean -purge
 
-yosys synth -top $top
+yosys synth -top $top -noshare
 
 # Remove internal only aliases for public nets and then give created instances
 # useful names. At this stage it is all the other synthesizable constructs.
@@ -95,6 +95,7 @@ if {[info exists ::env(ADDER_MAPPING)] && [file isfile $::env(ADDER_MAPPING)]} {
 # mapping to liberty
 set liberty $::env(LIBERTY)
 dfflibmap -liberty $liberty
+yosys rename -wire
 
 opt
 
