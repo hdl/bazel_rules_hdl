@@ -109,8 +109,8 @@ def _get_pythonpath_to_set(ctx):
     return ":".join(imports)
 
 def _get_path_to_set(ctx):
-    sim_paths = _remove_duplicates_from_list([dep.label.workspace_root for dep in ctx.attr.sim])
-    path = ":".join(["$PWD/" + str(p) for p in sim_paths])
+    sim_paths = set([dep.label.workspace_name for dep in ctx.attr.sim])
+    path = ":".join(["$PWD/../" + str(p) for p in sim_paths])
     return path
 
 def _get_test_command(ctx, verilog_files, vhdl_files):
@@ -132,7 +132,7 @@ def _get_test_command(ctx, verilog_files, vhdl_files):
     seed_args = " --seed {}".format(ctx.attr.seed) if ctx.attr.seed != "" else ""
 
     test_module_args = _pymodules_to_argstring(ctx.files.test_module, "test_module")
-    python_interpreter = ctx.toolchains["@rules_python//python:toolchain_type"].py3_runtime.interpreter.path
+    python_interpreter = ctx.toolchains["@rules_python//python:toolchain_type"].py3_runtime.interpreter.short_path
 
     command = (
         "PATH={}:$PATH ".format(_get_path_to_set(ctx)) +

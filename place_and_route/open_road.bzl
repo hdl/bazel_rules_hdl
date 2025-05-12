@@ -264,7 +264,7 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
             "DEFAULT_INPUT_DRIVER_CELL": stdcell_info.default_input_driver_cell,
             "DEFAULT_OUTPUT_LOAD": stdcell_info.default_output_load,
             "QT_QPA_PLATFORM": ctx.attr.qt_qpa_platform,
-            "TCL_LIBRARY": openroad_runfiles_dir + "/tk_tcl/library",
+            "TCL_LIBRARY": openroad_runfiles_dir + "/+_repo_rules+tk_tcl/library",
         },
         execution_requirements = execution_requirements,
         mnemonic = "OpenROAD",

@@ -58,7 +58,7 @@ def assemble_openroad_step(
     commands = [script_prefix]
 
     # TODO(amfv): Compute TCL_LIBRARY properly instead of hardcoding it.
-    commands.append("export TCL_LIBRARY=${RUNFILES}/../tk_tcl/library")
+    commands.append("export TCL_LIBRARY=${RUNFILES}/../+_repo_rules+tk_tcl/library")
 
     exec_openroad = """{openroad} {args} "$@"\n""".format(
         openroad = "${RUNFILES}/" + openroad_executable.short_path,

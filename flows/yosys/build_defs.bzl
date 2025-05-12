@@ -44,8 +44,8 @@ def _yosys_synth_file_step_impl(ctx):
 
     # TODO(amfv): Compute Yosys data environment variables properly instead of hardcoding them.
     commands.extend([
-        "export YOSYS_DATDIR=${RUNFILES}/../at_clifford_yosys/techlibs/",
-        "export ABC=${RUNFILES}/../edu_berkeley_abc/abc",
+        "export YOSYS_DATDIR=${RUNFILES}/../+_repo_rules+at_clifford_yosys/techlibs/",
+        "export ABC=${{RUNFILES}}/{}".format(ctx.executable._abc.short_path),
     ])
 
     exec_yosys = """{yosys} {args} "$@"\n""".format(
@@ -87,6 +87,11 @@ yosys_synth_file_step = rule(
             default = Label("//flows/yosys:synth.tcl"),
             allow_single_file = True,
             doc = "Tcl script controlling Yosys synthesis, using the Flow Step API environment variables",
+        ),
+        "_abc": attr.label(
+            default = Label("@edu_berkeley_abc//:abc"),
+            executable = True,
+            cfg = "exec",
         ),
         "_yosys": attr.label(
             default = Label("@at_clifford_yosys//:yosys"),
