@@ -50,8 +50,8 @@ cc_test(
     srcs = ["johnson_counter_test.cc"],
     deps = [
         ":johnson_counter_verilator",
-        "@com_google_googletest//:gtest",
-        "@com_google_googletest//:gtest_main",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
     ],
 )
 
@@ -135,8 +135,8 @@ cc_test(
     ],
     deps = [
         ":weights_replay_verilator",
-        "@com_google_googletest//:gtest",
-        "@com_google_googletest//:gtest_main",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
     ],
 )
 

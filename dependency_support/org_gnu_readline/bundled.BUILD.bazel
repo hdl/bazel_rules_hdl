@@ -165,6 +165,6 @@ cc_test(
     deps = [
         ":readline",
         "@com_google_absl//absl/strings",
-        "@com_google_googletest//:gtest_main",
+        "@googletest//:gtest_main",
     ],
 )

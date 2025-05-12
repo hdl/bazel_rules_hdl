@@ -158,7 +158,7 @@ cc_binary(
     deps = DEPS + [
         ":common",
         ":%s_chipdb" % family,
-        "@com_google_googletest//:gtest_main",
+        "@googletest//:gtest_main",
         "@python39//:libpython",
     ],
 ) for family in [
