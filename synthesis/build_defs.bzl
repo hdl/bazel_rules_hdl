@@ -111,8 +111,6 @@ def _synthesize_design_impl(ctx):
 
     if ctx.file.early_techmap:
         inputs.append(ctx.file.early_techmap)
-
-    yosys_runfiles_dir = ctx.executable.yosys_tool.path + ".runfiles"
     log_file = ctx.actions.declare_file("{}_yosys_output.log".format(ctx.attr.name))
 
     constr = ctx.actions.declare_file("{}_abc_constraints.constr".format(ctx.attr.name))
@@ -178,6 +176,7 @@ def _synthesize_design_impl(ctx):
         ha_fa_mapping_path = ha_fa_mapping[DefaultInfo].files.to_list()[0].path
         script_env_files["ADDER_MAPPING"] = str(ha_fa_mapping_path)
         inputs.append(ha_fa_mapping[DefaultInfo].files.to_list()[0])
+<<<<<<< HEAD
 
     env = {
         "ABC": yosys_runfiles_dir + "/edu_berkeley_abc/abc",
@@ -187,6 +186,16 @@ def _synthesize_design_impl(ctx):
     if ctx.file.early_techmap:
         script_env_files["EARLY_TECHMAP"] = ctx.file.early_techmap
 
+||||||| parent of 247251f (Removed yosys hardcoded dirs from rules.)
+
+    env = {
+        "ABC": yosys_runfiles_dir + "/+_repo_rules+edu_berkeley_abc/abc",
+        "YOSYS_DATDIR": yosys_runfiles_dir + "/+_repo_rules+at_clifford_yosys/techlibs/",
+    }
+
+=======
+    env = {}
+>>>>>>> 247251f (Removed yosys hardcoded dirs from rules.)
     for k, v in script_env_files.items():
         if type(v) == "File":
             env[k] = v.path
@@ -308,8 +317,6 @@ def _synthesize_binary_impl(ctx):
     for k, v in env.items():
         script += "export {}='{}'\n".format(k, v.short_path if type(v) == "File" else v)
 
-    yosys_runfiles_dir = ctx.executable.yosys_tool.short_path + ".runfiles"
-    script += "export YOSYS_DATDIR='{}/at_clifford_yosys/techlibs/'\n".format(yosys_runfiles_dir)
     yosys = ctx.attr.yosys_tool[DefaultInfo]
     script += "${{PREFIX_COMMAND}} {} -c {}\n".format(ctx.executable.yosys_tool.short_path, external_info.yosys_script.short_path)
 

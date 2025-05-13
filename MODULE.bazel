@@ -95,7 +95,7 @@ git_override(
 )
 git_override(
     module_name = "yosys",
-    commit = "cb3f8fe3e75db0b7c97fbc95b88596a00c611736",
+    commit = "7ad1308b968e24aa200a29ff3207e75fdf110800",
     remote = "https://github.com/amorphic-io/yosys.git",
     init_submodules = True,
 )
