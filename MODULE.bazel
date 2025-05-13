@@ -131,7 +131,7 @@ git_override(
 )
 git_override(
     module_name = "tcl",
-    commit = "4ca5c6850eae1a24b611a76a68eff0b31c840823",
+    commit = "e285aca41d39e84ab1753f125b095d65a0e15640",
     remote = "https://github.com/amorphic-io/tcl.git",
 )
 git_override(

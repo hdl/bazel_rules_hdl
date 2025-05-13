@@ -57,9 +57,6 @@ def assemble_openroad_step(
 
     commands = [script_prefix]
 
-    # TODO(amfv): Compute TCL_LIBRARY properly instead of hardcoding it.
-    commands.append("export TCL_LIBRARY=${RUNFILES}/../tk_tcl/library")
-
     exec_openroad = """{openroad} {args} "$@"\n""".format(
         openroad = "${RUNFILES}/" + openroad_executable.short_path,
         args = " ".join(openroad_args),
@@ -87,8 +84,7 @@ def assemble_openroad_step(
         ),
         DefaultInfo(
             executable = openroad_wrapper,
-            # TODO(amfv): Switch to runfiles.merge_all once our minimum Bazel version provides it.
-            runfiles = runfiles.merge(step_runfiles).merge(openroad_runfiles),
+            runfiles = runfiles.merge_all([step_runfiles, openroad_runfiles])
         ),
     ]
 
