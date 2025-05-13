@@ -209,6 +209,9 @@ def _synthesize_design_impl(ctx):
         inputs = inputs,
         arguments = [args],
         executable = ctx.executable.yosys_tool,
+        # TODO(lromor): this is required as some deps like yosys
+        # are wrapped in scripts that use grep/cut and they wouldn't work otherwise.
+        use_default_shell_env = True,
         env = env,
         mnemonic = "SynthesizingRTL",
         toolchain = None,

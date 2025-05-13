@@ -95,7 +95,7 @@ git_override(
 )
 git_override(
     module_name = "yosys",
-    commit = "7ad1308b968e24aa200a29ff3207e75fdf110800",
+    commit = "590ad236368e41af3de4ea8252811beeaadb5f97",
     remote = "https://github.com/amorphic-io/yosys.git",
     init_submodules = True,
 )
@@ -136,7 +136,7 @@ git_override(
 )
 git_override(
     module_name = "openroad",
-    commit = "c9236a6d6a90410969123575e54ff23dd4f4398e",
+    commit = "c80e4b3f54dd94cdbebfecc3c98a64049b8c7efc",
     remote = "https://github.com/amorphic-io/OpenROAD",
     init_submodules = True,
 )
