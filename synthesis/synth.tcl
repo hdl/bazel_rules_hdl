@@ -10,6 +10,7 @@
 # OUTPUT = verilog file for synthesis output
 # STATS_JSON = json file for structured stats output
 # EARLY_TECHMAP = verilog/system verilog file for early techmap process
+# SYNTH_ADDITIONAL_ARGS = Additional args for the Yosys synth pass
 
 yosys -import
 
@@ -79,7 +80,12 @@ yosys delete {*/t:$print}
 # pass.
 yosys opt_clean -purge
 
-yosys synth -top $top -noshare
+set synth_args "-noshare"
+if { [info exists ::env(SYNTH_ADDITIONAL_ARGS)] && ![string equal $::env(SYNTH_ADDITIONAL_ARGS) ""] } {
+  set synth_args "$synth_args $::env(SYNTH_ADDITIONAL_ARGS)"
+}
+
+yosys synth -top $top {*}$synth_args
 
 # Remove internal only aliases for public nets and then give created instances
 # useful names. At this stage it is all the other synthesizable constructs.

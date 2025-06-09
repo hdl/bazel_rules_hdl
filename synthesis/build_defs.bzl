@@ -160,6 +160,7 @@ def _synthesize_design_impl(ctx):
         "LIBERTY": default_liberty_file,
         "OUTPUT": output_file,
         "STANDARD_CELL_BLACK_BOX": standard_cell_black_box,
+        "SYNTH_ADDITIONAL_ARGS": ctx.attr.synth_additional_args,
         "TOP": ctx.attr.top_module,
         "UHDM_FLIST": uhdm_flist,
     }
@@ -384,6 +385,11 @@ synthesize_rtl = rule(
         "standard_cells": attr.label(
             providers = [StandardCellInfo],
             default = "@com_google_skywater_pdk_sky130_fd_sc_hd//:sky130_fd_sc_hd",
+        ),
+        "synth_additional_args": attr.string(
+            mandatory = False,
+            doc = "Additional args for the Yosys synth pass",
+            default = "",
         ),
         "synth_tcl": attr.label(
             default = Label("//synthesis:synth.tcl"),
