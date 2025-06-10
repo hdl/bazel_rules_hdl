@@ -109,6 +109,9 @@ def _synthesize_design_impl(ctx):
     inputs.append(default_liberty_file)
     inputs.extend(additional_liberty_files)
 
+    if ctx.file.early_techmap:
+        inputs.append(ctx.file.early_techmap)
+
     yosys_runfiles_dir = ctx.executable.yosys_tool.path + ".runfiles"
 
     log_file = ctx.actions.declare_file("{}_yosys_output.log".format(ctx.attr.name))
@@ -180,6 +183,9 @@ def _synthesize_design_impl(ctx):
         "ABC": yosys_runfiles_dir + "/edu_berkeley_abc/abc",
         "YOSYS_DATDIR": yosys_runfiles_dir + "/at_clifford_yosys/techlibs/",
     }
+
+    if ctx.file.early_techmap:
+        script_env_files["EARLY_TECHMAP"] = ctx.file.early_techmap
 
     for k, v in script_env_files.items():
         if type(v) == "File":
@@ -392,6 +398,11 @@ synthesize_rtl = rule(
             default = Label("@at_clifford_yosys//:yosys"),
             executable = True,
             cfg = "exec",
+        ),
+        "early_techmap": attr.label(
+            allow_single_file = True,
+            mandatory = False,
+            doc = "verilog/system verilog file for early techmap process"
         ),
     },
 )
