@@ -363,6 +363,11 @@ synthesize_rtl = rule(
         "deps": attr.label_list(
             providers = [[VerilogInfo], [UhdmInfo]],
         ),
+        "early_techmap": attr.label(
+            allow_single_file = True,
+            mandatory = False,
+            doc = "verilog/system verilog file for early techmap process",
+        ),
         "extra_tcl_command": attr.string(
             default = "",
         ),
@@ -398,11 +403,6 @@ synthesize_rtl = rule(
             default = Label("@at_clifford_yosys//:yosys"),
             executable = True,
             cfg = "exec",
-        ),
-        "early_techmap": attr.label(
-            allow_single_file = True,
-            mandatory = False,
-            doc = "verilog/system verilog file for early techmap process"
         ),
     },
 )
