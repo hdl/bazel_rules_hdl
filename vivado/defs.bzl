@@ -322,6 +322,12 @@ def _vivado_synthesis_optimize_impl(ctx):
     timing_summary_report = ctx.actions.declare_file("{}_timing.rpt".format(ctx.label.name))
     util_report = ctx.actions.declare_file("{}_util.rpt".format(ctx.label.name))
     drc_report = ctx.actions.declare_file("{}_drc.rpt".format(ctx.label.name))
+    if ctx.attr.with_probes:
+        probes_file = ctx.actions.declare_file("{}.ltx".format(ctx.label.name))
+        probes_file_path = probes_file.path
+    else:
+        probes_file = Null
+        probes_file_path = ""
 
     checkpoint_in = ctx.attr.checkpoint[VivadoSynthCheckpointInfo].checkpoint
 
@@ -329,6 +335,7 @@ def _vivado_synthesis_optimize_impl(ctx):
         "{{CHECKPOINT_IN}}": checkpoint_in.path,
         "{{CHECKPOINT_OUT}}": synth_checkpoint.path,
         "{{DRC_REPORT}}": drc_report.path,
+        "{{PROBES_FILE}}": probes_file_path,
         "{{OPT_DIRECTIVE}}": ctx.attr.opt_directive,
         "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{TIMING_REPORT}}": timing_summary_report.path,
@@ -336,6 +343,8 @@ def _vivado_synthesis_optimize_impl(ctx):
     }
 
     outputs = [synth_checkpoint, timing_summary_report, util_report, drc_report]
+    if ctx.attr.with_probes:
+        outputs.append(probes_file)
 
     default_info = run_tcl_template(
         ctx,
@@ -362,6 +371,10 @@ vivado_synthesis_optimize = rule(
         "opt_directive": attr.string(
             doc = "The optimization directive.",
             default = "Explore",
+        ),
+        "with_probes": attr.bool(
+            doc = "Create debug probes.",
+            default = False,
         ),
         "synthesis_optimize_template": attr.label(
             doc = "The synthesis optimzation tcl template",
