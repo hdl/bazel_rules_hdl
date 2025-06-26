@@ -1,0 +1,34 @@
+--- /dev/null
++++ libbacktrace.BUILD
+@@ -0,0 +1,30 @@
++
++cc_library(
++    name = "libbacktrace",
++    srcs = [
++        "atomic.c",
++        "backtrace.c",
++        "dwarf.c",
++        "fileline.c",
++        "filenames.h",
++        "internal.h",
++        "mmap.c",
++        "mmapio.c",
++        "posix.c",
++        "print.c",
++        "simple.c",
++        "sort.c",
++        "state.c",
++        "backtrace-supported.h",
++        "config.h",
++    ],
++    hdrs = [
++        "backtrace.h",
++    ],
++    visibility = [
++        "//visibility:public",
++    ],
++    includes = [
++        ".",
++    ]
++)
+\ No newline at end of file

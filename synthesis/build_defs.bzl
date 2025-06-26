@@ -180,8 +180,8 @@ def _synthesize_design_impl(ctx):
         inputs.append(ha_fa_mapping[DefaultInfo].files.to_list()[0])
 
     env = {
-        "ABC": yosys_runfiles_dir + "/edu_berkeley_abc/abc",
-        "YOSYS_DATDIR": yosys_runfiles_dir + "/at_clifford_yosys/techlibs/",
+        "ABC": yosys_runfiles_dir + "/+_repo_rules+edu_berkeley_abc/abc",
+        "YOSYS_DATDIR": yosys_runfiles_dir + "/+_repo_rules+at_clifford_yosys/techlibs/",
     }
 
     if ctx.file.early_techmap:

@@ -36,14 +36,14 @@ FAMILIES = [
 
 DEPS = [
     "@at_clifford_yosys//:json11",
-    "@boost//:filesystem",
-    "@boost//:iostreams",
-    "@boost//:program_options",
-    "@boost//:python",
-    "@boost//:system",
-    "@boost//:thread",
-    "@eigen//:eigen3",
-    "@rules_python//python/cc:current_py_cc_headers",
+    "@boost.filesystem",
+    "@boost.iostreams",
+    "@boost.program_options",
+    "@boost.python",
+    "@boost.system",
+    "@boost.thread",
+    "@local_config_python//:python_headers",
+    "@eigen//:eigen",
 ]
 
 DEFINES = [
@@ -103,8 +103,8 @@ cc_binary(
     srcs = ["bba/main.cc"],
     copts = COPTS,
     deps = [
-        "@boost//:filesystem",
-        "@boost//:program_options",
+        "@boost.filesystem",
+        "@boost.program_options",
     ],
 )
 
@@ -223,9 +223,9 @@ cc_library(
     ],
     deps = [
         ":common",
-        "@boost//:functional",
-        "@boost//:lexical_cast",
-        "@boost//:thread",
+        "@boost.functional",
+        "@boost.lexical_cast",
+        "@boost.thread",
     ],
 )
 
@@ -295,8 +295,8 @@ cc_library(
     ],
     deps = [
         ":common",
-        "@boost//:functional",
-        "@boost//:lexical_cast",
-        "@boost//:thread",
+        "@boost.functional",
+        "@boost.lexical_cast",
+        "@boost.thread",
     ],
 )

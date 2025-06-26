@@ -28,9 +28,8 @@ filegroup(
     output_licenses = ["unencumbered"],
     visibility = [
         "//visibility:public",
-    ]
+    ],
 )
-
 
 # find swig/v4_0_0/Lib \( -name '*.swg' -o -name '*.i' \)  -print  | awk '{gsub(/third_party\/swig\/v4_0_0\//, "", $0); printf("\"%s\",\n", $0) }'
 filegroup(
@@ -888,10 +887,10 @@ includes = [
 ]
 
 genrule(
-  name = "config",
-  srcs = ["@rules_hdl//dependency_support/org_swig:swigconfig.h"],
-  outs = ["Source/Include/swigconfig.h"],
-  cmd = "cat $(location @rules_hdl//dependency_support/org_swig:swigconfig.h) > $@",
+    name = "config",
+    srcs = ["@rules_hdl//dependency_support/org_swig:swigconfig.h"],
+    outs = ["Source/Include/swigconfig.h"],
+    cmd = "cat $(location @rules_hdl//dependency_support/org_swig:swigconfig.h) > $@",
 )
 
 cc_binary(

@@ -56,7 +56,6 @@ def _verilator_bisonpre_impl(ctx):
     bison_toolchain = ctx.toolchains["@rules_bison//bison:toolchain_type"].bison_toolchain
 
     args = ctx.actions.args()
-    args.add(ctx.file.bisonpre)
     args.add("--yacc", bison_toolchain.bison_tool.executable)
     args.add("-d")
     args.add("-v")
@@ -79,9 +78,9 @@ def _verilator_bisonpre_impl(ctx):
         outputs = outputs,
         inputs = [ctx.file.yacc_src],
         tools = tools,
-        executable = ctx.executable._process_wrapper,
+        executable = ctx.executable.bisonpre,
         arguments = [args],
-        mnemonic = "VerilatorBisonPre",
+        mnemonic = "BisonPre",
         use_default_shell_env = False,
         env = bison_env,
     )
@@ -96,10 +95,11 @@ verilator_bisonpre = rule(
     implementation = _verilator_bisonpre_impl,
     attrs = {
         "bisonpre": attr.label(
-            doc = "The path to the `bisonpre` tool.",
             allow_single_file = True,
-            mandatory = True,
             cfg = "exec",
+            doc = "The path to the `bisonpre` tool.",
+            executable = True,
+            mandatory = True,
         ),
         "out_hdr": attr.output(
             mandatory = True,

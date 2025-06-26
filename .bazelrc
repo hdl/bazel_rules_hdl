@@ -11,7 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-common --noenable_bzlmod
+common --enable_bzlmod
+
+common --registry=https://raw.githubusercontent.com/bazelboost/registry/main
+common --registry=https://bcr.bazel.build
 
 build --cxxopt "-std=c++17"
 build --cxxopt "-ffp-contract=off"
@@ -44,7 +47,7 @@ test:ciremotebuild --remote_timeout=3600
 ###############################################################################
 
 # https://github.com/bazelbuild/bazel/issues/8195
-build --incompatible_disallow_empty_glob=true
+build --incompatible_disallow_empty_glob=false
 
 ###############################################################################
 ## User flags
