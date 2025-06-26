@@ -54,6 +54,7 @@ def _skywater_corner_impl(ctx):
         inputs = ctx.files.srcs,
         arguments = [args],
         executable = ctx.executable._liberty_tool,
+        use_default_shell_env = True,
     )
 
     return [

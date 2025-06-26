@@ -9,6 +9,7 @@
 # LIBERTY = liberty file for the target technology library
 # OUTPUT = verilog file for synthesis output
 # STATS_JSON = json file for structured stats output
+# EARLY_TECHMAP = verilog/system verilog file for early techmap process
 
 yosys -import
 
@@ -56,6 +57,11 @@ foreach src $srcs {
 # generic synthesis
 set top $::env(TOP)
 hierarchy -check -top $top
+
+if { [info exists ::env(EARLY_TECHMAP)]} {
+    techmap -map $::env(EARLY_TECHMAP)
+}
+
 # Move proc_mux at the end of `yosys proc` to avoid inferred latches.
 # See https://github.com/YosysHQ/yosys/issues/3456
 # Ideally the bug would be solved in UHDM/Yosys.
@@ -73,7 +79,7 @@ yosys delete {*/t:$print}
 # pass.
 yosys opt_clean -purge
 
-yosys synth -top $top
+yosys synth -top $top -noshare
 
 # Remove internal only aliases for public nets and then give created instances
 # useful names. At this stage it is all the other synthesizable constructs.
@@ -95,6 +101,7 @@ if {[info exists ::env(ADDER_MAPPING)] && [file isfile $::env(ADDER_MAPPING)]} {
 # mapping to liberty
 set liberty $::env(LIBERTY)
 dfflibmap -liberty $liberty
+yosys rename -wire
 
 opt
 
