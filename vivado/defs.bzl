@@ -326,7 +326,7 @@ def _vivado_synthesis_optimize_impl(ctx):
         probes_file = ctx.actions.declare_file("{}.ltx".format(ctx.label.name))
         probes_file_path = probes_file.path
     else:
-        probes_file = Null
+        probes_file = None
         probes_file_path = ""
 
     checkpoint_in = ctx.attr.checkpoint[VivadoSynthCheckpointInfo].checkpoint
