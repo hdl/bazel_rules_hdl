@@ -335,8 +335,8 @@ def _vivado_synthesis_optimize_impl(ctx):
         "{{CHECKPOINT_IN}}": checkpoint_in.path,
         "{{CHECKPOINT_OUT}}": synth_checkpoint.path,
         "{{DRC_REPORT}}": drc_report.path,
-        "{{PROBES_FILE}}": probes_file_path,
         "{{OPT_DIRECTIVE}}": ctx.attr.opt_directive,
+        "{{PROBES_FILE}}": probes_file_path,
         "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{TIMING_REPORT}}": timing_summary_report.path,
         "{{UTIL_REPORT}}": util_report.path,
@@ -372,10 +372,6 @@ vivado_synthesis_optimize = rule(
             doc = "The optimization directive.",
             default = "Explore",
         ),
-        "with_probes": attr.bool(
-            doc = "Create debug probes.",
-            default = False,
-        ),
         "synthesis_optimize_template": attr.label(
             doc = "The synthesis optimzation tcl template",
             default = "//vivado:synth_optimize.tcl.template",
@@ -384,6 +380,10 @@ vivado_synthesis_optimize = rule(
         "threads": attr.int(
             doc = "Threads to pass to vivado which defines the amount of parallelism.",
             default = 8,
+        ),
+        "with_probes": attr.bool(
+            doc = "Create debug probes.",
+            default = False,
         ),
         "xilinx_env": attr.label(
             doc = "A shell script to source the vivado environment and " +
