@@ -126,6 +126,7 @@ pseudo_configure(
         "HAVE_TERMCAP_H": "1",
         "HAVE_TERMIO_H": "1",
         "HAVE_TERMIOS_H": "1",
+        "HAVE_TIMEVAL" : "1",
         "HAVE_UNISTD_H": "1",
         "HAVE_WCHAR_H": "1",
         "HAVE_WCTYPE_H": "1",
