@@ -30,5 +30,6 @@ def com_opencircuitdesign_magic():
         patches = [
             Label("@rules_hdl//dependency_support/com_opencircuitdesign_magic:magic_wrapper.patch"),
             Label("@rules_hdl//dependency_support/com_opencircuitdesign_magic:use_bash.patch"),
+            Label("@rules_hdl//dependency_support/com_opencircuitdesign_magic:rltypedefs.patch"),
         ],
     )
