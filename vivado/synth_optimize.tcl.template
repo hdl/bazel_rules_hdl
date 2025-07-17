@@ -5,4 +5,7 @@ opt_design -directive {{OPT_DIRECTIVE}}
 report_timing_summary -file {{TIMING_REPORT}}
 report_utilization -file {{UTIL_REPORT}}
 report_drc -file {{DRC_REPORT}}
+if {"{{PROBES_FILE}}" != ""} {
+    write_debug_probes {{PROBES_FILE}}
+}
 write_checkpoint -force {{CHECKPOINT_OUT}}

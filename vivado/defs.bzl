@@ -322,6 +322,12 @@ def _vivado_synthesis_optimize_impl(ctx):
     timing_summary_report = ctx.actions.declare_file("{}_timing.rpt".format(ctx.label.name))
     util_report = ctx.actions.declare_file("{}_util.rpt".format(ctx.label.name))
     drc_report = ctx.actions.declare_file("{}_drc.rpt".format(ctx.label.name))
+    if ctx.attr.with_probes:
+        probes_file = ctx.actions.declare_file("{}.ltx".format(ctx.label.name))
+        probes_file_path = probes_file.path
+    else:
+        probes_file = None
+        probes_file_path = ""
 
     checkpoint_in = ctx.attr.checkpoint[VivadoSynthCheckpointInfo].checkpoint
 
@@ -330,12 +336,15 @@ def _vivado_synthesis_optimize_impl(ctx):
         "{{CHECKPOINT_OUT}}": synth_checkpoint.path,
         "{{DRC_REPORT}}": drc_report.path,
         "{{OPT_DIRECTIVE}}": ctx.attr.opt_directive,
+        "{{PROBES_FILE}}": probes_file_path,
         "{{THREADS}}": "{}".format(ctx.attr.threads),
         "{{TIMING_REPORT}}": timing_summary_report.path,
         "{{UTIL_REPORT}}": util_report.path,
     }
 
     outputs = [synth_checkpoint, timing_summary_report, util_report, drc_report]
+    if ctx.attr.with_probes:
+        outputs.append(probes_file)
 
     default_info = run_tcl_template(
         ctx,
@@ -371,6 +380,10 @@ vivado_synthesis_optimize = rule(
         "threads": attr.int(
             doc = "Threads to pass to vivado which defines the amount of parallelism.",
             default = 8,
+        ),
+        "with_probes": attr.bool(
+            doc = "Create debug probes.",
+            default = False,
         ),
         "xilinx_env": attr.label(
             doc = "A shell script to source the vivado environment and " +
