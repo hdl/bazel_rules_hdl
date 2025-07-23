@@ -1,4 +1,5 @@
 # Copyright 2021 Google LLC
+# Copyright 2025 Precision Innovations Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,9 +23,9 @@ def org_swig():
         http_archive,
         name = "org_swig",
         urls = [
-            "https://downloads.sourceforge.net/swig/swig-4.0.0.tar.gz",
+            "https://downloads.sourceforge.net/swig/swig-4.3.0.tar.gz",
         ],
-        strip_prefix = "swig-4.0.0",
-        sha256 = "e8a39cd6437e342cdcbd5af27a9bf11b62dc9efec9248065debcb8276fcbb925",
+        strip_prefix = "swig-4.3.0",
+        sha256 = "f7203ef796f61af986c70c05816236cbd0d31b7aa9631e5ab53020ab7804aa9e",
         build_file = Label("//dependency_support/org_swig:bundled.BUILD.bazel"),
     )
