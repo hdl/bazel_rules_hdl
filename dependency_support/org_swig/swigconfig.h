@@ -41,7 +41,7 @@
 /* #undef HAVE_LIBDLD */
 
 /* Define if you have PCRE2 library */
-#define HAVE_PCRE 1
+/* #define HAVE_PCRE 1 */
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
