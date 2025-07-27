@@ -33,7 +33,7 @@ bazel_dep(name = "boost.bind", version = "1.83.0")
 bazel_dep(name = "boost.optional", version = "1.83.0")
 bazel_dep(name = "boost.thread", version = "1.83.0")
 
-bazel_dep(name = "eigen", version = "4.0.0-20241125.bcr.1")
+bazel_dep(name = "eigen", version = "4.0.0-20241125.bcr.2")
 bazel_dep(name = "fmt", version = "11.1.3")
 bazel_dep(name = "protobuf", version = "29.3")
 bazel_dep(name = "rules_bison", version = "0.3")
