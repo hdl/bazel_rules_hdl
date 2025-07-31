@@ -1,0 +1,19 @@
+
+# Create a project.
+open_project -reset {{PROJECT_NAME}}
+
+{{SOURCE_FILES}}
+
+# Specify the top-level function for synthesis
+set_top {{TOP_LEVEL_FUNCTION}}
+
+# Create solution1
+open_solution -reset sol1
+
+# Specify a Xilinx device and clock period
+set_part  { {{PART_NUMBER}} }
+create_clock -period {{CLOCK_PERIOD}}
+
+# Generate the verilog.
+csynth_design
+
