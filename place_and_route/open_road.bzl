@@ -211,6 +211,16 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
 
     real_commands = []
 
+    if hasattr(ctx.attr, "suppress_warnings") and ctx.attr.suppress_warnings:
+        for warning in ctx.attr.suppress_warnings:
+            parts = warning.split("-")
+            if len(parts) != 2:
+                fail(
+                    "Invalid format in suppress_warnings: {}. ".format(warning) +
+                    "Expected format: MODULE-NUMBER",
+                )
+            real_commands.append('::utl::suppress_message "{}" "{}"'.format(parts[0], parts[1]))
+
     # Liberty Setup
     stdcell_info = ctx.attr.synthesized_rtl[SynthesisInfo].standard_cell_info
     liberty = stdcell_info.default_corner.liberty

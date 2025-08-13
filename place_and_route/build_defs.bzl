@@ -155,6 +155,9 @@ place_and_route = rule(
             """,
             values = [step[0] for step in PLACE_AND_ROUTE_STEPS],
         ),
+        "suppress_warnings": attr.string_list(
+            doc = "A list of OpenROAD warnings to suppress, e.g., [\"STA-1212\", \"PDR-0020\"].",
+        ),
         "synthesized_rtl": attr.label(
             mandatory = True,
             providers = [SynthesisInfo],
