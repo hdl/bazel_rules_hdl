@@ -1197,11 +1197,7 @@ cc_library(
         "src/sat/xsat/xsatSolverAPI.c",
         "src/sat/xsat/xsatSolver.c",
     ],
-    hdrs = [
-        "src/base/abc/abc.h",
-        "src/base/main/main.h",
-        "src/misc/util/abc_global.h",
-    ],
+    hdrs = glob(["src/**/*.h"]) + glob(["src/**/*.hpp"]),
     copts = [
         "-Wno-sign-compare",
         "-Wno-unused-function",
