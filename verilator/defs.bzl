@@ -105,9 +105,25 @@ def _verilator_cc_library(ctx):
     verilator_toolchain = ctx.toolchains["//verilator:toolchain_type"]
 
     transitive_srcs = depset([], transitive = [ctx.attr.module[VerilogInfo].dag])
-    all_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs.to_list()]
-    all_data = [verilog_info_struct.data for verilog_info_struct in transitive_srcs.to_list()]
+    transitive_srcs_list = transitive_srcs.to_list()
+    all_srcs = [verilog_info_struct.srcs for verilog_info_struct in transitive_srcs_list]
+    all_data = [verilog_info_struct.data for verilog_info_struct in transitive_srcs_list]
     all_files = [src for sub_tuple in (all_srcs + all_data) for src in sub_tuple]
+
+    # Collect all directories named in the `includes` parameter.
+    all_include_tuples = [
+        verilog_info_struct.includes
+            for verilog_info_struct in transitive_srcs_list]
+    all_includes = [
+        include for sub_tuple in all_include_tuples for include in sub_tuple
+    ]
+    all_includes_unique = depset(all_includes).to_list()
+
+    # hdrs should appear in the build sandbox, but *not* in the command line,
+    # so keep them separate, and don't add them to `all_files`.
+    all_hdrs_tuple = [verilog_info_struct.hdrs for verilog_info_struct in transitive_srcs_list]
+    all_hdrs = [hdr for sub_tuple in all_hdrs_tuple for hdr in sub_tuple]
+    all_hdrs_unique = depset(all_hdrs).to_list()
 
     # Filter out .dat files.
     runfiles = []
@@ -129,6 +145,8 @@ def _verilator_cc_library(ctx):
     args.add("--Mdir", verilator_output.path)
     args.add("--top-module", ctx.attr.module_top)
     args.add("--prefix", prefix)
+    # Verilator requires no space between `-I` and the directory name.
+    args.add_all(all_includes_unique, format_each = "-I%s")
     if ctx.attr.trace:
         args.add("--trace")
     for verilog_file in verilog_files:
@@ -145,7 +163,7 @@ def _verilator_cc_library(ctx):
         mnemonic = "VerilatorCompile",
         executable = ctx.executable._process_wrapper,
         tools = verilator_toolchain.all_files,
-        inputs = verilog_files,
+        inputs = verilog_files + all_hdrs_unique,
         outputs = [verilator_output],
         progress_message = "[Verilator] Compiling {}".format(ctx.label),
         env = env,
