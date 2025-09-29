@@ -125,6 +125,7 @@ cc_library(
             "ncurses/tinfo/make_keys.c",
             "ncurses/tinfo/tinfo_driver.c",
             "ncurses/tinfo/make_hash.c",
+            "ncurses/report_hashing.c",
             "ncurses/report_offsets.c",
         ]),
     ) + [
