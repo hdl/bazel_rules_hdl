@@ -175,10 +175,11 @@ filegroup(
     ] + [file for file in RUNFILES],
 )
 
-[cc_binary(
-    name = name,
+cc_binary(
+    name = "ext2spice",
     srcs = [
-        "ext2spice/" + name + ".c",
+        "ext2spice/ext2spice.c",
+        "ext2spice/ext2hier.c",
     ],
     defines = DEFINES,
     copts = COPTS,
@@ -187,7 +188,7 @@ filegroup(
         ":magic_version",
     ],
     visibility = ["//visibility:public"],
-) for name in ["ext2spice", "ext2hier"]]
+)
 
 [cc_binary(
     name = name,
