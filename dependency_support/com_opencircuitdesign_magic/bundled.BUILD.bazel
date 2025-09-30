@@ -176,7 +176,7 @@ filegroup(
 )
 
 cc_binary(
-    name = ext2spice,
+    name = "ext2spice",
     srcs = [
         "ext2spice/ext2spice.c",
         "ext2spice/ext2hier.c",
