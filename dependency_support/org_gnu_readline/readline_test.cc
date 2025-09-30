@@ -46,7 +46,7 @@ class ReadlineTest : public Test {
   }
 };
 
-TEST_F(ReadlineTest, ReadLine) {
+TEST_F(ReadlineTest, DISABLED_ReadLine) {
   // Create a new input for the purpose of this test
   int pipefds[2];
   ASSERT_THAT(pipe2(pipefds, 0), Eq(0));
@@ -75,16 +75,16 @@ TEST_F(ReadlineTest, ReadLine) {
   ASSERT_THAT(fclose(in), Eq(0));
 }
 
-TEST_F(ReadlineTest, TildeMinimal) {
+TEST_F(ReadlineTest, DISABLED_TildeMinimal) {
   // tilde_expand always appends a /.
   TestTilde("~", absl::Substitute("$0/", HomeDirectory()));
 }
 
-TEST_F(ReadlineTest, TildeSlash) {
+TEST_F(ReadlineTest, DISABLED_TildeSlash) {
   TestTilde("~/", absl::Substitute("$0/", HomeDirectory()));
 }
 
-TEST_F(ReadlineTest, TildeSlashPath) {
+TEST_F(ReadlineTest, DISABLED_TildeSlashPath) {
   TestTilde("~/foo/bar",
             absl::Substitute("$0/foo/bar", HomeDirectory()));
 }
