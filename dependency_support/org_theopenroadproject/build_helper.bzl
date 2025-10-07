@@ -29,9 +29,6 @@ OPENROAD_BINARY_SRCS_WITHOUT_MAIN = [
     #finale
     ":finale_swig",
     ":finale_tcl",
-    #TritionMP
-    ":tritonmp_swig",
-    ":tritonmp_tcl",
     #antenna_checker
     ":ant_swig",
     ":ant_tcl",
@@ -62,9 +59,9 @@ OPENROAD_BINARY_SRCS_WITHOUT_MAIN = [
     #PDNGen
     ":pdngen_tcl",
     ":pdngen_swig",
-    #MPL2
-    ":mpl2_swig",
-    ":mpl2_tcl",
+    #MPL
+    ":mpl_swig",
+    ":mpl_tcl",
     #RMP
     ":rmp_swig",
     ":rmp_tcl",
@@ -105,6 +102,15 @@ OPENROAD_COPTS = [
     "-Wno-unused-parameter",
 ]
 
+OPENROAD_DEFINES = [
+    "OPENROAD_GIT_DESCRIBE=\\\"bazel_rules_hdl\\\"",
+    "BUILD_TYPE=\\\"release\\\"",
+    "GPU=false",
+    "BUILD_PYTHON=false",
+    "ABC_NAMESPACE=abc",
+    "TCLRL_VERSION_STR=",
+]
+
 OPENROAD_BINARY_DEPS = [
     ":logger",
     ":opendb_lib",
@@ -123,6 +129,8 @@ OPENROAD_LIBRARY_HDRS_INCLUDE = [
     "src/ifp/include/ifp/*.hh",
     #GUI
     "src/gui/include/gui/*.h",
+    #STA
+    "src/sta/include/sta/*.hh",
     #DbSTA
     "src/dbSta/include/db_sta/*.hh",
     #ioPlacer
@@ -137,6 +145,7 @@ OPENROAD_LIBRARY_HDRS_INCLUDE = [
     "src/mpl/include/mpl/*.h",
     #antenna_checker
     "src/ant/include/ant/*.hh",
+    "src/ant/src/*.hh",
     #FastRoute
     "src/grt/src/fastroute/include/*.h",
     "src/grt/include/grt/*.h",
@@ -150,6 +159,7 @@ OPENROAD_LIBRARY_HDRS_INCLUDE = [
     "src/rcx/include/rcx/*.h",
     #TritonRoute
     "src/drt/include/triton_route/*.h",
+    "src/drt/src/db/infra/*.hpp",
     #PDNSim
     "src/psm/include/psm/*.h",
     "src/psm/include/psm/*.hh",
@@ -160,9 +170,10 @@ OPENROAD_LIBRARY_HDRS_INCLUDE = [
     "src/pdn/include/pdn/*.hh",
     #STT
     "src/stt/include/stt/*.h",
-    #MPL2
-    "src/mpl2/include/mpl2/*.h",
+    #MPL
+    "src/mpl/include/mpl/*.h",
     #RMP
+    "src/rmp/src/*.h",
     "src/rmp/include/rmp/*.h",
     #Distributed
     "src/dst/include/dst/*.h",
@@ -174,13 +185,18 @@ OPENROAD_LIBRARY_HDRS_INCLUDE = [
     "src/dft/include/dft/*.hh",
     #upf
     "src/upf/include/upf/*.h",
+    "src/upf/src/*.h",
 ]
 
 OPENROAD_LIBRARY_INCLUDES = [
     #Root OpenRoad
     "include",
+    #OpenDB
+    "src/odb/include/odb",
     #OpenDBTCL
     "src/odb/src/swig/common",
+    #STA
+    "src/sta/include/sta",
     #DbSTA
     "src/dbSta/include",
     "src/dbSta/include/db_sta",
@@ -242,9 +258,9 @@ OPENROAD_LIBRARY_INCLUDES = [
     #PDNGen
     "src/pdn/include",
     "src/pdn/include/pdn",
-    #MPL2
-    "src/mpl2/include",
-    "src/mpl2/src",
+    #MPL
+    "src/mpl/include",
+    "src/mpl/src",
     #RMP
     "src/rmp/include",
     #STT
@@ -308,6 +324,9 @@ OPENROAD_LIBRARY_DEPS = [
 
 OPENROAD_LIBRARY_SRCS_EXCLUDE = [
     "src/Main.cc",
+    "src/Main_bindings.cc",
+    "src/OpenRoad.cc",
+    "src/rcx/src/extmeasure_res_v2.cpp",
     "src/rsz/src/Unused.cc",
     "src/drt/src/main.cpp",
     "src/utl/src/Logger.cpp",
@@ -316,6 +335,7 @@ OPENROAD_LIBRARY_SRCS_EXCLUDE = [
     "src/par/src/MLPart/mlpart/ABKCommon/abkrand_templ.cxx",
     "src/par/src/MLPart/mlpart/Partitioners/aGreedMoveMan.cxx",
     "src/par/src/MLPart/mlpart/Combi/grayPermut.cxx",
+    "src/utl/src/ScopedTemporaryFile.cpp",
 ]
 
 OPENROAD_LIBRARY_SRCS_INCLUDE = [
@@ -392,9 +412,9 @@ OPENROAD_LIBRARY_SRCS_INCLUDE = [
     "src/stt/src/pdr/src/*.h",
     "src/stt/src/pdr/src/*.cpp",
     "src/stt/src/flt/*.cpp",
-    #MPL2
-    "src/mpl2/src/*.cpp",
-    "src/mpl2/src/*.h",
+    #mpl
+    "src/mpl/src/*.cpp",
+    "src/mpl/src/*.h",
     #RMP
     "src/rmp/src/*.cpp",
     #Distributed
@@ -409,6 +429,8 @@ OPENROAD_LIBRARY_SRCS_INCLUDE = [
     "src/pad/src/*.h",
     #upf
     "src/upf/src/*.cpp",
+    #utl
+    "src/utl/*.h",
     #dft
     "src/dft/src/**/*.cpp",
     "src/dft/src/**/*.hh",
