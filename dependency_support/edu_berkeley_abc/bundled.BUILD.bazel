@@ -19,6 +19,23 @@ licenses(["notice"])
 
 exports_files(["LICENSE"])
 
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+
+# Copy c files to cc files to enable compilation with gcc_toolchains to work.
+copy_file(
+    name = "rename_utils_pth",
+    src = "src/misc/util/utilPth.c",
+    out = "src/misc/util/utilPth.cpp",
+)
+
+# Note this also needs a change to the include path as sswPart.cpp includes
+# sswPart.h and the copy is placed by bazel in a different directory.
+copy_file(
+    name = "rename_ssw_part",
+    src = "src/proof/ssw/sswPart.c",
+    out = "src/proof/ssw/sswPart.cpp",
+)
+
 cc_binary(
     name = "abc",
     srcs = ["src/base/main/main.c"],
@@ -794,7 +811,7 @@ cc_library(
         "src/misc/util/utilFile.c",
         "src/misc/util/utilIsop.c",
         "src/misc/util/utilNam.c",
-        "src/misc/util/utilPth.c",
+        "src/misc/util/utilPth.cpp",
         "src/misc/util/utilSignal.c",
         "src/misc/util/utilSort.c",
         "src/misc/zlib/adler32.c",
@@ -1101,7 +1118,7 @@ cc_library(
         "src/proof/ssw/sswLcorr.c",
         "src/proof/ssw/sswMan.c",
         "src/proof/ssw/sswPairs.c",
-        "src/proof/ssw/sswPart.c",
+        "src/proof/ssw/sswPart.cpp",
         "src/proof/ssw/sswRarity.c",
         "src/proof/ssw/sswSat.c",
         "src/proof/ssw/sswSemi.c",
@@ -1227,7 +1244,7 @@ cc_library(
         "_DEFAULT_SOURCE",
         "ABC_NAMESPACE=abc",
     ],
-    includes = ["src/"],
+    includes = ["src/", "src/proof/ssw/"],
     linkopts = ["-ldl", "-lpthread"],
     linkstatic = True,
     textual_hdrs = glob(
