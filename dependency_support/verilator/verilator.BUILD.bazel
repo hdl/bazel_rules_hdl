@@ -313,6 +313,9 @@ cc_library(
         "include/verilated_vcd_c.h",
         "include/verilated_vpi.h",
         "include/verilated.h",
+        # Needed for verilatedos
+        "include/verilatedos.h",
+        "include/verilatedos_c.h",
     ],
     # TODO: Remove these once upstream fixes these warnings
     copts = [
