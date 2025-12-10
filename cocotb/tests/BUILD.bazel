@@ -13,7 +13,7 @@
 # limitations under the License.
 
 load("//cocotb:cocotb.bzl", "cocotb_test")
-load("//dependency_support:requirements.bzl", "requirement")
+load("@rules_hdl_pip_deps//:requirements.bzl", "requirement")
 load("//verilog:defs.bzl", "verilog_library")
 
 package(

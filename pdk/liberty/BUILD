@@ -15,7 +15,7 @@
 """ASAP7 PDK Package"""
 
 load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
-load("//dependency_support:requirements.bzl", "requirement")
+load("@rules_hdl_pip_deps//:requirements.bzl", "requirement")
 
 package(
     default_applicable_licenses = ["//:package_license"],
