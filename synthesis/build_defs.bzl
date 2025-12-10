@@ -176,26 +176,12 @@ def _synthesize_design_impl(ctx):
         ha_fa_mapping_path = ha_fa_mapping[DefaultInfo].files.to_list()[0].path
         script_env_files["ADDER_MAPPING"] = str(ha_fa_mapping_path)
         inputs.append(ha_fa_mapping[DefaultInfo].files.to_list()[0])
-<<<<<<< HEAD
-
-    env = {
-        "ABC": yosys_runfiles_dir + "/edu_berkeley_abc/abc",
-        "YOSYS_DATDIR": yosys_runfiles_dir + "/at_clifford_yosys/techlibs/",
-    }
 
     if ctx.file.early_techmap:
         script_env_files["EARLY_TECHMAP"] = ctx.file.early_techmap
 
-||||||| parent of 247251f (Removed yosys hardcoded dirs from rules.)
-
-    env = {
-        "ABC": yosys_runfiles_dir + "/+_repo_rules+edu_berkeley_abc/abc",
-        "YOSYS_DATDIR": yosys_runfiles_dir + "/+_repo_rules+at_clifford_yosys/techlibs/",
-    }
-
-=======
     env = {}
->>>>>>> 247251f (Removed yosys hardcoded dirs from rules.)
+
     for k, v in script_env_files.items():
         if type(v) == "File":
             env[k] = v.path
