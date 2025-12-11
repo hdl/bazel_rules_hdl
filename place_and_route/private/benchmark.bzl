@@ -84,9 +84,14 @@ def benchmark(ctx, open_road_info):
         "inverters_area=$(cat {log} | awk '/Inverter/ {{ print $2 }}');",
         "wns_ps=$(cat {log} | awk '/wns/ {{ printf(\"%.0f\", $2 * 1000); }}');",
         "tns_ps=$(cat {log} | awk '/tns/ {{ printf(\"%.0f\", $2 * 1000); }}');",
-        "period=$(cat {log} | awk '/clk  / {{ period=$2; exit }} END {{ printf(\"%.0f\", period * 1000); }}');",
+        # Fixed: Match any clock name (not just "clk") in the clock properties table
+        # The table has format: "clock_name    period    waveform_start  waveform_end"
+        "period=$(cat {log} | awk '/Period.*Waveform/ {{ in_table=1; next }} in_table && /^-+$/ {{ next }} in_table && /^[a-zA-Z_][a-zA-Z0-9_]*[ \\t]+[0-9]/ {{ printf(\"%.0f\", $2 * 1000); exit }}');",
         "cpl=$(cat {log} | awk '/period_min/ {{ cpl=$4; exit }} END {{ printf(\"%.0f\", cpl * 1000); }}');",
-        "fmax=$(cat {log} | awk '/fmax/ {{ fmax=$7; exit }} END {{ print fmax }}');",
+        # Fixed: Convert fmax from MHz to GHz (OpenROAD reports in MHz, proto expects GHz)
+        # Log format: "clock_name period_min = X.XX fmax = Y.YY"
+        # where fmax is in MHz, so divide by 1000 to get GHz
+        "fmax=$(cat {log} | awk '/fmax/ {{ fmax=$7; exit }} END {{ printf(\"%.3f\", fmax / 1000.0) }}');",
         "tot_pow=$(cat {log} | awk '/^Total / {{ total_power=$5 }} END {{ print total_power }}');",
         "int_pow=$(cat {log} | awk '/^Total / {{ intern_power=$2 }} END {{ print intern_power }}');",
         "leak_pow=$(cat {log} | awk '/^Total / {{ leak_power=$4 }} END {{ print leak_power }}');",
