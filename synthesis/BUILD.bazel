@@ -29,7 +29,7 @@ exports_files(["abc.script"])
 
 pkg_tar(
     name = "yosys",
-    srcs = ["@yosys//:yosys"],
+    srcs = ["@yosys"],
     include_runfiles = True,
     strip_prefix = "./",
 )

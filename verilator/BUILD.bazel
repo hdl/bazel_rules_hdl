@@ -28,9 +28,9 @@ verilator_toolchain(
     name = "verilator_toolchain_impl",
     verilator = "@verilator//:verilator_executable",
     deps = [
-        "@zlib//:zlib",
         "@verilator//:libverilator",
         "@verilator//:svdpi",
+        "@zlib",
     ],
 )
 

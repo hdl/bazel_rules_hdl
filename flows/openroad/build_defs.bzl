@@ -84,7 +84,7 @@ def assemble_openroad_step(
         ),
         DefaultInfo(
             executable = openroad_wrapper,
-            runfiles = runfiles.merge_all([step_runfiles, openroad_runfiles])
+            runfiles = runfiles.merge_all([step_runfiles, openroad_runfiles]),
         ),
     ]
 

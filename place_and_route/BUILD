@@ -22,7 +22,7 @@ package(
 
 pkg_tar(
     name = "openroad",
-    srcs = ["@openroad//:openroad"],
+    srcs = ["@openroad"],
     include_runfiles = True,
     strip_prefix = "./",
 )

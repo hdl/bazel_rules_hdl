@@ -18,6 +18,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@rules_cc//cc:defs.bzl", "CcInfo")
+load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("//verilog:defs.bzl", "VerilogInfo")
 
 def cc_compile_and_link_static_library(ctx, srcs, hdrs, deps, runfiles, includes = [], defines = []):

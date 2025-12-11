@@ -18,6 +18,7 @@
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 
 package(
     default_applicable_licenses = ["//:package_license"],
