@@ -81,6 +81,7 @@ def _gds_write_impl(ctx):
                   gds_allow_empty_args +
                   " --out {}".format(final_gds.path),
         tools = depset([ctx.executable._gds_write]),
+        use_default_shell_env = True,
         toolchain = "//python:current_py_toolchain",
     )
 

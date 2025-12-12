@@ -34,8 +34,6 @@ def _run_opensta_impl(ctx):
     if default_liberty_file in additional_liberty_files:
         additional_liberty_files.remove(default_liberty_file)
 
-    opensta_runfiles_dir = ctx.executable._opensta.path + ".runfiles"
-
     sta_tcl = ctx.file.sta_tcl
     sta_log = ctx.actions.declare_file("{}_sta.log".format(ctx.attr.name))
 
@@ -44,7 +42,6 @@ def _run_opensta_impl(ctx):
         "LIBERTY": default_liberty_file.path,
         "LOGFILE": sta_log.path,
         "NETLIST": netlist.path,
-        "TCL_LIBRARY": opensta_runfiles_dir + "/tk_tcl/library",
         "TOP": synth_info.top_module,
     }
 
@@ -78,7 +75,7 @@ run_opensta_attrs = {
         providers = [SynthesisInfo],
     ),
     "_opensta": attr.label(
-        default = Label("@org_theopenroadproject//:opensta"),
+        default = Label("@openroad//:opensta"),
         executable = True,
         cfg = "exec",
     ),

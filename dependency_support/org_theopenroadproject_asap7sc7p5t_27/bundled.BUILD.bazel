@@ -374,7 +374,7 @@ asap7_srams_files(
 #)
 alias(
     name = "asap7-misc-sc7p5t_rev27-lef",
-    actual = "@org_theopenroadproject_asap7sc7p5t_28//:asap7-misc-sc7p5t_rev28-lef",
+    actual = "@org_theopenroadproject_asap7_pdk_sc7p5t_28//:asap7-misc-sc7p5t_rev28-lef",
 )
 
 filegroup(

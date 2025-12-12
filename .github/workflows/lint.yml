@@ -8,7 +8,7 @@ jobs:
   buildifier:
     runs-on: ubuntu-22.04
     env:
-      BUILDIFIER_VERSION: v6.3.3
+      BUILDIFIER_VERSION: v8.2.1
     steps:
       - uses: actions/checkout@v2
 

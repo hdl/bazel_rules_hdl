@@ -197,7 +197,7 @@ cc_library(
         "src/utl/include/utl",
         "src/utl/src",
     ],
-    visibility = ["@org_theopenroadproject//:__subpackages__"],
+    visibility = ["@openroad//:__subpackages__"],
     deps = [
         "@com_github_gabime_spdlog//:spdlog",
     ],
@@ -229,7 +229,7 @@ cc_library(
     includes = [
         "src/mpl/src/ParquetFP/src",
     ],
-    visibility = ["@org_theopenroadproject//:__subpackages__"],
+    visibility = ["@openroad//:__subpackages__"],
 )
 
 cc_library(
@@ -243,7 +243,7 @@ cc_library(
     includes = [
         "src/ppl/src/munkres/src",
     ],
-    visibility = ["@org_theopenroadproject//:__subpackages__"],
+    visibility = ["@openroad//:__subpackages__"],
 )
 
 cc_library(
@@ -909,7 +909,7 @@ filegroup(
     srcs = [
         "src/odb/src/swig/common/dbdiff.i",
     ],
-    visibility = ["@org_theopenroadproject//:__subpackages__"],
+    visibility = ["@openroad//:__subpackages__"],
 )
 
 filegroup(
@@ -918,7 +918,7 @@ filegroup(
         "src/odb/src/swig/common/swig_common.cpp",
         "src/odb/src/swig/common/swig_common.h",
     ],
-    visibility = ["@org_theopenroadproject//:__subpackages__"],
+    visibility = ["@openroad//:__subpackages__"],
 )
 
 tcl_wrap_cc(
@@ -1006,7 +1006,7 @@ cc_library(
         "src/odb/src/lef/lefin",
         "src/odb/src/lef/lefzlib",
     ],
-    visibility = ["@org_theopenroadproject//:__subpackages__"],
+    visibility = ["@openroad//:__subpackages__"],
     deps = [
         ":logger",
         ":opendb_def",
@@ -1265,7 +1265,7 @@ filegroup(
     name = "tcl_scripts",
     srcs = exported_tcl,
     visibility = [
-    	"@org_theopenroadproject//:__subpackages__",
+        "@openroad//:__subpackages__",
     ],
 )
 
@@ -1302,7 +1302,7 @@ filegroup(
         "src/sta/tcl/StaTclTypes.i",
         "src/sta/verilog/Verilog.i",
     ],
-    visibility = ["@org_theopenroadproject//:__subpackages__"],
+    visibility = ["@openroad//:__subpackages__"],
 )
 
 tcl_wrap_cc(
@@ -1454,7 +1454,7 @@ cc_library(
         "src/sta/include/sta",
         "src/sta/util",
     ],
-    visibility = ["@org_theopenroadproject//:__subpackages__"],
+    visibility = ["@openroad//:__subpackages__"],
     deps = [
         "@tk_tcl//:tcl",
         "@net_zlib//:zlib",
@@ -1466,7 +1466,7 @@ filegroup(
     srcs = [
         "src/sta/tcl/Util.tcl",
     ],
-    visibility = ["@org_theopenroadproject//:__subpackages__"],
+    visibility = ["@openroad//:__subpackages__"],
 )
 
 ## OpenSTA

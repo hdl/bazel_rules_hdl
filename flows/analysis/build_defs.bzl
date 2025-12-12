@@ -77,7 +77,7 @@ analyze_netlist_step = rule(
             mandatory = True,
         ),
         "_openroad": attr.label(
-            default = Label("@org_theopenroadproject//:openroad"),
+            default = Label("@openroad//:openroad"),
             executable = True,
             cfg = "exec",
         ),

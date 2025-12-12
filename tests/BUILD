@@ -193,7 +193,7 @@ EXTRA_ARGS = {
     basic_asic_flow(
         name = test_name + "-asap7-sc7p5t_rev27_rvt_4x",
         size = 2000,
-        cells = "@org_theopenroadproject_asap7sc7p5t_27//:asap7-sc7p5t_rev27_rvt_4x-ccs_ss",
+        cells = "@org_theopenroadproject_asap7_pdk_sc7p5t_27//:asap7-sc7p5t_rev27_rvt_4x-ccs_ss",
         extra_args = EXTRA_ARGS[test_name],
         gds = False,  # No GDS for the 4x cells
         target = ":" + test_name,

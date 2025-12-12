@@ -247,8 +247,6 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
     command_file = ctx.actions.declare_file(file_name)
     ctx.actions.write(command_file, content = "\n".join(real_commands))
 
-    openroad_runfiles_dir = ctx.executable._openroad.path + ".runfiles"
-
     log_file = ctx.actions.declare_file(
         "{}.log".format(
             output_db.basename[:-(len(output_db.extension) + 1)],
@@ -274,7 +272,6 @@ def openroad_command(ctx, commands, input_db = None, step_name = None, inputs = 
             "DEFAULT_INPUT_DRIVER_CELL": stdcell_info.default_input_driver_cell,
             "DEFAULT_OUTPUT_LOAD": stdcell_info.default_output_load,
             "QT_QPA_PLATFORM": ctx.attr.qt_qpa_platform,
-            "TCL_LIBRARY": openroad_runfiles_dir + "/tk_tcl/library",
         },
         execution_requirements = execution_requirements,
         mnemonic = "OpenROAD",

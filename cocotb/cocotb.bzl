@@ -250,7 +250,7 @@ _cocotb_test_attrs = {
     "sim": attr.label_list(
         doc = "Simulator to use",
         default = [
-            Label("@com_icarus_iverilog//:iverilog"),
+            Label("@iverilog//:iverilog"),
             Label("@com_icarus_iverilog//:vvp"),
         ],
     ),

@@ -39,8 +39,8 @@ cc_test(
     srcs = ["adder_test.cc"],
     deps = [
         ":adder_verilator",
-        "@com_google_googletest//:gtest",
-        "@com_google_googletest//:gtest_main",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
     ],
 )
 
@@ -67,8 +67,8 @@ cc_test(
     ],
     deps = [
         ":load_and_count_verilator",
-        "@com_google_googletest//:gtest",
-        "@com_google_googletest//:gtest_main",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
     ],
 )
 
@@ -112,7 +112,7 @@ cc_test(
     ],
     deps = [
         ":nested_module_2_verilator",
-        "@com_google_googletest//:gtest",
-        "@com_google_googletest//:gtest_main",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
     ],
 )

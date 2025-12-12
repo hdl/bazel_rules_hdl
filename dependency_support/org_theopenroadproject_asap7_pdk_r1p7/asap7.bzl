@@ -247,7 +247,6 @@ def _asap7_cell_library_impl(ctx):
         inputs = default_corner_libraries,
         arguments = [args],
         executable = ctx.executable._combine_liberty,
-        use_default_shell_env = True,
     )
 
     open_road_configuration = None
@@ -292,7 +291,8 @@ asap7_cell_library = rule(
             cfg = "exec",
         ),
         "_uncompress": attr.label(
-            default = Label("@7zip//:7za"),
+            allow_single_file = True,
+            default = Label("@p7zip//:7za"),
             executable = True,
             cfg = "exec",
         ),
