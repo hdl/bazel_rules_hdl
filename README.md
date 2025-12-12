@@ -1,38 +1,17 @@
 # rules_hdl
-Hardware Description Language (Verilog, VHDL, Chisel, nMigen, etc) with open tools (Yosys, Verilator, OpenROAD, etc) rules for Bazel (https://bazel.build)
+Hardware Description Language (Verilog, VHDL, Chisel, nMigen, etc) with open tools (Yosys, Verilator, OpenROAD, etc) rules for [Bazel](https://bazel.build)
 
-**THIS REPO REQUIRES BAZEL 5.4.0 or greater**
+> **🚀 Migration to Bzlmod**
+>
+> We have recently migrated the build system to Bzlmod (see [PR \#428](https://github.com/hdl/bazel_rules_hdl/pull/428)). While this setup has been verified against **Verilator simulation** and the **OpenROAD full EDA flow**, it may still be subject to instability or edge cases.
+>
+> Contributions and Pull Requests to improve stability are highly welcome\!
+>
+> **Need the legacy setup?** You can revert to the [WORKSPACE version here](https://github.com/hdl/bazel_rules_hdl/tree/af93b9a5893e482f9959ce351834960e09a45a7b).
 
-## Installation
+## Setup
 
-In your `WORKSPACE` file. Which is a file at the top directory of every bazel
-repo:
-
-```starlark
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
-
-# You don't need these variables, but are useful for configurability.
-# Feel free to hardcode these values in the maybe http_archive below.
-rules_hdl_git_hash = "{LATEST_HASH}"
-rules_hdl_git_sha256 = "{LATEST_SHA}"
-
-maybe(
-    http_archive,
-    name = "rules_hdl",
-    sha256 = rules_hdl_git_sha256,
-    strip_prefix = "bazel_rules_hdl-%s" % rules_hdl_git_hash,
-    urls = [
-        "https://github.com/hdl/bazel_rules_hdl/archive/%s.tar.gz" % rules_hdl_git_hash,
-    ],
-)
-
-load("@rules_hdl//dependency_support:dependency_support.bzl", rules_hdl_dependency_support = "dependency_support")
-rules_hdl_dependency_support()
-
-load("@rules_hdl//:init.bzl", rules_hdl_init = "init")
-rules_hdl_init()
-```
+You can refer to this [minimal working project](https://github.com/MrAMS/bazel-chisel-demo), specifically, see [rules_hdl_overrides.MODULE.bazel](https://github.com/MrAMS/bazel-chisel-demo/blob/b767ef0ff2213f200200402b7075b007f02516ed/rules/rules_hdl_overrides.MODULE.bazel)
 
 ## Usage
 
