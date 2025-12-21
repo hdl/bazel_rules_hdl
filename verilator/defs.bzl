@@ -69,6 +69,8 @@ def cc_compile_and_link_static_library(ctx, srcs, hdrs, deps, runfiles, includes
     )
 
     output_files = []
+    if linking_output.library_to_link.pic_static_library != None:
+        output_files.append(linking_output.library_to_link.pic_static_library)
     if linking_output.library_to_link.static_library != None:
         output_files.append(linking_output.library_to_link.static_library)
     if linking_output.library_to_link.dynamic_library != None:
