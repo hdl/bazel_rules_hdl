@@ -1,0 +1,18 @@
+--- textio/txMain.c	2020-08-11 22:50:26.000000000 +0200
++++ textio/txMain.c	2025-07-15 10:15:29.672949422 +0200
+@@ -43,12 +43,15 @@
+ global bool TxStdoutIsatty;
+ 
+ #ifdef USE_READLINE
++#define WANT_OBSOLETE_TYPEDEFS 1
+ #ifdef HAVE_READLINE
+ #include <readline/readline.h>
+ #include <readline/history.h>
++#include <readline/rltypedefs.h>
+ #else
+ #include "readline/readline.h"
+ #include "readline/history.h"
++#include "readline/rltypedefs.h"
+ #endif
+ 
+ int TxPrefix(void);
