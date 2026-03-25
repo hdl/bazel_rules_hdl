@@ -14,35 +14,25 @@ llvm.toolchain(
 use_repo(llvm, "llvm_toolchain")
 
 bazel_dep(name = "abc", version = "0.62-yosyshq")
-bazel_dep(name = "abseil-cpp", version = "20260107.0", repo_name = "com_google_absl")
 bazel_dep(name = "bazel_skylib", version = "1.9.0")
-bazel_dep(name = "eigen", version = "5.0.1")
 bazel_dep(name = "googletest", version = "1.17.0.bcr.2", repo_name = "com_google_googletest")
-bazel_dep(name = "or-tools", version = "9.14.bcr.1", repo_name = "com_google_ortools")
 bazel_dep(name = "readline", version = "8.3")
 bazel_dep(name = "libffi", version = "3.4.7.bcr.3")
-bazel_dep(name = "protobuf", version = "33.2", repo_name = "com_google_protobuf")
 bazel_dep(name = "rules_bison", version = "0.4")
 bazel_dep(name = "rules_cc", version = "0.2.17")
 bazel_dep(name = "rules_flex", version = "0.4")
 bazel_dep(name = "rules_license", version = "1.0.0")
-bazel_dep(name = "rules_m4", version = "0.3")
 bazel_dep(name = "rules_proto", version = "7.1.0")
 bazel_dep(name = "rules_pkg", version = "1.2.0")
 bazel_dep(name = "rules_python", version = "1.8.5")
 bazel_dep(name = "rules_shell", version = "0.6.1")
-bazel_dep(name = "spdlog", version = "1.17.0", repo_name = "com_github_gabime_spdlog")
-bazel_dep(name = "swig", version = "4.3.0.bcr.2")
 bazel_dep(name = "verilator", version = "5.036.bcr.3")
 bazel_dep(name = "zlib", version = "1.3.1.bcr.7")
 bazel_dep(name = "bzip2", version = "1.0.8.bcr.3")
 bazel_dep(name = "gperf", version = "3.1")
 bazel_dep(name = "tcl_lang", version = "8.6.16.bcr.1")
 bazel_dep(name = "openroad", repo_name = "org_theopenroadproject")
-bazel_dep(name = "libxml2", version = "2.15.1.bcr.1")
 bazel_dep(name = "rules_7zip", version = "0.0.1")
-bazel_dep(name = "rules_jvm_external", version = "6.9")
-
 git_override(
     module_name = "rules_7zip",
     commit = "03a10b5796eac0aed122cf52064ed15785610857",
@@ -56,15 +46,8 @@ use_repo(extension_setup_7zip, "7zip")
 # Need git_override b/c of submodules
 git_override(
     module_name = "openroad",
-    commit = "034958a19c715e0e3e64e077968069537d6755f0",
+    commit = "51c9638fb0b005e5d60d7216970110543621125c",
     init_submodules = True,
-    patch_args = ["-p1"],
-    patches = [
-        "//dependency_support/org_theopenroadproject:01-visibility.patch",
-        "//dependency_support/org_theopenroadproject:02-toolchains_llvm.patch",
-        "//dependency_support/org_theopenroadproject:03-tcl_wrap_cc.patch",
-        "//dependency_support/org_theopenroadproject:04-include_copts.patch",
-    ],
     remote = "https://github.com/The-OpenROAD-Project/OpenROAD.git",
 )
 
@@ -73,29 +56,6 @@ git_override(
     module_name = "qt-bazel",
     commit = "90cfbab79df93960c5493f8a75df6199fb80fe26",
     remote = "https://github.com/The-OpenROAD-Project/qt_bazel_prebuilts",
-)
-
-git_override(
-    module_name = "bazel-orfs",
-    commit = "1e862b169d97dc0fec5db106559640886e7fd7d0",
-    remote = "https://github.com/The-OpenROAD-Project/bazel-orfs.git",
-)
-
-# Fix versions
-single_version_override(
-    module_name = "rules_scala",
-    version = "7.1.6",
-)
-
-maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
-maven.install(
-    known_contributing_modules = [
-        "bazel-orfs",
-        "grpc-java",
-        "openroad",
-        "or-tools",
-        "protobuf",
-    ],
 )
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
