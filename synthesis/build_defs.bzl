@@ -463,7 +463,7 @@ def _benchmark_synth_impl(ctx):
     cmd2 = "{grep} Longest.topological.path {log}".format(grep = grep, log = synth_log)
     cmd3 = "{grep} Flop.count {log}".format(grep = grep, log = synth_log)
     cmd4 = "{grep} ^Liberty: {log}".format(grep = grep, log = synth_log)
-    cmd5 = "{grep} CPU:.user {log}".format(grep = grep, log = synth_log)
+    cmd5 = "{grep} 'End of script.*time:' {log}".format(grep = grep, log = synth_log)
 
     executable_file = ctx.actions.declare_file(ctx.label.name + ".sh")
 
