@@ -12,9 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+
 package(
     default_applicable_licenses = ["//:package_license"],
     default_visibility = ["//visibility:private"],
 )
 
 exports_files(["build_defs.bzl"])
+
+bzl_library(
+    name = "build_defs_bzl",
+    srcs = ["build_defs.bzl"],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
+    name = "open_road_configuration_bzl",
+    srcs = ["open_road_configuration.bzl"],
+    visibility = ["//visibility:public"],
+)
