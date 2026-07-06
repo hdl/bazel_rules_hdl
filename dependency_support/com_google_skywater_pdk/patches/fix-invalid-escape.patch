@@ -1,0 +1,11 @@
+--- a/scripts/python-skywater-pdk/skywater_pdk/liberty.py
++++ b/scripts/python-skywater-pdk/skywater_pdk/liberty.py
+@@ -473,7 +473,7 @@
+         driver_waveform_name : string; /* Specifies the name of the driver waveform table */
+         index_1 ("float, ... float"); /* Specifies input net transition */
+         index_2 ("float, ... float"); /* Specifies normalized voltage */
+-        values ("float, ... float", \ /* Specifies the time in library units */
++        values ("float, ... float",  /* Specifies the time in library units */
+             ... , \\
+             "float, ... float");
+     }
