@@ -132,7 +132,6 @@ def _synthesize_design_impl(ctx):
     args = ctx.actions.args()
     args.add("-q")  # quiet mode only errors printed to stderr
     args.add("-Q")  # Don't print header
-    args.add("-T")
     args.add_all("-l", [log_file])  # put output in log file
     args.add_all("-c", [synth_tcl])  # run synthesis tcl script
     if ctx.attr.extra_tcl_command:
@@ -463,7 +462,7 @@ def _benchmark_synth_impl(ctx):
     cmd2 = "{grep} Longest.topological.path {log}".format(grep = grep, log = synth_log)
     cmd3 = "{grep} Flop.count {log}".format(grep = grep, log = synth_log)
     cmd4 = "{grep} ^Liberty: {log}".format(grep = grep, log = synth_log)
-    cmd5 = "{grep} 'End of script.*time:' {log}".format(grep = grep, log = synth_log)
+    cmd5 = "{grep} 'End of script.*CPU:.user' {log}".format(grep = grep, log = synth_log)
 
     executable_file = ctx.actions.declare_file(ctx.label.name + ".sh")
 
