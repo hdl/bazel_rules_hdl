@@ -19,7 +19,7 @@ load("//flows:basic_asic.bzl", "basic_asic_flow")
 load("//gds_write:build_defs.bzl", "gds_write")
 load("//place_and_route:build_defs.bzl", "place_and_route")
 load("//static_timing:build_defs.bzl", "run_opensta")
-load("//synthesis:defs.bzl", "synthesize_rtl")
+load("//synthesis:defs.bzl", "sdc_library", "synthesize_rtl")
 load("//verilog:defs.bzl", "verilog_library")
 
 package(
@@ -78,6 +78,11 @@ place_and_route(
     synthesized_rtl = ":verilog_adder-synth",
 )
 
+sdc_library(
+    name = "constraint",
+    srcs = ["constraint.sdc"],
+)
+
 place_and_route(
     name = "verilog_counter-place_and_route",
     clock_period = "10",
@@ -85,7 +90,7 @@ place_and_route(
     die_height_microns = 200,
     die_width_microns = 200,
     placement_density = "0.7",
-    sdc = "constraint.sdc",
+    sdc = ":constraint",
     synthesized_rtl = ":verilog_counter-synth",
 )
 
