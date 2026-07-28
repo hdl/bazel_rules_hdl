@@ -101,7 +101,7 @@ def cocotb_argument_parser():
     )
     parser.add_argument(
         "--build_args",
-        nargs="*",
+        action="append",
         default=[],
         help="Extra build arguments for the simulator",
     )
