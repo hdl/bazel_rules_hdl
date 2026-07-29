@@ -27,6 +27,9 @@ def _list_to_argstring(data, argname, attr = None, operation = None):
         result += " {}".format(elem)
     return result
 
+def _repeated_argstring(data, argname):
+    return "".join([" --{}={}".format(argname, value) for value in data])
+
 def _dict_to_argstring(data, argname):
     result = " --{}".format(argname) if data else ""
     for key, value in data.items():
@@ -123,7 +126,10 @@ def _get_test_command(ctx, verilog_files, vhdl_files):
 
     includes_args = _list_to_argstring(ctx.attr.includes, "includes")
     testcase_args = _list_to_argstring(ctx.attr.testcase, "testcase")
-    build_args = _list_to_argstring(ctx.attr.build_args, "build_args")
+
+    # Use the --option=value form so argparse does not interpret simulator
+    # flags such as "-Wno-*" as options belonging to this wrapper.
+    build_args = _repeated_argstring(ctx.attr.build_args, "build_args")
     gpi_interfaces_args = _list_to_argstring(ctx.attr.gpi_interfaces, "gpi_interfaces")
     test_args = _list_to_argstring(ctx.attr.test_args, "test_args")
     plus_args = _list_to_argstring(ctx.attr.plus_args, "plus_args")
@@ -162,7 +168,6 @@ def _get_test_command(ctx, verilog_files, vhdl_files):
         seed_args +
         test_module_args
     )
-
     return command
 
 def _cocotb_test_impl(ctx):
@@ -170,7 +175,8 @@ def _cocotb_test_impl(ctx):
     vhdl_files = _collect_vhdl_files(ctx).to_list()
 
     # create test script
-    runner_script = ctx.actions.declare_file("cocotb_runner.sh")
+    runner_script_fname = ctx.label.name + "_cocotb_runner.sh"
+    runner_script = ctx.actions.declare_file(runner_script_fname)
     ctx.actions.write(
         output = runner_script,
         content = _get_test_command(ctx, verilog_files, vhdl_files),

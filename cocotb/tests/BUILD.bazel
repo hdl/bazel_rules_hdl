@@ -28,6 +28,9 @@ verilog_library(
 
 cocotb_test(
     name = "cocotb_counter",
+    build_args = [
+        "-Wall",
+    ],
     defines = {"INIT_CNT": "100"},
     hdl_toplevel = "counter",
     hdl_toplevel_lang = "verilog",
