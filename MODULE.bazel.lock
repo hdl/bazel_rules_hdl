@@ -692,7 +692,7 @@
   "moduleExtensions": {
     "//dependency_support:pdks_extension.bzl%pdks_extension": {
       "general": {
-        "bzlTransitiveDigest": "o+FadBhBCCa2+iFwfix5Hit3NaTazjgvd9BoeFLnzbM=",
+        "bzlTransitiveDigest": "vazBvlmuGhbABsu1hlI3UgVKb6mE6a0QRxum+beR2FY=",
         "usagesDigest": "tZ8UoTI8a5/l1BuCT9OFhu6sDTSdjC/aIHUMK+am4eg=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -2341,7 +2341,7 @@
     "@@toolchains_llvm+//toolchain/extensions:llvm.bzl%llvm": {
       "general": {
         "bzlTransitiveDigest": "i54NfnK6i34XT5yyh16sxeFE2U1s0aiixBtMQYMdAMo=",
-        "usagesDigest": "0xcqQOgAeLeZQn+aDo7D9xdDrwTXCSDB5wn2WrV1Xkc=",
+        "usagesDigest": "htBa/Ekk+MpxRpAGMKkhwk30yZpquYwdow2CVrSvf04=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -2357,7 +2357,7 @@
               "extra_llvm_distributions": {},
               "libclang_rt": {},
               "llvm_mirror": "",
-              "llvm_version": "18.1.8",
+              "llvm_version": "19.1.7",
               "llvm_versions": {},
               "netrc": "",
               "sha256": {},
@@ -2386,7 +2386,7 @@
               "link_flags": {},
               "link_libs": {},
               "llvm_versions": {
-                "": "18.1.8"
+                "": "19.1.7"
               },
               "opt_compile_flags": {},
               "opt_link_flags": {},

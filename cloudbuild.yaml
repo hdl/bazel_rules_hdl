@@ -34,14 +34,19 @@ steps:
     path: /root/.ssh
 
 # Run the build
-- name: gcr.io/cloud-builders/bazel:8.3.1
+- name: marketplace.gcr.io/google/ubuntu2204 # Ubuntu 22.04
   entrypoint: 'bash'
   args:
   - '-c'
   - |
     set -e
+    export DEBIAN_FRONTEND=noninteractive
     apt-get update
-    apt-get install -y libtinfo5 clang
+    apt-get install -y libtinfo5 clang libc6-dev curl git
+    curl -fsSL -o /usr/local/bin/bazel https://github.com/bazelbuild/bazelisk/releases/download/v1.29.0/bazelisk-linux-amd64
+    echo "5a408715e932c0250d28bd84555f12edbf70117de42f9181691c736eacc4a992  /usr/local/bin/bazel" | sha256sum -c -
+    chmod +x /usr/local/bin/bazel
+    export USE_BAZEL_VERSION=8.5.0
     BUILD_INVOCATION_ID=$(python3 tools/generate_uuid.py)
     TEST_INVOCATION_ID=$(python3 tools/generate_uuid.py)
     echo STATUS: Reporting logs with build invocation id $$BUILD_INVOCATION_ID and test invocation id $$TEST_INVOCATION_ID to GitHub.
