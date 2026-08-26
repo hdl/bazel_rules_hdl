@@ -1,6 +1,10 @@
 """verilog rules"""
 
 load(
+    ":filelist.bzl",
+    _verilog_filelist = "verilog_filelist",
+)
+load(
     ":providers.bzl",
     _VerilogInfo = "VerilogInfo",
     _make_dag_entry = "make_dag_entry",
@@ -12,3 +16,4 @@ VerilogInfo = _VerilogInfo
 verilog_library = _verilog_library
 make_dag_entry = _make_dag_entry
 make_verilog_info = _make_verilog_info
+verilog_filelist = _verilog_filelist

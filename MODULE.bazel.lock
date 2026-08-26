@@ -570,8 +570,8 @@
     "https://bcr.bazel.build/modules/rules_license/1.0.0/source.json": "a52c89e54cc311196e478f8382df91c15f7a2bfdf4c6cd0e2675cc2ff0b56efb",
     "https://bcr.bazel.build/modules/rules_m4/0.2.3/MODULE.bazel": "a201ad119823e1af5024240e1e1ef294425d9be73a698cb41c8450e6c8e107e3",
     "https://bcr.bazel.build/modules/rules_m4/0.2.5/MODULE.bazel": "95b962956ac1e92f49afe78d7a4f80853b741c4e89af7b43e1e1e3f7a361c033",
-    "https://bcr.bazel.build/modules/rules_m4/0.3/MODULE.bazel": "8793c3117300f7add1cd757d07eb7d6652e0c9259624379b84d891a6bf6e11e0",
-    "https://bcr.bazel.build/modules/rules_m4/0.3/source.json": "9db752727b32753fa382a52ac0da80f01559ecb5f3ba8f6799d6e5b4582b45ac",
+    "https://bcr.bazel.build/modules/rules_m4/0.3.bcr.1/MODULE.bazel": "41d4602bb89a1495fef1e694837f47bf18fc86e4cd7fb00cd6a4f6c0d2c395e4",
+    "https://bcr.bazel.build/modules/rules_m4/0.3.bcr.1/source.json": "0f3dffd7c11d8ae41eaf65ebcca59df6ed0b6cc44bd323129f1070ded71160f5",
     "https://bcr.bazel.build/modules/rules_nodejs/5.8.2/MODULE.bazel": "6bc03c8f37f69401b888023bf511cb6ee4781433b0cb56236b2e55a21e3a026a",
     "https://bcr.bazel.build/modules/rules_nodejs/6.7.3/MODULE.bazel": "c22a48b2a0dbf05a9dc5f83837bbc24c226c1f6e618de3c3a610044c9f336056",
     "https://bcr.bazel.build/modules/rules_nodejs/6.7.3/source.json": "a3f966f4415a8a6545e560ee5449eac95cc633f96429d08e87c87775c72f5e09",
@@ -660,8 +660,6 @@
     "https://bcr.bazel.build/modules/upb/0.0.0-20220923-a547704/MODULE.bazel": "7298990c00040a0e2f121f6c32544bab27d4452f80d9ce51349b1a28f3005c43",
     "https://bcr.bazel.build/modules/upb/0.0.0-20230516-61a97ef/MODULE.bazel": "c0df5e35ad55e264160417fd0875932ee3c9dda63d9fccace35ac62f45e1b6f9",
     "https://bcr.bazel.build/modules/upb/0.0.0-20230907-e7430e6/MODULE.bazel": "3a7dedadf70346e678dc059dbe44d05cbf3ab17f1ce43a1c7a42edc7cbf93fd9",
-    "https://bcr.bazel.build/modules/verilator/5.036.bcr.3/MODULE.bazel": "19ff7c6a9133f404157b0d499ff8c93bfc7e98e7e8d7569b51e50f79a5a33d1b",
-    "https://bcr.bazel.build/modules/verilator/5.036.bcr.3/source.json": "d7aa35ef34334e9bf11ffc308c1fa7f44f313b45e4e80c497cbd26deb585bcbf",
     "https://bcr.bazel.build/modules/xds/0.0.0-20240423-555b57e/MODULE.bazel": "cea509976a77e34131411684ef05a1d6ad194dd71a8d5816643bc5b0af16dc0f",
     "https://bcr.bazel.build/modules/xds/0.0.0-20240423-555b57e/source.json": "7227e1fcad55f3f3cab1a08691ecd753cb29cc6380a47bc650851be9f9ad6d20",
     "https://bcr.bazel.build/modules/xz/5.4.5.bcr.1/MODULE.bazel": "c037f75fa1b7e1ff15fbd15d807a8ce545e9b02f02df0a9777aa9aa7d8b268bb",
@@ -886,7 +884,7 @@
     },
     "//dependency_support:tools_extension.bzl%tools_extension": {
       "general": {
-        "bzlTransitiveDigest": "ke3xkrRQsIwBklBnyIhik7/2pPr4KkxlDEYRHw20xyU=",
+        "bzlTransitiveDigest": "9cvwhTuaSoSNu2UQSrJIEBvDGGv/ID64hIPJFY737RQ=",
         "usagesDigest": "D8UVpQVHhlp0i5GVBL+gBsba3jNGLsioGk9eKcl3ks4=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -917,12 +915,36 @@
               "sha256": "a68cb1ef7c017ef090ebedb2bc3e39ef90ecc70a3400afb4aa94303bc3beaa7d",
               "build_file": "@@//dependency_support/com_icarus_iverilog:bundled.BUILD.bazel"
             }
+          },
+          "verilator": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "urls": [
+                "https://github.com/verilator/verilator/archive/v5.050.tar.gz"
+              ],
+              "sha256": "ec6723f30c1798b1fbbbed97364f09c431fb4875577c314f37240e99b60a4a04",
+              "strip_prefix": "verilator-5.050",
+              "build_file": "@@//dependency_support/verilator:verilator.BUILD.bazel"
+            }
+          },
+          "net_lz4": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "urls": [
+                "https://github.com/lz4/lz4/releases/download/v1.10.0/lz4-1.10.0.tar.gz"
+              ],
+              "strip_prefix": "lz4-1.10.0",
+              "sha256": "537512904744b35e232912055ccf8ec66d768639ff3abe5788d90d792ec5f48b",
+              "build_file": "@@//dependency_support/net_lz4:net_lz4.BUILD.bazel"
+            }
           }
         },
         "moduleExtensionMetadata": {
           "explicitRootModuleDirectDeps": [
             "at_clifford_yosys",
-            "com_icarus_iverilog"
+            "com_icarus_iverilog",
+            "verilator",
+            "net_lz4"
           ],
           "explicitRootModuleDirectDevDeps": [],
           "useAllRepos": "NO",
@@ -1739,8 +1761,8 @@
     },
     "@@rules_m4+//m4/internal:default_toolchain_ext.bzl%default_toolchain_ext": {
       "general": {
-        "bzlTransitiveDigest": "tsDFT9pkt4Tt3gpC3ufpCdpFRFHSoWSmGrgkKq1xiPM=",
-        "usagesDigest": "si5emwgpnDsU6P/27vQdYzLJhnlKDJjWt+beEA2/t08=",
+        "bzlTransitiveDigest": "f9QX0T4bok6chCgsab761GzOe+jiOgtDXkPKcF8kSgc=",
+        "usagesDigest": "mAPTbsLqgPwbTIUSgrD4eVzTGI+BCmgG19qxyiT7qNY=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},

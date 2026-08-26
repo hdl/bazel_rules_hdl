@@ -26,6 +26,8 @@ toolchain_type(
 
 verilator_toolchain(
     name = "verilator_toolchain_impl",
+    root = "@verilator//:verilator_root",
+    shared = "@verilator//:verilator_shared",
     verilator = "@verilator//:verilator_executable",
     deps = [
         "@verilator//:libverilator",

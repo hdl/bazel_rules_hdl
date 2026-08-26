@@ -12,22 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import cocotb
-from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge, ClockCycles
+"""Providers for Verilator run targets"""
 
+VerilatedBinaryInfo = provider(
+    doc = "A verilated binary supplementary info",
+    fields = {
+        "coverage": "Coverage collection settings",
+        "trace": "Trace (waveform collection) enable",
+    },
+)
 
-@cocotb.test()
-async def counter_test(dut):
-    clock = Clock(dut.clk, 10, units="us")
-    cocotb.start_soon(clock.start())
+RawCoverageInfo = provider(
+    doc = "Raw coverage data written by a verilated model",
+    fields = {
+        "files": "Coverage data files",
+    },
+)
 
-    dut.rst.setimmediatevalue(1)
-    await RisingEdge(dut.clk)
-    dut.rst.value = 0
-
-    reset_value = int(dut.cnt.value)
-
-    CYCLES_TO_WAIT = 10
-    await ClockCycles(dut.clk, CYCLES_TO_WAIT)
-    assert dut.cnt.value == reset_value + CYCLES_TO_WAIT - 1
+CoverageInfo = provider(
+    doc = "Coverage data converted using 'verilator_convert' utility",
+    fields = {
+        "files": "Coverage info files",
+    },
+)
