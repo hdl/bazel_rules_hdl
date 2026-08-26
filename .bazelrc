@@ -57,6 +57,9 @@ build --incompatible_disallow_empty_glob=true
 ###############################################################################
 ## User flags
 ###############################################################################
+# Rewrite mirrors for more stable downloads.
+common --downloader_config=tools/bazel_downloader.cfg
+
 # Optionally allow users to define custom flags when developing new features.
 # https://bazel.build/configure/best-practices#bazelrc-file
 #

@@ -116,3 +116,20 @@ bazel_rules_hdl$ python tools/test_everything.py
 Note: `bazel test ...` does not run the tests in Bazel "remote" repositories,
 and `bazel_rules_hdl` bundles together support for several remote repositories
 -- this script serves as a helper for testing them all explicitly.
+
+### Reproducing Cloud Build locally
+
+Running the Cloud Build configuration locally can help reproduce CI-only issues,
+such as problems with hermetic toolchains or missing system packages. Install
+[the Google Cloud CLI](https://docs.cloud.google.com/sdk/docs/install-sdk) and
+Docker, then install the local Cloud Build component:
+
+```console
+sudo apt-get install google-cloud-cli-cloud-build-local
+```
+
+Then run the configuration in local mode, which does not require CI secrets:
+
+```console
+cloud-build-local --config=cloudbuild.yaml --substitutions=_LOCAL_BUILD=true,_USERNAME=local --dryrun=false .
+```
