@@ -26,6 +26,10 @@ steps:
   args:
   - '-c'
   - |
+    set -e
+    if [[ "${_LOCAL_BUILD}" == "true" ]]; then
+      exit 0
+    fi
     gcloud secrets versions access latest --secret=buildbuddy-cert > /root/.ssh/buildbuddy-cert.pem
     gcloud secrets versions access latest --secret=buildbuddy-key > /root/.ssh/buildbuddy-key.pem
     gcloud secrets versions access latest --secret=github-app-key-cloud-build-status-reporter > /root/.ssh/github-app-key-cloud-build-status-reporter.pem
@@ -47,27 +51,32 @@ steps:
     echo "5a408715e932c0250d28bd84555f12edbf70117de42f9181691c736eacc4a992  /usr/local/bin/bazel" | sha256sum -c -
     chmod +x /usr/local/bin/bazel
     export USE_BAZEL_VERSION=8.5.0
-    BUILD_INVOCATION_ID=$(python3 tools/generate_uuid.py)
-    TEST_INVOCATION_ID=$(python3 tools/generate_uuid.py)
-    echo STATUS: Reporting logs with build invocation id $$BUILD_INVOCATION_ID and test invocation id $$TEST_INVOCATION_ID to GitHub.
-    bazel run --config=ciremotebuild //tools:report_status_to_github -- \
-        --head_sha=${COMMIT_SHA} \
-        --build_invocation_id=$$BUILD_INVOCATION_ID \
-        --test_invocation_id=$$TEST_INVOCATION_ID \
-        --github_app_key_file=/root/.ssh/github-app-key-cloud-build-status-reporter.pem
-    echo STATUS: Reported logs to GitHub.
-    EXTRA_BAZEL_ARGS="--build_metadata=USER=${_USERNAME} \
-        --config=ciremotebuild \
-        --bes_results_url=https://app.buildbuddy.io/invocation/ \
-        --noshow_progress" \
-    EXTRA_BUILD_BAZEL_ARGS="--invocation_id=$$BUILD_INVOCATION_ID" \
-    EXTRA_TEST_BAZEL_ARGS="--invocation_id=$$TEST_INVOCATION_ID \
-                           --test_output=errors" \
-        tools/test_everything.py
+    if [[ "${_LOCAL_BUILD}" == "true" ]]; then
+      tools/test_everything.py
+    else
+      BUILD_INVOCATION_ID=$(python3 tools/generate_uuid.py)
+      TEST_INVOCATION_ID=$(python3 tools/generate_uuid.py)
+      echo STATUS: Reporting logs with build invocation id $$BUILD_INVOCATION_ID and test invocation id $$TEST_INVOCATION_ID to GitHub.
+      bazel run --config=ciremotebuild //tools:report_status_to_github -- \
+          --head_sha=${COMMIT_SHA} \
+          --build_invocation_id=$$BUILD_INVOCATION_ID \
+          --test_invocation_id=$$TEST_INVOCATION_ID \
+          --github_app_key_file=/root/.ssh/github-app-key-cloud-build-status-reporter.pem
+      echo STATUS: Reported logs to GitHub.
+      EXTRA_BAZEL_ARGS="--build_metadata=USER=${_USERNAME} \
+          --config=ciremotebuild \
+          --bes_results_url=https://app.buildbuddy.io/invocation/ \
+          --noshow_progress" \
+      EXTRA_BUILD_BAZEL_ARGS="--invocation_id=$$BUILD_INVOCATION_ID" \
+      EXTRA_TEST_BAZEL_ARGS="--invocation_id=$$TEST_INVOCATION_ID \
+                             --test_output=errors" \
+          tools/test_everything.py
+    fi
   timeout: 10800s
   volumes:
   - name: 'ssh'
     path: /root/.ssh
 
 substitutions:
+  _LOCAL_BUILD: "false"
   _USERNAME: $(commit.author.login)
