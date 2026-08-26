@@ -130,7 +130,7 @@ EXTRA_ARGS = {
     },
     "verilog_counter": {
         "place_and_route": dict(
-            sdc = "constraint.sdc",
+            sdc = ":constraint",
         ),
     },
 }
