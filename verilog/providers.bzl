@@ -24,7 +24,7 @@ VerilogInfo = provider(
     },
 )
 
-def make_dag_entry(srcs, hdrs, data, deps, label, tags):
+def make_dag_entry(srcs, hdrs, data, deps, label, tags, includes):
     """Create a new DAG entry for use in VerilogInfo.
 
     As VerilogInfo should be created via 'merge_verilog_info' (rather than directly),
@@ -43,6 +43,7 @@ def make_dag_entry(srcs, hdrs, data, deps, label, tags):
       deps: A list of Label that are deps of this entry.
       label: A Label to use as the name for this entry.
       tags: A list of str. (Ideally) just the entry tags for later filelist filtering.
+      includes: A list of additional include directories. Similar to the parameter of the same name in `cc_library`.  The package path is prepended.
     Returns:
       struct with all these fields properly stored.
     """
@@ -53,6 +54,7 @@ def make_dag_entry(srcs, hdrs, data, deps, label, tags):
         deps = tuple(deps),
         tags = tuple(tags),
         label = label,
+        includes = tuple(includes),
     )
 
 def make_verilog_info(
@@ -92,6 +94,15 @@ def _verilog_library_impl(ctx):
       A struct containing the DAG at this level of the dependency graph.
     """
 
+    full_includes = []
+    for include in ctx.attr.includes:
+        if include[:2] == "//":
+            full_includes += [include[2:]]
+        elif include != "" and include != ".":
+            full_includes += ["/".join([ctx.label.package, dir])]
+        else:
+            full_includes += [dir]
+
     verilog_info = make_verilog_info(
         new_entries = [make_dag_entry(
             srcs = ctx.files.srcs,
@@ -100,6 +111,7 @@ def _verilog_library_impl(ctx):
             deps = ctx.attr.deps,
             label = ctx.label,
             tags = [],
+            includes = full_includes,
         )],
         old_infos = [dep[VerilogInfo] for dep in ctx.attr.deps],
     )
@@ -125,6 +137,9 @@ verilog_library = rule(
         "hdrs": attr.label_list(
             doc = "Verilog or SystemVerilog headers.",
             allow_files = [".vh", ".svh"],
+        ),
+        "includes": attr.string_list(
+            doc = "Include directories to add when necessary",
         ),
         "srcs": attr.label_list(
             doc = "Verilog or SystemVerilog sources.",
