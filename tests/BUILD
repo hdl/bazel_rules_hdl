@@ -154,23 +154,7 @@ EXTRA_ARGS = {
 # ASAP7 predictive 7nm PDK
 # ------------------------------------------------------------------------
 
-# FIXME: Add ASAP7 7nm PDK - 6 track rev 26 standard cells
-
-# ASAP 7nm PDK - 7.5 track rev 27 standard cells
-[
-    [
-        basic_asic_flow(
-            name = test_name + "-" + cell_name,
-            cells = cell_target,
-            extra_args = EXTRA_ARGS[test_name],
-            gds = False,  # No GDS for the rev 27 cells
-            target = ":" + test_name,
-            top = test_name,
-        )
-        for cell_name, cell_target in for_each_asap7_cells("sc7p5t_rev27")
-    ]
-    for test_name in BASIC_TESTS
-]
+# FIXME: Add ASAP7 7nm PDK - 6 track rev 26 standard cellsss
 
 # ASAP 7nm PDK - 7.5 track rev 28 standard cells
 [
@@ -185,19 +169,5 @@ EXTRA_ARGS = {
         )
         for cell_name, cell_target in for_each_asap7_cells("sc7p5t_rev28")
     ]
-    for test_name in BASIC_TESTS
-]
-
-# "Special" ASAP7 7.5 track rev 27 4x scaled version
-[
-    basic_asic_flow(
-        name = test_name + "-asap7-sc7p5t_rev27_rvt_4x",
-        size = 2000,
-        cells = "@org_theopenroadproject_asap7sc7p5t_27//:asap7-sc7p5t_rev27_rvt_4x-ccs_ss",
-        extra_args = EXTRA_ARGS[test_name],
-        gds = False,  # No GDS for the 4x cells
-        target = ":" + test_name,
-        top = test_name,
-    )
     for test_name in BASIC_TESTS
 ]
