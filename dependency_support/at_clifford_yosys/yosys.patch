@@ -1,3 +1,4 @@
+diff --git a/kernel/yosys.cc b/kernel/yosys.cc
 --- kernel/yosys.cc
 +++ kernel/yosys.cc
 @@ -930,13 +930,12 @@ void init_share_dirname()
@@ -16,3 +17,19 @@
  #  endif
  }
  #endif
+diff --git a/libs/subcircuit/subcircuit.cc b/libs/subcircuit/subcircuit.cc
+--- libs/subcircuit/subcircuit.cc
++++ libs/subcircuit/subcircuit.cc
+@@ -24,3 +24,4 @@
+ #include <assert.h>
+ #include <stdarg.h>
+ #include <stdio.h>
++#include <stdlib.h>
+diff --git a/libs/ezsat/ezsat.h b/libs/ezsat/ezsat.h
+--- libs/ezsat/ezsat.h
++++ libs/ezsat/ezsat.h
+@@ -26,3 +26,4 @@
+ #include <string>
+ #include <stdio.h>
+ #include <stdint.h>
++#include <stdlib.h>
