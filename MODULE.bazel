@@ -19,7 +19,17 @@ bazel_dep(name = "googletest", version = "1.17.0.bcr.2", repo_name = "com_google
 bazel_dep(name = "readline", version = "8.3")
 bazel_dep(name = "libffi", version = "3.4.7.bcr.3")
 bazel_dep(name = "rules_bison", version = "0.4")
+
+# TODO: Remove this override once a new version of rules_bison with the missing
+# <cstdlib> include fixed (or with bazel_runfiles_m4 removed) is released.
+single_version_override(
+    module_name = "rules_bison",
+    patch_strip = 1,
+    patches = ["//dependency_support/rules_bison:include_cstdlib.patch"],
+)
+
 bazel_dep(name = "rules_cc", version = "0.2.17")
+bazel_dep(name = "rules_cc_autoconf", version = "0.24.0")
 bazel_dep(name = "rules_flex", version = "0.4")
 bazel_dep(name = "rules_license", version = "1.0.0")
 bazel_dep(name = "rules_proto", version = "7.1.0")
