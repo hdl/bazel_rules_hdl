@@ -43,21 +43,23 @@ def _gds_write_impl(ctx):
     all_lefs = cell_lef + additional_lef + [tech_lef]
     all_gds = platform_gds + additional_gds
 
-    lef_args = " "
-    for file in all_lefs:
-        lef_args += " --input-lef {}".format(file.path)
-    gds_args = " "
-    for file in all_gds:
-        gds_args += " --input-gds {}".format(file.path)
-    gds_allow_empty_args = ""
-    if ctx.attr.gds_allow_empty:
-        gds_allow_empty_args = " --gds-allow-empty {}".format(ctx.attr.gds_allow_empty)
-
     klayout_lyt = open_road_configuration.klayout_tech_file.files.to_list()[0]
     if ctx.file.klayout_lyt:
         klayout_lyt = ctx.file.klayout_lyt
 
-    ctx.actions.run_shell(
+    args = ctx.actions.args()
+    args.add("--design-name", ctx.attr.implemented_rtl[SynthesisInfo].top_module)
+    args.add("--input-def", ctx.attr.implemented_rtl[OpenRoadInfo].routed_def.path)
+    for file in all_lefs:
+        args.add("--input-lef", file.path)
+    for file in all_gds:
+        args.add("--input-gds", file.path)
+    args.add("--tech-file", klayout_lyt.path)
+    if ctx.attr.gds_allow_empty:
+        args.add("--gds-allow-empty", ctx.attr.gds_allow_empty)
+    args.add("--out", final_gds.path)
+
+    ctx.actions.run(
         outputs = [
             final_gds,
         ],
@@ -72,16 +74,9 @@ def _gds_write_impl(ctx):
                 tech_lef,
             ],
         ),
-        command = "{}".format(ctx.executable._gds_write.path) +
-                  " --design-name {}".format(ctx.attr.implemented_rtl[SynthesisInfo].top_module) +
-                  " --input-def {}".format(ctx.attr.implemented_rtl[OpenRoadInfo].routed_def.path) +
-                  lef_args +
-                  gds_args +
-                  " --tech-file {}".format(klayout_lyt.path) +
-                  gds_allow_empty_args +
-                  " --out {}".format(final_gds.path),
-        tools = depset([ctx.executable._gds_write]),
-        toolchain = "//python:current_py_toolchain",
+        arguments = [args],
+        executable = ctx.executable._gds_write,
+        use_default_shell_env = True,
     )
 
     return [DefaultInfo(files = depset([final_gds]))]
