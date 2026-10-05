@@ -19,6 +19,7 @@ def _pdks_extension_impl(ctx):
             "https://github.com/The-OpenROAD-Project/asap7_pdk_r1p7/archive/1ff7649bbf423207f6f70293dc1cf630cd477365.tar.gz",
         ],
         build_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:bundled.BUILD.bazel",
+        type = "tar.gz",
         strip_prefix = "asap7_pdk_r1p7-1ff7649bbf423207f6f70293dc1cf630cd477365",
         sha256 = "b5847f93e55debb49d03ec581e22eb301109ff90c9ad19d35ae1223c70250391",
     )
@@ -28,6 +29,7 @@ def _pdks_extension_impl(ctx):
             "https://github.com/The-OpenROAD-Project/asap7sc6t_26/archive/f572bf760c8bdc853cbafd0742790aba0780089c.tar.gz",
         ],
         build_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7sc6t_26:bundled.BUILD.bazel",
+        type = "tar.gz",
         strip_prefix = "asap7sc6t_26-f572bf760c8bdc853cbafd0742790aba0780089c",
         sha256 = "4bfe15775eaab3a5cc443d444ef82bf7b9c818ba2ed948ce3d9cc6a4cfa1c36c",
     )
@@ -37,6 +39,7 @@ def _pdks_extension_impl(ctx):
             "https://github.com/The-OpenROAD-Project/asap7sc7p5t_27/archive/900f55ed8bef025f39edcc8b8be5e04a2c55c15a.tar.gz",
         ],
         build_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7sc7p5t_27:bundled.BUILD.bazel",
+        type = "tar.gz",
         strip_prefix = "asap7sc7p5t_27-900f55ed8bef025f39edcc8b8be5e04a2c55c15a",
         sha256 = "db5531736a34f34e919488468e8ee09ae87495ff8a6188fad375d68c19e10e20",
     )
@@ -46,6 +49,7 @@ def _pdks_extension_impl(ctx):
             "https://github.com/The-OpenROAD-Project/asap7sc7p5t_28/archive/d88477438935a5a388bd6294f682dc405c93c5d2.tar.gz",
         ],
         build_file = "@rules_hdl//dependency_support/org_theopenroadproject_asap7sc7p5t_28:bundled.BUILD.bazel",
+        type = "tar.gz",
         strip_prefix = "asap7sc7p5t_28-d88477438935a5a388bd6294f682dc405c93c5d2",
         sha256 = "7f028a41425b8d736958cae994b3c1722d4bef2c0d28f6bf507b9ac8138ecc41",
     )
