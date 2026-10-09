@@ -12,22 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import cocotb
-from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge, ClockCycles
+"""Common provider types"""
 
+WaveformInfo = provider(
+    doc = "Waveform collected during a simulation run",
+    fields = {
+        "fsdb_files": "FSDB waveform files",
+        "vcd_files": "VCD waveform files",
+        "vpd_files": "VPD waveform files",
+    },
+)
 
-@cocotb.test()
-async def counter_test(dut):
-    clock = Clock(dut.clk, 10, units="us")
-    cocotb.start_soon(clock.start())
-
-    dut.rst.setimmediatevalue(1)
-    await RisingEdge(dut.clk)
-    dut.rst.value = 0
-
-    reset_value = int(dut.cnt.value)
-
-    CYCLES_TO_WAIT = 10
-    await ClockCycles(dut.clk, CYCLES_TO_WAIT)
-    assert dut.cnt.value == reset_value + CYCLES_TO_WAIT - 1
+LogInfo = provider(
+    doc = "A textual log file provider",
+    fields = {
+        "files": "Log files",
+    },
+)

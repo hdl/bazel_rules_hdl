@@ -32,8 +32,28 @@ def _tools_extension_impl(module_ctx):
         build_file = "//dependency_support/com_icarus_iverilog:bundled.BUILD.bazel",
     )
 
+    # Verilator
+    maybe(
+        http_archive,
+        name = "verilator",
+        urls = ["https://github.com/verilator/verilator/archive/f6f6f84047125cdedef0bb212865cd9088d737dd.tar.gz"],
+        sha256 = "20687977383be53e2be1260d55137dbb904e0f29e710abf74aeb1352f3b8d46b",
+        strip_prefix = "verilator-f6f6f84047125cdedef0bb212865cd9088d737dd",
+        build_file = "//dependency_support/verilator:verilator.BUILD.bazel",
+    )
+
+    # lz4
+    maybe(
+        http_archive,
+        name = "net_lz4",
+        urls = ["https://github.com/lz4/lz4/releases/download/v1.10.0/lz4-1.10.0.tar.gz"],
+        strip_prefix = "lz4-1.10.0",
+        sha256 = "537512904744b35e232912055ccf8ec66d768639ff3abe5788d90d792ec5f48b",
+        build_file = "//dependency_support/net_lz4:net_lz4.BUILD.bazel",
+    )
+
     return module_ctx.extension_metadata(
-        root_module_direct_deps = ["at_clifford_yosys", "com_icarus_iverilog"],
+        root_module_direct_deps = ["at_clifford_yosys", "com_icarus_iverilog", "verilator", "net_lz4"],
         root_module_direct_dev_deps = [],
     )
 

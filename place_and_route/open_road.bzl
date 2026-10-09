@@ -15,7 +15,7 @@
 """File encapsulating the open road command"""
 
 load("//pdk:open_road_configuration.bzl", "get_open_road_configuration")
-load("//synthesis:defs.bzl", "SynthesisInfo")
+load("//synthesis:defs.bzl", "SdcInfo", "SynthesisInfo")
 
 OpenRoadInfo = provider(
     "Provider to support running openroad outside of bazel",
@@ -100,7 +100,9 @@ def clock_commands(ctx):
     Returns:
         Struct with params inputs and commands. Both return values are lists.
     """
-    sdc = ctx.file.sdc
+    sdc = None
+    if ctx.attr.sdc and SdcInfo in ctx.attr.sdc:
+        sdc = ctx.attr.sdc[SdcInfo].sdc.files.to_list()[0]
 
     if sdc:
         return struct(inputs = [sdc], commands = ["read_sdc {}".format(sdc.path)])

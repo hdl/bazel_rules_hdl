@@ -11,6 +11,8 @@ always_ff @(posedge clk) begin
     mod_val <= input_val ^ 4;
 end
 
+logic unconnected; // Deliberate dangling wire to test linting
+
 nested_module_1 nested_module_1 (
     .clk,
     .input_val(mod_val),

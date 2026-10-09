@@ -13,7 +13,7 @@
 # limitations under the License.
 
 load("@rules_cc//cc:defs.bzl", "cc_test")
-load("//verilator:defs.bzl", "verilator_cc_library")
+load("//verilator:defs.bzl", "verilator_cc_binary", "verilator_cc_library", "verilator_lint", "verilator_run")
 load("//verilog:defs.bzl", "verilog_library")
 
 package(
@@ -103,6 +103,9 @@ verilator_cc_library(
     name = "nested_module_2_verilator",
     module = ":nested_module_2",
     module_top = "nested_module_2",
+    vopts = [
+        "--Wno-fatal",
+    ],
 )
 
 cc_test(
@@ -114,5 +117,79 @@ cc_test(
         ":nested_module_2_verilator",
         "@com_google_googletest//:gtest",
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+verilog_library(
+    name = "tb",
+    srcs = [
+        "tb.sv",
+    ],
+    deps = [
+        ":adder",
+    ],
+)
+
+verilator_cc_binary(
+    name = "tb_binary",
+    coverage = "all",
+    module = ":tb",
+    module_top = "tb",
+    trace = True,
+    vopts = [
+        "--timing",
+    ],
+)
+
+verilator_run(
+    name = "tb_run",
+    binary = ":tb_binary",
+)
+
+verilog_library(
+    name = "load_and_count_tb",
+    srcs = [
+        "load_and_count_tb.sv",
+    ],
+    deps = [
+        ":load_and_count",
+    ],
+)
+
+verilator_cc_binary(
+    name = "load_and_count_tb_binary",
+    coverage = "all",
+    module = ":load_and_count_tb",
+    module_top = "tb",
+    trace = True,
+    vopts = [
+        "--timing",
+    ],
+)
+
+verilator_run(
+    name = "load_and_count_tb_run",
+    binary = ":load_and_count_tb_binary",
+)
+
+verilator_lint(
+    name = "nested_module_2_verilator_lint",
+    module = ":nested_module_2",
+    module_top = "nested_module_2",
+    vopts = [
+        "-Wall",
+        "-Wno-fatal",
+    ],
+)
+
+verilator_lint(
+    name = "nested_module_2_verilator_lint_waived",
+    config_files = [
+        "nested_module_2.vlt",
+    ],
+    module = ":nested_module_2",
+    module_top = "nested_module_2",
+    vopts = [
+        "-Wall",
     ],
 )

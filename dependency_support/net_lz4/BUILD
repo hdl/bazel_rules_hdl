@@ -12,34 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_hdl_pip_deps_to_vendor//:requirements.bzl", "requirement")
-load("//cocotb:cocotb.bzl", "cocotb_test")
-load("//verilog:defs.bzl", "verilog_library")
-
 package(
     default_applicable_licenses = ["//:package_license"],
     default_visibility = ["//visibility:private"],
-)
-
-verilog_library(
-    name = "counter",
-    srcs = ["counter.v"],
-)
-
-cocotb_test(
-    name = "cocotb_counter",
-    build_args = [
-        "-Wall",
-    ],
-    defines = {"INIT_CNT": "100"},
-    hdl_toplevel = "counter",
-    hdl_toplevel_lang = "verilog",
-    parameters = {"COUNTER_WIDTH": "8"},
-    seed = "1234567890",
-    test_module = ["cocotb_counter.py"],
-    verilog_sources = [
-        ":counter",
-        "wavedump.v",
-    ],
-    deps = [requirement("cocotb")],
 )
