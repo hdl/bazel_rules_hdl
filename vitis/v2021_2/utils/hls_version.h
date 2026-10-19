@@ -1,0 +1,11 @@
+//Copyright 2011-2021 Xilinx, Inc. All rights reserved.
+
+#ifndef _XILINX_HLS_VERSION_H
+#define _XILINX_HLS_VERSION_H
+#  define XILINX_HLS_VERSION_MAJOR 2021
+#  define XILINX_HLS_VERSION_MINOR 2
+#  define XILINX_HLS_VERSION_PATCH "2021.2"
+#  define XILINX_HLS_VERSION_RELEASE 20212
+#  define XILINX_HLS_VERSION_2021
+#  define XILINX_HLS_VERSION_2021_2
+#endif
