@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_hdl_pip_deps_to_vendor//:requirements.bzl", "requirement")
 load("//cocotb:cocotb.bzl", "cocotb_test")
 load("//verilog:defs.bzl", "verilog_library")
 
@@ -24,22 +23,53 @@ package(
 verilog_library(
     name = "counter",
     srcs = ["counter.v"],
+    hdrs = ["counter_params.svh"],
 )
 
 cocotb_test(
     name = "cocotb_counter",
-    build_args = [
-        "-Wall",
-    ],
+    build_args = ["-Wall"],
     defines = {"INIT_CNT": "100"},
     hdl_toplevel = "counter",
-    hdl_toplevel_lang = "verilog",
     parameters = {"COUNTER_WIDTH": "8"},
     seed = "1234567890",
     test_module = ["cocotb_counter.py"],
-    verilog_sources = [
-        ":counter",
-        "wavedump.v",
-    ],
-    deps = [requirement("cocotb")],
+    verilog_libraries = [":counter"],
 )
+
+[
+    cocotb_test(
+        name = test["name"],
+        build_args = ["-Wall"],
+        defines = {"INIT_CNT": "100"},
+        hdl_toplevel = "counter",
+        parameters = {"COUNTER_WIDTH": "8"},
+        seed = "1234567890",
+        sim = test["sim"],
+        test_module = ["cocotb_counter.py"],
+        verilog_libraries = [":counter"],
+        waves = test["waves"],
+    )
+    for test in [
+        {
+            "name": "cocotb_counter_icarus_no_waves",
+            "sim": "icarus",
+            "waves": "none",
+        },
+        {
+            "name": "cocotb_counter_verilator",
+            "sim": "verilator",
+            "waves": "vcd",
+        },
+        {
+            "name": "cocotb_counter_verilator_fst",
+            "sim": "verilator",
+            "waves": "fst",
+        },
+        {
+            "name": "cocotb_counter_verilator_no_waves",
+            "sim": "verilator",
+            "waves": "none",
+        },
+    ]
+]

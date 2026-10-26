@@ -1,0 +1,31 @@
+"""Project flags"""
+
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+
+# This flag enables coverage collection by Verilator in the sim_genrules
+# Currently limited to enabling ALL or NONE types of coverage
+#
+# Usage:
+# bazel build --config=local --//util:coverage=all
+# bazel build --config=local --//util:coverage=none
+string_flag(
+    name = "coverage",
+    build_setting_default = "none",
+    values = [
+        "none",
+        "all",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "coverage_is_none",
+    flag_values = {":coverage": "none"},
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "coverage_is_all",
+    flag_values = {":coverage": "all"},
+    visibility = ["//visibility:public"],
+)

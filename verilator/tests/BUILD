@@ -13,12 +13,12 @@
 # limitations under the License.
 
 load("@rules_cc//cc:defs.bzl", "cc_test")
-load("//verilator:defs.bzl", "verilator_cc_binary", "verilator_cc_library", "verilator_lint", "verilator_run")
+load("//verilator:defs.bzl", "verilator_cc_binary", "verilator_cc_library", "verilator_lint", "verilator_preprocess", "verilator_run")
 load("//verilog:defs.bzl", "verilog_library")
 
 package(
     default_applicable_licenses = ["//:package_license"],
-    default_visibility = ["//visibility:private"],
+    default_visibility = ["//visibility:public"],
 )
 
 verilog_library(
@@ -147,6 +147,26 @@ verilator_run(
 )
 
 verilog_library(
+    name = "minimal_randomization",
+    srcs = ["minimal_randomization.sv"],
+)
+
+verilator_cc_binary(
+    name = "minimal_randomization_binary",
+    module = ":minimal_randomization",
+    module_top = "minimal_randomization",
+    vopts = [
+        "-Wall",
+        "-Wno-fatal",
+    ],
+)
+
+verilator_run(
+    name = "minimal_randomization_run",
+    binary = ":minimal_randomization_binary",
+)
+
+verilog_library(
     name = "load_and_count_tb",
     srcs = [
         "load_and_count_tb.sv",
@@ -192,4 +212,23 @@ verilator_lint(
     vopts = [
         "-Wall",
     ],
+)
+
+verilog_library(
+    name = "test_include",
+    srcs = ["test_include/consumer/test_include.sv"],
+    hdrs = [
+        "test_include/foo/bar/test_header.vh",
+    ],
+)
+
+verilator_lint(
+    name = "test_include_verilator_lint",
+    module = ":test_include",
+    module_top = "test_include",
+)
+
+verilator_preprocess(
+    name = "adder_preprocess",
+    module = ":adder",
 )

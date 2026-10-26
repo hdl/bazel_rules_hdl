@@ -14,20 +14,23 @@
 
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge, ClockCycles
+from cocotb.handle import Immediate
+from cocotb.triggers import ClockCycles, FallingEdge, ReadOnly, RisingEdge
 
 
 @cocotb.test()
 async def counter_test(dut):
-    clock = Clock(dut.clk, 10, units="us")
-    cocotb.start_soon(clock.start())
+    clock = Clock(dut.clk, 10, unit="us")
+    clock.start()
 
-    dut.rst.setimmediatevalue(1)
+    dut.rst.set(Immediate(1))
     await RisingEdge(dut.clk)
-    dut.rst.value = 0
-
+    await ReadOnly()
     reset_value = int(dut.cnt.value)
+    await FallingEdge(dut.clk)
+    dut.rst.value = 0
 
     CYCLES_TO_WAIT = 10
     await ClockCycles(dut.clk, CYCLES_TO_WAIT)
-    assert dut.cnt.value == reset_value + CYCLES_TO_WAIT - 1
+    await ReadOnly()
+    assert dut.cnt.value == reset_value + CYCLES_TO_WAIT

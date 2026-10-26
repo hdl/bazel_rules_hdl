@@ -2,7 +2,7 @@ dataclasses-json==0.6.7
 jwt==1.4.0
 requests==2.32.5
 absl-py==2.4.0
-cocotb==1.9.2
+cocotb==2.1.0
 klayout==0.30.7
 cffi>=2.0.0
 
@@ -10,5 +10,4 @@ cffi>=2.0.0
 # Older versions (like 41.0.4) do not have pre-compiled Python 3.13 wheels on PyPI,
 # which forces resource-intensive compilation from source.
 cryptography>=43.0.0
-
 

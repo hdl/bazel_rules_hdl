@@ -1,0 +1,55 @@
+load("//macros/log_test_test:log_test_test.bzl", "log_test_case")
+
+log_test_case(
+    name = "clean_log",
+    expect_rejection = False,
+    log = "testdata/golden/clean.log",
+)
+
+log_test_case(
+    name = "fatal_at_time",
+    expect_rejection = True,
+    log = "testdata/negative/fatal_at_time.log",
+)
+
+log_test_case(
+    name = "test_failed_checks",
+    expect_rejection = True,
+    log = "testdata/negative/test_failed_checks.log",
+)
+
+log_test_case(
+    name = "error",
+    expect_rejection = True,
+    log = "testdata/negative/error.log",
+)
+
+log_test_case(
+    name = "offending",
+    expect_rejection = True,
+    log = "testdata/negative/offending.log",
+)
+
+log_test_case(
+    name = "verilator_fatal",
+    expect_rejection = True,
+    log = "testdata/negative/verilator_fatal.log",
+)
+
+log_test_case(
+    name = "uvm_test_failed",
+    expect_rejection = True,
+    log = "testdata/negative/uvm_test_failed.log",
+)
+
+log_test_case(
+    name = "uvm_fatal",
+    expect_rejection = True,
+    log = "testdata/negative/uvm_fatal.log",
+)
+
+log_test_case(
+    name = "uvm_error",
+    expect_rejection = True,
+    log = "testdata/negative/uvm_error.log",
+)

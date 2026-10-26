@@ -3,7 +3,9 @@
 
 import argparse
 import shutil
+import sys
 from pathlib import Path
+from itertools import batched
 
 
 def parse_args() -> argparse.Namespace:
@@ -11,23 +13,11 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "--append-destination",
-        action="append",
-        default=[],
-        help="An additional directory appended to the destination"
-    )
-
-    parser.add_argument(
-        "srcs",
+        "paths_pairs",
         type=Path,
         nargs="*",
-        help="Paths to source files",
-    )
-
-    parser.add_argument(
-        "destination",
-        type=Path,
-        help="The destination directory"
+        # Destination is first to make the script easy to use with ctx.actions.args().add_all()
+        help="Pairs of paths, destination directory followed by source file",
     )
 
     return parser.parse_args()
@@ -37,13 +27,14 @@ def main() -> None:
     """The main entrypoint"""
 
     args = parse_args()
-    dest = args.destination
-    for dir in args.append_destination:
-        dest /= dir
+    paths_pairs = args.paths_pairs
 
-    dest.mkdir(exist_ok=True, parents=True)
-    for file in args.srcs:
-        shutil.copyfile(str(file), str(dest / file.name), follow_symlinks=True)
+    if len(paths_pairs) % 2:
+        sys.exit("Count of paths must be even")
+
+    for destination, source in batched(paths_pairs, n=2):
+        destination.mkdir(exist_ok=True, parents=True)
+        shutil.copyfile(source, destination / source.name, follow_symlinks=True)
 
 
 if __name__ == "__main__":

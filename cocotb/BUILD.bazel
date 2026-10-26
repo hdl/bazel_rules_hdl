@@ -12,18 +12,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load(":verilator/cocotb.bzl", "cocotb_verilator_support")
 
 package(
     default_applicable_licenses = ["//:package_license"],
     default_visibility = ["//visibility:private"],
 )
 
+cocotb_verilator_support(
+    name = "cocotb_verilator_support",
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "cocotb_wrapper_lib",
+    srcs = ["private/rules_hdl_cocotb_wrapper/common.py"],
+    imports = ["private"],
+    deps = ["@rules_hdl_pip_deps_to_vendor//cocotb"],
+)
+
 py_binary(
-    name = "cocotb_wrapper",
-    srcs = ["cocotb_wrapper.py"],
+    name = "cocotb_wrapper_icarus",
+    srcs = ["icarus/cocotb_wrapper.py"],
+    legacy_create_init = False,
+    main = "icarus/cocotb_wrapper.py",
     python_version = "PY3",
     srcs_version = "PY3",
     visibility = ["//visibility:public"],
-    deps = ["@rules_hdl_pip_deps_to_vendor//cocotb"],
+    deps = [":cocotb_wrapper_lib"],
+)
+
+py_binary(
+    name = "cocotb_wrapper_verilator",
+    srcs = ["verilator/cocotb_wrapper.py"],
+    legacy_create_init = False,
+    main = "verilator/cocotb_wrapper.py",
+    python_version = "PY3",
+    srcs_version = "PY3",
+    visibility = ["//visibility:public"],
+    deps = [":cocotb_wrapper_lib"],
 )

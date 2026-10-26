@@ -1,0 +1,1 @@
+`define CNT_DEF_WIDTH 32

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load(":defs.bzl", "verilator_toolchain")
+load(":defs.bzl", "verilator_toolchain", "z3_executable")
 
 package(
     default_applicable_licenses = ["//:package_license"],
@@ -41,4 +41,9 @@ toolchain(
     toolchain = ":verilator_toolchain_impl",
     toolchain_type = ":toolchain_type",
     visibility = ["//visibility:public"],
+)
+
+z3_executable(
+    name = "z3",
+    z3 = "@z3//:z3_static",
 )

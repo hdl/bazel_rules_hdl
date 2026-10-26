@@ -15,6 +15,7 @@
 
 """Functions for verilator."""
 
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@rules_cc//cc:defs.bzl", "CcInfo")
@@ -53,7 +54,7 @@ def cc_compile(ctx, srcs, hdrs, deps, includes = [], defines = []):
         actions = ctx.actions,
         feature_configuration = feature_configuration,
         cc_toolchain = cc_toolchain,
-        user_compile_flags = ctx.attr.copts,
+        user_compile_flags = _VERILATOR_DEFAULT_COPTS + ctx.attr.copts,
         srcs = srcs,
         includes = includes,
         defines = defines,
@@ -151,6 +152,7 @@ def cc_compile_and_link_binary(ctx, srcs, hdrs, deps, runfiles, includes = [], d
 
     return [
         DefaultInfo(
+            files = depset([linking_output.executable]),
             executable = linking_output.executable,
             runfiles = ctx.runfiles(files = runfiles),
         ),
@@ -172,22 +174,6 @@ def _only_hpp(f):
         return f.path
     return None
 
-def _copy_action(ctx, suffix, files, map_each):
-    dir = ctx.actions.declare_directory(ctx.label.name + suffix)
-
-    args = ctx.actions.args()
-    args.add_all(files, map_each = map_each)
-    args.add(dir.path)
-    ctx.actions.run(
-        mnemonic = "VerilatorCopyTree",
-        arguments = [args],
-        inputs = files,
-        outputs = [dir],
-        executable = ctx.executable._copy_tree,
-    )
-
-    return dir
-
 def _verilator_toolchain_env(toolchain):
     root_files = toolchain.root.files.to_list()
     if len(root_files) != 1:
@@ -197,7 +183,7 @@ def _verilator_toolchain_env(toolchain):
         "VERILATOR_ROOT": root_files[0].path,
     }
 
-def _verilator_args(ctx, srcs, vopts = [], config_files = []):
+def _verilator_args(ctx, srcs, vopts = [], config_files = [], user_vopts = []):
     """Given a depset of input files to Verilator returns invocation arguments and list of source, header and run files.
     """
     verilator_toolchain = ctx.toolchains["@rules_hdl//verilator:toolchain_type"]
@@ -219,15 +205,25 @@ def _verilator_args(ctx, srcs, vopts = [], config_files = []):
         else:
             verilog_files.append(file)
 
-    # Include directories
-    include_dirs = depset([f.dirname for f in (verilog_files + all_hdrs)]).to_list()
+    # Base include directories
+    base_include_dirs = depset([f.dirname for f in (verilog_files + all_hdrs)]).to_list()
+
+    # For each include directory traverse it back to root and add all intermediate
+    # directories as potential locations of include files. Deduplicate the final
+    # list via depset()
+    include_dirs = []
+    for dirname in base_include_dirs:
+        parts = dirname.split("/")
+        for i in range(len(parts)):
+            include_dirs.append("/".join([parts[j] for j in range(0, i + 1)]))
+    include_dirs = depset(include_dirs).to_list()
 
     # Args
     args = ctx.actions.args()
     args.add(verilator_toolchain.verilator)
     args.add_all(vopts)
     args.add_all(verilator_toolchain.extra_vopts)
-    args.add_all(ctx.attr.vopts, expand_directories = False)
+    args.add_all(user_vopts, expand_directories = False)
 
     # Configuration files are passed like source files.
     # It's recommended to pass them before source files,
@@ -243,35 +239,63 @@ def _verilator_args(ctx, srcs, vopts = [], config_files = []):
     # Return args, sources, headers and runfiles
     return args, verilog_files, all_hdrs, runfiles
 
-def _verilator_cc(ctx, opts = []):
+def verilator_generate_cc(ctx, verilog_dags, module_top, trace = False, trace_format = None, coverage = "none", opts = [], user_vopts = [], prefix = None):
+    """Generate C++ sources for a Verilog design using the Verilator toolchain.
+
+    Args:
+      ctx: Rule context used to declare and run the Verilator actions.
+      verilog_dags: Verilog dependency DAGs containing the design sources.
+      module_top: Name of the top-level Verilog module.
+      trace: Whether to enable waveform tracing in the generated model.
+      trace_format: Optional waveform format (`vcd` or `fst`).
+      coverage: Coverage instrumentation mode.
+      opts: Verilator options controlled by the calling rule.
+      user_vopts: Additional Verilator options supplied by the user.
+      prefix: Optional prefix for generated model classes and files.
+
+    Returns:
+      A tuple containing the generated C++ sources, generated headers, and
+      runtime files required by the design.
+    """
     verilator_toolchain = ctx.toolchains["@rules_hdl//verilator:toolchain_type"]
 
     # Sources
-    srcs = depset([], transitive = [ctx.attr.module[VerilogInfo].dag]).to_list()
+    srcs = depset([], transitive = verilog_dags).to_list()
 
     output = ctx.actions.declare_directory(ctx.label.name + "-gen")
-    prefix = "V" + ctx.attr.module_top
+    prefix = prefix or "V" + module_top
 
     # Options
     vopts = list(opts)
 
     vopts.extend(["--cc"])
     vopts.extend(["--Mdir", output.path])
-    vopts.extend(["--top-module", ctx.attr.module_top])
+    vopts.extend(["--top-module", module_top])
     vopts.extend(["--prefix", prefix])
 
-    if ctx.attr.trace:
-        vopts.extend(["--trace"])
+    if trace_format:
+        if not trace:
+            fail("trace_format requires trace = True")
+        if trace_format not in ["vcd", "fst"]:
+            fail("Unsupported trace format '{}'; expected 'vcd' or 'fst'".format(trace_format))
+        vopts.append("--trace-{}".format(trace_format))
+    elif trace:
+        vopts.append("--trace")
 
-    if ctx.attr.coverage == "all":
+    if coverage == "all":
         vopts.extend(["--coverage"])
-    if ctx.attr.coverage == "line":
+    if coverage == "line":
         vopts.extend(["--coverage-line"])
-    if ctx.attr.coverage == "toggle":
+    if coverage == "toggle":
         vopts.extend(["--coverage-toggle"])
 
     # Assemble Verilator args
-    args, vlog_srcs, vlog_hdrs, runfiles = _verilator_args(ctx, srcs, vopts)
+    args, vlog_srcs, vlog_hdrs, runfiles = _verilator_args(
+        ctx,
+        srcs,
+        vopts,
+        user_vopts = user_vopts,
+    )
 
     env = _verilator_toolchain_env(verilator_toolchain)
     if verilator_toolchain._avoid_nondeterministic_outputs:
@@ -290,18 +314,99 @@ def _verilator_cc(ctx, opts = []):
     )
 
     # Copy
+    # All files are copied in a single action to avoid compilation of unchanged files by cc_common.compile()
     copy_input = depset([output], transitive = [verilator_toolchain.shared[DefaultInfo].files])
+    output_cpp = ctx.actions.declare_directory(ctx.label.name + "_cpp")
+    output_hpp = ctx.actions.declare_directory(ctx.label.name + "_hpp")
 
-    verilator_output_cpp = _copy_action(ctx, "_cpp", copy_input, _only_cpp)
-    verilator_output_hpp = _copy_action(ctx, "_h", copy_input, _only_hpp)
+    args = ctx.actions.args()
+    args.add_all(copy_input, map_each = _only_cpp, before_each = output_cpp.path)
+    args.add_all(copy_input, map_each = _only_hpp, before_each = output_hpp.path)
 
-    return verilator_output_cpp, verilator_output_hpp, runfiles
+    ctx.actions.run(
+        mnemonic = "VerilatorCopyTree",
+        arguments = [args],
+        inputs = copy_input,
+        outputs = [output_cpp, output_hpp],
+        executable = ctx.executable._copy_tree,
+    )
+
+    return output_cpp, output_hpp, runfiles
+
+def verilator_build_binary(
+        ctx,
+        verilog_dags,
+        module_top,
+        extra_srcs = [],
+        extra_deps = [],
+        extra_runfiles = [],
+        trace = False,
+        trace_format = None,
+        coverage = "none",
+        opts = [],
+        user_vopts = [],
+        prefix = None,
+        defines = []):
+    """Generate a Verilated model and link it into an executable.
+
+    Args:
+      ctx: Rule context used to declare the generation and linking actions.
+      verilog_dags: Verilog dependency DAGs containing the design sources.
+      module_top: Name of the top-level Verilog module.
+      extra_srcs: Additional C++ sources to compile into the executable.
+      extra_deps: Additional C++ dependencies to link into the executable.
+      extra_runfiles: Additional files required by the executable at runtime.
+      trace: Whether to enable waveform tracing in the generated model.
+      trace_format: Optional waveform format (`vcd` or `fst`).
+      coverage: Coverage instrumentation mode.
+      opts: Verilator options controlled by the calling rule.
+      user_vopts: Additional Verilator options supplied by the user.
+      prefix: Optional prefix for generated model classes and files.
+      defines: C++ preprocessor definitions used when compiling the model.
+
+    Returns:
+      Providers for the linked Verilator executable.
+    """
+    generated_cpp, generated_hpp, design_runfiles = verilator_generate_cc(
+        ctx,
+        verilog_dags = verilog_dags,
+        module_top = module_top,
+        trace = trace,
+        trace_format = trace_format,
+        coverage = coverage,
+        opts = opts,
+        user_vopts = user_vopts,
+        prefix = prefix,
+    )
+    verilator_toolchain = ctx.toolchains["@rules_hdl//verilator:toolchain_type"]
+    return cc_compile_and_link_binary(
+        ctx,
+        srcs = [generated_cpp] + extra_srcs,
+        hdrs = [generated_hpp],
+        deps = verilator_toolchain.deps + extra_deps,
+        runfiles = design_runfiles + extra_runfiles,
+        includes = [generated_hpp.path],
+        defines = defines,
+    )
+
+def _verilator_cc(ctx, opts = []):
+    return verilator_generate_cc(
+        ctx,
+        verilog_dags = [ctx.attr.module[VerilogInfo].dag],
+        module_top = ctx.attr.module_top,
+        trace = ctx.attr.trace,
+        coverage = ctx.attr.coverage,
+        opts = opts,
+        user_vopts = ctx.attr.vopts,
+    )
 
 # Options from verilator/include/verilated.mk
 _VERILATOR_DEFAULT_COPTS = [
-    "-std=gnu++20",
+    "-std=c++20",
     "-faligned-new",
     "-fcf-protection=none",
+    "-Wextra",
+    "-Wfloat-conversion",
     "-Wno-bool-operation",
     "-Wno-shadow",
     "-Wno-sign-compare",
@@ -311,9 +416,6 @@ _VERILATOR_DEFAULT_COPTS = [
     "-Wno-unused-but-set-variable",
     "-Wno-unused-parameter",
     "-Wno-unused-variable",
-    "-Wextra",
-    "-Wfloat-conversion",
-    "-Wlogical-op",
 ]
 
 def _verilator_cc_library(ctx):
@@ -339,8 +441,7 @@ verilator_cc_library = rule(
     implementation = _verilator_cc_library,
     attrs = {
         "copts": attr.string_list(
-            doc = "List of additional compilation flags",
-            default = _VERILATOR_DEFAULT_COPTS,
+            doc = "Additional compilation flags appended after the Verilator defaults",
         ),
         "coverage": attr.string(
             doc = "Enable coverage collection",
@@ -392,29 +493,55 @@ verilator_cc_library = rule(
     fragments = ["cpp"],
 )
 
-def _verilator_cc_binary(ctx):
-    verilator_toolchain = ctx.toolchains["@rules_hdl//verilator:toolchain_type"]
+def _z3_executable_impl(ctx):
+    z3_files = ctx.attr.z3[DefaultInfo].files.to_list()
 
-    # Do verilation
-    verilator_output_cpp, verilator_output_hpp, runfiles = _verilator_cc(
-        ctx,
-        opts = ["--main"],
+    z3 = None
+    for f in z3_files:
+        if f.basename == "z3" and f.path.endswith("/bin/z3"):
+            z3 = f
+            break
+
+    if z3 == None:
+        fail("Could not find bin/z3 in @z3//:z3_static")
+
+    executable = ctx.actions.declare_file("z3")
+
+    ctx.actions.symlink(
+        output = executable,
+        target_file = z3,
     )
 
-    # Do actual compile
-    defines = ["VM_TRACE"] if ctx.attr.trace else []
+    return DefaultInfo(
+        executable = executable,
+        files = depset([executable]),
+    )
 
+z3_executable = rule(
+    implementation = _z3_executable_impl,
+    executable = True,
+    attrs = {
+        "z3": attr.label(
+            mandatory = True,
+            cfg = "exec",
+        ),
+    },
+)
+
+def _verilator_cc_binary(ctx):
+    defines = ["VM_TRACE"] if ctx.attr.trace else []
     if ctx.attr.coverage != "none":
         defines.append("VM_COVERAGE")
 
-    result = cc_compile_and_link_binary(
+    result = verilator_build_binary(
         ctx,
-        srcs = [verilator_output_cpp],
-        hdrs = [verilator_output_hpp],
+        verilog_dags = [ctx.attr.module[VerilogInfo].dag],
+        module_top = ctx.attr.module_top,
+        trace = ctx.attr.trace,
+        coverage = ctx.attr.coverage,
+        opts = ["--main"],
+        user_vopts = ctx.attr.vopts,
         defines = defines,
-        runfiles = runfiles,
-        includes = [verilator_output_hpp.path],
-        deps = verilator_toolchain.deps,
     )
 
     return result + [VerilatedBinaryInfo(coverage = ctx.attr.coverage, trace = ctx.attr.trace)]
@@ -423,8 +550,7 @@ verilator_cc_binary = rule(
     implementation = _verilator_cc_binary,
     attrs = {
         "copts": attr.string_list(
-            doc = "List of additional compilation flags",
-            default = _VERILATOR_DEFAULT_COPTS,
+            doc = "Additional compilation flags appended after the Verilator defaults",
         ),
         "coverage": attr.string(
             doc = "Enable coverage collection",
@@ -477,6 +603,74 @@ verilator_cc_binary = rule(
     fragments = ["cpp"],
 )
 
+def _verilator_preprocess_impl(ctx):
+    verilator_toolchain = ctx.toolchains["@rules_hdl//verilator:toolchain_type"]
+
+    # Sources
+    srcs = depset([], transitive = [ctx.attr.module[VerilogInfo].dag]).to_list()
+
+    output = ctx.actions.declare_file(paths.join(ctx.label.name, ctx.attr.out))
+
+    # Options
+    vopts = []
+    vopts.extend(["-E"])
+    vopts.extend(["-P"])
+
+    # Assemble Verilator args
+    args, vlog_srcs, vlog_hdrs, _ = _verilator_args(
+        ctx,
+        srcs,
+        vopts,
+        user_vopts = ctx.attr.vopts,
+    )
+
+    args.add("--stdout")
+    args.add(output.path)
+
+    ctx.actions.run(
+        outputs = [output],
+        inputs = vlog_srcs + vlog_hdrs,
+        tools = [verilator_toolchain.all_files, ctx.executable._run_wrapper],
+        env = _verilator_toolchain_env(verilator_toolchain),
+        executable = ctx.executable._run_wrapper,
+        arguments = [args],
+        mnemonic = "VerilatorPreprocess",
+        progress_message = "[Verilator] Preprocessing {}".format(ctx.label),
+    )
+
+    return [DefaultInfo(files = depset([output]))]
+
+verilator_preprocess = rule(
+    implementation = _verilator_preprocess_impl,
+    attrs = {
+        "module": attr.label(
+            doc = "The top level module target to verilate.",
+            providers = [VerilogInfo],
+            mandatory = True,
+        ),
+        "out": attr.string(
+            doc = "Name of the generated preprocessed output file.",
+            default = "preprocessed.v",
+        ),
+        "vopts": attr.string_list(
+            doc = "Additional command line options to pass to Verilator",
+            default = ["-Wall"],
+        ),
+        "_run_wrapper": attr.label(
+            doc = "A wrapper utility for running verilator",
+            cfg = "exec",
+            executable = True,
+            default = Label("//verilator/private:verilator_run_wrapper"),
+        ),
+    },
+    provides = [
+        DefaultInfo,
+    ],
+    toolchains = [
+        "@rules_hdl//verilator:toolchain_type",
+    ],
+)
+
 def _verilator_run(ctx):
     result = []
     args = []
@@ -521,13 +715,17 @@ def _verilator_run(ctx):
 
     # Target runfiles
     runfiles = ctx.attr.binary[DefaultInfo].default_runfiles.files.to_list()
+    runfiles = runfiles + ctx.attr._smt_solver[DefaultInfo].default_runfiles.files.to_list()
 
     # Run
     ctx.actions.run(
         outputs = outputs,
         inputs = runfiles,
-        tools = [ctx.executable._run_wrapper],
+        tools = [ctx.executable._run_wrapper, ctx.executable._smt_solver],
         executable = ctx.executable._run_wrapper,
+        env = {
+            "Z3_DIR": ctx.executable._smt_solver.dirname,
+        },
         arguments = args,
         mnemonic = "RunVerilatedBinary",
         use_default_shell_env = False,
@@ -568,6 +766,12 @@ verilator_run = rule(
             executable = True,
             default = Label("//verilator/private:verilator_run_wrapper"),
         ),
+        "_smt_solver": attr.label(
+            doc = "SMT solver for constrained randomization",
+            cfg = "exec",
+            executable = True,
+            default = Label(":z3"),
+        ),
     },
     provides = [
         DefaultInfo,
@@ -586,7 +790,13 @@ def _verilator_lint(ctx):
         "--lint-only",
     ]
     vopts.extend(["--top-module", ctx.attr.module_top])
-    args, vlog_srcs, vlog_hdrs, _ = _verilator_args(ctx, srcs, vopts, ctx.files.config_files)
+    args, vlog_srcs, vlog_hdrs, _ = _verilator_args(
+        ctx,
+        srcs,
+        vopts,
+        ctx.files.config_files,
+        user_vopts = ctx.attr.vopts,
+    )
 
     # Capture stderr to the log file
     log_file = ctx.actions.declare_file(ctx.label.name + ".log")

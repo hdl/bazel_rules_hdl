@@ -36,9 +36,9 @@ def _tools_extension_impl(module_ctx):
     maybe(
         http_archive,
         name = "verilator",
-        urls = ["https://github.com/verilator/verilator/archive/f6f6f84047125cdedef0bb212865cd9088d737dd.tar.gz"],
-        sha256 = "20687977383be53e2be1260d55137dbb904e0f29e710abf74aeb1352f3b8d46b",
-        strip_prefix = "verilator-f6f6f84047125cdedef0bb212865cd9088d737dd",
+        urls = ["https://github.com/verilator/verilator/archive/v5.052.tar.gz"],
+        sha256 = "8c8d2e11e6ad32f641dd250742a94195ddecb912e2e2dabe2f42ddbbb99c1092",
+        strip_prefix = "verilator-5.052",
         build_file = "//dependency_support/verilator:verilator.BUILD.bazel",
     )
 

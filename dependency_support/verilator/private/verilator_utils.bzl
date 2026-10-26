@@ -342,15 +342,20 @@ def _verilator_root_impl(ctx):
     dir = ctx.actions.declare_directory(ctx.label.name)
 
     cp_args = ctx.actions.args()
-    cp_args.add("--append-destination", "include")
-    for file in ctx.files.include:
-        cp_args.add(file.path)
-    cp_args.add(dir.path)
+    for destination, files in [
+        ("include", ctx.files.include),
+        ("include/fstcpp", ctx.files.fstcpp),
+        ("include/vltstd", ctx.files.vltstd),
+        ("bin", ctx.files.bin),
+    ]:
+        cp_args.add_all(files, before_each = dir.path + "/" + destination)
+
+    inputs = ctx.files.include + ctx.files.fstcpp + ctx.files.vltstd + ctx.files.bin
 
     ctx.actions.run(
         mnemonic = "VerilatorCopyTree",
         arguments = [cp_args],
-        inputs = ctx.files.include,
+        inputs = inputs,
         outputs = [dir],
         executable = ctx.executable._copy_tree,
     )
@@ -363,9 +368,18 @@ verilator_root = rule(
     doc = "Creates a directory with layout expected for the VERILATOR_ROOT directory",
     implementation = _verilator_root_impl,
     attrs = {
+        "bin": attr.label_list(
+            allow_files = True,
+        ),
+        "fstcpp": attr.label_list(
+            allow_files = True,
+        ),
         "include": attr.label_list(
             allow_files = True,
             mandatory = True,
+        ),
+        "vltstd": attr.label_list(
+            allow_files = True,
         ),
         "_copy_tree": attr.label(
             doc = "A tool for copying a tree of files",

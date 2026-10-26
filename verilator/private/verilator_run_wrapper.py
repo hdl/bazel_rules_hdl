@@ -60,11 +60,18 @@ def main():
     o = open(ns.stdout, "w") if ns.stdout else None
     e = open(ns.stderr, "w") if ns.stderr else None
 
+    env = os.environ.copy()
+
+    z3_dir = os.environ.get("Z3_DIR")
+    if z3_dir:
+        env["PATH"] = z3_dir + os.pathsep + env.get("PATH", "")
+
     p = subprocess.run(
         [binary] + args,
         cwd=ns.workdir,
         stdout=o,
         stderr=e,
+        env=env,
     )
 
     # Move the coverage file

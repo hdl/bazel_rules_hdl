@@ -14,8 +14,10 @@
 
 `timescale 1us/1us
 
+`include "counter_params.svh"
+
 module counter #(
-    parameter COUNTER_WIDTH = 32
+    parameter COUNTER_WIDTH = `CNT_DEF_WIDTH
 ) (
     input wire clk,
     input wire rst,
