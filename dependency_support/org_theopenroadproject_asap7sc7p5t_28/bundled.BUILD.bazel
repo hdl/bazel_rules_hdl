@@ -40,11 +40,26 @@ By default if not otherwise explicitly specified the default selection will be
 the 7.5 track library using RVT transistors and slow corner.
 """
 
-load("@rules_hdl//pdk:open_road_configuration.bzl", "open_road_pdk_configuration")
 load("@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:asap7.bzl", "asap7_cell_library")
 load("@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:asap7.bzl", "asap7_cells_files")
 load("@rules_hdl//dependency_support/org_theopenroadproject_asap7_pdk_r1p7:asap7.bzl", "asap7_srams_files")
+load("@rules_hdl//pdk:open_road_configuration.bzl", "open_road_pdk_configuration")
+load("@rules_license//rules:license.bzl", "license")
 
+# Arizona State Predictive PDK and Cell Library
+package(
+    default_applicable_licenses = ["@org_theopenroadproject_asap7sc7p5t_28//:license"],
+    default_visibility = ["//visibility:public"],
+)
+
+license(
+    name = "license",
+    package_name = "asap7sc7p5t_28",
+)
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
 
 # From org_theopenroadproject_asap7sc7p5t_28/cells-lvt.bzl
 """ ASAP7 "rev 28" 7.5 track standard cell library using Low VT transistors """
